@@ -1,7 +1,6 @@
 /* $Id$ */
 #include "bbs.h"
 static char            currmaildir[32];
-static char     msg_cc[] = "\033[32m[群組名單]\033[m\n";
 static char     listfile[] = "list.0";
 static int      mailkeep = 0, mailsum = 0;
 static int      mailsumlimit = 0, mailmaxkeep = 0;
@@ -18,20 +17,20 @@ setforward()
 	fscanf(fp, "%s", ip); // XXX check buffer size
 	fclose(fp);
     }
-    getdata_buf(b_lines - 1, 0, "請輸入信箱自動轉寄的email地址:",
+    getdata_buf(b_lines - 1, 0, SHM->i18nstr[cuser.language][1202],
 		ip, sizeof(ip), DOECHO);
     if (ip[0] && ip[0] != ' ') {
-	getdata(b_lines, 0, "確定開啟自動轉信功\能?(Y/n)", yn, sizeof(yn),
+	getdata(b_lines, 0, SHM->i18nstr[cuser.language][1203], yn, sizeof(yn),
 		LCECHO);
 	if (yn[0] != 'n' && (fp = fopen(buf, "w"))) {
 	    fprintf(fp, "%s", ip);
 	    fclose(fp);
-	    vmsg("設定完成!");
+	    vmsg(SHM->i18nstr[cuser.language][1204]);
 	    return 0;
 	}
     }
     unlink(buf);
-    vmsg("取消自動轉信!");
+    vmsg(SHM->i18nstr[cuser.language][1205]);
     return 0;
 }
 
@@ -41,11 +40,9 @@ built_mail_index()
     char            genbuf[128];
 
     move(b_lines - 4, 0);
-    outs("本功\能只在信箱檔毀損時使用，\033[1;33m無法\033[m救回被刪除的信件。\n"
-	 "除非您清楚這個功\能的作用，否則\033[1;33m請不要使用\033[m。\n"
-	 "警告：任意的使用將導致\033[1;33m不可預期的結果\033[m！\n");
+    outs(SHM->i18nstr[cuser.language][1206]);
     getdata(b_lines - 1, 0,
-	    "確定重建信箱?(y/N)", genbuf, 3,
+	    SHM->i18nstr[cuser.language][1207], genbuf, 3,
 	    LCECHO);
     if (genbuf[0] != 'y')
 	return 0;
@@ -54,7 +51,7 @@ built_mail_index()
 	     BBSHOME "/bin/buildir " BBSHOME "/home/%c/%s",
 	     cuser.userid[0], cuser.userid);
     move(22, 0);
-    prints("\033[1;31m已經處理完畢!! 諸多不便 敬請原諒~\033[m");
+    prints(SHM->i18nstr[cuser.language][1208]);
     pressanykey();
     system(genbuf);
     return 0;
@@ -119,13 +116,13 @@ m_internet()
 {
     char            receiver[60];
 
-    getdata(20, 0, "收信人：", receiver, sizeof(receiver), DOECHO);
+    getdata(20, 0, SHM->i18nstr[cuser.language][1209], receiver, sizeof(receiver), DOECHO);
     if (strchr(receiver, '@') && !invalidaddr(receiver) &&
-	getdata(21, 0, "主  題：", save_title, STRLEN, DOECHO))
+	getdata(21, 0, SHM->i18nstr[cuser.language][1210], save_title, STRLEN, DOECHO))
 	do_send(receiver, save_title);
     else {
 	move(22, 0);
-	outs("收信人或主題不正確, 請重新選取指令");
+	outs(SHM->i18nstr[cuser.language][1211]);
 	pressanykey();
     }
     return 0;
@@ -157,13 +154,12 @@ chkmailbox()
 	mailmaxkeep = max_keepmail + cuser.exmailbox;
 	m_init();
 	if ((mailkeep = get_num_records(currmaildir, sizeof(fileheader_t))) >
-	    mailmaxkeep ||
-	    (mailsum = get_sum_records(currmaildir, sizeof(fileheader_t))) >
-            mailsumlimit) {
+		mailmaxkeep ||
+		(mailsum = get_sum_records(currmaildir, sizeof(fileheader_t))) >
+			mailsumlimit) {
 	    bell();
 	    bell();
-	    vmsg("您保存信件數目或容量 %d 超出上限 %d, 請整理",
-		   mailkeep, mailmaxkeep);
+	    vmsg(SHM->i18nstr[cuser.language][1212], mailkeep, mailmaxkeep);
 	    return mailkeep;
 	}
     }
@@ -181,7 +177,7 @@ do_hold_mail(char *fpath, char *receiver, char *holder)
     stampfile(buf, &mymail);
 
     mymail.filemode = FILE_READ ;
-    strlcpy(mymail.owner, "[備.忘.錄]", sizeof(mymail.owner));
+    strlcpy(mymail.owner, SHM->i18nstr[cuser.language][1214], sizeof(mymail.owner));
     if (receiver) {
 	snprintf(title, sizeof(title), "(%s) %s", receiver, save_title);
 	strncpy(mymail.title, title, TTLEN);
@@ -200,7 +196,7 @@ hold_mail(char *fpath, char *receiver)
 {
     char            buf[4];
 
-    getdata(b_lines - 1, 0, "已順利寄出，是否自存底稿(Y/N)？[N] ",
+    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1215],
 	    buf, sizeof(buf), LCECHO);
 
     if (buf[0] == 'y')
@@ -226,7 +222,7 @@ do_send(char *userid, char *title)
 	    return -3;
 
 	if (!title)
-	    getdata(2, 0, "主題：", save_title, STRLEN - 20, DOECHO);
+	    getdata(2, 0, SHM->i18nstr[cuser.language][1216], save_title, STRLEN - 20, DOECHO);
 	curredit |= EDIT_MAIL;
 	curredit &= ~EDIT_ITEM;
     }
@@ -244,17 +240,17 @@ do_send(char *userid, char *title)
 	    return -2;
 	}
 	clear();
-	prints("信件即將寄給 %s\n標題為：%s\n確定要寄出嗎? (Y/N) [Y]",
+	prints(SHM->i18nstr[cuser.language][1217],
 	       userid, title);
 	ch = igetch();
 	switch (ch) {
 	case 'N':
 	case 'n':
-	    outs("N\n信件已取消");
+	    outs(SHM->i18nstr[cuser.language][1218]);
 	    res = -2;
 	    break;
 	default:
-	    outs("Y\n請稍候, 信件傳遞中...\n");
+	    outs(SHM->i18nstr[cuser.language][1219]);
 	    res =
 #ifndef USE_BSMTP
 		bbs_sendmail(fpath, title, userid);
@@ -303,7 +299,7 @@ my_send(char *uident)
 	outs(msg_cancel);
 	break;
     case -3:
-	prints("使用者 [%s] 無法收信", uident);
+	prints(SHM->i18nstr[cuser.language][1220], uident);
 	break;
     }
     pressanykey();
@@ -314,7 +310,7 @@ m_send()
 {
     char            uident[40];
 
-    stand_title("且聽風的話");
+    stand_title(SHM->i18nstr[cuser.language][1221]);
     usercomplete(msg_uid, uident);
     showplans(uident);
     if (uident[0])
@@ -330,18 +326,18 @@ multi_list(int *reciper)
     char            genbuf[200];
 
     while (1) {
-	stand_title("群組寄信名單");
-	ShowNameList(3, 0, msg_cc);
+	stand_title(SHM->i18nstr[cuser.language][1222]);
+	ShowNameList(3, 0, SHM->i18nstr[cuser.language][1201]);
 	move(1, 0);
-	prints("(I)引入好友 (O)引入上線通知 (N)引入新文章通知 (0-9)引入其他特別名單");
+	prints(SHM->i18nstr[cuser.language][1223]);
 	getdata(2, 0,
-	       "(A)增加     (D)刪除         (M)確認寄信名單   (Q)取消 ？[M]",
+	       SHM->i18nstr[cuser.language][1224],
 		genbuf, 4, LCECHO);
 	switch (genbuf[0]) {
 	case 'a':
 	    while (1) {
 		move(1, 0);
-		usercomplete("請輸入要增加的代號(只按 ENTER 結束新增): ", uid);
+		usercomplete(SHM->i18nstr[cuser.language][1225], uid);
 		if (uid[0] == '\0')
 		    break;
 
@@ -354,18 +350,18 @@ multi_list(int *reciper)
 		    AddNameList(uid);
 		    (*reciper)++;
 		}
-		ShowNameList(3, 0, msg_cc);
+		ShowNameList(3, 0, SHM->i18nstr[cuser.language][1201]);
 	    }
 	    break;
 	case 'd':
 	    while (*reciper) {
 		move(1, 0);
-		namecomplete("請輸入要刪除的代號(只按 ENTER 結束刪除): ", uid);
+		namecomplete(SHM->i18nstr[cuser.language][1226], uid);
 		if (uid[0] == '\0')
 		    break;
 		if (RemoveNameList(uid))
 		    (*reciper)--;
-		ShowNameList(3, 0, msg_cc);
+		ShowNameList(3, 0, SHM->i18nstr[cuser.language][1201]);
 	    }
 	    break;
 	case '0':
@@ -382,15 +378,15 @@ multi_list(int *reciper)
 	    genbuf[0] = '1';
 	case 'i':
 	    setuserfile(genbuf, genbuf[0] == '1' ? listfile : fn_overrides);
-	    ToggleNameList(reciper, genbuf, msg_cc);
+	    ToggleNameList(reciper, genbuf, SHM->i18nstr[cuser.language][1201]);
 	    break;
 	case 'o':
 	    setuserfile(genbuf, "alohaed");
-	    ToggleNameList(reciper, genbuf, msg_cc);
+	    ToggleNameList(reciper, genbuf, SHM->i18nstr[cuser.language][1201]);
 	    break;
 	case 'n':
 	    setuserfile(genbuf, "postlist");
-	    ToggleNameList(reciper, genbuf, msg_cc);
+	    ToggleNameList(reciper, genbuf, SHM->i18nstr[cuser.language][1201]);
 	    break;
 	case 'q':
 	    *reciper = 0;
@@ -419,7 +415,7 @@ multi_send(char *title)
 	fp = fopen(quote_file, "r");
 	assert(fp);
 	while (fgets(genbuf, 256, fp)) {
-	    if (strncmp(genbuf, "※ ", 3)) {
+	    if (strncmp(genbuf, SHM->i18nstr[cuser.language][1227], 3)) {
 		if (listing)
 		    break;
 	    } else {
@@ -432,12 +428,12 @@ multi_send(char *title)
 			    reciper++;
 			}
 		    } while ((ptr = (char *)strtok(NULL, " \n\r")));
-		} else if (!strncmp(genbuf + 3, "[通告]", 6))
+		} else if (!strncmp(genbuf + 3, SHM->i18nstr[cuser.language][1228], 6))
 		    listing = 1;
 	    }
 	}
 	fclose(fp);
-	ShowNameList(3, 0, msg_cc);
+	ShowNameList(3, 0, SHM->i18nstr[cuser.language][1201]);
     }
     multi_list(&reciper);
     move(1, 0);
@@ -448,21 +444,21 @@ multi_send(char *title)
 	if (title)
 	    do_reply_title(2, title);
 	else {
-	    getdata(2, 0, "主題：", fpath, sizeof(fpath), DOECHO);
-	    snprintf(save_title, sizeof(save_title), "[通告] %s", fpath);
+	    getdata(2, 0, SHM->i18nstr[cuser.language][1229], fpath, sizeof(fpath), DOECHO);
+	    snprintf(save_title, sizeof(save_title), SHM->i18nstr[cuser.language][1230], fpath);
 	}
 
 	setuserfile(fpath, fn_notes);
 
 	if ((fp = fopen(fpath, "w"))) {
-	    fprintf(fp, "※ [通告] 共 %d 人收件", reciper);
+	    fprintf(fp, SHM->i18nstr[cuser.language][1231], reciper);
 	    listing = 80;
 
 	    for (p = toplev; p; p = p->next) {
 		reciper = strlen(p->word) + 1;
 		if (listing + reciper > 75) {
 		    listing = reciper;
-		    fprintf(fp, "\n※");
+		    fprintf(fp, SHM->i18nstr[cuser.language][1232]);
 		} else
 		    listing += reciper;
 
@@ -522,7 +518,7 @@ multi_reply(int ent, fileheader_t * fhdr, char *direct)
     if (!(fhdr->filemode & FILE_MULTI))
 	return mail_reply(ent, fhdr, direct);
 
-    stand_title("群組回信");
+    stand_title(SHM->i18nstr[cuser.language][1234]);
     strlcpy(quote_user, fhdr->owner, sizeof(quote_user));
     setuserfile(quote_file, fhdr->filename);
     multi_send(fhdr->title);
@@ -532,7 +528,7 @@ multi_reply(int ent, fileheader_t * fhdr, char *direct)
 int
 mail_list()
 {
-    stand_title("群組作業");
+    stand_title(SHM->i18nstr[cuser.language][1235]);
     multi_send(NULL);
     return 0;
 }
@@ -547,18 +543,17 @@ mail_all()
     int             i, unum;
     char           *userid;
 
-    stand_title("給所有使用者的系統通告");
+    stand_title(SHM->i18nstr[cuser.language][1236]);
     setutmpmode(SMAIL);
-    getdata(2, 0, "主題：", fpath, sizeof(fpath), DOECHO);
+    getdata(2, 0, SHM->i18nstr[cuser.language][1237], fpath, sizeof(fpath), DOECHO);
     snprintf(save_title, sizeof(save_title),
-	     "[系統通告]\033[1;32m %s\033[m", fpath);
+	     SHM->i18nstr[cuser.language][1238], fpath);
 
     setuserfile(fpath, fn_notes);
 
     if ((fp = fopen(fpath, "w"))) {
-	fprintf(fp, "※ [\033[1m系統通告\033[m] 這是封給所有使用者的信\n");
-	fprintf(fp, "-----------------------------------------------------"
-		"----------------------\n");
+	fprintf(fp, SHM->i18nstr[cuser.language][1239]);
+	fprintf(fp, "---------------------------------------------------------------------------\n");
 	fclose(fp);
     }
     *quote_file = 0;
@@ -575,7 +570,7 @@ mail_all()
     curredit = 0;
 
     setutmpmode(MAILALL);
-    stand_title("寄信中...");
+    stand_title(SHM->i18nstr[cuser.language][1240]);
 
     sethomepath(genbuf, cuser.userid);
     stampfile(genbuf, &mymail);
@@ -624,7 +619,7 @@ mail_mbox()
     fileheader_t    fhdr;
 
     snprintf(cmd, sizeof(cmd), "/tmp/%s.uu", cuser.userid);
-    snprintf(fhdr.title, sizeof(fhdr.title), "%s 私人資料", cuser.userid);
+    snprintf(fhdr.title, sizeof(fhdr.title), SHM->i18nstr[cuser.language][1241], cuser.userid);
     doforward(cmd, &fhdr, 'Z');
     return 0;
 }
@@ -634,7 +629,7 @@ m_forward(int ent, fileheader_t * fhdr, char *direct)
 {
     char            uid[STRLEN];
 
-    stand_title("轉達信件");
+    stand_title(SHM->i18nstr[cuser.language][1242]);
     usercomplete(msg_uid, uid);
     if (uid[0] == '\0')
 	return FULLUPDATE;
@@ -644,7 +639,7 @@ m_forward(int ent, fileheader_t * fhdr, char *direct)
     snprintf(save_title, sizeof(save_title), "%.64s (fwd)", fhdr->title);
     move(1, 0);
     clrtobot();
-    prints("轉信給: %s\n標  題: %s\n", uid, save_title);
+    prints(SHM->i18nstr[cuser.language][1243], uid, save_title);
 
     switch (do_send(uid, save_title)) {
     case -1:
@@ -654,7 +649,7 @@ m_forward(int ent, fileheader_t * fhdr, char *direct)
 	outs(msg_cancel);
 	break;
     case -3:
-	prints("使用者 [%s] 無法收信", uid);
+	prints(SHM->i18nstr[cuser.language][1244], uid);
 	break;
     }
     pressanykey();
@@ -683,8 +678,8 @@ read_new_mail(fileheader_t * fptr)
 	return 0;
     clear();
     move(10, 0);
-    prints("您要讀來自[%s]的訊息(%s)嗎？", fptr->owner, fptr->title);
-    getdata(11, 0, "請您確定(Y/N/Q)?[Y] ", genbuf, 3, DOECHO);
+    prints(SHM->i18nstr[cuser.language][1245], fptr->owner, fptr->title);
+    getdata(11, 0, SHM->i18nstr[cuser.language][1246], genbuf, 3, DOECHO);
     if (genbuf[0] == 'q')
 	return QUIT;
     if (genbuf[0] == 'n')
@@ -700,18 +695,17 @@ read_new_mail(fileheader_t * fptr)
     while (!done) {
 	int             more_result = more(fname, YEA);
 
-        switch (more_result) {
-        case 999:
-	    mail_reply(idc, fptr, currmaildir);
-            return FULLUPDATE;
-        case -1:
-            return READ_SKIP;
-        case 0:
-            break;
-        default:
-            return more_result;
-        }
-
+	switch (more_result) {
+		case 999:
+			mail_reply(idc, fptr, currmaildir);
+			return FULLUPDATE;
+		case -1:
+			return READ_SKIP;
+		case 0:
+			break;
+		default:
+			return more_result;
+	}
 	outmsg(msg_mailer);
 
 	switch (igetch()) {
@@ -734,7 +728,7 @@ read_new_mail(fileheader_t * fptr)
     }
     if (delete_it) {
 	clear();
-	prints("刪除信件《%s》", fptr->title);
+	prints(SHM->i18nstr[cuser.language][1247], fptr->title);
 	getdata(1, 0, msg_sure_ny, genbuf, 2, LCECHO);
 	if (genbuf[0] == 'y') {
 	    unlink(fname);
@@ -756,7 +750,7 @@ m_new()
     curredit |= EDIT_MAIL;
     curredit &= ~EDIT_ITEM;
     if (apply_record(currmaildir, read_new_mail, sizeof(fileheader_t)) == -1) {
-	outs("沒有新信件了");
+	outs(SHM->i18nstr[cuser.language][1248]);
 	pressanykey();
 	return -1;
     }
@@ -765,7 +759,7 @@ m_new()
 	while (delcnt--)
 	    delete_record(currmaildir, sizeof(fileheader_t), delmsgs[delcnt]);
     }
-    outs(mrd ? "信已閱\畢" : "沒有新信件了");
+    outs(mrd ? SHM->i18nstr[cuser.language][1249] : SHM->i18nstr[cuser.language][1250]);
     pressanykey();
     return -1;
 }
@@ -775,15 +769,13 @@ mailtitle()
 {
     char            buf[256];
 
-    showtitle("\0郵件選單", BBSName);
-    prints("[←]離開[↑↓]選擇[→]閱\讀信件 [R]回信 [x]轉達 "
-	     "[y]群組回信 [O]站外信:%s [h]求助\n\033[7m"
-	     "編號   日 期  作 者          信  件  標  題     \033[32m",
-	     HAS_PERM(PERM_NOOUTMAIL) ? "\033[31m關\033[m" : "開");
+    showtitle(SHM->i18nstr[cuser.language][1251], BBSName);
+    prints(SHM->i18nstr[cuser.language][1252],
+	     HAS_PERM(PERM_NOOUTMAIL) ? SHM->i18nstr[cuser.language][1253] : SHM->i18nstr[cuser.language][1254]);
     buf[0] = 0;
     if (mailsumlimit) {
 	snprintf(buf, sizeof(buf),
-		 "(容量:%d/%dk %d/%d篇)", mailsum, mailsumlimit,
+		 SHM->i18nstr[cuser.language][1255], mailsum, mailsumlimit,
 		 mailkeep, mailmaxkeep);
     }
     prints("%-29s\033[m", buf);
@@ -800,7 +792,7 @@ maildoent(int num, fileheader_t * ent)
     title = subject(mark = ent->title);
     if (title == mark) {
 	color = '1';
-	mark = "◇";
+	mark = SHM->i18nstr[cuser.language][1256];
     } else {
 	color = '3';
 	mark = "R:";
@@ -824,11 +816,11 @@ mail_del(int ent, fileheader_t * fhdr, char *direct)
 	return DONOTHING;
 
     if (currmode & MODE_SELECT) {
-        vmsg("請先回到正常模式後再進行刪除...");
-        return READ_REDRAW;
-    }
-
-    if (getans(msg_del_ny) == 'y') {
+		vmsg("請先回到正常模式後再進行刪除...");
+		return READ_REDRAW;
+	}
+                        
+	if (getans(msg_del_ny) == 'y') {                        
 	if (!delete_record(direct, sizeof(*fhdr), ent)) {
 	    setdirpath(genbuf, direct, fhdr->filename);
 	    unlink(genbuf);
@@ -853,18 +845,18 @@ mail_read(int ent, fileheader_t * fhdr, char *direct)
 
 	if (more_result != -1) {
 	    fhdr->filemode |= FILE_READ;
-            substitute_ref_record(direct, fhdr, ent);
+			substitute_ref_record(direct, fhdr, ent);
 	}
 	switch (more_result) {
 	case 999:
-	    mail_reply(ent, fhdr, direct);
-	    return FULLUPDATE;
-        case -1:
-            return READ_SKIP;
+		mail_reply(ent, fhdr, direct);
+		return FULLUPDATE;
+	case -1:
+		return READ_SKIP;
         case 0:
-            break;
+		break;
 	default:
-            return more_result;
+		return more_result;                                                                            	
 	}
 	outmsg(msg_mailer);
 
@@ -889,8 +881,8 @@ mail_read(int ent, fileheader_t * fhdr, char *direct)
     if (delete_it)
 	mail_del(ent, fhdr, direct);
     else {
-	fhdr->filemode |= FILE_READ;
-        substitute_ref_record(direct, fhdr, ent);
+		fhdr->filemode |= FILE_READ;
+		substitute_ref_record(direct, fhdr, ent);
     }
     return FULLUPDATE;
 }
@@ -904,7 +896,7 @@ mail_reply(int ent, fileheader_t * fhdr, char *direct)
     FILE           *fp;
     char            genbuf[512];
 
-    stand_title("回  信");
+    stand_title(SHM->i18nstr[cuser.language][1257]);
 
     /* 判斷是 boards 或 mail */
     if (curredit & EDIT_MAIL)
@@ -924,7 +916,7 @@ mail_reply(int ent, fileheader_t * fhdr, char *direct)
 	if (!strcmp(t, str_author1) || !strcmp(t, str_author2))
 	    strlcpy(uid, strtok(NULL, str_space), sizeof(uid));
 	else {
-	    outs("錯誤: 找不到作者。");
+	    outs(SHM->i18nstr[cuser.language][1258]);
 	    pressanykey();
 	    return FULLUPDATE;
 	}
@@ -933,7 +925,7 @@ mail_reply(int ent, fileheader_t * fhdr, char *direct)
 
     /* make the title */
     do_reply_title(3, fhdr->title);
-    prints("\n收信人: %s\n標  題: %s\n", uid, save_title);
+    prints(SHM->i18nstr[cuser.language][1259], uid, save_title);
 
     /* edit, then send the mail */
     ent = curredit;
@@ -945,7 +937,7 @@ mail_reply(int ent, fileheader_t * fhdr, char *direct)
 	outs(msg_cancel);
 	break;
     case -3:
-	prints("使用者 [%s] 無法收信", uid);
+	prints(SHM->i18nstr[cuser.language][1260], uid);
 	break;
     }
     curredit = ent;
@@ -960,7 +952,7 @@ mail_edit(int ent, fileheader_t * fhdr, char *direct)
 
     if (!HAS_PERM(PERM_SYSOP) &&
 	strcmp(cuser.userid, fhdr->owner) &&
-	strcmp("[備.忘.錄]", fhdr->owner))
+	strcmp(SHM->i18nstr[cuser.language][1261], fhdr->owner))
 	return DONOTHING;
 
     setdirpath(genbuf, direct, fhdr->filename);
@@ -981,41 +973,20 @@ static int
 mail_mark(int ent, fileheader_t * fhdr, char *direct)
 {
     fhdr->filemode ^= FILE_MARKED;
-
-    substitute_ref_record(direct, fhdr, ent);
+    
+	substitute_ref_record(direct, fhdr, ent);
     return PART_REDRAW;
 }
 
 /* help for mail reading */
-static char    *mail_help[] = {
-    "\0電子信箱操作說明",
-    "\01基本命令",
-    "(p)(↑)    前一篇文章",
-    "(n)(↓)    下一篇文章",
-    "(P)(PgUp)  前一頁",
-    "(N)(PgDn)  下一頁",
-    "(##)(cr)   跳到第 ## 筆",
-    "($)        跳到最後一筆",
-    "\01進階命令",
-    "(r)(→)/(R)讀信 / 回信",
-    "(O)        關閉/開啟 站外信件轉入",
-    "(c/z)      收入此信件進入私人信件夾/進入私人信件夾",
-    "(x/X)      轉達信件/轉錄文章到其他看板",
-    "(y)        群組回信",
-    "(F)        將信傳送回您的電子信箱      (u)水球整理寄回信箱",
-    "(d)        殺掉此信",
-    "(D)        殺掉指定範圍的信",
-    "(m)        將信標記，以防被清除",
-    "(^G)       立即重建信箱 (信箱毀損時用)",
-    "(t)        標記欲刪除信件",
-    "(^D)       刪除已標記信件",
-    NULL
-};
+static int    mail_help[] = {1262, 1263, 1264, 1265, 1266, 1267, 1268,
+1269, 1270, 1271, 1272, 1273, 1274, 1275, 1276, 1277, 1278, 1279,
+1280, 1281, 1282, -1};
 
 static int
 m_help()
 {
-    //i18n remark show_help(mail_help);
+    show_help(mail_help);
     return FULLUPDATE;
 }
 
@@ -1032,7 +1003,7 @@ mail_cross_post(int ent, fileheader_t * fhdr, char *direct)
     move(2, 0);
     clrtoeol();
     move(1, 0);
-    generalnamecomplete("轉錄本文章於看板：", xboard, sizeof(xboard),
+    generalnamecomplete(SHM->i18nstr[cuser.language][1283], xboard, sizeof(xboard),
 			SHM->Bnumber,
 			completeboard_compar,
 			completeboard_permission,
@@ -1042,27 +1013,27 @@ mail_cross_post(int ent, fileheader_t * fhdr, char *direct)
 
     ent = 1;
     if (HAS_PERM(PERM_SYSOP) || !strcmp(fhdr->owner, cuser.userid)) {
-	getdata(2, 0, "(1)原文轉載 (2)舊轉錄格式？[1] ",
+	getdata(2, 0, SHM->i18nstr[cuser.language][1284],
 		genbuf, 3, DOECHO);
 	if (genbuf[0] != '2') {
 	    ent = 0;
-	    getdata(2, 0, "保留原作者名稱嗎?[Y] ", inputbuf, 3, DOECHO);
+	    getdata(2, 0, SHM->i18nstr[cuser.language][1285], inputbuf, 3, DOECHO);
 	    if (inputbuf[0] != 'n' && inputbuf[0] != 'N')
 		author = 1;
 	}
     }
     if (ent)
-	snprintf(xtitle, sizeof(xtitle), "[轉錄]%.66s", fhdr->title);
+	snprintf(xtitle, sizeof(xtitle), SHM->i18nstr[cuser.language][1286], fhdr->title);
     else
 	strlcpy(xtitle, fhdr->title, sizeof(xtitle));
 
-    snprintf(genbuf, sizeof(genbuf), "採用原標題《%.60s》嗎?[Y] ", xtitle);
+    snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][1287], xtitle);
     getdata(2, 0, genbuf, genbuf2, sizeof(genbuf2), LCECHO);
     if (*genbuf2 == 'n')
-	if (getdata(2, 0, "標題：", genbuf, TTLEN, DOECHO))
+	if (getdata(2, 0, SHM->i18nstr[cuser.language][1288], genbuf, TTLEN, DOECHO))
 	    strlcpy(xtitle, genbuf, sizeof(xtitle));
 
-    getdata(2, 0, "(S)存檔 (L)站內 (Q)取消？[Q] ", genbuf, 3, LCECHO);
+    getdata(2, 0, SHM->i18nstr[cuser.language][1289], genbuf, 3, LCECHO);
     if (genbuf[0] == 'l' || genbuf[0] == 's') {
 	int             currmode0 = currmode;
 
@@ -1089,7 +1060,7 @@ mail_cross_post(int ent, fileheader_t * fhdr, char *direct)
 	    write_header(xptr);
 	    currboard = save_currboard;
 
-	    fprintf(xptr, "※ [本文轉錄自 %s 信箱]\n\n", cuser.userid);
+	    fprintf(xptr, SHM->i18nstr[cuser.language][1290], cuser.userid);
 
 	    b_suckinfile(xptr, fname);
 	    addsignature(xptr, 0);
@@ -1105,7 +1076,7 @@ mail_cross_post(int ent, fileheader_t * fhdr, char *direct)
 	if (!xfile.filemode)
 	    outgo_post(&xfile, xboard);
 	cuser.numposts++;
-	outmsg("文章轉錄完成");
+	outmsg(SHM->i18nstr[cuser.language][1291]);
 	pressanykey();
 	currmode = currmode0;
     }
@@ -1121,7 +1092,7 @@ mail_man()
 	int             stat0 = currstat;
 
 	sethomeman(buf, cuser.userid);
-	snprintf(buf1, sizeof(buf1), "%s 的信件夾", cuser.userid);
+	snprintf(buf1, sizeof(buf1), SHM->i18nstr[cuser.language][1292], cuser.userid);
 	a_menu(buf1, buf, 1);
 	currutmp->mode = mode0;
 	currstat = stat0;
@@ -1140,7 +1111,7 @@ mail_cite(int ent, fileheader_t * fhdr, char *direct)
     int             bid;
 
     setuserfile(fpath, fhdr->filename);
-    strlcpy(title, "◇ ", sizeof(title));
+    strlcpy(title, SHM->i18nstr[cuser.language][1293], sizeof(title));
     strncpy(title + 3, fhdr->title, TTLEN - 3);
     title[TTLEN] = '\0';
     a_copyitem(fpath, title, 0, 1);
@@ -1152,7 +1123,7 @@ mail_cite(int ent, fileheader_t * fhdr, char *direct)
 	clrtoeol();
 	move(1, 0);
 
-	generalnamecomplete("輸入看板名稱 (直接Enter進入私人信件夾)：",
+	generalnamecomplete(SHM->i18nstr[cuser.language][1294],
 			    buf, sizeof(buf),
 			    SHM->Bnumber,
 			    completeboard_compar,
@@ -1183,7 +1154,7 @@ mail_save(int ent, fileheader_t * fhdr, char *direct)
 
     if (HAS_PERM(PERM_MAILLIMIT)) {
 	setuserfile(fpath, fhdr->filename);
-	strlcpy(title, "◇ ", sizeof(title));
+	strlcpy(title, SHM->i18nstr[cuser.language][1295], sizeof(title));
 	strncpy(title + 3, fhdr->title, TTLEN - 3);
 	title[TTLEN] = '\0';
 	a_copyitem(fpath, title, fhdr->owner, 1);
@@ -1202,32 +1173,30 @@ mail_waterball(int ent, fileheader_t * fhdr, char *direct)
     char            fname[500], genbuf[200];
     FILE           *fp;
 
-    if (!(strstr(fhdr->title, "熱線") && strstr(fhdr->title, "記錄"))) {
-	vmsg("必須是 熱線記錄 才能使用水球整理的唷!");
+    if (!(strstr(fhdr->title, SHM->i18nstr[cuser.language][1296]) && strstr(fhdr->title, SHM->i18nstr[cuser.language][1297]))) {
+	vmsg(SHM->i18nstr[cuser.language][1298]);
 	return 1;
     }
     if (!address[0])
 	strlcpy(address, cuser.email, sizeof(address));
     move(b_lines - 8, 0);
-    outs("水球整理程式:\n"
-	 "系統將會按照和不同人丟的水球各自獨立\n"
-	 "於整點的時候 (尖峰時段除外) 將資料整理好寄送給您\n\n\n");
+    outs(SHM->i18nstr[cuser.language][1299]);
     if (address[0]) {
-	snprintf(genbuf, sizeof(genbuf), "寄給 [%s] 嗎(Y/N/Q)？[Y] ", address);
+	snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][1300], address);
 	getdata(b_lines - 5, 0, genbuf, fname, 3, LCECHO);
 	if (fname[0] == 'q') {
-	    outmsg("取消處理");
+	    outmsg(SHM->i18nstr[cuser.language][1301]);
 	    return 1;
 	}
 	if (fname[0] == 'n')
 	    address[0] = '\0';
     }
     if (!address[0]) {
-	getdata(b_lines - 5, 0, "請輸入郵件地址：", fname, 60, DOECHO);
+	getdata(b_lines - 5, 0, SHM->i18nstr[cuser.language][1302], fname, 60, DOECHO);
 	if (fname[0] && strchr(fname, '.')) {
 	    strlcpy(address, fname, sizeof(address));
 	} else {
-	    vmsg("取消處理");
+	    vmsg(SHM->i18nstr[cuser.language][1303]);
 	    return 1;
 	}
     }
@@ -1235,21 +1204,17 @@ mail_waterball(int ent, fileheader_t * fhdr, char *direct)
 	return -2;
     if( strstr(address, ".bbs") && HAS_PERM(PERM_NOOUTMAIL) ){
 	move(b_lines - 4, 0);
-	outs("\n您必須要打開接受站外信, 水球整理系統才能寄入結果\n"
-	     "請麻煩到【郵件選單】按大寫 O改成接受站外信 (在右上角)\n"
-	     "再重新執行本功\能 :)\n");
-	vmsg("請打開站外信, 再重新執行本功\能");
+	outs(SHM->i18nstr[cuser.language][1304]);
+	vmsg(SHM->i18nstr[cuser.language][1305]);
 	return FULLUPDATE;
     }
 
     //snprintf(fname, sizeof(fname), "%d\n", cmode);
     move(b_lines - 4, 0);
-    outs("系統提供兩種模式: \n"
-	 "模式 0: 精簡模式, 將不含顏色控制碼, 方便以純文字編輯器整理收藏\n"
-	 "模式 1: 華麗模式, 包含顏色控制碼等, 方便在 bbs上直接編輯收藏\n");
-    getdata(b_lines - 1, 0, "使用模式(0/1/Q)? [1]", fname, 3, LCECHO);
+    outs(SHM->i18nstr[cuser.language][1306]);
+    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1307], fname, 3, LCECHO);
     if (fname[0] == 'Q' || fname[0] == 'q') {
-	outmsg("取消處理");
+	outmsg(SHM->i18nstr[cuser.language][1308]);
 	return 1;
     }
     cmode = (fname[0] != '0' && fname[0] != '1') ? 1 : fname[0] - '0';
@@ -1266,7 +1231,7 @@ mail_waterball(int ent, fileheader_t * fhdr, char *direct)
     assert(fp);
     fprintf(fp, "%s\n%s\n%d\n", cuser.userid, address, cmode);
     fclose(fp);
-    vmsg("設定完成, 系統將在下一個整點(尖峰時段除外)將資料寄給您");
+    vmsg(SHM->i18nstr[cuser.language][1309]);
     return FULLUPDATE;
 }
 #endif
@@ -1375,7 +1340,7 @@ m_read()
 	currutmp->mailalert = load_mailalert(cuser.userid);
 	return 0;
     } else {
-	outs("您沒有來信");
+	outs(SHM->i18nstr[cuser.language][1310]);
 	return XEASY;
     }
 }
@@ -1451,11 +1416,7 @@ bbs_sendmail(char *fpath, char *title, char *receiver)
 		cuser.userid, str_mail_address,
 		cuser.username,
 		cuser.userid, str_mail_address);
-    fprintf(fout,"To: %s\nSubject: %s\n"
-		 "Mime-Version: 1.0\r\n"
-		 "Content-Type: text/plain; charset=\"big5\"\r\n"
-		 "Content-Transfer-Encoding: 8bit\r\n"
-		 "X-Disclaimer: " BBSNAME "對本信內容恕不負責。\n\n",
+    fprintf(fout,"To: %s\nSubject: %s\nMime-Version: 1.0\r\nContent-Type: text/plain; charset=\"big5\"\r\nContent-Transfer-Encoding: 8bit\r\nX-Disclaimer: " BBSNAME SHM->i18nstr[cuser.language][1311],
 		receiver, title);
 
     while (fgets(genbuf, sizeof(genbuf), fin)) {
@@ -1532,16 +1493,16 @@ doforward(char *direct, fileheader_t * fh, int mode)
 	strlcpy(address, cuser.email, sizeof(address));
 
     if( mode == 'U' ){
-	vmsg("將進行 uuencode 。若您不清楚什麼是 uuencode 請改用 F轉寄。");
+	vmsg(SHM->i18nstr[cuser.language][1312]);
     }
 
     if (address[0]) {
 	snprintf(genbuf, sizeof(genbuf),
-		 "確定轉寄給 [%s] 嗎(Y/N/Q)？[Y] ", address);
+		 SHM->i18nstr[cuser.language][1313], address);
 	getdata(b_lines, 0, genbuf, fname, 3, LCECHO);
 
 	if (fname[0] == 'q') {
-	    outmsg("取消轉寄");
+	    outmsg(SHM->i18nstr[cuser.language][1314]);
 	    return 1;
 	}
 	if (fname[0] == 'n')
@@ -1549,7 +1510,7 @@ doforward(char *direct, fileheader_t * fh, int mode)
     }
     if (!address[0]) {
 	do {
-	    getdata(b_lines - 1, 0, "請輸入轉寄地址：", fname, 60, DOECHO);
+	    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1315], fname, 60, DOECHO);
 	    if (fname[0]) {
 		if (strchr(fname, '.'))
 		    strlcpy(address, fname, sizeof(address));
@@ -1557,7 +1518,7 @@ doforward(char *direct, fileheader_t * fh, int mode)
 		    snprintf(address, sizeof(address),
 			     "%s.bbs@%s", fname, MYHOSTNAME);
 	    } else {
-		vmsg("取消轉寄");
+		vmsg(SHM->i18nstr[cuser.language][1316]);
 		return 1;
 	    }
 	} while (mode == 'Z' && strstr(address, MYHOSTNAME));
@@ -1565,12 +1526,13 @@ doforward(char *direct, fileheader_t * fh, int mode)
     if (invalidaddr(address))
 	return -2;
 
-    outmsg("正轉寄請稍候...");
+    outmsg(fname);
     refresh();
 
     /* 追蹤使用者 */
-    if (HAS_PERM(PERM_LOGUSER)) 
-	log_user("mailforward to %s ",address);
+    if (HAS_PERM(PERM_LOGUSER)) {
+    	log_user("mailforward to %s ",address);
+    }
     if (mode == 'Z') {
 	snprintf(fname, sizeof(fname),
 		 TAR_PATH " cfz /tmp/home.%s.tgz home/%c/%s; "
@@ -1659,7 +1621,7 @@ mail_justify(userec_t muser)
     stampfile(buf1, &mhdr);
     unlink(buf1);
     strlcpy(mhdr.owner, cuser.userid, sizeof(mhdr.owner));
-    strncpy(mhdr.title, "[審核通過]", TTLEN);
+    strncpy(mhdr.title, SHM->i18nstr[cuser.language][1318], TTLEN);
     mhdr.filemode = 0;
 
     if (valid_ident(muser.email) && !invalidaddr(muser.email)) {

@@ -306,7 +306,7 @@ chc_log_step(board_t board, rc_t *from, rc_t *to)
 }
 
 static int
-#if defined(__linux__) || defined(Solaris)
+#if defined(__linux__)
 chc_filter(const struct dirent *dir)
 #else
 chc_filter(struct dirent *dir)
@@ -1030,7 +1030,11 @@ chc_watch(void)
 	vmsg("無法建立連線");
 	return -1;
     }
+#if defined(Solaris) && __OS_MAJOR_VERSION__ == 5 && __OS_MINOR_VERSION__ < 7
+    msgsock = accept(sock, (struct sockaddr *) 0, 0);
+#else
     msgsock = accept(sock, (struct sockaddr *) 0, (socklen_t *) 0);
+#endif
     close(sock);
     if (msgsock < 0)
 	return -1;

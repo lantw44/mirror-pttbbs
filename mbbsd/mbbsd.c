@@ -1362,17 +1362,22 @@ daemon_login(int argc, char *argv[], char *envp[])
 #endif
 #endif
 
-    snprintf(buf, sizeof(buf), "run/mbbsd.%d.%d.pid", listen_port, getpid());
+    snprintf(buf, sizeof(buf), "run/mbbsd.%d.%d.pid", listen_port, (int)getpid());
     if ((fp = fopen(buf, "w"))) {
-	fprintf(fp, "%d\n", getpid());
+	fprintf(fp, "%d\n", (int)getpid());
 	fclose(fp);
     }
 
     /* main loop */
     while( 1 ){
 	len_of_sock_addr = sizeof(xsin);
+#if defined(Solaris) && __OS_MAJOR_VERSION__ == 5 && __OS_MINOR_VERSION__ < 7
+	if( (csock = accept(msock, (struct sockaddr *)&xsin,
+			    &len_of_sock_addr)) < 0 ){
+#else
 	if( (csock = accept(msock, (struct sockaddr *)&xsin,
 			    (socklen_t *)&len_of_sock_addr)) < 0 ){
+#endif
 	    if (errno != EINTR)
 		sleep(1);
 	    continue;

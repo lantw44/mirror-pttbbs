@@ -2,9 +2,13 @@
 # 定義基本初值
 BBSHOME?=	$(HOME)
 BBSHOME?=	/home/bbs
+
 OS!=		uname
+OS_MAJOR_VER!=	uname -r|cut -d . -f 1
+OS_MINOR_VER!=	uname -r|cut -d . -f 2
 OSTYPE?=	$(OS)
-CC?=		gcc
+
+CC=		gcc
 CCACHE!=	which ccache|sed -e 's/^.*\///'
 PTT_CFLAGS=	-Wall -pipe -DBBSHOME='"$(BBSHOME)"' -I../include
 PTT_LDFLAGS=	-pipe -Wall -L/usr/local/lib
@@ -26,13 +30,16 @@ LIBS_Linux=
 # SunOS特有的環境
 CFLAGS_Solaris= -DSolaris -I/usr/local/include 
 LDFLAGS_Solaris= -L/usr/local/lib -L/usr/lib/
-LIBS_Solaris= -lnsl -lsocket -liconv
+LIBS_Solaris= -lnsl -lsocket -liconv -lkstat
 
+OS_FLAGS=	-D__OS_MAJOR_VERSION__=$(OS_MAJOR_VER) \
+		-D__OS_MINOR_VERSION__=$(OS_MINOR_VER)
 
 # CFLAGS, LDFLAGS, LIBS 加入 OS 相關參數
-PTT_CFLAGS+=	$(CFLAGS_$(OSTYPE))
+PTT_CFLAGS+=	$(CFLAGS_$(OSTYPE)) $(OS_FLAGS)
 PTT_LDFLAGS+=	$(LDFLAGS_$(OSTYPE))
 PTT_LIBS+=	$(LIBS_$(OSTYPE))
+
 
 # 若有定義 PROFILING
 .if defined(PROFILING)

@@ -306,7 +306,7 @@ chc_log_step(board_t board, rc_t *from, rc_t *to)
 }
 
 static int
-#ifdef __linux__
+#if defined(__linux__) || defined(Solaris)
 chc_filter(const struct dirent *dir)
 #else
 chc_filter(struct dirent *dir)

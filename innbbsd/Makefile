@@ -7,7 +7,8 @@
 # ------------------------------------------------------- #
 # stdarg.h patch for pttbbs by in2 03/05/05               #
 
-OSTYPE!=uname
+OS!=uname
+OSTYPE?=OS
 ####################################################
 # this is a bbs <--> news gateway
 #####################################################
@@ -93,7 +94,7 @@ irix:
 	@$(MAKE) EXTRAFLAGS="-DMMAP -DIRIX -DSYSV" target
 
 solaris:
-	@$(MAKE) EXTRAFLAGS="-DMMAP -DSOLARIS -DSYSV" LDFLAGS="-lsocket -lnsl" YACC="bison -y" target
+	@$(MAKE) EXTRAFLAGS="-DMMAP -DSOLARIS -DSYSV -I/usr/local/include/ -I../include/" LDFLAGS="-L/usr/local/lib -liconv -lsocket -lnsl ../mbbsd/osdep.o" YACC="bison -y" target
 
 FreeBSD:
 	@$(MAKE) CC=cc EXTRAFLAGS="-DBSD44 -DMMAP -DGETRUSAGE" LDFLAGS="-lcrypt -liconv" target

@@ -377,7 +377,7 @@ char *completeutmp_getname(int where);
 /* osdep */
 int cpuload(char *str);
 double swapused(int *total, int *used);
-#ifdef __linux__
+#if defined(__linux__) || defined(Solaris)
 char *strcasestr(const char *big, const char *little);
 #endif
 

@@ -85,8 +85,10 @@ do_voteboardreply(fileheader_t * fhdr)
     }
     if ((fd = open(oldfpath, O_RDONLY)) == -1)
 	return;
-    if(flock(fd, LOCK_EX)==-1 )
-       {close(fd); return;}
+    if(flock(fd, LOCK_EX)==-1 ) {
+	close(fd);
+	return;
+    }
     if(!(fi = fopen(oldfpath, "r")))
        {flock(fd, LOCK_UN); close(fd); return;}
      

@@ -1,7 +1,7 @@
 /* $Id$ */
 #include "bbs.h"
 
-#ifdef __linux__
+#if defined(__linux__)
 #include <sys/types.h>
 #include <string.h>
 
@@ -139,6 +139,9 @@ size_t strlcpy(dst, src, siz)
 	return(s - src - 1);	/* count does not include NUL */
 }
 
+#endif
+
+#if defined(linux) || defined(Solaris)
 char           *
 strcasestr(const char *big, const char *little)
 {
@@ -156,25 +159,222 @@ strcasestr(const char *big, const char *little)
 
 #endif
 
+#ifdef Solaris
+
+/*
+ * Scan the directory dirname calling select to make a list of
+selected
+ * directory entries then sort using qsort and compare routine
+dcomp.
+ * Returns the number of entries and a pointer to a list of
+pointers to
+ * struct dirent (through namelist). Returns -1 if there were any
+errors.
+ */
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <stdlib.h>
+#include <string.h>
+
+/*
+ * The DIRSIZ macro is the minimum record length which will hold
+the directory
+ * entry. This requires the amount of space in struct dirent
+without the
+ * d_name field, plus enough space for the name and a terminating
+nul byte
+ * (dp->d_namlen + 1), rounded up to a 4 byte boundary.
+ */
+#undef DIRSIZ
+#define DIRSIZ(dp) \
+         ((sizeof(struct dirent) - sizeof(dp)->d_name) + \
+         ((strlen((dp)->d_name) + 1 + 3) &~ 3))
+#if 0
+         ((sizeof(struct dirent) - sizeof(dp)->d_name) + \
+         (((dp)->d_namlen + 1 + 3) &~ 3))
+#endif
+
+int
+scandir(dirname, namelist, select, dcomp)
+        const char *dirname;
+        struct dirent ***namelist;
+        int (*select) (struct dirent *);
+        int (*dcomp) (const void *, const void *);
+{
+        register struct dirent *d, *p, **names;
+        register size_t nitems;
+        struct stat stb;
+        long arraysz;
+        DIR *dirp;
+
+        if ((dirp = opendir(dirname)) == NULL)
+                return(-1);
+        if (fstat(dirp->dd_fd, &stb) < 0)
+                return(-1);
+
+        /*
+         * estimate the array size by taking the size of thedirectory file
+         * and dividing it by a multiple of the minimum sizeentry.
+         */
+        arraysz = (stb.st_size / 24);
+     names = (struct dirent **)malloc(arraysz * sizeof(struct dirent *));
+        if (names == NULL)
+                return(-1);
+
+        nitems = 0;
+        while ((d = readdir(dirp)) != NULL) {
+                if (select != NULL && !(*select)(d))
+                        continue; /* just selected names */
+                /*
+                 * Make a minimum size copy of the data
+                 */
+                p = (struct dirent *)malloc(DIRSIZ(d));
+                if (p == NULL)
+                        return(-1);
+                p->d_ino = d->d_ino;
+                p->d_off = d->d_off;
+                p->d_reclen = d->d_reclen;
+                memcpy(p->d_name, d->d_name, strlen(d->d_name) +1);
+#if 0
+                p->d_fileno = d->d_fileno;
+                p->d_type = d->d_type;
+                p->d_reclen = d->d_reclen;
+                p->d_namlen = d->d_namlen;
+                bcopy(d->d_name, p->d_name, p->d_namlen + 1);
+#endif
+                /*
+                 * Check to make sure the array has space left and
+                 * realloc the maximum size.
+                 */
+                if (++nitems >= arraysz) {
+                        if (fstat(dirp->dd_fd, &stb) < 0)
+                                return(-1); /* just might have grown */
+                        arraysz = stb.st_size / 12;
+                        names = (struct dirent **)realloc((char*)names,
+                            arraysz * sizeof(struct dirent*));
+                        if (names == NULL)
+                                return(-1);
+                }
+                names[nitems-1] = p;
+        }
+        closedir(dirp);
+        if (nitems && dcomp != NULL)
+                qsort(names, nitems, sizeof(struct dirent *),dcomp);
+        *namelist = names;
+        return(nitems);
+}
+
+/*
+ * Alphabetic order comparison routine for those who want it.
+ */
+int
+alphasort(d1, d2)
+        const void *d1;
+        const void *d2;
+{
+        return(strcmp((*(struct dirent **)d1)->d_name,
+            (*(struct dirent **)d2)->d_name));
+} 
+int
+flock (int fd, int f)
+{
+    if( f == LOCK_EX )
+        return lockf(fd, F_LOCK, 0L);
+
+    if( f == LOCK_UN )
+        return lockf(fd, F_ULOCK, 0L);
+
+    return -1;
+}
+
+void
+unsetenv(name)
+        char *name;
+{
+        extern char **environ;
+        register char **pp;
+        int len = strlen(name);
+
+        for (pp = environ; *pp != NULL; pp++)
+        {
+                if (strncmp(name, *pp, len) == 0 &&
+                    ((*pp)[len] == '=' || (*pp)[len] == '\0'))
+                        break;
+        }
+
+        for (; *pp != NULL; pp++)
+                *pp = pp[1];
+}
+
+
+
+
+
+#include <sys/stat.h>
+#include <sys/swap.h>
+#include <sys/loadavg.h>
+
+
+double swapused(int *total, int *used)
+{
+    double          percent = -1;
+    register int cnt, i;
+    register int free;
+    struct swaptable *swt;
+    struct swapent *ste;
+    static char path[256];
+    cnt = swapctl(SC_GETNSWP, 0);
+    swt = (struct swaptable *)malloc(sizeof(int) +
+                                     cnt * sizeof(struct swapent));
+    if (swt == NULL)
+    {
+        return 0;
+    }
+    swt->swt_n = cnt;
+
+    /* fill in ste_path pointers: we don't care about the paths, so we point
+       them all to the same buffer */
+    ste = &(swt->swt_ent[0]);
+    i = cnt;
+    while (--i >= 0)
+    {
+        ste++->ste_path = path;
+    }
+    /* grab all swap info */
+    swapctl(SC_LIST, swt);
+
+    /* walk thru the structs and sum up the fields */
+    *total = free = 0;
+    ste = &(swt->swt_ent[0]);
+    i = cnt;
+    while (--i >= 0)
+    {
+        /* dont count slots being deleted */
+        if (!(ste->ste_flags & ST_INDEL) &&
+            !(ste->ste_flags & ST_DOINGDEL))
+        {
+            *total += ste->ste_pages;
+            free += ste->ste_free;
+        }
+        ste++;
+    }
+
+    *used = *total - free;
+    if( total != 0)
+        percent = (double)*used / (double)*total;
+    else
+        percent = 0;
+
+    return percent;
+}
+#endif
+
 #if __FreeBSD__
 
 #include <kvm.h>
 
-int
-cpuload(char *str)
-{
-    double          l[3] = {-1, -1, -1};
-    if (getloadavg(l, 3) != 3)
-	l[0] = -1;
-
-    if (str) {
-	if (l[0] != -1)
-	    sprintf(str, " %.2f %.2f %.2f", l[0], l[1], l[2]);
-	else
-	    strcpy(str, " (unknown) ");
-    }
-    return (int)l[0];
-}
 
 double
 swapused(int *total, int *used)
@@ -198,7 +398,28 @@ swapused(int *total, int *used)
     return percent;
 }
 
-#else
+#endif
+
+#if _freebsd_ || defined(Solaris)
+
+int
+cpuload(char *str)
+{
+    double          l[3] = {-1, -1, -1};
+    if (getloadavg(l, 3) != 3)
+	l[0] = -1;
+
+    if (str) {
+	if (l[0] != -1)
+	    sprintf(str, " %.2f %.2f %.2f", l[0], l[1], l[2]);
+	else
+	    strcpy(str, " (unknown) ");
+    }
+    return (int)l[0];
+}
+#endif
+
+#ifdef linux
 int
 cpuload(char *str)
 {

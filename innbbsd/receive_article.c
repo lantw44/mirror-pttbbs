@@ -31,6 +31,29 @@
 #include "inntobbs.h"
 #include "antisplam.h"
 
+#ifdef SOLARIS
+time_t timegm (struct tm *tm) {
+    time_t ret;
+    char *tz;
+    char buf[256] = "TZ=";
+
+    tz = getenv("TZ");
+    putenv("TZ=");
+   
+    tzset();
+    ret = mktime(tm);
+    if (tz){
+        strcat( buf, tz);
+        putenv(buf);
+    }
+    else
+        unsetenv("TZ");
+    tzset();
+    return ret;
+}
+#endif
+
+
 extern int      Junkhistory;
 
 char           *post_article ARG((char *, char *, char *, int (*) (), char *, char *));

@@ -42,8 +42,8 @@
         #include <machine/limits.h>
     #endif
     #include <machine/param.h>
-#endif
-#ifdef __linux__
+
+#elif defined(__linux__)
     #include <sys/param.h>
     #include <sys/ioctl.h>
     #include <limits.h>
@@ -54,6 +54,29 @@
 
     size_t
     strlcat(char *dst, const char *src, size_t size);
+
+#elif defined(Solaris)
+
+#include <alloca.h>
+#include <crypt.h>
+#include <sys/param.h>
+#include <sys/ioctl.h>
+#include <limits.h>
+#include <strings.h>       /* for strcasecmp() */             
+                                                              
+#define LOCK_EX 1
+#define LOCK_UN 2
+
+int flock(int, int);
+
+void unsetenv(char *name);
+
+int scandir(const char *dirname, struct dirent ***namelist, int (*select)(struct dirent *), int (*compar)(const void *, const void *));
+int alphasort(const void *d1, const void *d2);
+
+
+#else
+#warning "Unknown OSTYPE"
 #endif
 
 /* our header */

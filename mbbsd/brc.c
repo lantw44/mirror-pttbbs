@@ -1,10 +1,8 @@
 #include "bbs.h"
 
 #ifndef BRC_MAXNUM
-#define BRC_STRLEN 15		/* Length of board name */
+#define BRC_STRLEN      15	/* Length of board name */
 #define BRC_MAXSIZE     24576   /* Effective size of brc rc file, 8192 * 3 */
-#define BRC_ITEMSIZE    ((BRC_MAXNUM + 2) * sizeof( int ))
-    /* Maximum size of each record */
 #define BRC_MAXNUM      80      /* Upper bound of brc_num, size of brc_list  */
 #endif
 

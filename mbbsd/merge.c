@@ -198,5 +198,6 @@ m_fpg_brd(char *bname, char *fromdir)
   sprintf(fh.owner, cuser.userid);
   sprintf(buf, "man/boards/%c/%s/.DIR", bname[0], bname);
   append_record(buf, &fh, sizeof(fh));
-  vmsg("匯入成功\ 精華區請link %s",fbname);
+  sprintf(fromdir, "fpg/home/bbs/boards/%s/.DIR", fbname);
+  vmsg("即將匯入 %s 版資料..按鍵後需要一點時間",fbname);
 }

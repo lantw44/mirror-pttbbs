@@ -77,40 +77,6 @@ rel_move(int was_col, int was_ln, int new_col, int new_ln)
     do_move(new_col, new_ln);
 }
 
-static void
-standoutput(char *buf, int ds, int de, int sso, int eso)
-{
-    if (eso <= ds || sso >= de) {
-	output(buf + ds, de - ds);
-    } else {
-#if 0
-	if (sso > ds) // does is not happened?
-	    output(buf + ds, sso - ds);
-	else
-	    vmsg("!!!!!!");
-	o_standup();
-	output(buf + sso, de - sso);
-	o_standdown();
-	if (de > eso) // does is not happened?
-	    output(buf + eso, de - eso);
-	else
-	    vmsg("!!!!!!");
-#else
-	short st_start, st_end;
-
-	st_start = MAX(sso, ds);
-	st_end = MIN(eso, de);
-	if (sso > ds)
-	    output(buf + ds, sso - ds);
-	o_standup();
-	output(buf + st_start, st_end - st_start);
-	o_standdown();
-	if (de > eso)
-	    output(buf + eso, de - eso);
-#endif
-    }
-}
-
 void
 redoscr()
 {
@@ -125,7 +91,7 @@ redoscr()
 	if ((len = bp->len)) {
 	    rel_move(tc_col, tc_line, 0, i);
 	    if (bp->mode & STANDOUT) {
-		standoutput((char *)bp->data, 0, len, bp->sso, bp->eso);
+//		standoutput((char *)bp->data, 0, len, bp->sso, bp->eso);
 	    }
 	    else
 		output((char *)bp->data, len);
@@ -190,9 +156,9 @@ refresh()
 		bp->emod = len - 1;
 	    rel_move(tc_col, tc_line, bp->smod, i);
 
-	    if (bp->mode & STANDOUT)
-		standoutput((char *)bp->data, bp->smod, bp->emod + 1,
-			bp->sso, bp->eso);
+	    if (bp->mode & STANDOUT) {
+//		standoutput((char *)bp->data, bp->smod, bp->emod + 1, bp->sso, bp->eso);
+	    }
 	    else
 		output((char *)&bp->data[bp->smod], bp->emod - bp->smod + 1);
 	    tc_col = bp->emod + 1;
@@ -286,7 +252,7 @@ clrtobot()
 }
 
 void
-outch(unsigned char c)
+outc(unsigned char c)
 {
     register screenline_t *slp;
     register int    i;
@@ -351,76 +317,15 @@ parsecolor(char *buf)
 
     while (val) {
 	if (atoi(val) < 30) {
-#if 0
 	    if (data[0]) {
 		data[len++] = ';';
 		data[len] = 0;
 	    }
 	    strcpy(&data[len], val);
-#else
-	    if (data[0]) {
-		data[len++] = ';';
-		data[len] = 0;
-	    }
-	    strcpy(&data[len], val);
-#endif
 	}
 	val = (char *)strtok(NULL, ";");
     }
     strlcpy(buf, data, sizeof(data));
-}
-
-#define NORMAL (00)
-#define ESCAPE (01)
-#define VTKEYS (02)
-
-void
-outc(unsigned char ch)
-{
-    if (showansi)
-	outch(ch);
-    else {
-	static char     buf[24];
-	static int      p = 0;
-	static int      mode = NORMAL;
-	int             i;
-
-	switch (mode) {
-	case NORMAL:
-	    if (ch == '\033')
-		mode = ESCAPE;
-	    else
-		outch(ch);
-	    return;
-	case ESCAPE:
-	    if (ch == '[')
-		mode = VTKEYS;
-	    else {
-		mode = NORMAL;
-		outch('');
-		outch(ch);
-	    }
-	    return;
-	case VTKEYS:
-	    if (ch == 'm') {
-		buf[p++] = '\0';
-		parsecolor(buf);
-	    } else if (((size_t)p < sizeof(buf)) && (not_alpha(ch))) {
-		buf[p++] = ch;
-		return;
-	    }
-	    if (buf[0]) {
-		outch('');
-		outch('[');
-
-		for (i = 0; buf[i]; i++)
-		    outch(buf[i]);
-		outch(ch);
-	    }
-	    p = 0;
-	    mode = NORMAL;
-	}
-    }
 }
 
 int
@@ -429,7 +334,7 @@ edit_outs(const char *text)
     register int    column = 0;
     register char   ch;
     while ((ch = *text++) && (++column < t_columns))
-	outch(ch == 27 ? '*' : ch);
+	outc(ch == 27 ? '*' : ch);	/* 27 == ESC */
 
     return 0;
 }
@@ -528,10 +433,11 @@ region_scroll_up(int top, int bottom)
     refresh();
 }
 
-/* ¶}©l¤Ï¥Õ - ¼ü¹õ¤W¤§«áªº°T®§¶}©l¤Ï¥Õ¿é¥X¡A·|¼g¦b screenline_t ¤W¡C */
+/* ¶}©l¤Ï¥Õ */
 void
 standout()
 {
+#if 1
     if (!standing && strtstandoutlen) {
 	register screenline_t *slp;
 
@@ -540,13 +446,16 @@ standout()
 	slp->sso = slp->eso = cur_col;
 	slp->mode |= STANDOUT;
     }
-//    outs(strtstandout);
+#else
+    outs(strtstandout);
+#endif
 }
 
 /* µ²§ô¤Ï¥Õ */
 void
 standend()
 {
+#if 1
     if (standing && strtstandoutlen) {
 	register screenline_t *slp;
 
@@ -554,5 +463,7 @@ standend()
 	standing = NA;
 	slp->eso = MAX(slp->eso, cur_col);
     }
-//    outs(endstandout);
+#else
+    outs(endstandout);
+#endif
 }

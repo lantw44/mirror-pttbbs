@@ -79,7 +79,6 @@ char           *str_permboard[] = {
 int             usernum;
 int             currmode = 0;
 int             curredit = 0;
-int             showansi = 1;
 int             paste_level;
 int             currbid;
 char            quote_file[80] = "\0";

@@ -88,20 +88,21 @@ void sigfree(int);
 /* brc */
 void brc_initialize();
 void brc_finalize();
-int brc_unread(const char *fname, int bnum, const int *blist);
-int brc_unread_time(time_t ftime, int bnum, const int *blist);
+int brc_unread(const char *fname, int bnum, const time_t *blist);
+int brc_unread_time(time_t ftime, int bnum, const time_t *blist);
 int brc_initial_board(const char *boardname);
 void brc_update();
-int brc_read_record(const char* bname, int* num, int* list);
-void brc_trunc(const char* brdname, int ftime);
-void brc_addlist(const char *fname);
+int brc_read_record(int bid, int *num, time_t *list);
+time_t * brc_find_record(int bid, int *num);
+void brc_trunc(int bid, time_t ftime);
+void brc_addlist(const char* fname);
 
 /* cache */
 int moneyof(int uid);
 int getuser(char *userid);
 void setuserid(int num, char *userid);
 int searchuser(char *userid);
-int getbnum(char *bname);
+int getbnum(const char *bname);
 void reset_board(int bid);
 void touch_boards();
 void addbrd_touchcache();

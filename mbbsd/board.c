@@ -118,8 +118,9 @@ have_author(char *brdname)
 static int
 check_newpost(boardstat_t * ptr)
 {				/* Ptt зя */
-    int             tbrc_list[BRC_MAXNUM], tbrc_num;
+    int             tbrc_num;
     time_t          ftime;
+    time_t         *tbrc_list;
 
     ptr->myattr &= ~NBRD_UNREAD;
     if (B_BH(ptr)->brdattr & BRD_GROUPBOARD)
@@ -133,8 +134,8 @@ check_newpost(boardstat_t * ptr)
     if (ftime > now)
 	ftime = B_LASTPOSTTIME(ptr) = now - 1;
 
-    if ( brc_read_record(B_BH(ptr)->brdname, &tbrc_num, tbrc_list) == 0 ||
-	 brc_unread_time(ftime, tbrc_num, tbrc_list) )
+    tbrc_list = brc_find_record(ptr->bid, &tbrc_num);
+    if ( brc_unread_time(ftime, tbrc_num, tbrc_list) )
 	ptr->myattr |= NBRD_UNREAD;
     
     return 1;
@@ -1005,10 +1006,10 @@ choose_board(int newflag)
 		break;
 	    if (ch == 'v') {
 		ptr->myattr &= ~NBRD_UNREAD;
-		brc_trunc(B_BH(ptr)->brdname, now);
+		brc_trunc(ptr->bid, now);
 		setbrdtime(ptr->bid, now);
 	    } else {
-		brc_trunc(B_BH(ptr)->brdname, 1);
+		brc_trunc(ptr->bid, 1);
 		setbrdtime(ptr->bid, 1);
 		ptr->myattr |= NBRD_UNREAD;
 	    }

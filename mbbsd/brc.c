@@ -1,13 +1,22 @@
 #include "bbs.h"
 
 #ifndef BRC_MAXNUM
+#define BRC_STRLEN 15		/* Length of board name */
 #define BRC_MAXSIZE     24576   /* Effective size of brc rc file, 8192 * 3 */
 #define BRC_ITEMSIZE    ((BRC_MAXNUM + 2) * sizeof( int ))
     /* Maximum size of each record */
 #define BRC_MAXNUM      80      /* Upper bound of brc_num, size of brc_list  */
 #endif
 
-/* brc rc file form:
+#if MAX_BOARD > 32767 || BRC_MAXSIZE > 32767
+#error Max number of boards or BRC_MAXSIZE cannot fit in unsighed short, \
+please rewrite brc.c
+#endif
+
+typedef unsigned short brcbid_t;
+typedef unsigned short brcnbrd_t;
+
+/* old brc rc file form:
  * board_name     15 bytes
  * brc_num         1 byte, binary integer
  * brc_list       brc_num * sizeof(int) bytes, brc_num binary integer(s) */
@@ -18,112 +27,154 @@ static time_t   brc_expire_time;
 
 static int      brc_changed = 0;
 /* The below two will be filled by read_brc_buf() and brc_update() */
-static int     *brc_buf = NULL;
-static int      brc_size;
+static char     *brc_buf = NULL;
+static int       brc_size;
 
 static char * const fn_oldboardrc = ".boardrc";
 static char * const fn_brc = ".brc2";
 
-static int    *
-brc_getrecord(int *ptr, int *endp, int *bid, int *pnum, int *list)
+#if 0
+/* unused after brc2 */
+static char *
+brc_getrecord(char *ptr, char *endp, brcbid_t *bid, brcnbrd_t *pnum, time_t *list)
 {
-    int  num;
-    int *tmp;
+    brcnbrd_t num;
+    char   *tmp;
 
-    if (ptr + 2 > endp)
+    if (ptr + sizeof(brcbid_t) + sizeof(brcnbrd_t) > endp)
 	return endp + 1; /* dangling, ignoring it */
-    *bid = *ptr++;       /* bid */
-    num = *ptr++;          /* brc_num */
-    tmp = ptr + num;     /* end of this record */
+    *bid = *(brcbid_t*)ptr;    /* bid */
+    ptr += sizeof(brcbid_t);
+    num = *(brcnbrd_t*)ptr;    /* brc_num */
+    ptr += sizeof(brcnbrd_t);
+    tmp = ptr + num * sizeof(time_t);     /* end of this record */
     if (tmp <= endp){
-	memcpy(list, ptr, num * sizeof(int)); /* brc_list */
+	memcpy(list, ptr, num * sizeof(time_t)); /* brc_list */
 	if (num > BRC_MAXNUM)
 	    num = BRC_MAXNUM;
 	*pnum = num;
     }
     return tmp;
 }
+#endif
 
-static int *
-brc_putrecord(int *ptr, int *endp, int bid, int num, const int *list)
+/* Returns the address of the record strictly between begin and endp with
+ * bid equal to the parameter. Returns 0 if not found.
+ * brcnbrd_t *num is an output parameter which will filled with brc_num
+ * if the record is found. If not found the record, *num will be the number
+ * of dangling bytes. */
+static char *
+brc_findrecord_in(char *begin, char *endp, brcbid_t bid, brcnbrd_t *num)
 {
+    char     *tmpp, *ptr = begin;
+    brcbid_t tbid;
+    while (ptr + sizeof(brcbid_t) + sizeof(brcnbrd_t) < endp) {
+	/* for each available records */
+	tmpp = ptr;
+	tbid = *(brcbid_t*)tmpp;
+	tmpp += sizeof(brcbid_t);
+	*num = *(brcnbrd_t*)tmpp;
+	tmpp += sizeof(brcnbrd_t) + *num * sizeof(time_t); /* end of record */
+
+	if ( tmpp > endp ){
+	    /* dangling, ignore the trailing data */
+	    *num = (brcnbrd_t)(endp - ptr); /* for brc_insert_record() */
+	    return 0;
+	}
+	if ( tbid == bid )
+	    return ptr;
+	ptr = tmpp;
+    }
+
+    *num = 0;
+    return 0;
+}
+
+time_t *
+brc_find_record(int bid, int *num)
+{
+    char *p;
+    *num = 0;
+    p = brc_findrecord_in(brc_buf, brc_buf + brc_size, bid, (brcnbrd_t*)num);
+    if (p)
+	return (time_t*)(p + sizeof(brcbid_t) + sizeof(brcnbrd_t));
+    *num = 0;
+    return 0;
+}
+
+static char *
+brc_putrecord(char *ptr, char *endp, brcbid_t bid, brcnbrd_t num, const time_t *list)
+{
+    char * tmp;
     if (num > 0 && list[0] > brc_expire_time &&
-	    ptr + 2 <= endp) {
+	    ptr + sizeof(brcbid_t) + sizeof(brcnbrd_t) <= endp) {
 	if (num > BRC_MAXNUM)
 	    num = BRC_MAXNUM;
 
-	while (num > 1 && list[num - 1] < brc_expire_time)
+	while (num > 0 && list[num - 1] < brc_expire_time)
 	    num--; /* don't write the times before brc_expire_time */
 
-	if( num == 0 ) return ptr;
+	if (num == 0) return ptr;
 
-	*ptr++ = bid;         /* write in bid */
-	*ptr++ = num;         /* write in brc_num */
-	if (ptr + num <= endp)
-	    memcpy(ptr, list, num * sizeof(int)); /* write in brc_list */
-	ptr += num;
+	*(brcbid_t*)ptr  = bid;         /* write in bid */
+	ptr += sizeof(brcbid_t);
+	*(brcnbrd_t*)ptr = num;         /* write in brc_num */
+	ptr += sizeof(brcnbrd_t);
+	tmp = ptr + num * sizeof(time_t);
+	if (tmp <= endp)
+	    memcpy(ptr, list, num * sizeof(time_t)); /* write in brc_list */
+	ptr = tmp;
     }
     return ptr;
 }
 
-#error "Below not changed yet"
 static inline void
-brc_insert_record(const char* board, int num, int* list)
+brc_insert_record(brcbid_t bid, brcnbrd_t num, time_t* list)
 {
-    int            *ptr, *endp, *tmpp = 0;
-    char            tmp_buf[BRC_ITEMSIZE];
-    char            tmp_name[BRC_STRLEN];
-    int             tmp_list[BRC_MAXNUM];
-    int             new_size, end_size, tmp_num;
-    int             found = 0;
+    char           *ptr;
+    int             new_size, end_size;
+    brcnbrd_t       tnum;
 
-    ptr = brc_buf;
-    endp = &brc_buf[brc_size];
-    while (ptr < endp && (*ptr >= ' ' && *ptr <= 'z')) {
-	/* for each available records */
-	tmpp = brc_getrecord(ptr, endp, tmp_name, &tmp_num, tmp_list);
+    ptr = brc_findrecord_in(brc_buf, brc_buf + brc_size, bid, &tnum);
 
-	if ( tmpp > endp ){
-	    /* dangling, ignore the trailing data */
-	    brc_size = (int)(ptr - brc_buf);
-	    break;
-	}
-	if ( strncmp(tmp_name, board, BRC_STRLEN) == 0 ){
-	    found = 1;
-	    break;
-	}
-	ptr = tmpp;
-    }
+    /* FIXME: this loop is copied from brc_putrecord() */
+    while (num > 0 && list[num - 1] < brc_expire_time)
+	num--; /* don't write the times before brc_expire_time */
 
-    if( ! found ){
+    if (!ptr) {
+	brc_size -= tnum;
+
 	/* put on the beginning */
-	ptr = brc_putrecord(tmp_buf, tmp_buf + BRC_MAXSIZE,
-		board, num, list);
-	new_size = (int)(ptr - tmp_buf);
-	if( new_size ){
+	if (num && (new_size =
+		sizeof(brcbid_t) + sizeof(brcnbrd_t) + num * sizeof(time_t))){
 	    brc_size += new_size;
-	    if ( brc_size > BRC_MAXSIZE )
+	    if (brc_size > BRC_MAXSIZE)
 		brc_size = BRC_MAXSIZE;
-	    memmove(brc_buf + new_size, brc_buf, brc_size);
-	    memmove(brc_buf, tmp_buf, new_size);
+	    if (brc_size > new_size)
+		memmove(brc_buf + new_size, brc_buf, brc_size - new_size);
+	    brc_putrecord(brc_buf, brc_buf + new_size, bid, num, list);
 	}
-    }else{
+    } else {
 	/* ptr points to the old current brc list.
 	 * tmpp is the end of it (exclusive).       */
-	end_size = endp - tmpp;
-	new_size = (int)(brc_putrecord(tmp_buf, tmp_buf + BRC_ITEMSIZE,
-		    board, num, list) - tmp_buf);
-	if( new_size ){
+	char *tmpp = ptr + sizeof(brcbid_t) + sizeof(brcnbrd_t)
+	    + tnum * sizeof(time_t);
+	end_size = brc_buf + brc_size - tmpp;
+	if (num) {
+	    new_size = sizeof(brcbid_t) + sizeof(brcnbrd_t)
+		+ num * sizeof(time_t);
 	    brc_size += new_size - (tmpp - ptr);
-	    if ( brc_size > BRC_MAXSIZE ){
+	    if (brc_size - BRC_MAXSIZE > 0) {
 		end_size -= brc_size - BRC_MAXSIZE;
 		brc_size = BRC_MAXSIZE;
 	    }
-	    if ( end_size > 0 && ptr + new_size != tmpp )
+	    if (end_size > 0 && ptr + new_size != tmpp)
 		memmove(ptr + new_size, tmpp, end_size);
-	    memmove(ptr, tmp_buf, new_size);
-	}else
-	    memmove(ptr, tmpp, brc_size - (tmpp - brc_buf));
+	    brc_putrecord(ptr, brc_buf + BRC_MAXSIZE, bid, num, list);
+	} else { /* deleting record */
+	    memmove(ptr, tmpp, end_size);
+	    brc_size -= (tmpp - ptr);
+	}
     }
 
     brc_changed = 0;
@@ -131,20 +182,26 @@ brc_insert_record(const char* board, int num, int* list)
 
 void
 brc_update(){
-    if (brc_changed && cuser.userlevel && brc_num > 0)
-	brc_insert_record(currboard, brc_num, brc_list);
+    if (brc_changed && cuser->userlevel && brc_num > 0)
+	brc_insert_record(currbid, brc_num, brc_list);
 }
 
-inline static void
+/* return 1 if successfully read from old .boardrc file.
+ * otherwise, return 0. */
+inline static int
 read_old_brc()
 {
+//#error read_old_brc() not implement yet
     /* XXX: read from old brc file */
+    char brdname[BRC_STRLEN + 1];
+    return 0;
+    brdname[0] = brdname[0];
 }
 
 inline static void
 read_brc_buf()
 {
-    if( brc_buf == NULL ){
+    if (brc_buf == NULL) {
 	char            dirfile[STRLEN];
 	int             fd;
 
@@ -154,7 +211,9 @@ read_brc_buf()
 	    brc_size = read(fd, brc_buf, BRC_MAXSIZE);
 	    close(fd);
 	} else {
-	    read_old_brc();
+	    if ( ! read_old_brc()) {
+		brc_size = 0;
+	    }
 	}
     }
 }
@@ -164,7 +223,7 @@ brc_finalize(){
     char brcfile[STRLEN];
     int fd;
     brc_update();
-    setuserfile(brcfile, fn_boardrc);
+    setuserfile(brcfile, fn_brc);
     if (brc_buf != NULL &&
 	(fd = open(brcfile, O_WRONLY | O_CREAT | O_TRUNC, 0644)) != -1) {
 	write(fd, brc_buf, brc_size);
@@ -175,7 +234,7 @@ brc_finalize(){
 void
 brc_initialize(){
     static char done = 0;
-    if( done )
+    if (done)
 	return;
     done = 1;
     brc_expire_time = login_start_time - 365 * 86400;
@@ -183,19 +242,16 @@ brc_initialize(){
 }
 
 int
-brc_read_record(const char* bname, int* num, int* list){
-    char            *ptr;
-    char            *endp;
-    char            tmp_name[BRC_STRLEN];
-    ptr = brc_buf;
-    endp = &brc_buf[brc_size];
-    while (ptr < endp && (*ptr >= ' ' && *ptr <= 'z')) {
-	/* for each available records */
-	ptr = brc_getrecord(ptr, endp, tmp_name, num, list);
-	if (strncmp(tmp_name, bname, BRC_STRLEN) == 0)
-	    return *num;
+brc_read_record(int bid, int *num, time_t *list){
+    char *ptr;
+    *num = 0;
+    ptr = brc_findrecord_in(brc_buf, brc_buf + brc_size, bid, (brcnbrd_t*)num);
+    if ( ptr ){
+	memcpy(list, ptr + sizeof(brcbid_t) + sizeof(brcnbrd_t),
+		*num * sizeof(time_t));
+	return *num;
     }
-    *num = list[0] = 1;
+    list[0] = *num = 1;
     return 0;
 }
 
@@ -213,13 +269,13 @@ brc_initial_board(const char *boardname)
     currboard = bcache[currbid - 1].brdname;
     currbrdattr = bcache[currbid - 1].brdattr;
 
-    return brc_read_record(boardname, &brc_num, brc_list);
+    return brc_read_record(currbid, &brc_num, brc_list);
 }
 
 void
-brc_trunc(const char* brdname, int ftime){
-    brc_insert_record(brdname, 1, &ftime);
-    if (strncmp(brdname, currboard, BRC_STRLEN) == 0){
+brc_trunc(int bid, time_t ftime){
+    brc_insert_record(bid, 1, &ftime);
+    if ( bid == currbid ){
 	brc_num = 1;
 	brc_list[0] = ftime;
 	brc_changed = 0;
@@ -229,9 +285,10 @@ brc_trunc(const char* brdname, int ftime){
 void
 brc_addlist(const char *fname)
 {
-    int             ftime, n, i;
+    int             n, i;
+    time_t          ftime;
 
-    if (!cuser.userlevel)
+    if (!cuser->userlevel)
 	return;
 
     ftime = atoi(&fname[2]);
@@ -253,7 +310,7 @@ brc_addlist(const char *fname)
 	} else if (ftime > brc_list[n]) {
 	    if (brc_num < BRC_MAXNUM)
 		brc_num++;
-	    /* insert ftime in to brc_list */
+	    /* insert ftime into brc_list */
 	    for (i = brc_num - 1; --i >= n; brc_list[i + 1] = brc_list[i]);
 	    brc_list[n] = ftime;
 	    brc_changed = 1;
@@ -263,14 +320,14 @@ brc_addlist(const char *fname)
 }
 
 int
-brc_unread_time(time_t ftime, int bnum, const int *blist)
+brc_unread_time(time_t ftime, int bnum, const time_t *blist)
 {
     int             n;
 
     if (ftime <= brc_expire_time) /* too old */
 	return 0;
 
-    if (brc_num <= 0)
+    if (bnum <= 0)
 	return 1;
     for (n = 0; n < bnum; n++) { /* using linear search */
 	if (ftime > blist[n])
@@ -282,7 +339,7 @@ brc_unread_time(time_t ftime, int bnum, const int *blist)
 }
 
 int
-brc_unread(const char *fname, int bnum, const int *blist)
+brc_unread(const char *fname, int bnum, const time_t *blist)
 {
     int             ftime, n;
 
@@ -291,7 +348,7 @@ brc_unread(const char *fname, int bnum, const int *blist)
     if (ftime <= brc_expire_time) /* too old */
 	return 0;
 
-    if (brc_num <= 0)
+    if (bnum <= 0)
 	return 1;
     for (n = 0; n < bnum; n++) { /* using linear search */
 	if (ftime > blist[n])

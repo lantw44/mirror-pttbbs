@@ -121,7 +121,14 @@ typedef struct userec_t {
 #define LIVERIGHT       0x200  /* true if get "liveright" already */
 #define REJ_OUTTAMAIL   0x400 /* true if don't accept outside mails */
 #define REJECT_OUTTAMAIL (cuser.uflag2 & REJ_OUTTAMAIL)
-#define BEING_ANGEL     0x1000 /* true if willing to be angel */
+#define REJ_QUESTION    0x800 /* true if don't want to be angel for a while */
+#define REJECT_QUESTION (cuser.uflag2 & REJ_QUESTION)
+#define ANGEL_MASK      0x3000
+#define ANGEL_R_MAEL    0x1000 /* true if reject male */
+#define ANGEL_R_FEMAEL  0x2000 /* true if reject female */
+#define ANGEL_STATUS()  ((cuser.uflag2 & ANGEL_MASK) >> 12)
+#define ANGEL_SET(X)    (cuser.uflag2 = (cuser.uflag2 & ~ANGEL_MASK) | \
+                          ((X & 3) << 12))
 
 #define BTLEN      48             /* Length of board title */
 
@@ -260,7 +267,7 @@ typedef struct userinfo_t {
     unsigned char   active;         /* When allocated this field is true */
     unsigned char   invisible;      /* Used by cloaking function in Xyz menu */
     unsigned char   sockactive;     /* Used to coordinate talk requests */
-    unsigned char   being_angel;
+    unsigned char   angel;
     unsigned int    userlevel;
     unsigned char   mode;           /* UL/DL, Talk Mode, Chat Mode, ... */
     unsigned char   pager;          /* pager toggle, YEA, or NA */

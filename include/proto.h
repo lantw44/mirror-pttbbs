@@ -540,6 +540,9 @@ int toconnect(char *host, int port);
 int toread(int fd, void *buf, int len);
 int towrite(int fd, void *buf, int len);
 #endif
+#ifdef PLAY_ANGEL
+void pressanykey_or_callangel(void);
+#endif
 
 /* syspost */
 int post_msg(char* bname, char* title, char *msg, char* author);
@@ -584,6 +587,8 @@ int make_connection_to_somebody(userinfo_t *uin, int timeout);
 #ifdef PLAY_ANGEL
 int t_changeangel(void);
 void CallAngel(void);
+void SwitchBeingAngel(void);
+void SwitchAngelSex(int);
 int t_switchangel(void);
 #endif
 

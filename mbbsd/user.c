@@ -89,8 +89,10 @@ user_display(userec_t * u, int real)
 	   get_num_records(genbuf, sizeof(fileheader_t)),
 	   u->exmailbox, u->mobile,
 	   u->month, u->day, u->year % 100, u->mychicken.name);
+#ifdef PLAY_ANGEL
     prints("                小 天 使: %s\n",
 	    u->myangel[0] ? u->myangel : "無");
+#endif
     prints("                註冊日期: %s", ctime(&u->firstlogin));
     prints("                前次光臨: %s", ctime(&u->lastlogin));
     prints("                前次點歌: %s", ctime(&u->lastsong));
@@ -221,6 +223,9 @@ static void Customize(void)
     char    done = 0, mindbuf[5];
     char    *wm[3] = {"一般", "進階", "未來"};
     int     key;
+#ifdef PLAY_ANGEL
+    char    *am[4] = {"男女皆可", "限女生", "限男生", "暫不接受新的小主人"};
+#endif
 
     showtitle("個人化設定", "個人化設定");
     memcpy(mindbuf, &currutmp->mind, 4);
@@ -240,8 +245,9 @@ static void Customize(void)
 #ifdef PLAY_ANGEL
 	if( HAS_PERM(PERM_ANGEL) ){
 	    prints("%-30s%10s\n", "F. 接受小主人詢問", 
-		    ((cuser.uflag2 & BEING_ANGEL) ? "是" : "否"));
-	    key = getkey("請按 [A-F] 切換設定，按 [Return] 結束：");
+		    (REJECT_QUESTION ? "否" : "是"));
+	    prints("%-30s%10s\n", "G. 接受的小主人性別", am[ANGEL_STATUS()]);
+	    key = getkey("請按 [A-G] 切換設定，按 [Return] 結束：");
 	}else
 #endif
 	    key = getkey("請按 [A-E] 切換設定，按 [Return] 結束：");
@@ -281,7 +287,15 @@ static void Customize(void)
 #ifdef PLAY_ANGEL
 	case 'f':
 	    if( HAS_PERM(PERM_ANGEL) ){
-		t_switchangel();
+		SwitchBeingAngel();
+		break;
+	    }
+	    done = 1;
+	    break;
+
+	case 'g':
+	    if( HAS_PERM(PERM_ANGEL) ){
+		SwitchAngelSex(ANGEL_STATUS() + 1);
 		break;
 	    }
 #endif
@@ -394,6 +408,21 @@ uinfo_query(userec_t * u, int real, int unum)
 	    i++;
 	    break;
 	}
+
+#ifdef PLAY_ANGEL
+	if (real)
+	    while (1) {
+		getdata_str(i, 0, "小天使：", buf, IDLEN + 1, DOECHO,
+			x.myangel);
+		if(buf[0] == 0 || (getuser(buf) &&
+			    (xuser.userlevel & PERM_ANGEL))){
+		    strlcpy(x.myangel, buf, IDLEN + 1);
+		    ++i;
+		    break;
+		}
+	    }
+#endif
+
 	if (real) {
 	    int l;
 	    if (HAS_PERM(PERM_BBSADM)) {

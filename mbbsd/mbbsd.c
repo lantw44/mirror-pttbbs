@@ -771,8 +771,11 @@ setup_utmp(int mode)
 #endif
     if (enter_uflag & CLOAK_FLAG)
 	uinfo.invisible = YEA;
-    if (cuser.uflag2 & BEING_ANGEL)
-	uinfo.being_angel = 1;
+
+    if (REJECT_QUESTION)
+	uinfo.angel = 1;
+    uinfo.angel |= ANGEL_STATUS() << 1;
+
     getnewutmpent(&uinfo);
     SHM->UTMPneedsort = 1;
     if (!(cuser.numlogins % 20) && cuser.userlevel & PERM_BM)

@@ -603,6 +603,8 @@ my_write2(void)
  * 6. my_write2  flag = WATERBALL_CONFIRM, 4 (pre-edit but confirm)
  * 7. (when defined PLAY_ANGEL)
  *    呼叫小天使 flag = WATERBALL_ANGEL,   5 (隱藏 id)
+ * 8. (when defined PLAY_ANGEL)
+ *    回答小主人 flag = WATERBALL_ANSWER,  6
  */
 int
 my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
@@ -709,7 +711,8 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
 	    kill(uin->pid, SIGUSR1);
     } else if (flag != WATERBALL_ALOHA &&
 #ifdef PLAY_ANGEL
-	       flag != WATERBALL_ANGEL && flag != WATERBALL_ANSWER &&
+	       (flag != WATERBALL_ANGEL || (uin->angel & 1)) &&
+	       flag != WATERBALL_ANSWER &&
 	       /* Angel accept or not is checked outside.
 		* Avoiding new users don't know what pager is. */
 #endif
@@ -1926,11 +1929,13 @@ draw_pickup(int drawall, pickup_t * pickup, int pickup_way,
 int
 call_in(userinfo_t * uentp, int fri_stat)
 {
+#ifdef PLAY_ANGLE
     static int CallInAngelWarning = 1;
     if( CallInAngelWarning && ! strcasecmp(uentp->userid, cuser.myangel) ){
 	outmsg("直接丟水球給小天使是會被知道 ID 的喔！");
 	CallInAngelWarning = 0;
     }
+#endif
  
     if (iswritable_stat(uentp, fri_stat)) {
 	char            genbuf[60];
@@ -2803,16 +2808,23 @@ t_changeangel(){
 
 static int
 FindAngel(void){
-    /* TODO: randomized choose an online angel, shouldn't be themself */
     int nAngel;
     int i, j;
     int choose;
     int trial = 0;
+    int mask;
+
+    if (cuser.sex < 6) /* 正常性別 */
+	mask = 1 | (2 << (cuser.sex & 1));
+    else
+	mask = 7;
+
     do{
 	nAngel = 0;
 	j = SHM->currsorted;
 	for (i = 0; i < SHM->UTMPnumber; ++i)
-	    if (SHM->sorted[j][0][i]->userlevel & PERM_ANGEL)
+	    if ((SHM->sorted[j][0][i]->userlevel & PERM_ANGEL)
+		    && (SHM->sorted[j][0][j]->angel & mask) == 0)
 		++nAngel;
 
 	if (nAngel == 0)
@@ -2821,10 +2833,11 @@ FindAngel(void){
 	choose = rand() % nAngel + 1;
 	j = SHM->currsorted;
 	for (i = 0; i < SHM->UTMPnumber && choose; ++i)
-	    if (SHM->sorted[j][0][i]->userlevel & PERM_ANGEL)
+	    if ((SHM->sorted[j][0][i]->userlevel & PERM_ANGEL)
+		    && (SHM->sorted[j][0][j]->angel & mask) == 0)
 		--choose;
 
-	if (choose == 0 && SHM->sorted[j][0][i - 1] != currutmp){
+	if (choose == 0 && SHM->sorted[j][0][i - 1]->uid != currutmp->uid){
 	    strlcpy(cuser.myangel, SHM->sorted[j][0][i - 1]->userid, IDLEN + 1);
 	    return 1;
 	}
@@ -2864,12 +2877,15 @@ TalkToAngel(){
     }
 
     uent = search_ulist_userid(cuser.myangel);
-    if (uent == 0 || !uent->being_angel){
+    if (uent == 0 || (uent->angel & 1)){
 	NoAngelFound("您的小天使現在不在線上");
 	return;
     }
 
-    /* TODO: complete first name-hiden waterball */
+    move(b_lines - 1, 0);
+    outs("現在你的id受到保密，回答你問題的小天使並不知道你是誰       \n"
+         "你可以選擇不向對方透露自己身份來保護自己                   ");
+
     snprintf(buf, 128, "問小天使 %s： ", cuser.myangel);
     my_write(uent->pid, buf, cuser.myangel, WATERBALL_ANGEL, uent);
     return;
@@ -2890,15 +2906,22 @@ CallAngel(){
     redoscr();
 }
 
-void SwitchBeingAngel(){
-    cuser.uflag2 ^= BEING_ANGEL;
-    currutmp->being_angel ^= 1;
+void
+SwitchBeingAngel(){
+    cuser.uflag2 ^= REJ_QUESTION;
+    currutmp->angel ^= 1;
 }
 
-int t_switchangel(){
+void
+SwitchAngelSex(int newmode){
+    ANGEL_SET(newmode);
+    currutmp->angel = (currutmp->angel & ~0x6) | ((newmode & 3) << 1);
+}
+
+int
+t_switchangel(){
     SwitchBeingAngel();
-    outs(cuser.uflag2 & BEING_ANGEL ?
-	    "開放小主人問問題" : "休息一會兒");
+    outs(REJECT_QUESTION ? "休息一會兒" : "開放小主人問問題");
     return XEASY;
 }
 #endif

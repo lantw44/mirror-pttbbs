@@ -10,16 +10,16 @@ m_loginmsg()
   clrtobot();
   if(SHM->loginmsg.pid && SHM->loginmsg.pid != currutmp->pid)
     {
-      prints("目前已經有以下的 進站水球設定請先協調好再設定..");
+      prints(SHM->i18nstr[cuser.language][0]);
       getmessage(SHM->loginmsg);
     }
   getdata(22, 0, 
-     "進站水球:本站活動,不干擾使用者為限,設定者離站自動取消,確定要設?(y/N)",
+     SHM->i18nstr[cuser.language][1],
           msg, 3, LCECHO);
 
   if(msg[0]=='y' &&
 
-     getdata_str(23, 0, "設定進站水球:", msg, 56, DOECHO, SHM->loginmsg.last_call_in))
+     getdata_str(23, 0, SHM->i18nstr[cuser.language][2], msg, 56, DOECHO, SHM->loginmsg.last_call_in))
     {
           SHM->loginmsg.pid=currutmp->pid; /*站長不多 就不管race condition */
           strcpy(SHM->loginmsg.last_call_in, msg);
@@ -36,7 +36,7 @@ m_user()
     int             id;
     char            genbuf[200];
 
-    stand_title("使用者設定");
+    stand_title(SHM->i18nstr[cuser.language][3]);
     usercomplete(msg_uid, genbuf);
     if (*genbuf) {
 	move(2, 0);
@@ -66,14 +66,13 @@ search_key_user(char *passwdfile, int mode)
 
     assert(fp1);
     clear();
-    getdata(0, 0, mode ? "請輸入使用者關鍵字[電話|地址|姓名|身份證|上站地點|"
-	    "email|小雞id] :" : "請輸入id :", key, sizeof(key), DOECHO);
+    getdata(0, 0, mode ? SHM->i18nstr[cuser.language][4] : SHM->i18nstr[cuser.language][5], key, sizeof(key), DOECHO);
     if(!key[0])
 	return 0;
     while ((fread(&user, sizeof(user), 1, fp1)) > 0 && coun < MAX_USERS) {
 	if (!(++coun & 15)) {
 	    move(1, 0);
-	    prints("第 [%d] 筆資料\n", coun);
+	    prints(SHM->i18nstr[cuser.language][6], coun);
 	    refresh();
 	}
         keymatch = NULL;
@@ -99,16 +98,15 @@ search_key_user(char *passwdfile, int mode)
 	}
         if(keymatch) {
 	    move(1, 0);
-	    prints("第 [%d] 筆資料\n", coun);
+	    prints(SHM->i18nstr[cuser.language][7], coun);
 	    refresh();
 
 	    user_display(&user, 1);
 	    uinfo_query(&user, 1, coun);
-	    outs("\033[44m               空白鍵\033[37m:搜尋下一個"
-		 "          \033[33m Q\033[37m: 離開");
+	    outs(SHM->i18nstr[cuser.language][8]);
 	    outs(mode ? 
                  "      A: add to namelist \033[m " :
-		 "      S: 取用備份資料    \033[m ");
+		 SHM->i18nstr[cuser.language][9]);
 	    while (1) {
 		while ((ch = igetch()) == 0);
                 if (ch == 'a' || ch=='A' )
@@ -134,26 +132,26 @@ search_key_user(char *passwdfile, int mode)
 			fclose(fp1);
 			return 0;
 		    } else {
+			move(b_lines - 1, 0);
 			getdata(0, 0,
-				"目前的 PASSWD 檔沒有此 ID，新增嗎？[y/N]",
+				SHM->i18nstr[cuser.language][10],
 				genbuf, 3, LCECHO);
 			if (genbuf[0] != 'y') {
-			    outs("目前的PASSWDS檔沒有此id "
-				 "請先new一個這個id的帳號");
+			    outs(SHM->i18nstr[cuser.language][11]);
 			} else {
 			    int             allocid = getnewuserid();
 
 			    if (allocid > MAX_USERS || allocid <= 0) {
-				fprintf(stderr, "本站人口已達飽和！\n");
+				fprintf(stderr, SHM->i18nstr[cuser.language][12]);
 				exit(1);
 			    }
 			    if (passwd_update(allocid, &user) == -1) {
-				fprintf(stderr, "客滿了，再見！\n");
+				fprintf(stderr, SHM->i18nstr[cuser.language][13]);
 				exit(1);
 			    }
 			    setuserid(allocid, user.userid);
 			    if (!searchuser(user.userid)) {
-				fprintf(stderr, "無法建立帳號\n");
+				fprintf(stderr, SHM->i18nstr[cuser.language][14]);
 				exit(1);
 			    }
 			    fclose(fp1);
@@ -190,15 +188,13 @@ search_user_bybakpwd()
 
     clear();
     move(1, 1);
-    outs("請輸入你要用來尋找備份的檔案 或按 'q' 離開\n");
-    outs(" [\033[1;31m1\033[m]一天前, [\033[1;31m2\033[m]兩天前, "
-	 "[\033[1;31m3\033[m]三天前\n");
-    outs(" [\033[1;31m4\033[m]四天前, [\033[1;31m5\033[m]五天前, "
-	 "[\033[1;31m6\033[m]六天前\n");
-    outs(" [7]備份的\n");
+    outs(SHM->i18nstr[cuser.language][15]);
+    outs(SHM->i18nstr[cuser.language][16]);
+    outs(SHM->i18nstr[cuser.language][17]);
+    outs(SHM->i18nstr[cuser.language][18]);
     do {
 	move(5, 1);
-	outs("選擇 => ");
+	outs(SHM->i18nstr[cuser.language][19]);
 	ch = igetch();
 	if (ch == 'q' || ch == 'Q')
 	    return 0;
@@ -211,8 +207,8 @@ search_user_bybakpwd()
 static void
 bperm_msg(boardheader_t * board)
 {
-    prints("\n設定 [%s] 看板之(%s)權限：", board->brdname,
-	   board->brdattr & BRD_POSTMASK ? "發表" : "閱\讀");
+    prints(SHM->i18nstr[cuser.language][20], board->brdname,
+	   board->brdattr & BRD_POSTMASK ? SHM->i18nstr[cuser.language][21] : SHM->i18nstr[cuser.language][22]);
 }
 
 unsigned int
@@ -225,16 +221,16 @@ setperms(unsigned int pbits, char *pstring[])
     for (i = 0; i < NUMPERMS / 2; i++) {
 	prints("%c. %-20s %-15s %c. %-20s %s\n",
 	       'A' + i, pstring[i],
-	       ((pbits >> i) & 1 ? "ˇ" : "Ｘ"),
+	       ((pbits >> i) & 1 ? SHM->i18nstr[cuser.language][23] : SHM->i18nstr[cuser.language][24]),
 	       i < 10 ? 'Q' + i : '0' + i - 10,
 	       pstring[i + 16],
-	       ((pbits >> (i + 16)) & 1 ? "ˇ" : "Ｘ"));
+	       ((pbits >> (i + 16)) & 1 ? SHM->i18nstr[cuser.language][25] : SHM->i18nstr[cuser.language][26]));
     }
     clrtobot();
-    while (
-       (i = getkey("請按 [A-5] 切換設定，按 [Return] 結束："))!='\r')
-         {
-	i = i - 'a';
+    while(
+    	(i = getkey(SHM->i18nstr[cuser.language][27]))!='\r')
+    	{
+    i = i - 'a';
 	if (i < 0)
 	    i = choice[0] - '0' + 26;
 	if (i >= NUMPERMS)
@@ -242,7 +238,7 @@ setperms(unsigned int pbits, char *pstring[])
 	else {
 	    pbits ^= (1 << i);
 	    move(i % 16 + 4, i <= 15 ? 24 : 64);
-	    prints((pbits >> i) & 1 ? "ˇ" : "Ｘ");
+	    prints((pbits >> i) & 1 ? SHM->i18nstr[cuser.language][28] : SHM->i18nstr[cuser.language][29]);
 	}
     }
     return pbits;
@@ -263,7 +259,7 @@ void delete_symbolic_link(boardheader_t *bh, int bid)
     memset(bh, 0, sizeof(boardheader_t));
     substitute_record(fn_board, bh, sizeof(boardheader_t), bid);
     reset_board(bid);
-    sort_bcache(); 
+    sort_bcache();
     log_usies("DelLink", bh->brdname);
 }
 
@@ -280,15 +276,14 @@ m_mod_board(char *bname)
 	pressanykey();
 	return -1;
     }
-    prints("看板名稱：%s\n看板說明：%s\n看板bid：%d\n看板GID：%d\n"
-	   "板主名單：%s", bh.brdname, bh.title, bid, bh.gid, bh.BM);
+    prints(SHM->i18nstr[cuser.language][30], bh.brdname, bh.title, bid, bh.gid, bh.BM);
     bperm_msg(&bh);
 
     /* Ptt 這邊斷行會檔到下面 */
     move(9, 0);
-    snprintf(genbuf, sizeof(genbuf), "(E)設定 (V)違法/解除%s%s [Q]取消？",
-	    HAS_PERM(PERM_SYSOP) ? " (B)BVote (S)救回文章 (G)賭盤解卡" : "",
-	    HAS_PERM(PERM_SYSSUBOP) ? " (D)刪除" : "");
+    snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][31],
+	    HAS_PERM(PERM_SYSOP) ? SHM->i18nstr[cuser.language][32] : "",
+	    HAS_PERM(PERM_SYSSUBOP) ? SHM->i18nstr[cuser.language][33] : "");
     getdata(10, 0, genbuf, ans, sizeof(ans), LCECHO);
 
     switch (*ans) {
@@ -315,8 +310,8 @@ m_mod_board(char *bname)
 	    memcpy(&newbh, &bh, sizeof(bh));
 	    snprintf(bvotebuf, sizeof(bvotebuf), "%d", newbh.bvote);
 	    move(20, 0);
-	    prints("看板 %s 原來的 BVote：%d", bh.brdname, bh.bvote);
-	    getdata_str(21, 0, "新的 Bvote：", genbuf, 5, LCECHO, bvotebuf);
+	    prints(SHM->i18nstr[cuser.language][34], bh.brdname, bh.bvote);
+	    getdata_str(21, 0, SHM->i18nstr[cuser.language][35], genbuf, 5, LCECHO, bvotebuf);
 	    newbh.bvote = atoi(genbuf);
 	    substitute_record(fn_board, &newbh, sizeof(newbh), bid);
 	    reset_board(bid);
@@ -326,9 +321,9 @@ m_mod_board(char *bname)
 	    break;
     case 'v':
 	memcpy(&newbh, &bh, sizeof(bh));
-	outs("看板目前為");
-	outs((bh.brdattr & BRD_BAD) ? "違法" : "正常");
-	getdata(21, 0, "確定更改？", genbuf, 5, LCECHO);
+	outs(SHM->i18nstr[cuser.language][36]);
+	outs((bh.brdattr & BRD_BAD) ? SHM->i18nstr[cuser.language][37] : SHM->i18nstr[cuser.language][38]);
+	getdata(21, 0, SHM->i18nstr[cuser.language][39], genbuf, 5, LCECHO);
 	if (genbuf[0] == 'y') {
 	    if (newbh.brdattr & BRD_BAD)
 		newbh.brdattr = newbh.brdattr & (!BRD_BAD);
@@ -351,31 +346,30 @@ m_mod_board(char *bname)
 	else {
 	    strlcpy(bname, bh.brdname, sizeof(bh.brdname));
 	    snprintf(genbuf, sizeof(genbuf),
-		    "/bin/tar zcvf tmp/board_%s.tgz boards/%c/%s man/boards/%c/%s >/dev/null 2>&1;"
-		    "/bin/rm -fr boards/%c/%s man/boards/%c/%s",
+		    "/bin/tar zcvf tmp/board_%s.tgz boards/%c/%s man/boards/%c/%s >/dev/null 2>&1;/bin/rm -fr boards/%c/%s man/boards/%c/%s",
 		    bname, bname[0], bname, bname[0],
 		    bname, bname[0], bname, bname[0], bname);
 	    system(genbuf);
 	    memset(&bh, 0, sizeof(bh));
 	    snprintf(bh.title, sizeof(bh.title),
-		     "%s 看板 %s 刪除", bname, cuser.userid);
-	    post_msg("Security", bh.title, "請注意刪除的合法性", "[系統安全局]");
+		     SHM->i18nstr[cuser.language][40], bname, cuser.userid);
+	    post_msg("Security", bh.title, SHM->i18nstr[cuser.language][41], SHM->i18nstr[cuser.language][42]);
 	    substitute_record(fn_board, &bh, sizeof(bh), bid);
 	    reset_board(bid);
-            sort_bcache(); 
+	    sort_bcache();
 	    log_usies("DelBoard", bh.title);
-	    outs("刪板完畢");
+	    outs(SHM->i18nstr[cuser.language][43]);
 	}
 	break;
     case 'e':
 	move(8, 0);
-	outs("直接按 [Return] 不修改該項設定");
+	outs(SHM->i18nstr[cuser.language][44]);
 	memcpy(&newbh, &bh, sizeof(bh));
 
-	while (getdata(9, 0, "新看板名稱：", genbuf, IDLEN + 1, DOECHO)) {
+	while (getdata(9, 0, SHM->i18nstr[cuser.language][45], genbuf, IDLEN + 1, DOECHO)) {
 	    if (getbnum(genbuf)) {
 		move(3, 0);
-		outs("錯誤! 板名雷同");
+		outs(SHM->i18nstr[cuser.language][46]);
 	    } else if ( !invalid_brdname(genbuf) ){
 		strlcpy(newbh.brdname, genbuf, sizeof(newbh.brdname));
 		break;
@@ -383,7 +377,7 @@ m_mod_board(char *bname)
 	}
 
 	do {
-	    getdata_str(12, 0, "看板類別：", genbuf, 5, DOECHO, bh.title);
+	    getdata_str(12, 0, SHM->i18nstr[cuser.language][47], genbuf, 5, DOECHO, bh.title);
 	    if (strlen(genbuf) == 4)
 		break;
 	} while (1);
@@ -393,11 +387,11 @@ m_mod_board(char *bname)
 
 	newbh.title[4] = ' ';
 
-	getdata_str(14, 0, "看板主題：", genbuf, BTLEN + 1, DOECHO,
+	getdata_str(14, 0, SHM->i18nstr[cuser.language][48], genbuf, BTLEN + 1, DOECHO,
 		    bh.title + 7);
 	if (genbuf[0])
 	    strlcpy(newbh.title + 7, genbuf, sizeof(newbh.title) - 7);
-	if (getdata_str(15, 0, "新板主名單：", genbuf, IDLEN * 3 + 3, DOECHO,
+	if (getdata_str(15, 0, SHM->i18nstr[cuser.language][49], genbuf, IDLEN * 3 + 3, DOECHO,
 			bh.BM)) {
 	    trim(genbuf);
 	    strlcpy(newbh.BM, genbuf, sizeof(newbh.BM));
@@ -410,16 +404,16 @@ m_mod_board(char *bname)
 	    clrtobot();
 	}
 	if (newbh.brdattr & BRD_GROUPBOARD)
-	    strncpy(newbh.title + 5, "Σ", 2);
+	    strncpy(newbh.title + 5, SHM->i18nstr[cuser.language][50], 2);
 	else if (newbh.brdattr & BRD_NOTRAN)
-	    strncpy(newbh.title + 5, "◎", 2);
+	    strncpy(newbh.title + 5, SHM->i18nstr[cuser.language][51], 2);
 	else
-	    strncpy(newbh.title + 5, "●", 2);
+	    strncpy(newbh.title + 5, SHM->i18nstr[cuser.language][52], 2);
 
 	if (HAS_PERM(PERM_SYSOP) && !(newbh.brdattr & BRD_HIDE)) {
-	    getdata_str(14, 0, "設定讀寫權限(Y/N)？", ans, sizeof(ans), LCECHO, "N");
+	    getdata_str(14, 0, SHM->i18nstr[cuser.language][53], ans, sizeof(ans), LCECHO, "N");
 	    if (*ans == 'y') {
-		getdata_str(15, 0, "限制 [R]閱\讀 (P)發表？", ans, sizeof(ans), LCECHO,
+		getdata_str(15, 0, SHM->i18nstr[cuser.language][54], ans, sizeof(ans), LCECHO,
 			    "R");
 		if (*ans == 'p')
 		    newbh.brdattr |= BRD_POSTMASK;
@@ -433,7 +427,7 @@ m_mod_board(char *bname)
 		clear();
 	    }
 	}
-	getdata(b_lines - 1, 0, "請您確定(Y/N)？[Y]", genbuf, 4, LCECHO);
+	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][55], genbuf, 4, LCECHO);
 
 	if ((*genbuf != 'n') && memcmp(&newbh, &bh, sizeof(bh))) {
 	    if (strcmp(bh.brdname, newbh.brdname)) {
@@ -450,7 +444,7 @@ m_mod_board(char *bname)
 	    setup_man(&newbh);
 	    substitute_record(fn_board, &newbh, sizeof(newbh), bid);
 	    reset_board(bid);
-            sort_bcache(); 
+	    sort_bcache();
 	    log_usies("SetBoard", newbh.brdname);
 	}
     }
@@ -463,7 +457,7 @@ m_board()
 {
     char            bname[32];
 
-    stand_title("看板設定");
+    stand_title(SHM->i18nstr[cuser.language][56]);
     generalnamecomplete(msg_bid, bname, sizeof(bname), SHM->Bnumber,
 			completeboard_compar,
 			completeboard_permission,
@@ -483,16 +477,16 @@ x_file()
 
     move(b_lines - 6, 0);
     /* Ptt */
-    outs("設定 (1)身份確認信 (4)post注意事項 (5)錯誤登入訊息 (6)註冊範例 (7)通過確認通知\n");
-    outs("     (8)email post通知 (9)系統功\能精靈 (A)茶樓 (B)站長名單 (C)email通過確認\n");
-    outs("     (D)新使用者需知 (E)身份確認方法 (F)歡迎畫面 (G)進站畫面"
+    outs(SHM->i18nstr[cuser.language][57]);
+    outs(SHM->i18nstr[cuser.language][58]);
+    outs(SHM->i18nstr[cuser.language][59]);
 #ifdef MULTI_WELCOME_LOGIN
-	 "(X)刪除進站畫面"
+	 outs(SHM->i18nstr[cuser.language][60]);
 #endif
-	 "\n");
-    outs("     (H)看板期限 (I)故鄉 (J)出站畫面 (K)生日卡 (L)節日 (M)外籍使用者認證通知\n");
-    outs("     (N)外籍使用者過期警告通知\n");
-    getdata(b_lines - 1, 0, "[Q]取消[1-9 A-N]？", ans, sizeof(ans), LCECHO);
+	outs("\n");
+    outs(SHM->i18nstr[cuser.language][61]);
+    outs(SHM->i18nstr[cuser.language][62]);
+    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][63], ans, sizeof(ans), LCECHO);
 
     switch (ans[0]) {
     case '1':
@@ -533,7 +527,7 @@ x_file()
 	break;
     case 'g':
 #ifdef MULTI_WELCOME_LOGIN
-	getdata(b_lines - 1, 0, "第幾個進站畫面[0-4]", ans, sizeof(ans), LCECHO);
+	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][64], ans, sizeof(ans), LCECHO);
 	if (ans[0] == '1') {
 	    fpath = "etc/Welcome_login.1";
 	} else if (ans[0] == '2') {
@@ -552,7 +546,7 @@ x_file()
 
 #ifdef MULTI_WELCOME_LOGIN
     case 'x':
-	getdata(b_lines - 1, 0, "第幾個進站畫面[1-4]", ans, sizeof(ans), LCECHO);
+	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][65], ans, sizeof(ans), LCECHO);
 	if (ans[0] == '1') {
 	    unlink("etc/Welcome_login.1");
 	    outs("ok");
@@ -566,7 +560,7 @@ x_file()
 	    unlink("etc/Welcome_login.4");
 	    outs("ok");
 	} else {
-	    outs("所指定的進站畫面無法刪除");
+	    outs(SHM->i18nstr[cuser.language][66]);
 	}
 	pressanykey();
 	return FULLUPDATE;
@@ -598,8 +592,8 @@ x_file()
 	return FULLUPDATE;
     }
     aborted = vedit(fpath, NA, NULL);
-    prints("\n\n系統檔案[%s]：%s", fpath,
-	   (aborted == -1) ? "未改變" : "更新完畢");
+    prints(SHM->i18nstr[cuser.language][67], fpath,
+	   (aborted == -1) ? SHM->i18nstr[cuser.language][68] : SHM->i18nstr[cuser.language][69]);
     pressanykey();
     return FULLUPDATE;
 }
@@ -610,7 +604,7 @@ static int add_board_record(boardheader_t *board)
     if ((bid = getbnum("")) > 0) {
 	substitute_record(fn_board, board, sizeof(boardheader_t), bid);
 	reset_board(bid);
-        sort_bcache(); 
+	sort_bcache();
     } else if (append_record(fn_board, (fileheader_t *)board, sizeof(boardheader_t)) == -1) {
 	return -1;
     } else {
@@ -626,13 +620,13 @@ m_newbrd(int recover)
     char            ans[4];
     char            genbuf[200];
 
-    stand_title("建立新板");
+    stand_title(SHM->i18nstr[cuser.language][70]);
     memset(&newboard, 0, sizeof(newboard));
 
     newboard.gid = class_bid;
     if (newboard.gid == 0) {
 	move(6, 0);
-	outs("請先選擇一個類別再開板!");
+	outs(SHM->i18nstr[cuser.language][71]);
 	pressanykey();
 	return -1;
     }
@@ -643,7 +637,7 @@ m_newbrd(int recover)
     } while (invalid_brdname(newboard.brdname));
 
     do {
-	getdata(6, 0, "看板類別：", genbuf, 5, DOECHO);
+	getdata(6, 0, SHM->i18nstr[cuser.language][72], genbuf, 5, DOECHO);
 	if (strlen(genbuf) == 4)
 	    break;
     } while (1);
@@ -652,19 +646,19 @@ m_newbrd(int recover)
 
     newboard.title[4] = ' ';
 
-    getdata(8, 0, "看板主題：", genbuf, BTLEN + 1, DOECHO);
+    getdata(8, 0, SHM->i18nstr[cuser.language][73], genbuf, BTLEN + 1, DOECHO);
     if (genbuf[0])
 	strlcpy(newboard.title + 7, genbuf, sizeof(newboard.title) - 7);
     setbpath(genbuf, newboard.brdname);
 
     if (recover) {
 	if (dashd(genbuf)) {
-	    outs("此看板已經存在! 請取不同英文板名");
+	    outs(SHM->i18nstr[cuser.language][74]);
 	    pressanykey();
 	    return -1;
 	}
     } else if (getbnum(newboard.brdname) > 0 || mkdir(genbuf, 0755) == -1) {
-	outs("此看板已經存在! 請取不同英文板名");
+	outs(SHM->i18nstr[cuser.language][75]);
 	pressanykey();
 	return -1;
     }
@@ -677,24 +671,24 @@ m_newbrd(int recover)
 	move(1, 0);
 	clrtobot();
     }
-    getdata(9, 0, "是看板? (N:目錄) (Y/n)：", genbuf, 3, LCECHO);
+    getdata(9, 0, SHM->i18nstr[cuser.language][76], genbuf, 3, LCECHO);
     if (genbuf[0] == 'n')
 	newboard.brdattr |= BRD_GROUPBOARD;
 
     if (newboard.brdattr & BRD_GROUPBOARD)
-	strncpy(newboard.title + 5, "Σ", 2);
+	strncpy(newboard.title + 5, SHM->i18nstr[cuser.language][77], 2);
     else if (newboard.brdattr & BRD_NOTRAN)
-	strncpy(newboard.title + 5, "◎", 2);
+	strncpy(newboard.title + 5, SHM->i18nstr[cuser.language][78], 2);
     else
-	strncpy(newboard.title + 5, "●", 2);
+	strncpy(newboard.title + 5, SHM->i18nstr[cuser.language][79], 2);
 
     newboard.level = 0;
-    getdata(11, 0, "板主名單：", newboard.BM, sizeof(newboard.BM), DOECHO);
+    getdata(11, 0, SHM->i18nstr[cuser.language][80], newboard.BM, sizeof(newboard.BM), DOECHO);
 
     if (HAS_PERM(PERM_SYSOP) && !(newboard.brdattr & BRD_HIDE)) {
-	getdata_str(14, 0, "設定讀寫權限(Y/N)？", ans, sizeof(ans), LCECHO, "N");
+	getdata_str(14, 0, SHM->i18nstr[cuser.language][81], ans, sizeof(ans), LCECHO, "N");
 	if (*ans == 'y') {
-	    getdata_str(15, 0, "限制 [R]閱\讀 (P)發表？", ans, sizeof(ans), LCECHO, "R");
+	    getdata_str(15, 0, SHM->i18nstr[cuser.language][82], ans, sizeof(ans), LCECHO, "R");
 	    if (*ans == 'p')
 		newboard.brdattr |= BRD_POSTMASK;
 	    else
@@ -713,7 +707,7 @@ m_newbrd(int recover)
     pressanykey();
     setup_man(&newboard);
 
-    outs("\n新板成立");
+    outs(SHM->i18nstr[cuser.language][83]);
     post_newboard(newboard.title, newboard.brdname, newboard.BM);
     log_usies("NewBoard", newboard.title);
     pressanykey();
@@ -744,7 +738,7 @@ int make_symbolic_link(char *bname, int gid)
     strlcpy(newboard.brdname, bname, sizeof(newboard.brdname));
     newboard.brdname[strlen(bname) - 1] = '~';
     strlcpy(newboard.title, bcache[bid - 1].title, sizeof(newboard.title));
-    strcpy(newboard.title + 5, "＠看板連結");
+    strcpy(newboard.title + 5, SHM->i18nstr[cuser.language][84]);
 
     newboard.gid = gid;
     BRD_LINK_TARGET(&newboard) = bid;
@@ -766,10 +760,10 @@ int make_symbolic_link_interactively(int gid)
     if (!buf[0])
 	return -1;
 
-    stand_title("建立看板連結");
+    stand_title(SHM->i18nstr[cuser.language][85]);
 
     if (make_symbolic_link(buf, gid) < 0) {
-	vmsg("看板連結建立失敗");
+	vmsg(SHM->i18nstr[cuser.language][86]);
 	return -1;
     }
     log_usies("NewSymbolic", buf);
@@ -784,8 +778,8 @@ auto_scan(char fdata[][STRLEN], char ans[])
     int             i;
     char            temp[10];
 
-    if (!strncmp(fdata[2], "小", 2) || strstr(fdata[2], "丫")
-	|| strstr(fdata[2], "誰") || strstr(fdata[2], "不")) {
+    if (!strncmp(fdata[2], SHM->i18nstr[cuser.language][87], 2) || strstr(fdata[2], SHM->i18nstr[cuser.language][88])
+	|| strstr(fdata[2], SHM->i18nstr[cuser.language][89]) || strstr(fdata[2], SHM->i18nstr[cuser.language][90])) {
 	ans[0] = '0';
 	return 1;
     }
@@ -798,17 +792,17 @@ auto_scan(char fdata[][STRLEN], char ans[])
 	return 1;
     }
     if (strlen(fdata[2]) >= 6) {
-	if (strstr(fdata[2], "陳水扁")) {
+	if (strstr(fdata[2], SHM->i18nstr[cuser.language][91])) {
 	    ans[0] = '0';
 	    return 1;
 	}
-	if (strstr("趙錢孫李周吳鄭王", temp))
+	if (strstr(SHM->i18nstr[cuser.language][92], temp))
 	    good++;
-	else if (strstr("杜顏黃林陳官余辛劉", temp))
+	else if (strstr(SHM->i18nstr[cuser.language][93], temp))
 	    good++;
-	else if (strstr("蘇方吳呂李邵張廖應蘇", temp))
+	else if (strstr(SHM->i18nstr[cuser.language][94], temp))
 	    good++;
-	else if (strstr("徐謝石盧施戴翁唐", temp))
+	else if (strstr(SHM->i18nstr[cuser.language][95], temp))
 	    good++;
     }
     if (!good)
@@ -820,25 +814,25 @@ auto_scan(char fdata[][STRLEN], char ans[])
 	ans[0] = '4';
 	return 5;
     }
-    if (strstr(fdata[3], "大")) {
-	if (strstr(fdata[3], "台") || strstr(fdata[3], "淡") ||
-	    strstr(fdata[3], "交") || strstr(fdata[3], "政") ||
-	    strstr(fdata[3], "清") || strstr(fdata[3], "警") ||
-	    strstr(fdata[3], "師") || strstr(fdata[3], "銘傳") ||
-	    strstr(fdata[3], "中央") || strstr(fdata[3], "成") ||
-	    strstr(fdata[3], "輔") || strstr(fdata[3], "東吳"))
+    if (strstr(fdata[3], SHM->i18nstr[cuser.language][96])) {
+	if (strstr(fdata[3], SHM->i18nstr[cuser.language][97]) || strstr(fdata[3], SHM->i18nstr[cuser.language][98]) ||
+	    strstr(fdata[3], SHM->i18nstr[cuser.language][99]) || strstr(fdata[3], SHM->i18nstr[cuser.language][100]) ||
+	    strstr(fdata[3], SHM->i18nstr[cuser.language][101]) || strstr(fdata[3], SHM->i18nstr[cuser.language][102]) ||
+	    strstr(fdata[3], SHM->i18nstr[cuser.language][103]) || strstr(fdata[3], SHM->i18nstr[cuser.language][104]) ||
+	    strstr(fdata[3], SHM->i18nstr[cuser.language][105]) || strstr(fdata[3], SHM->i18nstr[cuser.language][106]) ||
+	    strstr(fdata[3], SHM->i18nstr[cuser.language][107]) || strstr(fdata[3], SHM->i18nstr[cuser.language][108]))
 	    good++;
-    } else if (strstr(fdata[3], "女中"))
+    } else if (strstr(fdata[3], SHM->i18nstr[cuser.language][109]))
 	good++;
 
-    if (strstr(fdata[4], "地球") || strstr(fdata[4], "宇宙") ||
-	strstr(fdata[4], "信箱")) {
+    if (strstr(fdata[4], SHM->i18nstr[cuser.language][110]) || strstr(fdata[4], SHM->i18nstr[cuser.language][111]) ||
+	strstr(fdata[4], SHM->i18nstr[cuser.language][112])) {
 	ans[0] = '2';
 	return 3;
     }
-    if (strstr(fdata[4], "市") || strstr(fdata[4], "縣")) {
-	if (strstr(fdata[4], "路") || strstr(fdata[4], "街")) {
-	    if (strstr(fdata[4], "號"))
+    if (strstr(fdata[4], SHM->i18nstr[cuser.language][113]) || strstr(fdata[4], SHM->i18nstr[cuser.language][114])) {
+	if (strstr(fdata[4], SHM->i18nstr[cuser.language][115]) || strstr(fdata[4], SHM->i18nstr[cuser.language][116])) {
+	    if (strstr(fdata[4], SHM->i18nstr[cuser.language][117]))
 		good++;
 	}
     }
@@ -870,17 +864,17 @@ scan_register_form(char *regfile, int automode, int neednum)
 	"uid", "ident", "name", "career", "addr", "phone", "email", NULL
     };
     char    *finfo[] = {
-	"帳號", "身分證號", "真實姓名", "服務單位", "目前住址",
-	"連絡電話", "電子郵件信箱", NULL
+	SHM->i18nstr[cuser.language][118], SHM->i18nstr[cuser.language][119], SHM->i18nstr[cuser.language][120], SHM->i18nstr[cuser.language][121], SHM->i18nstr[cuser.language][122],
+	SHM->i18nstr[cuser.language][123], SHM->i18nstr[cuser.language][124], NULL
     };
     char    *reason[] = {
-	"輸入真實姓名",
-	"詳細填寫您的「學校以及『科系』『年級』」或「服務單位(詳細至職稱)」",
-	"填寫完整的住址資料 (含縣市名稱, 台北市請含行政區域）",
-	"詳填連絡電話 (含區域碼, 中間不用加 \"-\", \"(\", \")\"等符號",
-	"確實填寫註冊申請表",
-	"用中文填寫申請單",
-	"輸入真實身分證字號",
+	SHM->i18nstr[cuser.language][125],
+	SHM->i18nstr[cuser.language][126],
+	SHM->i18nstr[cuser.language][127],
+	SHM->i18nstr[cuser.language][128],
+	SHM->i18nstr[cuser.language][129],
+	SHM->i18nstr[cuser.language][130],
+	SHM->i18nstr[cuser.language][131],
 	NULL
     };
     char    *autoid = "AutoScan";
@@ -897,22 +891,22 @@ scan_register_form(char *regfile, int automode, int neednum)
     move(2, 0);
     if (dashf(fname)) {
 	if (neednum == 0) {	/* 自己進 Admin 來審的 */
-	    outs("其他 SYSOP 也在審核註冊申請單");
+	    outs(SHM->i18nstr[cuser.language][132]);
 	    pressanykey();
 	}
 	return -1;
     }
     Rename(regfile, fname);
     if ((fn = fopen(fname, "r")) == NULL) {
-	prints("系統錯誤，無法讀取註冊資料檔: %s", fname);
+	prints(SHM->i18nstr[cuser.language][133], fname);
 	pressanykey();
 	return -1;
     }
     if (neednum) {		/* 被強迫審的 */
 	move(1, 0);
 	clrtobot();
-	prints("各位具有站長權限的人，註冊單累積超過一百份了，麻煩您幫忙審 %d 份\n", neednum);
-	prints("也就是大概二十分之一的數量，當然，您也可以多審\n沒審完之前，系統不會讓你跳出喲！謝謝");
+	prints(SHM->i18nstr[cuser.language][134], neednum);
+	prints(SHM->i18nstr[cuser.language][135]);
 	pressanykey();
     }
     memset(fdata, 0, sizeof(fdata));
@@ -929,7 +923,7 @@ scan_register_form(char *regfile, int automode, int neednum)
 	} else if ((unum = getuser(fdata[0])) == 0) {
 	    move(2, 0);
 	    clrtobot();
-	    outs("系統錯誤，查無此人\n\n");
+	    outs(SHM->i18nstr[cuser.language][136]);
 	    for (n = 0; field[n]; n++)
 		prints("%s     : %s\n", finfo[n], fdata[n]);
 	    pressanykey();
@@ -944,29 +938,28 @@ scan_register_form(char *regfile, int automode, int neednum)
 		uid = cuser.userid;
 
 		move(1, 0);
-		prints("帳號位置    ：%d\n", unum);
+		prints(SHM->i18nstr[cuser.language][137], unum);
 		user_display(&muser, 1);
 		move(14, 0);
-		prints("\033[1;32m------------- 請站長嚴格審核使用者資料，您還有 %d 份---------------\033[m\n", neednum);
-	    	prints("  %-12s：%s\n", finfo[0], fdata[0]);
-		prints("  %-12s：%s\n", finfo[1], fdata[1]);
+		prints(SHM->i18nstr[cuser.language][138], neednum);
+	    	prints(SHM->i18nstr[cuser.language][139], finfo[0], fdata[0]);
+		prints(SHM->i18nstr[cuser.language][140], finfo[1], fdata[1]);
 #ifdef FOREIGN_REG
-		prints("0.%-12s：%s%s\n", finfo[2], fdata[2], muser.uflag2 & FOREIGN ? " (外籍)" : "");
+		prints(SHM->i18nstr[cuser.language][141], finfo[2], fdata[2], muser.uflag2 & FOREIGN ? SHM->i18nstr[cuser.language][142] : "");
 #else
-		prints("0.%-12s：%s\n", finfo[2], fdata[2]);
+		prints(SHM->i18nstr[cuser.language][143], finfo[2], fdata[2]);
 #endif
 		for (n = 3; field[n]; n++) {
-		    prints("%d.%-12s：%s\n", n - 2, finfo[n], fdata[n]);
+		    prints(SHM->i18nstr[cuser.language][144], n - 2, finfo[n], fdata[n]);
 		}
 		if (muser.userlevel & PERM_LOGINOK) {
-		    ans[0] = getkey("此帳號已經完成註冊, "
-				    "更新(Y/N/Skip)？[N] ");
+		    ans[0] = getkey(SHM->i18nstr[cuser.language][145]);
 		    if (ans[0] != 'y' && ans[0] != 's')
 			ans[0] = 'd';
 		} else {
-		    if (search_ulist(unum) == NULL)
-		        ans[0] = vmsg_lines(22, "是否接受此資料(Y/N/Q/Del/Skip)？[S])");
-		    else
+			if (search_ulist(unum) == NULL)
+				ans[0] = vmsg_lines(22, SHM->i18nstr[cuser.language][146]);
+			else
 			ans[0] = 's';
 		    if ('A' <= ans[0] && ans[0] <= 'Z')
 			ans[0] += 32;
@@ -981,7 +974,7 @@ scan_register_form(char *regfile, int automode, int neednum)
 	    if (neednum > 0 && ans[0] == 'q') {
 		move(2, 0);
 		clrtobot();
-		prints("沒審完不能退出");
+		prints(SHM->i18nstr[cuser.language][147]);
 		pressanykey();
 		ans[0] = 's';
 	    }
@@ -1007,13 +1000,13 @@ scan_register_form(char *regfile, int automode, int neednum)
 		    for (n = 0; field[n]; n++)
 			prints("%s: %s\n", finfo[n], fdata[n]);
 		    move(9, 0);
-		    prints("請提出退回申請表原因，按 <enter> 取消\n");
+		    prints(SHM->i18nstr[cuser.language][148]);
 		    for (n = 0; reason[n]; n++)
-			prints("%d) 請%s\n", n, reason[n]);
+			prints(SHM->i18nstr[cuser.language][149], n, reason[n]);
 		} else
 		    buf[0] = ans[0];
 		if (ans[0] != 'n' ||
-		    getdata(10 + n, 0, "退回原因：", buf, 60, DOECHO))
+		    getdata(10 + n, 0, SHM->i18nstr[cuser.language][150], buf, 60, DOECHO))
 		    if ((buf[0] - '0') >= 0 && (buf[0] - '0') < n) {
 			int             i;
 			fileheader_t    mhdr;
@@ -1023,7 +1016,7 @@ scan_register_form(char *regfile, int automode, int neednum)
 			sethomepath(buf1, muser.userid);
 			stampfile(buf1, &mhdr);
 			strlcpy(mhdr.owner, cuser.userid, sizeof(mhdr.owner));
-			strlcpy(mhdr.title, "[註冊失敗]", TTLEN);
+			strlcpy(mhdr.title, SHM->i18nstr[cuser.language][151], TTLEN);
 			mhdr.filemode = 0;
 			sethomedir(title, muser.userid);
 			if (append_record(title, &mhdr, sizeof(mhdr)) != -1) {
@@ -1033,7 +1026,7 @@ scan_register_form(char *regfile, int automode, int neednum)
 				if (!isdigit(buf[i]))
 				    continue;
 				snprintf(genbuf, sizeof(genbuf),
-				    "[退回原因] 請%s", reason[buf[i] - '0']);
+				    SHM->i18nstr[cuser.language][152], reason[buf[i] - '0']);
 				fprintf(fp, "%s\n", genbuf);
 			    }
 
@@ -1051,7 +1044,7 @@ scan_register_form(char *regfile, int automode, int neednum)
 		    }
 		move(10, 0);
 		clrtobot();
-		prints("取消退回此註冊申請表");
+		prints(SHM->i18nstr[cuser.language][153]);
 	    case 's':
 		if ((freg = fopen(regfile, "a"))) {
 		    for (n = 0; field[n]; n++)
@@ -1061,10 +1054,10 @@ scan_register_form(char *regfile, int automode, int neednum)
 		}
 		break;
 	    default:
-		prints("以下使用者資料已經更新:\n");
-		mail_muser(muser, "[註冊成功\囉]", "etc/registered");
+		prints(SHM->i18nstr[cuser.language][154]);
+		mail_muser(muser, SHM->i18nstr[cuser.language][155], "etc/registered");
 		if(muser.uflag2 & FOREIGN)
-		    mail_muser(muser, "[出入境管理局]", "etc/foreign_welcome");
+		    mail_muser(muser, SHM->i18nstr[cuser.language][156], "etc/foreign_welcome");
 		muser.userlevel |= (PERM_LOGINOK | PERM_POST);
 		strlcpy(muser.realname, fdata[2], sizeof(muser.realname));
 		strlcpy(muser.address, fdata[4], sizeof(muser.address));
@@ -1095,7 +1088,7 @@ scan_register_form(char *regfile, int automode, int neednum)
     clrtobot();
 
     move(5, 0);
-    prints("您審了 %d 份註冊單，AutoScan 審了 %d 份", nSelf, nAuto);
+    prints(SHM->i18nstr[cuser.language][157], nSelf, nAuto);
 
     /**	DickG: 將審了幾份的相關資料 post 到 Security 板上	***********/
     /*
@@ -1125,10 +1118,10 @@ m_register()
     char            genbuf[200];
 
     if ((fn = fopen(fn_register, "r")) == NULL) {
-	outs("目前並無新註冊資料");
+	outs(SHM->i18nstr[cuser.language][158]);
 	return XEASY;
     }
-    stand_title("審核使用者註冊資料");
+    stand_title(SHM->i18nstr[cuser.language][159]);
     y = 2;
     x = wid = 0;
 
@@ -1146,7 +1139,7 @@ m_register()
 	}
     }
     fclose(fn);
-    getdata(b_lines - 1, 0, "開始審核嗎(Auto/Yes/No)？[N] ", ans, sizeof(ans), LCECHO);
+    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][160], ans, sizeof(ans), LCECHO);
     if (ans[0] == 'a')
 	scan_register_form(fn_register, 1, 0);
     else if (ans[0] == 'y')
@@ -1160,9 +1153,9 @@ cat_register()
 {
     if (system("cat register.new.tmp >> register.new") == 0 &&
 	system("rm -f register.new.tmp") == 0)
-	vmsg("OK 嚕~~ 繼續去奮鬥吧!!");
+	vmsg(SHM->i18nstr[cuser.language][161]);
     else
-	vmsg("沒辦法CAT過去呢 去檢查一下系統吧!!");
+	vmsg(SHM->i18nstr[cuser.language][162]);
     return 0;
 }
 
@@ -1174,12 +1167,12 @@ give_id_money(char *user_id, int money, FILE * log_fp, char *mail_title, time_t 
     if (deumoney(searchuser(user_id), money) < 0) {
 	move(12, 0);
 	clrtoeol();
-	prints("id:%s money:%d 不對吧!!", user_id, money);
+	prints(SHM->i18nstr[cuser.language][163], user_id, money);
 	pressanykey();
     } else {
 	fprintf(log_fp, "%d %s %d", (int)t, user_id, money);
-	snprintf(tt, sizeof(tt), "%s : %d ptt 幣", mail_title, money);
-	mail_id(user_id, tt, "etc/givemoney.why", "[PTT 銀行]");
+	snprintf(tt, sizeof(tt), SHM->i18nstr[cuser.language][164], mail_title, money);
+	mail_id(user_id, tt, "etc/givemoney.why", SHM->i18nstr[cuser.language][165]);
     }
 }
 
@@ -1192,16 +1185,16 @@ give_money()
     struct tm      *pt = localtime(&now);
     int             to_all = 0, money = 0;
 
-    getdata(0, 0, "指定使用者(S) 全站使用者(A) 取消(Q)？[S]", buf, sizeof(buf), LCECHO);
+    getdata(0, 0, SHM->i18nstr[cuser.language][166], buf, sizeof(buf), LCECHO);
     if (buf[0] == 'q')
 	return 1;
     else if (buf[0] == 'a') {
 	to_all = 1;
-	getdata(1, 0, "發多少錢呢?", buf, 20, DOECHO);
+	getdata(1, 0, SHM->i18nstr[cuser.language][167], buf, 20, DOECHO);
 	money = atoi(buf);
 	if (money <= 0) {
 	    move(2, 0);
-	    prints("輸入錯誤!!");
+	    prints(SHM->i18nstr[cuser.language][168]);
 	    pressanykey();
 	    return 1;
 	}
@@ -1211,7 +1204,7 @@ give_money()
     }
 
     clear();
-    getdata(0, 0, "要發錢了嗎(Y/N)[N]", buf, 3, LCECHO);
+    getdata(0, 0, SHM->i18nstr[cuser.language][169], buf, 3, LCECHO);
     if (buf[0] != 'y')
 	return 1;
 
@@ -1221,17 +1214,17 @@ give_money()
     fprintf(fp2, "%s\n", buf);
 
 
-    getdata(1, 0, "紅包袋標題 ：", tt, TTLEN, DOECHO);
+    getdata(1, 0, SHM->i18nstr[cuser.language][170], tt, TTLEN, DOECHO);
     move(2, 0);
 
-    prints("編紅包袋內容");
+    prints(SHM->i18nstr[cuser.language][171]);
     pressanykey();
     if (vedit("etc/givemoney.why", NA, NULL) < 0) {
         fclose(fp2);
 	return 1;
     }
 
-    stand_title("發錢中...");
+    stand_title(SHM->i18nstr[cuser.language][172]);
     if (to_all) {
 	int             i, unum;
 	for (unum = SHM->number, i = 0; i < unum; i++) {
@@ -1241,7 +1234,7 @@ give_money()
 	    give_id_money(id, money, fp2, tt, now);
 	}
 	//something wrong @ _ @
-	    //give_money_post("全站使用者", atoi(money));
+	    //give_money_post(SHM->i18nstr[cuser.language][173], atoi(money));
     } else {
 	if (!(fp = fopen("etc/givemoney.txt", "r+"))) {
 	    fclose(fp2);

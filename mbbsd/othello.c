@@ -10,9 +10,9 @@
 #define STARTX 3
 #define STARTY 20
 #define NONE_CHESS "  "
-#define WHITE_CHESS "●"
-#define BLACK_CHESS "○"
-#define HINT_CHESS "＃"
+#define WHITE_CHESS SHM->i18nstr[cuser.language][1542]
+#define BLACK_CHESS SHM->i18nstr[cuser.language][1543]
+#define HINT_CHESS SHM->i18nstr[cuser.language][1544]
 #define NONE  0
 #define HINT  1
 #define BLACK 2
@@ -21,7 +21,7 @@
 #define INVERT(COLOR) (((COLOR))==WHITE?BLACK:WHITE)
 
 static char     nowx = 3, nowy = 3;
-static char    *CHESS_TYPE[] = {NONE_CHESS, HINT_CHESS, BLACK_CHESS, WHITE_CHESS};
+static char     *CHESS_TYPE[4];// = {NONE_CHESS, HINT_CHESS, BLACK_CHESS, WHITE_CHESS};
 static char     DIRX[] = {-1, -1, -1, 0, 1, 1, 1, 0};
 static char     DIRY[] = {-1, 0, 1, 1, 1, 0, -1, -1};
 static char     number[2];
@@ -79,43 +79,43 @@ printboard()
     int             i;
 
     move(STARTX, STARTY);
-    prints("┌─┬─┬─┬─┬─┬─┬─┬─┐");
+    prints(SHM->i18nstr[cuser.language][1545]);
     for (i = 0; i < 7; i++) {
 	move(STARTX + 1 + i * 2, STARTY);
-	prints("│  │  │  │  │  │  │  │  │");
+	prints(SHM->i18nstr[cuser.language][1546]);
 	move(STARTX + 2 + i * 2, STARTY);
-	prints("├─┼─┼─┼─┼─┼─┼─┼─┤");
+	prints(SHM->i18nstr[cuser.language][1547]);
     }
     move(STARTX + 1 + i * 2, STARTY);
-    prints("│  │  │  │  │  │  │  │  │");
+    prints(SHM->i18nstr[cuser.language][1548]);
     move(STARTX + 2 + i * 2, STARTY);
-    prints("└─┴─┴─┴─┴─┴─┴─┴─┘");
+    prints(SHM->i18nstr[cuser.language][1549]);
     print_chess(4, 4, WHITE);
     print_chess(5, 5, WHITE);
     print_chess(4, 5, BLACK);
     print_chess(5, 4, BLACK);
     move(3, 56);
-    prints("(黑)%s", cuser.userid);
+    prints(SHM->i18nstr[cuser.language][1550], cuser.userid);
     move(3, 72);
     prints(": 02");
     move(4, 56);
-    prints("(白)電腦        : 02");
+    prints(SHM->i18nstr[cuser.language][1551]);
     move(6, 56);
-    prints("＃  可以下之處");
+    prints(SHM->i18nstr[cuser.language][1552]);
     move(7, 56);
-    prints("[q] 退出");
+    prints(SHM->i18nstr[cuser.language][1553]);
     move(8, 56);
-    prints("[h] 開啟/關閉 提示");
+    prints(SHM->i18nstr[cuser.language][1554]);
     move(9, 56);
-    prints("[Enter][Space] 下棋");
+    prints(SHM->i18nstr[cuser.language][1555]);
     move(10, 56);
-    prints("上:↑, i");
+    prints(SHM->i18nstr[cuser.language][1556]);
     move(11, 56);
-    prints("下:↓, k");
+    prints(SHM->i18nstr[cuser.language][1557]);
     move(12, 56);
-    prints("左:←, j");
+    prints(SHM->i18nstr[cuser.language][1558]);
     move(13, 56);
-    prints("右:→, l");
+    prints(SHM->i18nstr[cuser.language][1559]);
 }
 
 static int
@@ -219,7 +219,7 @@ static void
 end_of_game(int quit)
 {
     FILE           *fp, *fp1;
-    char           *opponent[] = {"", "CD-65", "", "嬰兒", "小孩", "", "大人", "專家"};
+    char           *opponent[] = {"", "CD-65", "", SHM->i18nstr[cuser.language][1560], SHM->i18nstr[cuser.language][1561], "", SHM->i18nstr[cuser.language][1562], SHM->i18nstr[cuser.language][1563]};
 
     move(STARTX - 1, 30);
     prints("                         ");
@@ -239,36 +239,36 @@ end_of_game(int quit)
 		fclose(fp);
 	    return;
 	}
-	fprintf(fp, "在%s級中, %s臨陣脫逃\n", opponent[think], cuser.userid);
+	fprintf(fp, SHM->i18nstr[cuser.language][1564], opponent[think], cuser.userid);
 	if (fp)
 	    fclose(fp);
 	return;
     }
     if (number[0] > number[1]) {
-	prints("你贏了電腦%02d子", number[0] - number[1]);
+	prints(SHM->i18nstr[cuser.language][1565], number[0] - number[1]);
 	if (think == 6 && number[0] - number[1] >= 50)
 	    demoney(200);
 	if (think == 7 && number[0] - number[1] >= 40)
 	    demoney(200);
 	if (fp)
-	    fprintf(fp, "在%s級中, %s以 %02d:%02d 贏了電腦%02d子\n",
+	    fprintf(fp, SHM->i18nstr[cuser.language][1566],
 		    opponent[think], cuser.userid, number[0], number[1],
 		    number[0] - number[1]);
     } else if (number[1] > number[0]) {
-	prints("電腦贏了你%02d子", number[1] - number[0]);
+	prints(SHM->i18nstr[cuser.language][1567], number[1] - number[0]);
 	if (fp) {
-	    fprintf(fp, "在%s級中, ", opponent[think]);
+	    fprintf(fp, SHM->i18nstr[cuser.language][1568], opponent[think]);
 	    if (number[1] - number[0] > 20)
-		fprintf(fp, "電腦以 %02d:%02d 慘電%s %02d子\n", number[1],
+		fprintf(fp, SHM->i18nstr[cuser.language][1569], number[1],
 			number[0], cuser.userid, number[1] - number[0]);
 	    else
-		fprintf(fp, "電腦以 %02d:%02d 贏了%s %02d子\n", number[1],
+		fprintf(fp, SHM->i18nstr[cuser.language][1570], number[1],
 			number[0], cuser.userid, number[1] - number[0]);
 	}
     } else {
-	prints("你和電腦打成平手!!");
+	prints(SHM->i18nstr[cuser.language][1571]);
 	if (fp)
-	    fprintf(fp, "在%s級中, %s和電腦以 %02d:%02d 打成了平手\n",
+	    fprintf(fp, SHM->i18nstr[cuser.language][1572],
 		    opponent[think], cuser.userid, number[1], number[0]);
     }
     if (fp)
@@ -347,7 +347,7 @@ player(char color)
 	pass++;
 	if (pass == 1) {
 	    move(23, 34);
-	    prints("你必需放棄這一步!!");
+	    prints(SHM->i18nstr[cuser.language][1573]);
 	    igetch();
 	    move(28, 23);
 	    prints("                             ");
@@ -364,6 +364,11 @@ init()
 {
     int             i, j, i1, j1;
 
+	CHESS_TYPE[0] = "  ";
+	CHESS_TYPE[1] = SHM->i18nstr[cuser.language][1544];
+	CHESS_TYPE[2] = SHM->i18nstr[cuser.language][1543];
+	CHESS_TYPE[3] = SHM->i18nstr[cuser.language][1542];
+	
     nowx = 4;
     nowy = 4;
     number[0] = number[1] = 2;
@@ -398,7 +403,7 @@ report()
     move(3, 72);
     prints(": %02d", number[0]);
     move(4, 60);
-    prints("電腦        : %02d", number[1]);
+    prints(SHM->i18nstr[cuser.language][1574], number[1]);
 }
 
 static int
@@ -477,7 +482,7 @@ Computer(int thinkstep, int table)
 	nowy = maxj;
     } else {
 	move(23, 30);
-	prints("電腦放棄這一步棋!!");
+	prints(SHM->i18nstr[cuser.language][1575]);
 	pass++;
 	if (pass == 2) {
 	    move(23, 24);
@@ -498,13 +503,13 @@ choose()
     char            thinkstep[2];
 
     move(2, 0);
-    prints("請選擇難度:");
+    prints(SHM->i18nstr[cuser.language][1576]);
     move(5, 0);
     prints("(1) CD-65\n");	/* 想 1 步 */
-    prints("(2) 嬰兒\n");	/* 想 3 步 */
-    prints("(3) 小孩\n");	/* 想 4 步 */
+    prints(SHM->i18nstr[cuser.language][1577]);	/* 想 3 步 */
+    prints(SHM->i18nstr[cuser.language][1578]);	/* 想 4 步 */
     do {
-	getdata(4, 0, "請選擇一個對象和您對打:(1~5)",
+	getdata(4, 0, SHM->i18nstr[cuser.language][1579],
 		thinkstep, sizeof(thinkstep), LCECHO);
     } while (thinkstep[0] < '1' || thinkstep[0] > '3');
     clear();
@@ -531,12 +536,12 @@ othello_main()
     clear();
     init();
     think = choose();
-    showtitle("黑白棋", BBSName);
+    showtitle(SHM->i18nstr[cuser.language][1580], BBSName);
     printboard();
     which_table = rand() % NR_TABLE;
     while (true) {
 	move(STARTX - 1, 30);
-	prints("輪到你下了...");
+	prints(SHM->i18nstr[cuser.language][1581]);
 	if (!player(BLACK))
 	    break;
 	report();
@@ -546,7 +551,7 @@ othello_main()
 	    break;
 	}
 	move(STARTX - 1, 30);
-	prints("電腦思考中...");
+	prints(SHM->i18nstr[cuser.language][1582]);
 	refresh();
 	if (!Computer(think, which_table))
 	    break;

@@ -259,16 +259,14 @@ char           * const ModeTypeTable[MAX_MODES] = {
     "火車查詢",			/* RAIL_WAY */
     "搜尋選單",			/* SREG */
     "下象棋",			/* CHC */
-    "下暗琪",			/* DARK */
-    "NBA大猜測"			/* TMPJACK */
+    "下暗棋",			/* DARK */
+    "NBA大猜測",		/* TMPJACK */
     "Ｐtt查榜系統",		/* JCEE */
-    "重編文章"			/* REEDIT */
+    "重編文章",			/* REEDIT */
     "部落格",                   /* BLOGGING */
+    "看象棋",			/* CHESSWATCHING */
+    "下圍棋",			/* GO */
     "", /* for future usage */
-    "",
-    "",
-    "",
-    "",
     "",
     "",
     "",
@@ -405,7 +403,7 @@ screenline_t   *big_picture = NULL;
 char            roll;
 
 /* gomo.c */
-char            ku[BRDSIZ][BRDSIZ];
+const char     * const bw_chess[] = {"●", "○"};
 unsigned char  *pat, *adv;
 unsigned char  * const pat_gomoku /* [1954] */ =
  /* 0 */ "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
@@ -602,7 +600,7 @@ word_t         *toplev;
 #ifndef _BBS_UTIL_C_
 /* menu.c */
 const commands_t      cmdlist[] = {
-    {admin, PERM_SYSOP | PERM_VIEWSYSOP, "00Admin       【 系統維護區 】"},
+    {admin, PERM_SYSOP|PERM_ACCOUNTS|PERM_BOARD|PERM_VIEWSYSOP, "00Admin       【 系統維護區 】"},
     {Announce, 0, "AAnnounce     【 精華公佈欄 】"},
     {Boards, 0, "FFavorite     【 我 的 最愛 】"},
     {root_board, 0, "CClass        【 分組討論區 】"},

@@ -7,7 +7,7 @@ static char    * const IdleTypeTable[] = {
     "偶在花呆啦", "情人來電", "覓食中", "拜見周公", "假死狀態", "我在思考"
 };
 static char    * const sig_des[] = {
-    "鬥雞", "聊天", "", "下棋", "象棋", "暗棋"
+    "鬥雞", "聊天", "", "下棋", "象棋", "暗棋", "下圍棋",
 };
 
 #define MAX_SHOW_MODE 4
@@ -78,7 +78,7 @@ char           *
 modestring(userinfo_t * uentp, int simple)
 {
     static char     modestr[40];
-    char    *notonline = "不在站上";
+    static char *const notonline = "不在站上";
     register int    mode = uentp->mode;
     register char  *word;
     int             fri_stat;
@@ -89,6 +89,7 @@ modestring(userinfo_t * uentp, int simple)
 	word = ModeTypeTable[mode % MAX_MODES];
     } else
 	word = ModeTypeTable[mode];
+
     fri_stat = friend_stat(currutmp, uentp);
     if (!(HAS_PERM(PERM_SYSOP) || HAS_PERM(PERM_SEECLOAK)) &&
 	((uentp->invisible || (fri_stat & HRM)) &&
@@ -101,8 +102,9 @@ modestring(userinfo_t * uentp, int simple)
 	word = modestr;
     } else if (!mode && *uentp->chatid == 1) {
 	if (!simple)
-	    snprintf(modestr, sizeof(modestr),
-		     "回應 %s", getuserid(uentp->destuid));
+	    snprintf(modestr, sizeof(modestr), "回應 %s",
+		    isvisible_uid(uentp->destuid) ?
+		    getuserid(uentp->destuid) : "空氣");
 	else
 	    snprintf(modestr, sizeof(modestr), "回應呼叫");
     } 
@@ -131,26 +133,16 @@ modestring(userinfo_t * uentp, int simple)
 	return word;
     else if (uentp->in_chat && mode == CHATING)
 	snprintf(modestr, sizeof(modestr), "%s (%s)", word, uentp->chatid);
-    else if (mode == TALK) {
+    else if (mode == TALK || mode == M_FIVE || mode == CHC || mode == GO
+	    || mode == DARK) {
 	if (!isvisible_uid(uentp->destuid))	/* Leeym 對方(紫色)隱形 */
-	    snprintf(modestr, sizeof(modestr), "%s", "交談 空氣");
+	    snprintf(modestr, sizeof(modestr), "%s 空氣", word);
 	/* Leeym * 大家自己發揮吧！ */
 	else
 	    snprintf(modestr, sizeof(modestr),
 		     "%s %s", word, getuserid(uentp->destuid));
-    } else if (mode == M_FIVE) {
-	if (!isvisible_uid(uentp->destuid))
-	    snprintf(modestr, sizeof(modestr), "%s", "五子棋 空氣");
-	else
-	    snprintf(modestr, sizeof(modestr), "%s %s", word, getuserid(uentp->destuid));
     } else if (mode == CHESSWATCHING) {
 	snprintf(modestr, sizeof(modestr), "觀棋");
-    } else if (mode == CHC) {
-	if (isvisible_uid(uentp->destuid))
-	    snprintf(modestr, sizeof(modestr), "%s", "下象棋");
-	else
-	    snprintf(modestr, sizeof(modestr),
-		     "下象棋 %s", getuserid(uentp->destuid));
     } else if (mode != PAGE && mode != TQUERY)
 	return word;
     else
@@ -1357,6 +1349,7 @@ my_talk(userinfo_t * uin, int fri_stat, char defact)
 
     if (ch == EDITING || ch == TALK || ch == CHATING || ch == PAGE ||
 	ch == MAILALL || ch == MONITOR || ch == M_FIVE || ch == CHC ||
+	ch == DARK || ch == GO ||
 	(!ch && (uin->chatid[0] == 1 || uin->chatid[0] == 3)) ||
 	uin->lockmode == M_FIVE || uin->lockmode == CHC) {
 	if (ch == CHC) {
@@ -1386,8 +1379,9 @@ my_talk(userinfo_t * uin, int fri_stat, char defact)
 	outs(msg_usr_left);
     } else {
 	showplans(uin->userid);
-	getdata(2, 0, "要和他(她) (T)談天(F)下五子棋(P)鬥寵物"
-		"(C)下象棋(D)下暗棋(N)沒事找錯人了?[N] ", genbuf, 4, LCECHO);
+	move(2, 0);
+	outs("要和他(她) (T)談天(F)下五子棋(P)鬥寵物(C)下象棋(D)下暗棋(G)下圍棋\n");
+	getdata(3, 0, "           (N)沒事找錯人了?[N] ", genbuf, 4, LCECHO);
 	switch (*genbuf) {
 	case 'y':
 	case 't':
@@ -1403,6 +1397,9 @@ my_talk(userinfo_t * uin, int fri_stat, char defact)
 	    break;
 	case 'd':
 	    uin->sig = SIG_DARK;
+	    break;
+	case 'g':
+	    uin->sig = SIG_GO;
 	    break;
 	case 'p':
 	    reload_chicken();
@@ -1456,6 +1453,9 @@ my_talk(userinfo_t * uin, int fri_stat, char defact)
 		break;
 	    case SIG_CHC:
 		chc(msgsock, CHC_VERSUS);
+		break;
+	    case SIG_GO:
+		gochess(msgsock);
 		break;
 	    case SIG_TALK:
 	    default:
@@ -2468,9 +2468,11 @@ userlist(void)
 
 	    case 'm':
 		if (HAS_PERM(PERM_BASIC)) {
+		    char   userid[IDLEN + 1];
+		    strlcpy(userid, uentp->userid, sizeof(userid));
 		    stand_title("寄  信");
-		    prints("[寄信] 收信人：%s", uentp->userid);
-		    my_send(uentp->userid);
+		    prints("[寄信] 收信人：%s", userid);
+		    my_send(userid);
 		    setutmpmode(LUSERS);
 		    redrawall = redraw = 1;
 		}
@@ -2748,9 +2750,9 @@ talkreply(void)
 	    "      (B) 對不起，我有事情不能跟你 %s\n",
 	    sig_des[sig], sig_des[sig]);
     prints("       (C) 請不要吵我好嗎？"
-	    "     (D) 我要離站囉..下次再聊吧.......\n");
+	    "       (D) 我要離站囉..下次再聊吧.......\n");
     prints("       (E) 有事嗎？請先來信"
-	    "     (F) \033[1;33m我自己輸入理由好了...\033[m\n");
+	    "       (F) \033[1;33m我自己輸入理由好了...\033[m\n");
     prints("       (1) %s？先拿100銀兩來"
 	    "  (2) %s？先拿1000銀兩來..\n\n", sig_des[sig], sig_des[sig]);
 
@@ -2798,6 +2800,9 @@ talkreply(void)
 	    break;
 	case SIG_CHC:
 	    chc(a, CHC_VERSUS);
+	    break;
+	case SIG_GO:
+	    gochess(a);
 	    break;
 	case SIG_TALK:
 	default:

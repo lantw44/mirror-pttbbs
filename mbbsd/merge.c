@@ -102,7 +102,7 @@ m_fpg()
 #endif
 
      i =  cuser.exmailbox + man.mailk + man.keepmail;
-     if (i > 1000) i = 1000;
+     if (i > MAX_EXKEEPMAIL) i = MAX_EXKEEPMAIL;
      sprintf(buf, "±zªºªá¶é«H½c¦³ %d (%dk), ­ì¦³ %d ¶×¤J«á¦@¦³ %d\n", 
 	    man.keepmail, man.mailk, cuser.exmailbox, i);
      strcat(msg, buf);
@@ -177,7 +177,7 @@ m_fpg()
        Copy(buf, genbuf);
        strcat(buf, genbuf);
        friend_load(FRIEND_OVERRIDE);
-       strcat(msg, "¶×¤J¦n¦³¤ÍÍ³ææ\n");
+       strcat(msg, "¶×¤J¦n¤Í¦W³æ\n");
    }
    sprintf(buf, "±b¸¹¶×¤J³ø§i %s -> %s ", userid, cuser.userid);
    post_msg("Security", buf, msg, "[¨t²Î¦w¥þ§½]");
@@ -205,7 +205,7 @@ m_fpg_brd(char *bname, char *fromdir)
      if(!getdata(20,0, "¤p³½ªºªO¦W [­^¤å¤j¤p¼g­n§¹¥þ¥¿½T]:", fbname, 20,
 	        DOECHO)) return;
   }
-  while(invalid_brdname(fbname));
+  while((invalid_brdname(fbname)&1));
 
   sprintf(buf, "fpg/boards/%s.inf", fbname);
   if(!dashf(buf))

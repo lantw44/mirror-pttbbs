@@ -7,6 +7,7 @@
 #define o_standup()   output(strtstandout,strtstandoutlen)
 #define o_standdown() output(endstandout,endstandoutlen)
 
+
 static unsigned char cur_ln = 0, cur_col = 0;
 static unsigned char docls, downfrom = 0;
 static unsigned char standing = NA;
@@ -15,15 +16,16 @@ static int      scrollcnt, tc_col, tc_line;
 #define MODIFIED (1)		/* if line has been modifed, screen output */
 #define STANDOUT (2)		/* if this line has a standout region */
 
-int             tputs(const char *str, int affcnt, int (*putc) (int));
 
 void
 initscr()
 {
     if (!big_picture) {
-	scr_lns = t_lines;
+#ifdef Try_to_remove_these_code
+	scr_lns = scr_lns;
 	scr_cols = ANSILINELEN;
 	/* scr_cols = MIN(t_columns, ANSILINELEN); */
+#endif
 	big_picture = (screenline_t *) calloc(scr_lns, sizeof(screenline_t));
 	docls = YEA;
     }
@@ -75,14 +77,29 @@ rel_move(int was_col, int was_ln, int new_col, int new_ln)
     do_move(new_col, new_ln);
 }
 
+/*
+ */
 static void
 standoutput(char *buf, int ds, int de, int sso, int eso)
 {
-    int             st_start, st_end;
-
     if (eso <= ds || sso >= de) {
 	output(buf + ds, de - ds);
     } else {
+#if 0
+	if (sso > ds) // does is not happened?
+	    output(buf + ds, sso - ds);
+	else
+	    vmsg("!!!!!!");
+	o_standup();
+	output(buf + sso, de - sso);
+	o_standdown();
+	if (de > eso) // does is not happened?
+	    output(buf + eso, de - eso);
+	else
+	    vmsg("!!!!!!");
+#else
+	short st_start, st_end;
+
 	st_start = MAX(sso, ds);
 	st_end = MIN(eso, de);
 	if (sso > ds)
@@ -92,6 +109,7 @@ standoutput(char *buf, int ds, int de, int sso, int eso)
 	o_standdown();
 	if (de > eso)
 	    output(buf + eso, de - eso);
+#endif
     }
 }
 
@@ -113,7 +131,7 @@ redoscr()
 	    else
 		output((char *)bp->data, len);
 	    tc_col += len;
-	    if (tc_col >= t_columns) {
+    	    if (tc_col >= t_columns) {
 		/* XXX Is this code right? */
 		if (automargins)
 		    tc_col = t_columns - 1;
@@ -125,6 +143,7 @@ redoscr()
 		}
 	    }
 	    bp->mode &= ~(MODIFIED);
+	    // oldlen = len ?
 	    bp->oldlen = len;
 	}
     }
@@ -233,6 +252,7 @@ clrtoeol()
     if (cur_col <= slp->sso)
 	slp->mode &= ~STANDOUT;
 
+    // XXX
     if (cur_col > slp->oldlen) {
 	for (ln = slp->len; ln <= cur_col; ln++)
 	    slp->data[ln] = ' ';
@@ -301,7 +321,7 @@ outch(unsigned char c)
     }
     if (slp->data[cur_col] != c) {
 	slp->data[cur_col] = c;
-	if ((slp->mode & MODIFIED) != MODIFIED)
+	if (!(slp->mode & MODIFIED))
 	    slp->smod = slp->emod = cur_col;
 	slp->mode |= MODIFIED;
 	if (cur_col > slp->emod)
@@ -325,15 +345,18 @@ parsecolor(char *buf)
 {
     char           *val;
     char            data[24];
+    short	    len = 0;
 
     data[0] = '\0';
     val = (char *)strtok(buf, ";");
 
     while (val) {
 	if (atoi(val) < 30) {
-	    if (data[0])
-		strcat(data, ";");
-	    strcat(data, val);
+	    if (data[0]) {
+		data[len++] = ';';
+		data[len] = 0;
+	    }
+	    strcpy(&data[len], val);
 	}
 	val = (char *)strtok(NULL, ";");
     }
@@ -436,7 +459,7 @@ void
 prints(char *fmt,...)
 {
     va_list         args;
-    char            buff[1024];
+    char            buff[256];
 
     va_start(args, fmt);
     vsnprintf(buff, sizeof(buff), fmt, args);
@@ -449,7 +472,7 @@ mouts(int y, int x, char *str)
 {
     move(y, x);
     clrtoeol();
-    prints("%s",str);
+    outs(str);
 }
 
 void
@@ -498,6 +521,7 @@ region_scroll_up(int top, int bottom)
     refresh();
 }
 
+/* 開始反白 - 瑩幕上之後的訊息開始反白輸出 */
 void
 standout()
 {
@@ -511,6 +535,7 @@ standout()
     }
 }
 
+/* 結束反白 */
 void
 standend()
 {

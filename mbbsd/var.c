@@ -401,8 +401,12 @@ char            chc_warnmsg[64], *chc_mateid;
 
 /* screen.c */
 screenline_t   *big_picture = NULL;
+#ifdef Try_to_remove_these_code
 unsigned char   scr_lns;
 unsigned short  scr_cols;
+#endif
+#define scr_lns		t_lines
+#define scr_cols	t_columns
 char            roll;
 
 /* gomo.c */

@@ -527,7 +527,7 @@ login_query()
 #else
     show_file("etc/Welcome", 1, -1, NO_RELOAD);
 #endif
-    output("1", 1);
+    output("1", 1); ///???????????
 
 
     attempts = 0;

@@ -16,6 +16,8 @@ Structure
 ‧fav_type_t
   這算是架在以下三個東西之上的介面，等於是將他們視為同一種東西，方便之後的存取。
   用一個 void * 指標指向某塊記憶體，存取時可透過 type 變數來得知正確的型態。
+  用這個方式做出 polymorphism 的效果。之後如果要新增另一個類型的 entry，只須
+  定義 fac_xxx_t，再到 fav.c 裡面的一些 switch case 新增 case 即可。
 
 ‧fav_board_t
   紀錄了 bid 及上次拜訪時間。

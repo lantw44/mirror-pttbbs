@@ -1,14 +1,24 @@
 /* $Id$ */
 #include "bbs.h"
 
-// XXX why linux use smaller buffer?
-#if defined(linux)
-#define OBUFSIZE  2048
-#define IBUFSIZE  128
-#else
+/*
+ * Mechanism
+ * =========
+ *   每次 output 的時候，會先寫到 output buffer。如果這時候 buffer 滿了、
+ *   或是呼叫 oflush() 時， buffer 才會被寫出。
+ *
+ *   int ochar(char c)
+ *      寫一個 c 到 output buffer
+ *
+ *   void output(char *s, int len)
+ *      寫一個長度為 len 的字串 s 到 output buffer
+ *
+ *   void oflush(void)
+ *      把 buffer 寫出去
+ */
+
 #define OBUFSIZE  4096
 #define IBUFSIZE  256
-#endif
 
 static char     outbuf[OBUFSIZE], inbuf[IBUFSIZE];
 static int      obufsize = 0, ibufsize = 0;
@@ -18,6 +28,20 @@ static int      icurrchar = 0;
 /* convert routines                                      */
 /* ----------------------------------------------------- */
 #ifdef CONVERT
+
+/*
+ * CONVERT
+ * =======
+ *   pttbbs 支援 Big5<->GB 與 Big5<->UTF-8 之間的 encoding 轉換。這個功能
+ * 主要在 io.c 裡面達成。
+ * 
+ *   io.c 裡面在處理 read 跟 write 時，用了 read_wrapper 跟 write_wrapper
+ * 這兩個 function pointer。一般情況下，也就是不轉換 encoding 時，是指到
+ * read(2) 跟 write(2) 兩個 system call。否則會指到 convert.c 裡面定義的轉
+ * 換函式。
+ *
+ * convert.c 中定義了轉換的 interface，詳見 convert.c。
+ */
 
 read_write_type write_type = (read_write_type)write;
 read_write_type read_type = read;

@@ -1,13 +1,6 @@
 /* $Id$ */
 #include "bbs.h"
 
-int             tgetent(const char *bp, char *name);
-char           *tgetstr(const char *id, char **area);
-int             tgetflag(const char *id);
-int             tgetnum(const char *id);
-int             tputs(const char *str, int affcnt, int (*putc) (int));
-char           *tparm(const char *str,...);
-char           *tgoto(const char *cap, int col, int row);
 
 static struct termios tty_state, tty_new;
 
@@ -78,7 +71,9 @@ term_resize(int sig)
     }
     t_lines = newsize.ws_row;
     t_columns = newsize.ws_col;
+#ifdef Try_to_remove_these_code
     scr_lns = t_lines;	/* XXX: scr_lns 跟 t_lines 有什麼不同, 為何分成兩個 */
+#endif
     b_lines = t_lines - 1;
     p_lines = t_lines - 4;
 

@@ -262,7 +262,7 @@ whereami(int ent, fileheader_t * fhdr, char *direct)
     bh = getbcache(currutmp->brc_id);
     root = getbcache(1);
     p[0] = bh;
-    for (i = 0; i < WHEREAMI_LEVEL && p[i]->parent; i++)
+    for (i = 0; i < WHEREAMI_LEVEL && p[i]->parent>1; i++)
 	p[i + 1] = getbcache(p[i]->parent);
     j = i;
     prints("§Ú¦b­þ?\n%-40.40s %.13s\n", p[j]->title + 7, p[j]->BM);

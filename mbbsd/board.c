@@ -264,19 +264,17 @@ brc_unread(const char *fname, int bnum, const int *blist)
 /* personal board state
  * 癸狾 attr (BRD_* in ../include/pttstruct.h),
  * 硂ㄇ琌τ钵 flag */
-#define NBRD_FAV    	1
-#define NBRD_BOARD	2
-#define NBRD_LINE   	4
-#define NBRD_FOLDER	8
-#define NBRD_TAG	       16
+#define NBRD_FAV    	 1
+#define NBRD_BOARD	 2
+#define NBRD_LINE   	 4
+#define NBRD_FOLDER	 8
+#define NBRD_TAG	16
 #define NBRD_UNREAD     32
 #define NBRD_SYMBOLIC   64
 
 #define TITLE_MATCH(bptr, key)	((key)[0] && !strcasestr((bptr)->title, (key)))
 #define GROUPOP()		(currmode & MODE_GROUPOP)
 
-
-#define FAVNB      ".favnb"
 
 #define B_TOTAL(bptr)        (SHM->total[(bptr)->bid - 1])
 #define B_LASTPOSTTIME(bptr) (SHM->lastposttime[(bptr)->bid - 1])
@@ -294,60 +292,6 @@ static char     yank_flag = 1;
 inline int getbid(boardheader_t *fh)
 {
     return (fh - bcache);
-}
-
-#define BRD_OLD 0
-#define BRD_NEW 1
-#define BRD_END 2
-
-void updatenewfav(int mode)
-{
-    /* mode: 0: don't write to fav  1: write to fav */
-    int i, fd;
-    char fname[80], *brd;
-
-    if(!(cuser.uflag2 & FAVNEW_FLAG))
-	return;
-
-    setuserfile(fname, FAVNB);
-
-    if( (fd = open(fname, O_RDWR, 0600)) != -1 ){
-
-	brd = (char *)malloc((numboards + 1) * sizeof(char));
-	memset(brd, 0, (numboards + 1) * sizeof(char));
-	read(fd, brd, (numboards + 1) * sizeof(char));
-	
-	for(i = 0; i < numboards + 1 && brd[i] != BRD_END; i++){
-	    if(brd[i] == BRD_NEW){
-		if(bcache[i].brdname[0] && HasPerm(&bcache[i])){ // check the permission if the board exsits
-		    if(mode)
-			fav_add_board(i + 1);
-		    brd[i] = BRD_OLD;
-		}
-	    }
-	    else{
-		if(!bcache[i].brdname[0])
-		    brd[i] = BRD_NEW;
-	    }
-	}
-	if( i < numboards) // the board number may change
-	    for(i-- ; i < numboards; i++){
-		if(bcache[i].brdname[0] && HasPerm(&bcache[i])){
-		    if(mode)
-			fav_add_board(i + 1);
-		    brd[i] = BRD_OLD;
-		}
-		else
-		    brd[i] = BRD_NEW;
-	    }
-
-	brd[i] = BRD_END;
-	
-	lseek(fd, 0, SEEK_SET);
-	write(fd, brd, (numboards + 1 ) * sizeof(char));
-	free(brd);
-	close(fd);
-    }
 }
 
 void imovefav(int old)
@@ -1130,16 +1074,22 @@ choose_board(int newflag)
 	    brdnum = -1;
 	    break;
 	case Ctrl('D'):
-	    fav_remove_all_tagged_item();
-	    brdnum = -1;
+	    if (HAS_PERM(PERM_LOGINOK)) {
+		fav_remove_all_tagged_item();
+		brdnum = -1;
+	    }
 	    break;
 	case Ctrl('A'):
-	    fav_add_all_tagged_item();
-	    brdnum = -1;
+	    if (HAS_PERM(PERM_LOGINOK)) {
+		fav_add_all_tagged_item();
+		brdnum = -1;
+	    }
 	    break;
 	case Ctrl('T'):
-	    fav_remove_all_tag();
-	    brdnum = -1;
+	    if (HAS_PERM(PERM_LOGINOK)) {
+		fav_remove_all_tag();
+		brdnum = -1;
+	    }
 	    break;
 	case Ctrl('P'):
 	    if (class_bid != 0 &&
@@ -1169,7 +1119,7 @@ choose_board(int newflag)
 		brdnum = -1;
 		head = 9999;
 	    }
-	    else if (HAS_PERM(PERM_BASIC) && yank_flag == 0) {
+	    else if (HAS_PERM(PERM_LOGINOK) && yank_flag == 0) {
 		if (fav_add_line() == NULL) {
 		    vmsg("穝糤ア毖だ筳絬/羆程稲 计秖笷程");
 		    break;
@@ -1188,7 +1138,7 @@ choose_board(int newflag)
 	    }
 	    break;
 	case 'm':
-	    if (HAS_PERM(PERM_BASIC)) {
+	    if (HAS_PERM(PERM_LOGINOK)) {
 		ptr = &nbrd[num];
 		if (yank_flag == 0) {
 		    if (ptr->myattr & NBRD_FAV) {
@@ -1215,7 +1165,7 @@ choose_board(int newflag)
 	    }
 	    break;
 	case 'M':
-	    if (HAS_PERM(PERM_BASIC)){
+	    if (HAS_PERM(PERM_LOGINOK)){
 		if (class_bid == 0 && yank_flag == 0){
 		    imovefav(num);
 		    brdnum = -1;
@@ -1224,7 +1174,7 @@ choose_board(int newflag)
 	    }
 	    break;
 	case 'g':
-	    if (HAS_PERM(PERM_BASIC) && yank_flag == 0) {
+	    if (HAS_PERM(PERM_LOGINOK) && yank_flag == 0) {
 		fav_type_t  *ft;
 		if (fav_stack_full()){
 		    vmsg("ヘ魁笷程糷计!!");
@@ -1243,7 +1193,7 @@ choose_board(int newflag)
 	    }
 	    break;
 	case 'T':
-	    if (HAS_PERM(PERM_BASIC) && nbrd[num].myattr & NBRD_FOLDER) {
+	    if (HAS_PERM(PERM_LOGINOK) && nbrd[num].myattr & NBRD_FOLDER) {
 		fav_type_t *ft = getfolder(nbrd[num].bid);
 		strlcpy(buf, get_item_title(ft), sizeof(buf));
 		getdata_buf(b_lines - 1, 0, "叫块狾:", buf, 65, DOECHO);
@@ -1252,7 +1202,7 @@ choose_board(int newflag)
 	    }
 	    break;
 	case 'K':
-	    if (HAS_PERM(PERM_BASIC)) {
+	    if (HAS_PERM(PERM_LOGINOK)) {
 		char c, fname[80];
 		if (!current_fav_at_root()) {
 		    vmsg("叫и程稲程糷磅︽セ\");
@@ -1290,26 +1240,27 @@ choose_board(int newflag)
 	    }
 	    break;
 	case 'z':
-	    if (HAS_PERM(PERM_BASIC))
+	    if (HAS_PERM(PERM_LOGINOK))
 		vmsg("糑糑 硂\竒砆и程稲奔翅!");
 	    break;
+
 	case 'Z':
-	    if (HAS_PERM(PERM_BASIC)) {
-		sprintf(buf, "絋﹚璶 %s璹綷\ 穝狾? [N/y] ", cuser.uflag2 & FAVNEW_FLAG ? "" : "");
-		if (getans(buf) != 'y')
+	    if (HAS_PERM(PERM_LOGINOK)) {
+		char genbuf[256];
+		sprintf(genbuf, "絋﹚璶 %s璹綷\ 穝狾? [N/y] ", cuser.uflag2 & FAVNEW_FLAG ? "" : "");
+		if (getans(genbuf) != 'y')
 		    break;
 
 		cuser.uflag2 ^= FAVNEW_FLAG;
-		if(cuser.uflag2 & FAVNEW_FLAG){
-		    setuserfile(buf, FAVNB);
-		    if( (tmp = open(buf, O_RDONLY, 0600)) != -1 ){
-			close(tmp);
-			updatenewfav(0);
-		    }
+		if (cuser.uflag2 & FAVNEW_FLAG) {
+		    subscribe_newfav();
+		    vmsg("ち传璹綷\穝狾家Α");
 		}
-		vmsg((cuser.uflag2 & FAVNEW_FLAG) ? "ち传璹綷\穝狾家Α" : "ち传タ盽家Α");
+		else
+		    vmsg("璹綷\穝狾");
 	    }
 	    break;
+
 	case 'v':
 	case 'V':
 	    ptr = &nbrd[num];

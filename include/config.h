@@ -33,6 +33,10 @@
 #define MAX_STRING        (8000)         /* 系統最多使用字串 */
 #endif
 
+#ifndef LANG_FILE
+#define LANG_FILE	  "lang.big5"    /* 預設語言檔 */
+#endif
+
 #ifndef MAX_POST_MONEY                      /* 發表文章稿費的上限 */
 #define MAX_POST_MONEY     100
 #endif

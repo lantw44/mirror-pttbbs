@@ -677,4 +677,9 @@ void touchbtotal(int bid);
 /* util_cache.c */
 void reload_pttcache(void);
 
+#ifdef I18N
+/* i18n.c */
+void load_i18nstring(void);
+#endif
+
 #endif

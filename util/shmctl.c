@@ -596,6 +596,11 @@ int SHMinit(int argc, char **argv)
 
     attach_SHM();
 
+#ifdef I18N    
+    puts("loading i18nstring...");
+    load_i18nstring();
+#endif
+
     puts("loading bcache...");
     reload_bcache();
 

@@ -7,6 +7,10 @@
 #include "config.h"
 #include "pttstruct.h"
 
+#ifdef Solaris
+#include <strings.h>
+#endif
+
 typedef struct hash_t {
     char *brdname;
     struct hash_t *next;

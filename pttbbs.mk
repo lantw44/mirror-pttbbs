@@ -2,12 +2,13 @@
 # 定義基本初值
 BBSHOME?=	$(HOME)
 BBSHOME?=	/home/bbs
-OSTYPE!=	uname
+OS!=		uname
+OSTYPE?=	$(OS)
 CC?=		gcc
 CCACHE!=	which ccache|sed -e 's/^.*\///'
 PTT_CFLAGS=	-Wall -pipe -DBBSHOME='"$(BBSHOME)"' -I../include
 PTT_LDFLAGS=	-pipe -Wall -L/usr/local/lib
-PTT_LIBS=	-lcrypt -lhz
+PTT_LIBS=	-lcrypt
 
 # enable assert()
 #PTT_CFLAGS+=	-DNDEBUG 
@@ -18,10 +19,15 @@ LDFLAGS_FreeBSD=
 LIBS_FreeBSD=	-lkvm -liconv
 
 # Linux特有的環境
-# CFLAGS_linux=   -DHAVE_DES_CRYPT -DLinux
-CFLAGS_Linux=	
+CFLAGS_Linux=	-DHAVE_DES_CRYPT
 LDFLAGS_Linux=	-pipe -Wall 
 LIBS_Linux=	
+
+# SunOS特有的環境
+CFLAGS_Solaris= -DSolaris -I/usr/local/include 
+LDFLAGS_Solaris= -L/usr/local/lib -L/usr/lib/
+LIBS_Solaris= -lnsl -lsocket -liconv
+
 
 # CFLAGS, LDFLAGS, LIBS 加入 OS 相關參數
 PTT_CFLAGS+=	$(CFLAGS_$(OSTYPE))

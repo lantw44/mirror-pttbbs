@@ -24,14 +24,14 @@ CPROG_WITH_UTIL= \
 	reaper		buildAnnounce	inndBM		shmctl		\
 	outmail		chkhbf		checkmoney      merge_dir       \
 	transman	angel		gamblegive	checkdir	\
-	chesscountry
+	chesscountry	tunepasswd	buildir
 
 # 下面這些程式, 會直接被 compile
 CPROG_WITHOUT_UTIL= \
 	shmsweep	uhash_loader	showboard	\
 	countalldice	webgrep		bbsrf		initbbs		\
-	userlist	tunepasswd	buildir		merge_passwd	\
-	merge_board	xchatd		bbsmail         
+	userlist	xchatd		bbsmail         merge_passwd	\
+	merge_board	
 
 # 下面這些程式會被 install
 PROGS=	${UTIL_OBJS}	${CPROG_WITH_UTIL}	${CPROG_WITHOUT_UTIL}	\

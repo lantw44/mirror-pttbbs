@@ -1,5 +1,8 @@
 /* $Id$ */
+#ifndef Solaris
 #define _XOPEN_SOURCE
+#endif
+
 #define _ISOC99_SOURCE
  
 #include "bbs.h"

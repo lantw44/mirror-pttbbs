@@ -44,7 +44,7 @@ install: $(PROG)
 	install -d $(BBSHOME)/bin/
 	install -c -m 755 $(PROG) $(BBSHOME)/bin/
 	mv -f $(BBSHOME)/bin/mbbsd $(BBSHOME)/bin/mbbsd.`date '+%m%d%H'`
-	ln -sv $(BBSHOME)/bin/mbbsd.`date '+%m%d%H'` $(BBSHOME)/bin/mbbsd
+	ln -s $(BBSHOME)/bin/mbbsd.`date '+%m%d%H'` $(BBSHOME)/bin/mbbsd
 
 clean:
 	rm -f $(OBJS) $(PROG)

@@ -31,11 +31,11 @@ lockutmpmode(int unmode, int state)
 	clear();
 	move(10, 20);
 	if (errorno == 1)
-	    prints("請先離開 %s 才能再 %s ",
+	    prints(SHM->i18nstr[cuser.language][532],
 		   ModeTypeTable[currutmp->lockmode],
 		   ModeTypeTable[unmode]);
 	else
-	    prints("抱歉! 您已有其他線相同的ID正在%s",
+	    prints(SHM->i18nstr[cuser.language][533],
 		   ModeTypeTable[unmode]);
 	pressanykey();
 	return errorno;
@@ -67,8 +67,8 @@ vice(int money, char *item)
     sprintf(vice,"%8.8d\n", viceserial);
     log_file(buf, vice, 1);
     snprintf(buf, sizeof(buf),
-	     "%s 花了%d$ 編號[%08d]", item, money, viceserial);
-    mail_id(cuser.userid, buf, "etc/vice.txt", "Ptt經濟部");
+	     SHM->i18nstr[cuser.language][534], item, money, viceserial);
+    mail_id(cuser.userid, buf, "etc/vice.txt", SHM->i18nstr[cuser.language][535]);
     return 0;
 }
 
@@ -96,7 +96,7 @@ osong(char *defaultid)
     /* Jaky 一人一天點一首 */
     if (!strcmp(buf, Cdatedate(&cuser.lastsong)) && !HAS_PERM(PERM_SYSOP)) {
 	move(22, 0);
-	outs("你今天已經點過囉，明天再點吧....");
+	outs(SHM->i18nstr[cuser.language][536]);
 	refresh();
 	pressanykey();
 
@@ -105,7 +105,7 @@ osong(char *defaultid)
     }
     if (cuser.money < 200) {
 	move(22, 0);
-	outs("點歌要200銀唷!....");
+	outs(SHM->i18nstr[cuser.language][537]);
 	refresh();
 	pressanykey();
 	unlockutmpmode();
@@ -113,38 +113,38 @@ osong(char *defaultid)
     }
     move(12, 0);
     clrtobot();
-    prints("親愛的 %s 歡迎來到歐桑自動點歌系統\n", cuser.userid);
+    prints(SHM->i18nstr[cuser.language][538], cuser.userid);
     trans_buffer[0] = 0;
     if (!defaultid) {
-	getdata(13, 0, "要點給誰呢:[可直接按 Enter 先選歌]",
+	getdata(13, 0, SHM->i18nstr[cuser.language][539],
 		destid, sizeof(destid), DOECHO);
 	while (!destid[0]) {
-	    a_menu("點歌歌本", SONGBOOK, 0);
+	    a_menu(SHM->i18nstr[cuser.language][540], SONGBOOK, 0);
 	    clear();
-	    getdata(13, 0, "要點給誰呢:[可按 Enter 重新選歌]",
+	    getdata(13, 0, SHM->i18nstr[cuser.language][541],
 		    destid, sizeof(destid), DOECHO);
 	}
     } else
 	strlcpy(destid, defaultid, sizeof(destid));
 
     /* Heat:點歌者匿名功能 */
-    getdata(14, 0, "要匿名嗎?[y/n]:", ano, sizeof(ano), DOECHO);
+    getdata(14, 0, SHM->i18nstr[cuser.language][542], ano, sizeof(ano), DOECHO);
 
     if (!destid[0]) {
 	unlockutmpmode();
 	return 0;
     }
-    getdata_str(14, 0, "想要要對他(她)說..:", say,
-		sizeof(say), DOECHO, "我愛妳..");
+    getdata_str(14, 0, SHM->i18nstr[cuser.language][543], say,
+		sizeof(say), DOECHO, SHM->i18nstr[cuser.language][544]);
     snprintf(save_title, sizeof(save_title),
-	     "%s:%s", (ano[0] == 'y') ? "匿名者" : cuser.userid, say);
-    getdata_str(16, 0, "寄到誰的信箱(可用E-mail)?",
+	     "%s:%s", (ano[0] == 'y') ? SHM->i18nstr[cuser.language][545] : cuser.userid, say);
+    getdata_str(16, 0, SHM->i18nstr[cuser.language][546],
 		receiver, sizeof(receiver), LCECHO, destid);
 
     if (!trans_buffer[0]) {
-	outs("\n接著要選歌囉..進入歌本好好的選一首歌吧..^o^");
+	outs(SHM->i18nstr[cuser.language][547]);
 	pressanykey();
-	a_menu("點歌歌本", SONGBOOK, 0);
+	a_menu(SHM->i18nstr[cuser.language][548], SONGBOOK, 0);
     }
     if (!trans_buffer[0] || strstr(trans_buffer, "home") ||
 	strstr(trans_buffer, "boards") || !(fp = fopen(trans_buffer, "r"))) {
@@ -162,14 +162,14 @@ osong(char *defaultid)
 	unlockutmpmode();
 	return 0;
     }
-    strlcpy(mail.owner, "點歌機", sizeof(mail.owner));
+    strlcpy(mail.owner, SHM->i18nstr[cuser.language][549], sizeof(mail.owner));
     snprintf(mail.title, sizeof(mail.title),
-	     "◇ %s 點給 %s ",
-	     (ano[0] == 'y') ? "匿名者" : cuser.userid, destid);
+	     SHM->i18nstr[cuser.language][550],
+	     (ano[0] == 'y') ? SHM->i18nstr[cuser.language][551] : cuser.userid, destid);
 
     while (fgets(buf, sizeof(buf), fp)) {
 	char           *po;
-	if (!strncmp(buf, "標題: ", 6)) {
+	if (!strncmp(buf, SHM->i18nstr[cuser.language][552], 6)) {
 	    clear();
 	    move(10, 10);
 	    outs(buf);
@@ -183,7 +183,7 @@ osong(char *defaultid)
 	    po[0] = 0;
 	    snprintf(genbuf, sizeof(genbuf),
 		     "%s%s%s", buf,
-		     (ano[0] == 'y') ? "匿名者" : cuser.userid, po + 7);
+		     (ano[0] == 'y') ? SHM->i18nstr[cuser.language][553] : cuser.userid, po + 7);
 	    strlcpy(buf, genbuf, sizeof(buf));
 	}
 	while ((po = strstr(buf, "<~Des~>"))) {
@@ -210,10 +210,10 @@ osong(char *defaultid)
 	    delete_range(OSONGPATH "/.DIR", 1, nsongs - 500);
 	}
 	/* 把第一首拿掉 */
-	vice(200, "點歌");
+	vice(200, SHM->i18nstr[cuser.language][554]);
     }
     snprintf(save_title, sizeof(save_title),
-	     "%s:%s", (ano[0] == 'y') ? "匿名者" : cuser.userid, say);
+	     "%s:%s", (ano[0] == 'y') ? SHM->i18nstr[cuser.language][555] : cuser.userid, say);
     hold_mail(filename, destid);
 
     if (receiver[0]) {
@@ -225,13 +225,7 @@ osong(char *defaultid)
     }
     clear();
     outs(
-	 "\n\n  恭喜您點歌完成囉..\n"
-	 "  一小時內動態看板會自動重新更新\n"
-	 "  大家就可以看到您點的歌囉\n\n"
-	 "  點歌有任何問題可以到Note板的精華區找答案\n"
-	 "  也可在Note板精華區看到自己的點歌記錄\n"
-	 "  有任何保貴的意見也歡迎到Note板留話\n"
-	 "  讓親切的板主為您服務\n");
+	 SHM->i18nstr[cuser.language][556]);
     pressanykey();
     sortsong();
     topsong();
@@ -264,12 +258,12 @@ p_cloak()
 {
     char            buf[4];
     getdata(b_lines - 1, 0,
-	    currutmp->invisible ? "確定要現身?[y/N]" : "確定要隱身?[y/N]",
+	    currutmp->invisible ? SHM->i18nstr[cuser.language][557] : SHM->i18nstr[cuser.language][558],
 	    buf, sizeof(buf), LCECHO);
     if (buf[0] != 'y')
 	return 0;
     if (cuser.money >= 19) {
-	vice(19, "付費隱身");
+	vice(19, SHM->i18nstr[cuser.language][559]);
 	currutmp->invisible %= 2;
 	outs((currutmp->invisible ^= 1) ? MSG_CLOAKED : MSG_UNCLOAK);
 	refresh();
@@ -284,15 +278,15 @@ p_from()
 {
     char            ans[4];
 
-    getdata(b_lines - 2, 0, "確定要改故鄉?[y/N]", ans, sizeof(ans), LCECHO);
+    getdata(b_lines - 2, 0, SHM->i18nstr[cuser.language][560], ans, sizeof(ans), LCECHO);
     if (ans[0] != 'y')
 	return 0;
     reload_money();
     if (cuser.money < 49)
 	return 0;
-    if (getdata_buf(b_lines - 1, 0, "請輸入新故鄉:",
+    if (getdata_buf(b_lines - 1, 0, SHM->i18nstr[cuser.language][561],
 		    currutmp->from, sizeof(currutmp->from), DOECHO)) {
-	vice(49, "更改故鄉");
+	vice(49, SHM->i18nstr[cuser.language][562]);
 	currutmp->from_alias = 0;
     }
     return 0;
@@ -305,12 +299,12 @@ p_exmail()
     int             n;
 
     if (cuser.exmailbox >= MAX_EXKEEPMAIL) {
-	prints("容量最多增加 %d 封，不能再買了。", MAX_EXKEEPMAIL);
+	prints(SHM->i18nstr[cuser.language][563], MAX_EXKEEPMAIL);
 	refresh();
 	return 0;
     }
     snprintf(buf, sizeof(buf),
-	     "您曾增購 %d 封容量，還要再買多少?", cuser.exmailbox);
+	     SHM->i18nstr[cuser.language][564], cuser.exmailbox);
 
     getdata_str(b_lines - 2, 0, buf, ans, sizeof(ans), LCECHO, "10");
 
@@ -324,7 +318,7 @@ p_exmail()
     reload_money();
     if (cuser.money < n * 1000)
 	return 0;
-    vice(n * 1000, "購買信箱");
+    vice(n * 1000, SHM->i18nstr[cuser.language][565]);
     inmailbox(n);
     return 0;
 }
@@ -339,15 +333,10 @@ mail_redenvelop(char *from, char *to, int money, char mode)
     stampfile(genbuf, &fhdr);
     if (!(fp = fopen(genbuf, "w")))
 	return;
-    fprintf(fp, "作者: %s\n"
-	    "標題: 招財進寶\n"
-	    "時間: %s\n"
-	    "\033[1;33m親愛的 %s ：\n\n\033[m"
-	    "\033[1;31m    我包給你一個 %d 元的大紅包喔 ^_^\n\n"
-	    "    禮輕情意重，請笑納...... ^_^\033[m\n"
+    fprintf(fp, SHM->i18nstr[cuser.language][566]
 	    ,from, ctime(&now), to, money);
     fclose(fp);
-    snprintf(fhdr.title, sizeof(fhdr.title), "招財進寶");
+    snprintf(fhdr.title, sizeof(fhdr.title), SHM->i18nstr[cuser.language][567]);
     strlcpy(fhdr.owner, from, sizeof(fhdr.owner));
 
     if (mode == 'y')
@@ -378,9 +367,9 @@ p_give()
     char            id[IDLEN + 1], genbuf[90];
 
     move(1, 0);
-    usercomplete("這位幸運兒的id:", id);
+    usercomplete(SHM->i18nstr[cuser.language][568], id);
     if (!id[0] || !strcmp(cuser.userid, id) ||
-	!getdata(2, 0, "要給多少錢:", genbuf, 7, LCECHO))
+	!getdata(2, 0, SHM->i18nstr[cuser.language][569], genbuf, 7, LCECHO))
 	return 0;
     money = atoi(genbuf);
     reload_money();
@@ -390,11 +379,11 @@ p_give()
 	    return 0;		/* 繳完稅就沒錢給了 */
 	deumoney(searchuser(id), money - tax);
 	demoney(-money);
-	snprintf(genbuf, sizeof(genbuf), "%s\t給%s\t%d\t%s",
+	snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][570],
 		 cuser.userid, id, money - tax, ctime(&now));
 	log_file(FN_MONEY, genbuf, 1);
 	genbuf[0] = 'n';
-	getdata(3, 0, "要自行書寫紅包袋嗎？[y/N]", genbuf, 2, LCECHO);
+	getdata(3, 0, SHM->i18nstr[cuser.language][571], genbuf, 2, LCECHO);
 	mail_redenvelop(cuser.userid, id, money - tax, genbuf[0]);
     }
     return 0;
@@ -408,16 +397,15 @@ p_sysinfo(void)
     extern char    *compile_time;
 
     load = cpuload(NULL);
-    cpuloadstr = (load < 5 ? "良好" : (load < 20 ? "尚可" : "過重"));
+    cpuloadstr = (load < 5 ? SHM->i18nstr[cuser.language][572] : (load < 20 ? SHM->i18nstr[cuser.language][573] : SHM->i18nstr[cuser.language][574]));
 
     clear();
-    showtitle("系統資訊", BBSNAME);
+    showtitle(SHM->i18nstr[cuser.language][575], BBSNAME);
     move(2, 0);
-    prints("您現在位於 " TITLE_COLOR BBSNAME "\033[m (" MYIP ")\n"
-	   "系統負載情況: %s\n"
-	   "線上服務人數: %d/%d\n"
-	   "編譯時間:     %s\n"
-	   "起始時間:     %s\n",
+    prints(SHM->i18nstr[cuser.language][576]);
+    prints(TITLE_COLOR BBSNAME);
+    prints("\033[m (" MYIP);
+    prints(SHM->i18nstr[cuser.language][577],
 	   cpuloadstr, SHM->UTMPnumber,
 #ifdef DYMAX_ACTIVE
 	   GLOBALVAR[9] > 1000 ? GLOBALVAR[9] : MAX_ACTIVE,
@@ -428,10 +416,10 @@ p_sysinfo(void)
     if (HAS_PERM(PERM_SYSOP)) {
 	struct rusage ru;
 	getrusage(RUSAGE_SELF, &ru);
-	prints("記憶體用量: sbrk: %d KB, idrss: %d KB, isrss: %d KB\n",
+	prints(SHM->i18nstr[cuser.language][578],
 	       ((int)sbrk(0) - 0x8048000) / 1024,
 	       (int)ru.ru_idrss, (int)ru.ru_isrss);
-	prints("特別參數:"
+	prints(SHM->i18nstr[cuser.language][579]
 #ifdef CRITICAL_MEMORY
 		" CRITICAL_MEMORY"
 #endif

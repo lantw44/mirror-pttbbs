@@ -28,18 +28,18 @@ u_loginview()
     move(4, 0);
     for (i = 0; i < NUMVIEWFILE; i++)
 	prints("    %c. %-20s %-15s \n", 'A' + i,
-	       loginview_file[i][1], ((pbits >> i) & 1 ? "ˇ" : "Ｘ"));
+	       loginview_file[i][1], ((pbits >> i) & 1 ? SHM->i18nstr[cuser.language][2079] : SHM->i18nstr[cuser.language][2080]));
 
     clrtobot();
-    while ((i = getkey("請按 [A-N] 切換設定，按 [Return] 結束："))!='\r')
-       {
+    while ((i = getkey(SHM->i18nstr[cuser.language][2081]))!='\r') {
 	i = i - 'a';
+               	
 	if (i >= NUMVIEWFILE || i < 0)
 	    bell();
 	else {
 	    pbits ^= (1 << i);
 	    move(i + 4, 28);
-	    prints((pbits >> i) & 1 ? "ˇ" : "Ｘ");
+	    prints((pbits >> i) & 1 ? SHM->i18nstr[cuser.language][2082] : SHM->i18nstr[cuser.language][2083]);
 	}
     }
 
@@ -58,41 +58,29 @@ user_display(userec_t * u, int real)
 
     clrtobot();
     prints(
-	   "        \033[30;41m┴┬┴┬┴┬\033[m  \033[1;30;45m    使 用 者"
-	   " 資 料        "
-	   "     \033[m  \033[30;41m┴┬┴┬┴┬\033[m\n");
-    prints("                代號暱稱: %s(%s)\n"
-	   "                真實姓名: %s"
-#ifdef FOREIGN_REG
-	   " %s%s"
-#endif
-	   "\n"
-	   "                居住住址: %s\n"
-	   "                電子信箱: %s\n"
-	   "                性    別: %s\n"
-	   "                銀行帳戶: %d 銀兩\n",
+	   SHM->i18nstr[cuser.language][2084]);
+    prints(SHM->i18nstr[cuser.language][2085],
 	   u->userid, u->username, u->realname,
 #ifdef FOREIGN_REG
-	   u->uflag2 & FOREIGN ? "(外籍: " : "",
+	   u->uflag2 & FOREIGN ? SHM->i18nstr[cuser.language][2087] : "",
 	   u->uflag2 & FOREIGN ?
-		(u->uflag2 & LIVERIGHT) ? "永久居留)" : "未取得居留權)"
+		(u->uflag2 & LIVERIGHT) ? SHM->i18nstr[cuser.language][2088] : SHM->i18nstr[cuser.language][2089]
 		: "",
+#else
+		"","",
 #endif
 	   u->address, u->email,
 	   sex[u->sex % 8], u->money);
 
     sethomedir(genbuf, u->userid);
-    prints("                私人信箱: %d 封  (購買信箱: %d 封)\n"
-	   "                手機號碼: %010d\n"
-	   "                生    日: %02i/%02i/%02i\n"
-	   "                小雞名字: %s\n",
+    prints(SHM->i18nstr[cuser.language][2090],
 	   get_num_records(genbuf, sizeof(fileheader_t)),
 	   u->exmailbox, u->mobile,
 	   u->month, u->day, u->year % 100, u->mychicken.name);
-    prints("                註冊日期: %s", ctime(&u->firstlogin));
-    prints("                前次光臨: %s", ctime(&u->lastlogin));
-    prints("                前次點歌: %s", ctime(&u->lastsong));
-    prints("                上站文章: %d 次 / %d 篇\n",
+    prints(SHM->i18nstr[cuser.language][2091], ctime(&u->firstlogin));
+    prints(SHM->i18nstr[cuser.language][2092], ctime(&u->lastlogin));
+    prints(SHM->i18nstr[cuser.language][2093], ctime(&u->lastsong));
+    prints(SHM->i18nstr[cuser.language][2094],
 	   u->numlogins, u->numposts);
 
     if (real) {
@@ -100,12 +88,11 @@ user_display(userec_t * u, int real)
 	for (diff = 0; diff < 32; diff++)
 	    if (!(u->userlevel & (1 << diff)))
 		genbuf[diff] = '-';
-	prints("                認證資料: %s\n"
-	       "                user權限: %s\n",
+	prints(SHM->i18nstr[cuser.language][2095],
 	       u->justify, genbuf);
     } else {
 	diff = (now - login_start_time) / 60;
-	prints("                停留期間: %d 小時 %2d 分\n",
+	prints(SHM->i18nstr[cuser.language][2096],
 	       diff / 60, diff % 60);
     }
 
@@ -114,7 +101,7 @@ user_display(userec_t * u, int real)
 	int             i;
 	boardheader_t  *bhdr;
 
-	outs("                擔任板主: ");
+	outs(SHM->i18nstr[cuser.language][2097]);
 
 	for (i = 0, bhdr = bcache; i < numboards; i++, bhdr++) {
 	    if (is_uBM(bhdr->BM, u->userid)) {
@@ -124,16 +111,15 @@ user_display(userec_t * u, int real)
 	}
 	outc('\n');
     }
-    outs("        \033[30;41m┴┬┴┬┴┬┴┬┴┬┴┬┴┬┴┬┴┬┴┬┴┬┴"
-	 "┬┴┬┴┬┴┬\033[m");
+    outs(SHM->i18nstr[cuser.language][2098]);
 
     outs((u->userlevel & PERM_LOGINOK) ?
-	 "\n您的註冊程序已經完成，歡迎加入本站" :
-	 "\n如果要提昇權限，請參考本站公佈欄辦理註冊");
+	 SHM->i18nstr[cuser.language][2099] :
+	 SHM->i18nstr[cuser.language][2100]);
 
 #ifdef NEWUSER_LIMIT
     if ((u->lastlogin - u->firstlogin < 3 * 86400) && !HAS_PERM(PERM_POST))
-	outs("\n新手上路，三天後開放權限");
+	outs(SHM->i18nstr[cuser.language][2101]);
 #endif
 }
 
@@ -147,16 +133,11 @@ mail_violatelaw(char *crime, char *police, char *reason, char *result)
     stampfile(genbuf, &fhdr);
     if (!(fp = fopen(genbuf, "w")))
 	return;
-    fprintf(fp, "作者: [Ptt法院]\n"
-	    "標題: [報告] 違法判決報告\n"
-	    "時間: %s\n"
-	    "\033[1;32m%s\033[m判決：\n     \033[1;32m%s\033[m"
-	    "因\033[1;35m%s\033[m行為，\n違反本站站規，處以\033[1;35m%s\033[m，特此通知"
-	"\n請到 PttLaw 查詢相關法規資訊，並到 Play-Pay-ViolateLaw 繳交罰單",
+    fprintf(fp, SHM->i18nstr[cuser.language][2102],
 	    ctime(&now), police, crime, reason, result);
     fclose(fp);
-    strcpy(fhdr.title, "[報告] 違法判決報告");
-    strcpy(fhdr.owner, "[Ptt法院]");
+    strcpy(fhdr.title, SHM->i18nstr[cuser.language][2103]);
+    strcpy(fhdr.owner, SHM->i18nstr[cuser.language][2104]);
     snprintf(genbuf, 200, "home/%c/%s/.DIR", crime[0], crime);
     append_record(genbuf, &fhdr, sizeof(fhdr));
 }
@@ -169,26 +150,26 @@ violate_law(userec_t * u, int unum)
     move(1, 0);
     clrtobot();
     move(2, 0);
-    prints("(1)Cross-post (2)亂發廣告信 (3)亂發連鎖信\n");
-    prints("(4)騷擾站上使用者 (8)其他以罰單處置行為\n(9)砍 id 行為\n");
-    getdata(5, 0, "(0)結束", ans, 3, DOECHO);
+    prints(SHM->i18nstr[cuser.language][2105]);
+    prints(SHM->i18nstr[cuser.language][2106]);
+    getdata(5, 0, SHM->i18nstr[cuser.language][2107], ans, 3, DOECHO);
     switch (ans[0]) {
     case '1':
 	strcpy(reason, "Cross-post");
 	break;
     case '2':
-	strcpy(reason, "亂發廣告信");
+	strcpy(reason, SHM->i18nstr[cuser.language][2108]);
 	break;
     case '3':
-	strcpy(reason, "亂發連鎖信");
+	strcpy(reason, SHM->i18nstr[cuser.language][2109]);
 	break;
     case '4':
-	while (!getdata(7, 0, "請輸入被檢舉理由以示負責：", reason, 50, DOECHO));
-	strcat(reason, "[騷擾站上使用者]");
+	while (!getdata(7, 0, SHM->i18nstr[cuser.language][2110], reason, 50, DOECHO));
+	strcat(reason, SHM->i18nstr[cuser.language][2111]);
 	break;
     case '8':
     case '9':
-	while (!getdata(6, 0, "請輸入理由以示負責：", reason, 50, DOECHO));
+	while (!getdata(6, 0, SHM->i18nstr[cuser.language][2112], reason, 50, DOECHO));
 	break;
     default:
 	return;
@@ -201,15 +182,15 @@ violate_law(userec_t * u, int unum)
 	snprintf(src, sizeof(src), "home/%c/%s", u->userid[0], u->userid);
 	snprintf(dst, sizeof(dst), "tmp/%s", u->userid);
 	Rename(src, dst);
-	post_violatelaw(u->userid, cuser.userid, reason, "砍除 ID");
+	post_violatelaw(u->userid, cuser.userid, reason, SHM->i18nstr[cuser.language][2113]);
         kill_user(unum);
 
     } else {
 	u->userlevel |= PERM_VIOLATELAW;
 	u->vl_count++;
 	passwd_update(unum, u);
-	post_violatelaw(u->userid, cuser.userid, reason, "罰單處份");
-	mail_violatelaw(u->userid, cuser.userid, reason, "罰單處份");
+	post_violatelaw(u->userid, cuser.userid, reason, SHM->i18nstr[cuser.language][2114]);
+	mail_violatelaw(u->userid, cuser.userid, reason, SHM->i18nstr[cuser.language][2115]);
     }
     pressanykey();
 }
@@ -217,31 +198,30 @@ violate_law(userec_t * u, int unum)
 static void Customize(void)
 {
     char    done = 0, mindbuf[5];
-    char    *wm[3] = {"一般", "進階", "未來"};
 
-    showtitle("個人化設定", "個人化設定");
+    showtitle(SHM->i18nstr[cuser.language][2119], SHM->i18nstr[cuser.language][2120]);
     memcpy(mindbuf, &currutmp->mind, 4);
     mindbuf[4] = 0;
     while( !done ){
 	move(2, 0);
-	prints("您目前的個人化設定: ");
+	prints(SHM->i18nstr[cuser.language][2121]);
 	move(4, 0);
-	prints("%-30s%10s\n", "A. 水球模式",
-	       wm[(cuser.uflag2 & WATER_MASK)]);
-	prints("%-30s%10s\n", "B. 接受站外信",
-	       ((cuser.userlevel & PERM_NOOUTMAIL) ? "否" : "是"));
-	prints("%-30s%10s\n", "C. 新板自動進我的最愛",
-	       ((cuser.uflag2 & FAVNEW_FLAG) ? "是" : "否"));
-	prints("%-30s%10s\n", "D. 目前的心情", mindbuf);
-	prints("%-30s%10s\n", "E. 高亮度顯示我的最愛", 
-	       ((cuser.uflag2 & FAVNOHILIGHT) ? "否" : "是"));
-	switch(getkey("請按 [A-E] 切換設定，按 [Return] 結束：")){
+	prints("%-30s%10s\n", SHM->i18nstr[cuser.language][2122],
+	       SHM->i18nstr[cuser.language][2116 + (cuser.uflag2 & WATER_MASK)]);
+	prints("%-30s%10s\n", SHM->i18nstr[cuser.language][2123],
+	       ((cuser.userlevel & PERM_NOOUTMAIL) ? SHM->i18nstr[cuser.language][2124] : SHM->i18nstr[cuser.language][2125]));
+	prints("%-30s%10s\n", SHM->i18nstr[cuser.language][2126],
+	       ((cuser.uflag2 & FAVNEW_FLAG) ? SHM->i18nstr[cuser.language][2127] : SHM->i18nstr[cuser.language][2128]));
+	prints("%-30s%10s\n", SHM->i18nstr[cuser.language][2129], mindbuf);
+	prints("%-30s%10s\n", SHM->i18nstr[cuser.language][2130], 
+	       ((cuser.uflag2 & FAVNOHILIGHT) ? SHM->i18nstr[cuser.language][2131] : SHM->i18nstr[cuser.language][2132]));
+	switch(getkey(SHM->i18nstr[cuser.language][2133])){
 	case 'a':{
 	    int     currentset = cuser.uflag2 & WATER_MASK;
 	    currentset = (currentset + 1) % 3;
 	    cuser.uflag2 &= ~WATER_MASK;
 	    cuser.uflag2 |= currentset;
-	    vmsg("修正水球模式後請正常離線再重新上線");
+	    vmsg(SHM->i18nstr[cuser.language][2134]);
 	}
 	    break;
 	case 'b':
@@ -253,12 +233,12 @@ static void Customize(void)
 		subscribe_newfav();
 	    break;
 	case 'd':{
-	    getdata(b_lines - 1, 0, "現在的心情? ",
+	    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][2135],
 		    mindbuf, sizeof(mindbuf), DOECHO);
-	    if (strcmp(mindbuf, "通緝") == 0)
-		vmsg("不可以把自己設通緝啦!");
-	    else if (strcmp(mindbuf, "壽星") == 0)
-		vmsg("你不是今天生日欸!");
+	    if (strcmp(mindbuf, SHM->i18nstr[cuser.language][2136]) == 0)
+		vmsg(SHM->i18nstr[cuser.language][2137]);
+	    else if (strcmp(mindbuf, SHM->i18nstr[cuser.language][2138]) == 0)
+		vmsg(SHM->i18nstr[cuser.language][2139]);
 	    else
 		memcpy(currutmp->mind, mindbuf, 4);
 	}
@@ -271,7 +251,7 @@ static void Customize(void)
 	}
 	passwd_update(usernum, &cuser);
     }
-    vmsg("設定完成");
+    pressanykey();
 }
 
 void
@@ -291,11 +271,9 @@ uinfo_query(userec_t * u, int real, int unum)
     fail = mail_changed = 0;
 
     memcpy(&x, u, sizeof(userec_t));
-    ans = getans(real ?
-	    "(1)改資料(2)設密碼(3)設權限(4)砍帳號(5)改ID"
-	    "(6)殺/復活寵物(7)審判 [0]結束 " :
-	    "請選擇 (1)修改資料 (2)設定密碼 (C) 個人化設定 ==> [0]結束 ");
-
+	ans = getans(real ?
+		SHM->i18nstr[cuser.language][2140] :
+		SHM->i18nstr[cuser.language][2141]);
     if (ans > '2' && ans != 'C' && ans != 'c' && !real)
 	ans = '0';
 
@@ -316,33 +294,32 @@ uinfo_query(userec_t * u, int real, int unum)
 	return;
     case '1':
 	move(0, 0);
-	outs("請逐項修改。");
+	outs(SHM->i18nstr[cuser.language][2142]);
 
-	getdata_buf(i++, 0, " 暱 稱  ：", x.username,
+	getdata_buf(i++, 0, SHM->i18nstr[cuser.language][2143], x.username,
 		    sizeof(x.username), DOECHO);
 	if (real) {
-	    getdata_buf(i++, 0, "真實姓名：",
+	    getdata_buf(i++, 0, SHM->i18nstr[cuser.language][2144],
 			x.realname, sizeof(x.realname), DOECHO);
 #ifdef FOREIGN_REG
-	    getdata_buf(i++, 0, cuser.uflag2 & FOREIGN ? "護照號碼" : "身分證號：", x.ident, sizeof(x.ident), DOECHO);
+	    getdata_buf(i++, 0, cuser.uflag2 & FOREIGN ? SHM->i18nstr[cuser.language][2145] : SHM->i18nstr[cuser.language][2146], x.ident, sizeof(x.ident), DOECHO);
 #else
-	    getdata_buf(i++, 0, "身分證號：", x.ident, sizeof(x.ident), DOECHO);
+	    getdata_buf(i++, 0, SHM->i18nstr[cuser.language][2147], x.ident, sizeof(x.ident), DOECHO);
 #endif
-	    getdata_buf(i++, 0, "居住地址：",
+	    getdata_buf(i++, 0, SHM->i18nstr[cuser.language][2148],
 			x.address, sizeof(x.address), DOECHO);
 	}
 	snprintf(buf, sizeof(buf), "%010d", x.mobile);
-	getdata_buf(i++, 0, "手機號碼：", buf, 11, LCECHO);
+	getdata_buf(i++, 0, SHM->i18nstr[cuser.language][2149], buf, 11, LCECHO);
 	x.mobile = atoi(buf);
-	getdata_str(i++, 0, "電子信箱[變動要重新認證]：", buf, 50, DOECHO,
+	getdata_str(i++, 0, SHM->i18nstr[cuser.language][2150], buf, 50, DOECHO,
 		    x.email);
 	if (strcmp(buf, x.email) && strchr(buf, '@')) {
 	    strlcpy(x.email, buf, sizeof(x.email));
 	    mail_changed = 1 - real;
 	}
 	snprintf(genbuf, sizeof(genbuf), "%i", (u->sex + 1) % 8);
-	getdata_str(i++, 0, "性別 (1)葛格 (2)姐接 (3)底迪 (4)美眉 (5)薯叔 "
-		    "(6)阿姨 (7)植物 (8)礦物：",
+	getdata_str(i++, 0, SHM->i18nstr[cuser.language][2151],
 		    buf, 3, DOECHO, genbuf);
 	if (buf[0] >= '1' && buf[0] <= '8')
 	    x.sex = (buf[0] - '1') % 8;
@@ -354,7 +331,7 @@ uinfo_query(userec_t * u, int real, int unum)
 
 	    snprintf(genbuf, sizeof(genbuf), "%02i/%02i/%02i",
 		     u->month, u->day, u->year % 100);
-	    len = getdata_str(i, 0, "生日 月月/日日/西元：", buf, 9,
+	    len = getdata_str(i, 0, SHM->i18nstr[cuser.language][2152], buf, 9,
 			      DOECHO, genbuf);
 	    if (len && len != 8)
 		continue;
@@ -378,7 +355,7 @@ uinfo_query(userec_t * u, int real, int unum)
 	    int l;
 	    if (HAS_PERM(PERM_BBSADM)) {
 		snprintf(genbuf, sizeof(genbuf), "%d", x.money);
-		if (getdata_str(i++, 0, "銀行帳戶：", buf, 10, DOECHO, genbuf))
+		if (getdata_str(i++, 0, SHM->i18nstr[cuser.language][2153], buf, 10, DOECHO, genbuf))
 		    if ((l = atol(buf)) != 0) {
 			if (l != x.money) {
 			    money_change = 1;
@@ -388,40 +365,40 @@ uinfo_query(userec_t * u, int real, int unum)
 		    }
 	    }
 	    snprintf(genbuf, sizeof(genbuf), "%d", x.exmailbox);
-	    if (getdata_str(i++, 0, "購買信箱數：", buf, 6,
+	    if (getdata_str(i++, 0, SHM->i18nstr[cuser.language][2154], buf, 6,
 			    DOECHO, genbuf))
 		if ((l = atol(buf)) != 0)
 		    x.exmailbox = (int)l;
 
-	    getdata_buf(i++, 0, "認證資料：", x.justify,
+	    getdata_buf(i++, 0, SHM->i18nstr[cuser.language][2155], x.justify,
 			sizeof(x.justify), DOECHO);
-	    getdata_buf(i++, 0, "最近光臨機器：",
+	    getdata_buf(i++, 0, SHM->i18nstr[cuser.language][2156],
 			x.lasthost, sizeof(x.lasthost), DOECHO);
 
 	    snprintf(genbuf, sizeof(genbuf), "%d", x.numlogins);
-	    if (getdata_str(i++, 0, "上線次數：", buf, 10, DOECHO, genbuf))
+	    if (getdata_str(i++, 0, SHM->i18nstr[cuser.language][2157], buf, 10, DOECHO, genbuf))
 		if ((fail = atoi(buf)) >= 0)
 		    x.numlogins = fail;
 	    snprintf(genbuf, sizeof(genbuf), "%d", u->numposts);
-	    if (getdata_str(i++, 0, "文章數目：", buf, 10, DOECHO, genbuf))
+	    if (getdata_str(i++, 0, SHM->i18nstr[cuser.language][2158], buf, 10, DOECHO, genbuf))
 		if ((fail = atoi(buf)) >= 0)
 		    x.numposts = fail;
 	    snprintf(genbuf, sizeof(genbuf), "%d", u->goodpost);
-	    if (getdata_str(i++, 0, "優良文章數:", buf, 10, DOECHO, genbuf))
+	    if (getdata_str(i++, 0, SHM->i18nstr[cuser.language][2159], buf, 10, DOECHO, genbuf))
 		if ((fail = atoi(buf)) >= 0)
 		    x.goodpost = fail;
 	    snprintf(genbuf, sizeof(genbuf), "%d", u->badpost);
-	    if (getdata_str(i++, 0, "惡劣文章數:", buf, 10, DOECHO, genbuf))
+	    if (getdata_str(i++, 0, SHM->i18nstr[cuser.language][2160], buf, 10, DOECHO, genbuf))
 		if ((fail = atoi(buf)) >= 0)
 		    x.badpost = fail;
 	    snprintf(genbuf, sizeof(genbuf), "%d", u->vl_count);
-	    if (getdata_str(i++, 0, "違法記錄：", buf, 10, DOECHO, genbuf))
+	    if (getdata_str(i++, 0, SHM->i18nstr[cuser.language][2161], buf, 10, DOECHO, genbuf))
 		if ((fail = atoi(buf)) >= 0)
 		    x.vl_count = fail;
 
 	    snprintf(genbuf, sizeof(genbuf),
 		     "%d/%d/%d", u->five_win, u->five_lose, u->five_tie);
-	    if (getdata_str(i++, 0, "五子棋戰績 勝/敗/和：", buf, 16, DOECHO,
+	    if (getdata_str(i++, 0, SHM->i18nstr[cuser.language][2162], buf, 16, DOECHO,
 			    genbuf))
 		while (1) {
 		    p = strtok(buf, "/\r\n");
@@ -440,7 +417,7 @@ uinfo_query(userec_t * u, int real, int unum)
 		}
 	    snprintf(genbuf, sizeof(genbuf),
 		     "%d/%d/%d", u->chc_win, u->chc_lose, u->chc_tie);
-	    if (getdata_str(i++, 0, "象棋戰績 勝/敗/和：", buf, 16, DOECHO,
+	    if (getdata_str(i++, 0, SHM->i18nstr[cuser.language][2163], buf, 16, DOECHO,
 			    genbuf))
 		while (1) {
 		    p = strtok(buf, "/\r\n");
@@ -458,7 +435,7 @@ uinfo_query(userec_t * u, int real, int unum)
 		    break;
 		}
 #ifdef FOREIGN_REG
-	    if (getdata_str(i++, 0, "住在 1)台灣 2)其他：", buf, 2, DOECHO, x.uflag2 & FOREIGN ? "2" : "1"))
+	    if (getdata_str(i++, 0, SHM->i18nstr[cuser.language][2164], buf, 2, DOECHO, x.uflag2 & FOREIGN ? "2" : "1"))
 		if ((fail = atoi(buf)) > 0){
 		    if (fail == 2){
 			x.uflag2 |= FOREIGN;
@@ -467,7 +444,7 @@ uinfo_query(userec_t * u, int real, int unum)
 			x.uflag2 &= ~FOREIGN;
 		}
 	    if (x.uflag2 & FOREIGN)
-		if (getdata_str(i++, 0, "永久居留權 1)是 2)否：", buf, 2, DOECHO, x.uflag2 & LIVERIGHT ? "1" : "2")){
+		if (getdata_str(i++, 0, SHM->i18nstr[cuser.language][2165], buf, 2, DOECHO, x.uflag2 & LIVERIGHT ? "1" : "2")){
 		    if ((fail = atoi(buf)) > 0){
 			if (fail == 1){
 			    x.uflag2 |= LIVERIGHT;
@@ -487,29 +464,29 @@ uinfo_query(userec_t * u, int real, int unum)
     case '2':
 	i = 19;
 	if (!real) {
-	    if (!getdata(i++, 0, "請輸入原密碼：", buf, PASSLEN, NOECHO) ||
+	    if (!getdata(i++, 0, SHM->i18nstr[cuser.language][2166], buf, PASSLEN, NOECHO) ||
 		!checkpasswd(u->passwd, buf)) {
-		outs("\n\n您輸入的密碼不正確\n");
+		outs(SHM->i18nstr[cuser.language][2167]);
 		fail++;
 		break;
 	    }
 	} else {
 	    char            witness[3][32];
 	    for (i = 0; i < 3; i++) {
-		if (!getdata(19 + i, 0, "請輸入協助證明之使用者：",
+		if (!getdata(19 + i, 0, SHM->i18nstr[cuser.language][2168],
 			     witness[i], sizeof(witness[i]), DOECHO)) {
-		    outs("\n不輸入則無法更改\n");
+		    outs(SHM->i18nstr[cuser.language][2169]);
 		    fail++;
 		    break;
 		} else if (!(uid = getuser(witness[i]))) {
-		    outs("\n查無此使用者\n");
+		    outs(SHM->i18nstr[cuser.language][2170]);
 		    fail++;
 		    break;
 		} else {
 		    userec_t        atuser;
 		    passwd_query(uid, &atuser);
 		    if (now - atuser.firstlogin < 6 * 30 * 24 * 60 * 60) {
-			outs("\n註冊未超過半年，請重新輸入\n");
+			outs(SHM->i18nstr[cuser.language][2171]);
 			i--;
 		    }
 		}
@@ -520,16 +497,16 @@ uinfo_query(userec_t * u, int real, int unum)
 		i = 20;
 	}
 
-	if (!getdata(i++, 0, "請設定新密碼：", buf, PASSLEN, NOECHO)) {
-	    outs("\n\n密碼設定取消, 繼續使用舊密碼\n");
+	if (!getdata(i++, 0, SHM->i18nstr[cuser.language][2172], buf, PASSLEN, NOECHO)) {
+	    outs(SHM->i18nstr[cuser.language][2173]);
 	    fail++;
 	    break;
 	}
 	strncpy(genbuf, buf, PASSLEN);
 
-	getdata(i++, 0, "請檢查新密碼：", buf, PASSLEN, NOECHO);
+	getdata(i++, 0, SHM->i18nstr[cuser.language][2174], buf, PASSLEN, NOECHO);
 	if (strncmp(buf, genbuf, PASSLEN)) {
-	    outs("\n\n新密碼確認失敗, 無法設定新密碼\n");
+	    outs(SHM->i18nstr[cuser.language][2175]);
 	    fail++;
 	    break;
 	}
@@ -555,10 +532,10 @@ uinfo_query(userec_t * u, int real, int unum)
 	break;
 
     case '5':
-	if (getdata_str(b_lines - 3, 0, "新的使用者代號：", genbuf, IDLEN + 1,
+	if (getdata_str(b_lines - 3, 0, SHM->i18nstr[cuser.language][2176], genbuf, IDLEN + 1,
 			DOECHO, x.userid)) {
 	    if (searchuser(genbuf)) {
-		outs("錯誤! 已經有同樣 ID 的使用者");
+		outs(SHM->i18nstr[cuser.language][2177]);
 		fail++;
 	    } else
 		strlcpy(x.userid, genbuf, sizeof(x.userid));
@@ -568,7 +545,7 @@ uinfo_query(userec_t * u, int real, int unum)
 	if (x.mychicken.name[0])
 	    x.mychicken.name[0] = 0;
 	else
-	    strlcpy(x.mychicken.name, "[死]", sizeof(x.mychicken.name));
+	    strlcpy(x.mychicken.name, SHM->i18nstr[cuser.language][2178], sizeof(x.mychicken.name));
 	break;
     default:
 	return;
@@ -578,7 +555,7 @@ uinfo_query(userec_t * u, int real, int unum)
 	pressanykey();
 	return;
     }
-    if (getans(msg_sure_ny) == 'y') {
+	if (getans(msg_sure_ny) == 'y') {
 	if (flag)
 	    post_change_perm(temp, i, cuser.userid, x.userid);
 	if (strcmp(u->userid, x.userid)) {
@@ -615,25 +592,21 @@ uinfo_query(userec_t * u, int real, int unum)
 	    if (!(fp = fopen(genbuf, "w")))
 		return;
 
-	    fprintf(fp, "作者: [系統安全局] 看板: Security\n"
-		    "標題: [公安報告] 站長修改金錢報告\n"
-		    "時間: %s\n"
-		    "   站長\033[1;32m%s\033[m把\033[1;32m%s\033[m"
-		    "的錢從\033[1;35m%d\033[m改成\033[1;35m%d\033[m",
+	    fprintf(fp, SHM->i18nstr[cuser.language][2179],
 		    ctime(&now), cuser.userid, x.userid, money, x.money);
 
 	    clrtobot();
 	    clear();
-	    while (!getdata(5, 0, "請輸入理由以示負責：",
+	    while (!getdata(5, 0, SHM->i18nstr[cuser.language][2180],
 			    reason, sizeof(reason), DOECHO));
 
-	    fprintf(fp, "\n   \033[1;37m站長%s修改錢理由是：%s\033[m",
+	    fprintf(fp, SHM->i18nstr[cuser.language][2181],
 		    cuser.userid, reason);
 	    fclose(fp);
 	    snprintf(fhdr.title, sizeof(fhdr.title),
-		     "[公安報告] 站長%s修改%s錢報告", cuser.userid,
+		     SHM->i18nstr[cuser.language][2182], cuser.userid,
 		     x.userid);
-	    strlcpy(fhdr.owner, "[系統安全局]", sizeof(fhdr.owner));
+	    strlcpy(fhdr.owner, SHM->i18nstr[cuser.language][2183], sizeof(fhdr.owner));
 	    append_record("boards/S/Security/.DIR", &fhdr, sizeof(fhdr));
 	}
     }
@@ -677,7 +650,7 @@ u_switchproverb()
 	FILE           *fp = fopen(buf, "a");
 	assert(fp);
 
-	fprintf(fp, "座右銘狀態為[自定型]要記得設座右銘的內容唷!!");
+	fprintf(fp, SHM->i18nstr[cuser.language][2184]);
 	fclose(fp);
     }
     passwd_update(usernum, &cuser);
@@ -693,9 +666,7 @@ u_editproverb()
     setuserfile(buf, fn_proverb);
     move(1, 0);
     clrtobot();
-    outs("\n\n 請一行一行依序鍵入想系統提醒你的內容,\n"
-	 " 儲存後記得把狀態設為 [自定型] 才有作用\n"
-	 " 座右銘最多100條");
+    outs(SHM->i18nstr[cuser.language][2185]);
     pressanykey();
     vedit(buf, NA, NULL);
     return 0;
@@ -708,7 +679,7 @@ showplans(char *uid)
 
     sethomefile(genbuf, uid, fn_plans);
     if (!show_file(genbuf, 7, MAX_QUERYLINES, ONLY_COLOR))
-	prints("《個人名片》%s 目前沒有名片", uid);
+	prints(SHM->i18nstr[cuser.language][2186], uid);
 }
 
 int
@@ -727,7 +698,7 @@ showsignature(char *fname, int *j)
     for (ch = '1'; ch <= '9'; ch++) {
 	fname[*j] = ch;
 	if ((fp = fopen(fname, "r"))) {
-	    prints("\033[36m【 簽名檔.%c 】\033[m\n", ch);
+	    prints(SHM->i18nstr[cuser.language][2187], ch);
 	    for (i = 0; i < MAX_SIGLINES && fgets(buf, sizeof(buf), fp); i++)
 		outs(buf);
 	    num++;
@@ -747,7 +718,7 @@ u_editsig()
 
     showsignature(genbuf, &j);
 
-    getdata(0, 0, "簽名檔 (E)編輯 (D)刪除 (Q)取消？[Q] ",
+    getdata(0, 0, SHM->i18nstr[cuser.language][2188],
 	    ans, sizeof(ans), LCECHO);
 
     aborted = 0;
@@ -757,7 +728,7 @@ u_editsig()
 	aborted = 2;
 
     if (aborted) {
-	if (!getdata(1, 0, "請選擇簽名檔(1-9)？[1] ", ans, sizeof(ans), DOECHO))
+	if (!getdata(1, 0, SHM->i18nstr[cuser.language][2189], ans, sizeof(ans), DOECHO))
 	    ans[0] = '1';
 	if (ans[0] >= '1' && ans[0] <= '9') {
 	    genbuf[j] = ans[0];
@@ -768,7 +739,7 @@ u_editsig()
 		setutmpmode(EDITSIG);
 		aborted = vedit(genbuf, NA, NULL);
 		if (aborted != -1)
-		    outs("簽名檔更新完畢");
+		    outs(SHM->i18nstr[cuser.language][2190]);
 	    }
 	}
 	pressanykey();
@@ -781,7 +752,7 @@ u_editplan()
 {
     char            genbuf[200];
 
-    getdata(b_lines - 1, 0, "名片 (D)刪除 (E)編輯 [Q]取消？[Q] ",
+    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][2191],
 	    genbuf, 3, LCECHO);
 
     if (genbuf[0] == 'e') {
@@ -791,13 +762,13 @@ u_editplan()
 	setuserfile(genbuf, fn_plans);
 	aborted = vedit(genbuf, NA, NULL);
 	if (aborted != -1)
-	    outs("名片更新完畢");
+	    outs(SHM->i18nstr[cuser.language][2192]);
 	pressanykey();
 	return 0;
     } else if (genbuf[0] == 'd') {
 	setuserfile(genbuf, fn_plans);
 	unlink(genbuf);
-	outmsg("名片刪除完畢");
+	outmsg(SHM->i18nstr[cuser.language][2193]);
     }
     return 0;
 }
@@ -807,7 +778,7 @@ u_editcalendar()
 {
     char            genbuf[200];
 
-    getdata(b_lines - 1, 0, "行事曆 (D)刪除 (E)編輯 [Q]取消？[Q] ",
+    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][2194],
 	    genbuf, 3, LCECHO);
 
     sethomefile(genbuf, cuser.userid, "calendar");
@@ -818,11 +789,11 @@ u_editcalendar()
 	sethomefile(genbuf, cuser.userid, "calendar");
 	aborted = vedit(genbuf, NA, NULL);
 	if (aborted != -1)
-	    vmsg("行事曆更新完畢");
+	    vmsg(SHM->i18nstr[cuser.language][2195]);
 	return 0;
     } else if (genbuf[0] == 'd') {
 	unlink(genbuf);
-	vmsg("行事曆刪除完畢");
+	vmsg(SHM->i18nstr[cuser.language][2196]);
     }
     return 0;
 }
@@ -835,12 +806,12 @@ getfield(int line, char *info, char *desc, char *buf, int len)
     char            genbuf[200];
 
     move(line, 2);
-    prints("原先設定：%-30.30s (%s)", buf, info);
-    snprintf(prompt, sizeof(prompt), "%s：", desc);
+    prints(SHM->i18nstr[cuser.language][2197], buf, info);
+    snprintf(prompt, sizeof(prompt), SHM->i18nstr[cuser.language][2198], desc);
     if (getdata_str(line + 1, 2, prompt, genbuf, len, DOECHO, buf))
 	strcpy(buf, genbuf);
     move(line, 2);
-    prints("%s：%s", desc, buf);
+    prints(SHM->i18nstr[cuser.language][2199], desc, buf);
     clrtoeol();
 }
 
@@ -943,62 +914,47 @@ toregister(char *email, char *genbuf, char *phone, char *career,
 	fclose(fn);
     }
     clear();
-    stand_title("認證設定");
+    stand_title(SHM->i18nstr[cuser.language][2200]);
     if (cuser.userlevel & PERM_NOREGCODE){
 	strcpy(email, "x");
 	goto REGFORM2;
     }
     move(2, 0);
-    outs("您好, 本站認證認證的方式有:\n"
-	 "  1.若您有 E-Mail  (本站不接受 yahoo, kimo等免費的 E-Mail)\n"
-	 "    請輸入您的 E-Mail , 我們會寄發含有認證碼的信件給您\n"
-	 "    收到後請到 (U)ser => (R)egister 輸入認證碼, 即可通過認證\n"
-	 "\n"
-	 "  2.若您沒有 E-Mail , 請輸入 x ,\n"
-	 "    我們會由站長親自審核您的註冊資料\n"
-	 "************************************************************\n"
-	 "* 注意!                                                    *\n"
-	 "* 您應該會在輸入完成後十分鐘內收到認證信, 若過久未收到,    *\n"
-	 "* 或輸入後發生認證碼錯誤, 麻煩重填一次 E-Mail 或改手動認證 *\n"
-	 "************************************************************\n");
+    outs(SHM->i18nstr[cuser.language][2201]);
 
 #ifdef HAVEMOBILE
-    outs("  3.若您有手機門號且想採取手機簡訊認證的方式 , 請輸入 m \n"
-	 "    我們將會寄發含有認證碼的簡訊給您 \n"
-	 "    收到後請到(U)ser => (R)egister 輸入認證碼, 即可通過認證\n");
+    outs(SHM->i18nstr[cuser.language][2202]);
 #endif
 
     while (1) {
 	email[0] = 0;
-	getfield(15, "身分認證用", "E-Mail Address", email, 50);
+	getfield(15, SHM->i18nstr[cuser.language][2203], "E-Mail Address", email, 50);
 	if (strcmp(email, "x") == 0 || strcmp(email, "X") == 0)
 	    break;
 #ifdef HAVEMOBILE
 	else if (strcmp(email, "m") == 0 || strcmp(email, "M") == 0) {
 	    if (isvalidmobile(mobile)) {
 		char            yn[3];
-		getdata(16, 0, "請再次確認您輸入的手機號碼正確嘛? [y/N]",
+		getdata(16, 0, SHM->i18nstr[cuser.language][2204],
 			yn, sizeof(yn), LCECHO);
 		if (yn[0] == 'Y' || yn[0] == 'y')
 		    break;
 	    } else {
 		move(17, 0);
-		prints("指定的手機號碼不合法,"
-		       "若您無手機門號請選擇其他方式認證");
+		prints(SHM->i18nstr[cuser.language][2205]);
 	    }
 
 	}
 #endif
 	else if (isvalidemail(email)) {
 	    char            yn[3];
-	    getdata(16, 0, "請再次確認您輸入的 E-Mail 位置正確嘛? [y/N]",
+	    getdata(16, 0, SHM->i18nstr[cuser.language][2206],
 		    yn, sizeof(yn), LCECHO);
 	    if (yn[0] == 'Y' || yn[0] == 'y')
 		break;
 	} else {
 	    move(17, 0);
-	    prints("指定的 E-Mail 不合法,"
-		   "若您無 E-Mail 請輸入 x由站長手動認證");
+	    prints(SHM->i18nstr[cuser.language][2207]);
 	}
     }
     strncpy(cuser.email, email, sizeof(cuser.email));
@@ -1031,8 +987,8 @@ toregister(char *email, char *genbuf, char *phone, char *career,
 	    strncpy(cuser.justify, genbuf, REGLEN);
 	    sethomefile(buf, cuser.userid, "justify");
 	}
-	snprintf(buf, sizeof(buf),
-		 "您在 " BBSNAME " 的認證碼: %s", getregcode(genbuf));
+	snprintf(buf, sizeof(buf), "%s%s%s%s",
+		 SHM->i18nstr[cuser.language][2208], BBSNAME, SHM->i18nstr[cuser.language][2209], getregcode(genbuf));
 	strlcpy(tmp, cuser.userid, sizeof(tmp));
 	strlcpy(cuser.userid, "SYSOP", sizeof(cuser.userid));
 #ifdef HAVEMOBILE
@@ -1042,9 +998,7 @@ toregister(char *email, char *genbuf, char *phone, char *career,
 #endif
 	    bsmtp("etc/registermail", buf, email, 0);
 	strlcpy(cuser.userid, tmp, sizeof(cuser.userid));
-	outs("\n\n\n我們即將寄出認證信 (您應該會在 10 分鐘內收到)\n"
-	     "收到後您可以根據認證信標題的認證碼\n"
-	     "輸入到 (U)ser -> (R)egister 後就可以完成註冊");
+	outs(SHM->i18nstr[cuser.language][2210]);
 	pressanykey();
 	return;
     }
@@ -1055,12 +1009,12 @@ static int HaveRejectStr(char *s, char **rej)
 {
     int     i;
     char    *ptr, *rejectstr[] =
-	{"幹", "阿", "不", "你媽", "某", "笨", "呆", "..", "xx",
-	 "你管", "管我", "猜", "天才", "超人", 
-	 "ㄅ", "ㄆ", "ㄇ", "ㄈ", "ㄉ", "ㄊ", "ㄋ", "ㄌ", "ㄍ", "ㄎ", "ㄏ",
-	 "ㄐ", "ㄑ", "ㄒ", "ㄓ",/*"ㄔ",*/    "ㄕ", "ㄖ", "ㄗ", "ㄘ", "ㄙ",
-	 "ㄧ", "ㄨ", "ㄩ", "ㄚ", "ㄛ", "ㄜ", "ㄝ", "ㄞ", "ㄟ", "ㄠ", "ㄡ",
-	 "ㄢ", "ㄣ", "ㄤ", "ㄥ", "ㄦ", NULL};
+	{SHM->i18nstr[cuser.language][2211], SHM->i18nstr[cuser.language][2212], SHM->i18nstr[cuser.language][2213], SHM->i18nstr[cuser.language][2214], SHM->i18nstr[cuser.language][2215], SHM->i18nstr[cuser.language][2216], SHM->i18nstr[cuser.language][2217], "..", "xx",
+	 SHM->i18nstr[cuser.language][2218], SHM->i18nstr[cuser.language][2219], SHM->i18nstr[cuser.language][2220], SHM->i18nstr[cuser.language][2221], SHM->i18nstr[cuser.language][2222], 
+	 SHM->i18nstr[cuser.language][2223], SHM->i18nstr[cuser.language][2224], SHM->i18nstr[cuser.language][2225], SHM->i18nstr[cuser.language][2226], SHM->i18nstr[cuser.language][2227], SHM->i18nstr[cuser.language][2228], SHM->i18nstr[cuser.language][2229], SHM->i18nstr[cuser.language][2230], SHM->i18nstr[cuser.language][2231], SHM->i18nstr[cuser.language][2232], SHM->i18nstr[cuser.language][2233],
+	 SHM->i18nstr[cuser.language][2234], SHM->i18nstr[cuser.language][2235], SHM->i18nstr[cuser.language][2236], SHM->i18nstr[cuser.language][2237],/*"ㄔ",*/    SHM->i18nstr[cuser.language][2238], SHM->i18nstr[cuser.language][2239], SHM->i18nstr[cuser.language][2240], SHM->i18nstr[cuser.language][2241], SHM->i18nstr[cuser.language][2242],
+	 SHM->i18nstr[cuser.language][2243], SHM->i18nstr[cuser.language][2244], SHM->i18nstr[cuser.language][2245], SHM->i18nstr[cuser.language][2246], SHM->i18nstr[cuser.language][2247], SHM->i18nstr[cuser.language][2248], SHM->i18nstr[cuser.language][2249], SHM->i18nstr[cuser.language][2250], SHM->i18nstr[cuser.language][2251], SHM->i18nstr[cuser.language][2252], SHM->i18nstr[cuser.language][2253],
+	 SHM->i18nstr[cuser.language][2254], SHM->i18nstr[cuser.language][2255], SHM->i18nstr[cuser.language][2256], SHM->i18nstr[cuser.language][2257], SHM->i18nstr[cuser.language][2258], NULL};
 
     if( rej != NULL )
 	for( i = 0 ; rej[i] != NULL ; ++i )
@@ -1071,8 +1025,8 @@ static int HaveRejectStr(char *s, char **rej)
 	if( strstr(s, rejectstr[i]) )
 	    return 1;
 
-    if( (ptr = strstr(s, "ㄔ")) != NULL ){
-	if( ptr != s && strncmp(ptr - 1, "都市", 4) == 0 )
+    if( (ptr = strstr(s, SHM->i18nstr[cuser.language][2259])) != NULL ){
+	if( ptr != s && strncmp(ptr - 1, SHM->i18nstr[cuser.language][2260], 4) == 0 )
 	    return 0;
 	return 1;
     }
@@ -1086,20 +1040,20 @@ static char *isvalidname(char *rname)
     return NULL;
 #else
     char    *rejectstr[] =
-	{"肥", "胖", "豬頭", "小白", "小明", "路人", "老王", "老李", "寶貝",
-	 "先生", "帥哥", "老頭", "小姊", "小姐", "美女", "小妹", "大頭", 
-	 "公主", "同學", "寶寶", "公子", "大頭", "小小", "小弟", "小妹",
-	 "妹妹", "嘿", "嗯", "爺爺", "大哥", "無",
+	{SHM->i18nstr[cuser.language][2261], SHM->i18nstr[cuser.language][2262], SHM->i18nstr[cuser.language][2263], SHM->i18nstr[cuser.language][2264], SHM->i18nstr[cuser.language][2265], SHM->i18nstr[cuser.language][2266], SHM->i18nstr[cuser.language][2267], SHM->i18nstr[cuser.language][2268], SHM->i18nstr[cuser.language][2269],
+	 SHM->i18nstr[cuser.language][2270], SHM->i18nstr[cuser.language][2271], SHM->i18nstr[cuser.language][2272], SHM->i18nstr[cuser.language][2273], SHM->i18nstr[cuser.language][2274], SHM->i18nstr[cuser.language][2275], SHM->i18nstr[cuser.language][2276], SHM->i18nstr[cuser.language][2277], 
+	 SHM->i18nstr[cuser.language][2278], SHM->i18nstr[cuser.language][2279], SHM->i18nstr[cuser.language][2280], SHM->i18nstr[cuser.language][2281], SHM->i18nstr[cuser.language][2282], SHM->i18nstr[cuser.language][2283], SHM->i18nstr[cuser.language][2284], SHM->i18nstr[cuser.language][2285],
+	 SHM->i18nstr[cuser.language][2286], SHM->i18nstr[cuser.language][2287], SHM->i18nstr[cuser.language][2288], SHM->i18nstr[cuser.language][2289], SHM->i18nstr[cuser.language][2290], SHM->i18nstr[cuser.language][2291],
 	 NULL};
     if( removespace(rname) && rname[0] < 0 &&
 	strlen(rname) >= 4 &&
 	!HaveRejectStr(rname, rejectstr) &&
-	strncmp(rname, "小", 2) != 0   && //起頭是「小」
-	strncmp(rname, "我是", 4) != 0 && //起頭是「我是」
-	!(strlen(rname) == 4 && strncmp(&rname[2], "兒", 2) == 0) &&
+	strncmp(rname, SHM->i18nstr[cuser.language][2292], 2) != 0   && //起頭是「小」
+	strncmp(rname, SHM->i18nstr[cuser.language][2293], 4) != 0 && //起頭是「我是」
+	!(strlen(rname) == 4 && strncmp(&rname[2], SHM->i18nstr[cuser.language][2294], 2) == 0) &&
 	!(strlen(rname) >= 4 && strncmp(&rname[0], &rname[2], 2) == 0))
 	return NULL;
-    return "您的輸入不正確";
+    return SHM->i18nstr[cuser.language][2295];
 #endif
 
 }
@@ -1109,14 +1063,14 @@ static char *isvalidcareer(char *career)
 #ifndef FOREIGN_REG
     char    *rejectstr[] = {NULL};
     if (!(removespace(career) && career[0] < 0 && strlen(career) >= 6) ||
-	strcmp(career, "家裡") == 0 || HaveRejectStr(career, rejectstr) )
-	return "您的輸入不正確";
-    if (strcmp(&career[strlen(career) - 2], "大") == 0 ||
-	strcmp(&career[strlen(career) - 4], "大學") == 0 ||
-	strcmp(career, "學生大學") == 0)
-	return "麻煩請加學校系所";
-    if (strcmp(career, "學生高中") == 0)
-	return "麻煩輸入學校名稱";
+	strcmp(career, SHM->i18nstr[cuser.language][2296]) == 0 || HaveRejectStr(career, rejectstr) )
+	return SHM->i18nstr[cuser.language][2297];
+    if (strcmp(&career[strlen(career) - 2], SHM->i18nstr[cuser.language][2298]) == 0 ||
+	strcmp(&career[strlen(career) - 4], SHM->i18nstr[cuser.language][2299]) == 0 ||
+	strcmp(career, SHM->i18nstr[cuser.language][2300]) == 0)
+	return SHM->i18nstr[cuser.language][2301];
+    if (strcmp(career, SHM->i18nstr[cuser.language][2302]) == 0)
+	return SHM->i18nstr[cuser.language][2303];
 #endif
     return NULL;
 }
@@ -1125,23 +1079,23 @@ static char *isvalidaddr(char *addr)
 {
 #ifndef FOREIGN_REG
     char    *rejectstr[] =
-	{"地球", "銀河", "火星", NULL};
+	{SHM->i18nstr[cuser.language][2304], SHM->i18nstr[cuser.language][2305], SHM->i18nstr[cuser.language][2306], NULL};
 
     if (!removespace(addr) || addr[0] > 0 || strlen(addr) < 15) 
-	return "這個地址並不合法";
-    if (strstr(addr, "信箱") != NULL || strstr(addr, "郵政") != NULL) 
-	return "抱歉我們不接受郵政信箱";
-    if ((strstr(addr, "市") == NULL && strstr(addr, "巿") == NULL &&
-	 strstr(addr, "縣") == NULL && strstr(addr, "室") == NULL) ||
+	return SHM->i18nstr[cuser.language][2307];
+    if (strstr(addr, SHM->i18nstr[cuser.language][2308]) != NULL || strstr(addr, SHM->i18nstr[cuser.language][2309]) != NULL) 
+	return SHM->i18nstr[cuser.language][2310];
+    if ((strstr(addr, SHM->i18nstr[cuser.language][2311]) == NULL && strstr(addr, SHM->i18nstr[cuser.language][2312]) == NULL &&
+	 strstr(addr, SHM->i18nstr[cuser.language][2313]) == NULL && strstr(addr, SHM->i18nstr[cuser.language][2314]) == NULL) ||
 	HaveRejectStr(addr, rejectstr)             ||
-	strcmp(&addr[strlen(addr) - 2], "段") == 0 ||
-	strcmp(&addr[strlen(addr) - 2], "路") == 0 ||
-	strcmp(&addr[strlen(addr) - 2], "巷") == 0 ||
-	strcmp(&addr[strlen(addr) - 2], "弄") == 0 ||
-	strcmp(&addr[strlen(addr) - 2], "區") == 0 ||
-	strcmp(&addr[strlen(addr) - 2], "市") == 0 ||
-	strcmp(&addr[strlen(addr) - 2], "街") == 0    )
-	return "這個地址並不合法";
+	strcmp(&addr[strlen(addr) - 2], SHM->i18nstr[cuser.language][2315]) == 0 ||
+	strcmp(&addr[strlen(addr) - 2], SHM->i18nstr[cuser.language][2316]) == 0 ||
+	strcmp(&addr[strlen(addr) - 2], SHM->i18nstr[cuser.language][2317]) == 0 ||
+	strcmp(&addr[strlen(addr) - 2], SHM->i18nstr[cuser.language][2318]) == 0 ||
+	strcmp(&addr[strlen(addr) - 2], SHM->i18nstr[cuser.language][2319]) == 0 ||
+	strcmp(&addr[strlen(addr) - 2], SHM->i18nstr[cuser.language][2320]) == 0 ||
+	strcmp(&addr[strlen(addr) - 2], SHM->i18nstr[cuser.language][2321]) == 0    )
+	return SHM->i18nstr[cuser.language][2322];
 #endif
     return NULL;
 }
@@ -1151,12 +1105,12 @@ static char *isvalidphone(char *phone)
     int     i;
     for( i = 0 ; phone[i] != 0 ; ++i )
 	if( !isdigit(phone[i]) )
-	    return "請不要加分隔符號";
+	    return SHM->i18nstr[cuser.language][2323];
     if (!removespace(phone) || 
 	strlen(phone) < 9 || 
 	strstr(phone, "00000000") != NULL ||
 	strstr(phone, "22222222") != NULL    ) {
-	return "這個電話號碼並不合法(請含區碼)" ;
+	return SHM->i18nstr[cuser.language][2324] ;
     }
     return NULL;
 }
@@ -1176,7 +1130,7 @@ u_register(void)
     FILE           *fn;
 
     if (cuser.userlevel & PERM_LOGINOK) {
-	outs("您的身份確認已經完成，不需填寫申請表");
+	outs(SHM->i18nstr[cuser.language][2325]);
 	return XEASY;
     }
     if ((fn = fopen(fn_register, "r"))) {
@@ -1186,7 +1140,7 @@ u_register(void)
 	    if (strncmp(genbuf, "uid: ", 5) == 0 &&
 		strcmp(genbuf + 5, cuser.userid) == 0) {
 		fclose(fn);
-		outs("您的註冊申請單尚在處理中，請耐心等候");
+		outs(SHM->i18nstr[cuser.language][2326]);
 		return XEASY;
 	    }
 	}
@@ -1223,7 +1177,7 @@ u_register(void)
     }
 
     if (cuser.userlevel & PERM_NOREGCODE) {
-	vmsg("您不被允許\使用認證碼認證。請填寫註冊申請單");
+	vmsg(SHM->i18nstr[cuser.language][2327]);
 	goto REGFORM;
     }
 
@@ -1231,35 +1185,33 @@ u_register(void)
 	strcmp(cuser.email, "x") != 0 &&	/* 上次手動認證失敗 */
 	strcmp(cuser.email, "X") != 0) {
 	clear();
-	stand_title("EMail認證");
+	stand_title(SHM->i18nstr[cuser.language][2328]);
 	move(2, 0);
-	prints("%s(%s) 您好，請輸入您的認證碼。\n"
-	       "或您可以輸入 x來重新填寫 E-Mail 或改由站長手動認證\n",
+	prints(SHM->i18nstr[cuser.language][2329],
 	       cuser.userid, cuser.username);
 	inregcode[0] = 0;
 	do{
-	    getdata(10, 0, "您的輸入: ", inregcode, sizeof(inregcode), DOECHO);
+	    getdata(10, 0, SHM->i18nstr[cuser.language][2330], inregcode, sizeof(inregcode), DOECHO);
 	    if( strcmp(inregcode, "x") == 0 ||
 		strcmp(inregcode, "X") == 0 ||
 		strlen(inregcode) == 13 )
 		break;
 	    if( strlen(inregcode) != 13 )
-		vmsg("認證碼輸入不完全，應該一共有十三碼。");
+		vmsg(SHM->i18nstr[cuser.language][2331]);
 	} while( 1 );
 
 	if (strcmp(inregcode, getregcode(regcode)) == 0) {
 	    int             unum;
 	    if ((unum = getuser(cuser.userid)) == 0) {
-		vmsg("系統錯誤，查無此人！");
+		vmsg(SHM->i18nstr[cuser.language][2332]);
 		u_exit("getuser error");
 		exit(0);
 	    }
-	    mail_muser(cuser, "[註冊成功\囉]", "etc/registeredmail");
+	    mail_muser(cuser, SHM->i18nstr[cuser.language][2333], "etc/registeredmail");
 	    if(cuser.uflag2 & FOREIGN)
-		mail_muser(cuser, "[出入境管理局]", "etc/foreign_welcome");
+		mail_muser(cuser, SHM->i18nstr[cuser.language][2334], "etc/foreign_welcome");
 	    cuser.userlevel |= (PERM_LOGINOK | PERM_POST);
-	    prints("\n註冊成功\, 重新上站後將取得完整權限\n"
-		   "請按下任一鍵跳離後重新上站~ :)");
+	    prints(SHM->i18nstr[cuser.language][2335]);
 	    sethomefile(genbuf, cuser.userid, "justify.wait");
 	    unlink(genbuf);
 	    pressanykey();
@@ -1268,7 +1220,7 @@ u_register(void)
 	    return QUIT;
 	} else if (strcmp(inregcode, "x") != 0 &&
 		   strcmp(inregcode, "X") != 0) {
-	    vmsg("認證碼錯誤！");
+	    vmsg(SHM->i18nstr[cuser.language][2336]);
 	} else {
 	    toregister(email, genbuf, phone, career,
 		       ident, rname, addr, mobile);
@@ -1277,7 +1229,7 @@ u_register(void)
     }
 
     REGFORM:
-    getdata(b_lines - 1, 0, "您確定要填寫註冊單嗎(Y/N)？[N] ",
+    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][2337],
 	    ans, 3, LCECHO);
     if (ans[0] != 'y')
 	return FULLUPDATE;
@@ -1287,12 +1239,12 @@ u_register(void)
     while (1) {
 	clear();
 	move(1, 0);
-	prints("%s(%s) 您好，請據實填寫以下的資料:",
+	prints(SHM->i18nstr[cuser.language][2338],
 	       cuser.userid, cuser.username);
 #ifdef FOREIGN_REG
 	fore[0] = 'y';
 	fore[1] = 0;
-	getfield(2, "Y/n", "是否現在住在台灣", fore, 2);
+	getfield(2, "Y/n", SHM->i18nstr[cuser.language][2339], fore, 2);
     	if (fore[0] == 'n')
 	    fore[0] |= FOREIGN;
 	else
@@ -1300,43 +1252,43 @@ u_register(void)
 	if (!fore[0]){
 #endif
 	    while( 1 ){
-		getfield(3, "D123456789", "身分證號", ident, 11);
+		getfield(3, "D123456789", SHM->i18nstr[cuser.language][2340], ident, 11);
 		if ('a' <= ident[0] && ident[0] <= 'z')
 		    ident[0] -= 32;
 		if( ispersonalid(ident) )
 		    break;
-		vmsg("您的輸入不正確(若有問題麻煩至SYSOP板)");
+		vmsg(SHM->i18nstr[cuser.language][2341]);
 	    }
 #ifdef FOREIGN_REG
 	}
 	else{
 	    int i;
 	    while( 1 ){
-		getfield(4, "0123456789","身分證號 護照號碼 或 SSN", ident, 11);
+		getfield(4, "0123456789",SHM->i18nstr[cuser.language][2342], ident, 11);
 		move(6, 2);
-		prints("號碼有誤者將無法取得進一步的權限！");
-		getdata(7, 2, "是否確定(Y/N)", ans, 3, LCECHO);
+		prints(SHM->i18nstr[cuser.language][2343]);
+		getdata(7, 2, SHM->i18nstr[cuser.language][2344], ans, 3, LCECHO);
 		if (ans[0] == 'y' || ans[0] == 'Y')
 		    break;
-		vmsg("請重新輸入(若有問題麻煩至SYSOP板)");
+		vmsg(SHM->i18nstr[cuser.language][2345]);
 	    }
 	    for(i = 0; ans[i] != 0; i++)
 		if ('a' <= ident[0] && ident[0] <= 'z')
 		    ident[0] -= 32;
 	    if( ispersonalid(ident) ){
 		fore[0] = 0;
-		vmsg("您的身份已更改為台灣居民");
+		vmsg(SHM->i18nstr[cuser.language][2346]);
 	    }
 	}
 #endif
 	while (1) {
 	    getfield(8, 
 #ifdef FOREIGN_REG
-                     "請用本名",
+                     SHM->i18nstr[cuser.language][2347],
 #else
-                     "請用中文",
+                     SHM->i18nstr[cuser.language][2348],
 #endif
-                     "真實姓名", rname, 20);
+                     SHM->i18nstr[cuser.language][2349], rname, 20);
 	    if( (errcode = isvalidname(rname)) == NULL )
 		break;
 	    else
@@ -1344,24 +1296,22 @@ u_register(void)
 	}
 
 	move(11, 0);
-	prints("  盡量詳細的填寫您的服務單位, 大專院校請麻煩"
-	       "  加\033[1;33m系所\033[m, 公司單位請加職稱\n"
+	prints(SHM->i18nstr[cuser.language][2350]
 	       );
 	while (1) {
-	    getfield(9, "學校(含\033[1;33m系所年級\033[m)或單位職稱",
-		     "服務單位", career, 40);
+	    getfield(9, SHM->i18nstr[cuser.language][2351],
+		     SHM->i18nstr[cuser.language][2352], career, 40);
 	    if( (errcode = isvalidcareer(career)) == NULL )
 		break;
 	    else
 		vmsg(errcode);
 	}
 	while (1) {
-	    getfield(11, "含\033[1;33m縣市\033[m及門寢號碼"
-		     "(台北請加\033[1;33m行政區\033[m)",
-		     "目前住址", addr, 50);
+	    getfield(11, SHM->i18nstr[cuser.language][2353],
+		     SHM->i18nstr[cuser.language][2354], addr, 50);
 	    if( (errcode = isvalidaddr(addr)) == NULL
 #ifdef FOREIGN_REG
-                && fore[0] == 0
+                && fore[0] == 0 
 #endif
 		)
 		break;
@@ -1369,18 +1319,18 @@ u_register(void)
 		vmsg(errcode);
 	}
 	while (1) {
-	    getfield(13, "不加-(), 包括長途區號", "連絡電話", phone, 11);
+	    getfield(13, SHM->i18nstr[cuser.language][2355], SHM->i18nstr[cuser.language][2356], phone, 11);
 	    if( (errcode = isvalidphone(phone)) == NULL )
 		break;
 	    else
 		vmsg(errcode);
 	}
-	getfield(15, "只輸入數字 如:0912345678 (可不填)",
-		 "手機號碼", mobile, 20);
+	getfield(15, SHM->i18nstr[cuser.language][2357],
+		 SHM->i18nstr[cuser.language][2358], mobile, 20);
 	while (1) {
 	    int             len;
 
-	    getfield(17, "月月/日日/西元 如:09/27/76", "生日", birthday, 9);
+	    getfield(17, SHM->i18nstr[cuser.language][2359], SHM->i18nstr[cuser.language][2360], birthday, 9);
 	    len = strlen(birthday);
 	    if (!len) {
 		snprintf(birthday, 9, "%02i/%02i/%02i",
@@ -1393,18 +1343,18 @@ u_register(void)
 		day = (birthday[3] - '0') * 10 + (birthday[4] - '0');
 		year = (birthday[6] - '0') * 10 + (birthday[7] - '0');
 	    } else{
-		vmsg("您的輸入不正確");
+		vmsg(SHM->i18nstr[cuser.language][2361]);
 		continue;
 	    }
 	    if (mon > 12 || mon < 1 || day > 31 || day < 1 || year > 90 ||
 		year < 40){
-		vmsg("您的輸入不正確");
+		vmsg(SHM->i18nstr[cuser.language][2362]);
 		continue;
 	    }
 	    break;
 	}
-	getfield(19, "1.葛格 2.姐接 ", "性別", sex_is, 2);
-	getdata(20, 0, "以上資料是否正確(Y/N)？(Q)取消註冊 [N] ",
+	getfield(19, SHM->i18nstr[cuser.language][2363], SHM->i18nstr[cuser.language][2364], sex_is, 2);
+	getdata(20, 0, SHM->i18nstr[cuser.language][2365],
 		ans, 3, LCECHO);
 	if (ans[0] == 'q')
 	    return 0;
@@ -1434,8 +1384,7 @@ u_register(void)
 
     clear();
     move(9, 3);
-    prints("最後Post一篇\033[32m自我介紹文章\033[m給大家吧，"
-	   "告訴所有老骨頭\033[31m我來啦^$。\\n\n\n\n");
+    prints(SHM->i18nstr[cuser.language][2366]);
     pressanykey();
     cuser.userlevel |= PERM_POST;
     brc_initial_board("WhoAmI");
@@ -1459,10 +1408,9 @@ u_list_CB(int num, userec_t * uentp)
     if (uentp == NULL) {
 	move(2, 0);
 	clrtoeol();
-	prints("\033[7m  使用者代號   %-25s   上站  文章  %s  "
-	       "最近光臨日期     \033[0m\n",
-	       "綽號暱稱",
-	       HAS_PERM(PERM_SEEULEVELS) ? "等級" : "");
+	prints(SHM->i18nstr[cuser.language][2367],
+	       SHM->i18nstr[cuser.language][2368],
+	       HAS_PERM(PERM_SEEULEVELS) ? SHM->i18nstr[cuser.language][2369] : "");
 	i = 3;
 	return 0;
     }
@@ -1473,8 +1421,7 @@ u_list_CB(int num, userec_t * uentp)
 	return 0;
 
     if (i == b_lines) {
-	prints("\033[34;46m  已顯示 %d/%d 人(%d%%)  \033[31;47m  "
-	       "(Space)\033[30m 看下一頁  \033[31m(Q)\033[30m 離開  \033[m",
+	prints(SHM->i18nstr[cuser.language][2370],
 	       usercounter, totalusers, usercounter * 100 / totalusers);
 	i = igetch();
 	if (i == 'q' || i == 'Q')
@@ -1528,7 +1475,7 @@ u_list()
     u_list_special = usercounter = 0;
     totalusers = SHM->number;
     if (HAS_PERM(PERM_SEEULEVELS)) {
-	getdata(b_lines - 1, 0, "觀看 [1]特殊等級 (2)全部？",
+	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][2371],
 		genbuf, 3, DOECHO);
 	if (genbuf[0] != '2')
 	    u_list_special = PERM_BASIC | PERM_CHAT | PERM_PAGE | PERM_POST | PERM_LOGINOK | PERM_BM;
@@ -1540,8 +1487,7 @@ u_list()
     }
     move(b_lines, 0);
     clrtoeol();
-    prints("\033[34;46m  已顯示 %d/%d 的使用者(系統容量無上限)  "
-	   "\033[31;47m  (請按任意鍵繼續)  \033[m", usercounter, totalusers);
+    prints(SHM->i18nstr[cuser.language][2372], usercounter, totalusers);
     igetch();
     return 0;
 }

@@ -96,8 +96,9 @@ time_t *
 brc_find_record(int bid, int *num)
 {
     char *p;
-    *num = 0;
-    p = brc_findrecord_in(brc_buf, brc_buf + brc_size, bid, (brcnbrd_t*)num);
+    brcnbrd_t tnum;
+    ptr = brc_findrecord_in(brc_buf, brc_buf + brc_size, bid, &tnum);
+    *num = tnum;
     if (p)
 	return (time_t*)(p + sizeof(brcbid_t) + sizeof(brcnbrd_t));
     *num = 0;

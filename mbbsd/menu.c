@@ -410,9 +410,9 @@ static commands_t userlist[] = {
     {u_editplan, PERM_LOGINOK,      "QQueryEdit     編輯名片檔"},
     {u_editsig, PERM_LOGINOK,       "SSignature     編輯簽名檔"},
 #if HAVE_FREECLOAK
-    {u_cloak, PERM_LOGINOK,           "KCloak         隱身術"},
+    {u_cloak, PERM_LOGINOK,           "CCloak         隱身術"},
 #else
-    {u_cloak, PERM_CLOAK,           "KCloak         隱身術"},
+    {u_cloak, PERM_CLOAK,           "CCloak         隱身術"},
 #endif
     {u_register, PERM_BASIC,        "RRegister      填寫《註冊申請單》"},
     {u_list, PERM_SYSOP,            "UUsers         列出註冊名單"},

@@ -322,8 +322,7 @@ igetch()
 		}
 	    }
 	    return ch;
-	//case '\n':		/* Ptt§â \n®³±¼ */
-	//    continue;
+
 	case Ctrl('T'):
 	    if (WATERMODE(WATER_ORIG) || WATERMODE(WATER_NEW)) {
 		if (watermode > 0) {
@@ -371,8 +370,10 @@ igetch()
 	    }
 	    return ch;
 
-	case Ctrl('J'):
+	case Ctrl('J'):  /* Ptt §â \n ®³±¼ */
+#ifdef PLAY_ANGEL
 	    CallAngel();
+#endif
 	    continue;
 
 	case IAC:

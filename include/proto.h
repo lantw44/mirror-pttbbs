@@ -578,9 +578,11 @@ int isvisible_uid(int tuid);
 int friend_stat(userinfo_t *me, userinfo_t * ui);
 int call_in(userinfo_t *uentp, int fri_stat);
 int make_connection_to_somebody(userinfo_t *uin, int timeout);
+#ifdef PLAY_ANGEL
 int t_changeangel(void);
 void CallAngel(void);
 int t_switchangel(void);
+#endif
 
 /* tmpjack */
 int reg_barbq(void);

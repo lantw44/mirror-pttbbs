@@ -422,6 +422,7 @@ pressanykey()
     refresh();
 }
 
+#ifdef PLAY_ANGEL
 void
 pressanykey_or_callangel(){
     int             ch;
@@ -444,6 +445,7 @@ pressanykey_or_callangel(){
     clrtoeol();
     refresh();
 }
+#endif
 
 int
 vmsg(const char *fmt,...)
@@ -629,7 +631,11 @@ show_help(char *helptext[])
 	else
 	    prints("        %s\n", str);
     }
+#ifdef PLAY_ANGEL
     pressanykey_or_callangel();
+#else
+    pressanykey();
+#endif
 }
 #endif // _BBS_UTIL_C_
 

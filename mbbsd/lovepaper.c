@@ -20,16 +20,16 @@ x_love()
     move(1, 0);
     clrtobot();
 
-    outs("\n歡迎使用情書產生器 v0.00 板 \n");
-    outs("有何難以啟齒的話,交由系統幫你說吧.\n爸爸說 : 濫情不犯法.\n");
+    outs(SHM->i18nstr[cuser.language][1195]);
+    outs(SHM->i18nstr[cuser.language][1196]);
 
-    if (!getdata(7, 0, "收信人：", receiver, sizeof(receiver), DOECHO))
+    if (!getdata(7, 0, SHM->i18nstr[cuser.language][1197], receiver, sizeof(receiver), DOECHO))
 	return 0;
     if (receiver[0] && !(searchuser(receiver) &&
-			 getdata(8, 0, "主  題：", save_title,
+			 getdata(8, 0, SHM->i18nstr[cuser.language][1198], save_title,
 				 sizeof(save_title), DOECHO))) {
 	move(10, 0);
-	outs("收信人或主題不正確, 情書無法傳遞. ");
+	outs(SHM->i18nstr[cuser.language][1199]);
 	pressanykey();
 	return 0;
     }
@@ -88,7 +88,7 @@ x_love()
 	if (vedit(path, YEA, NULL) == -1) {
 	    unlink(path);
 	    clear();
-	    outs("\n\n 放棄寄情書\n");
+	    outs(SHM->i18nstr[cuser.language][1200]);
 	    pressanykey();
 	    return -2;
 	}

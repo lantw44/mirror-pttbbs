@@ -162,8 +162,8 @@ vote_report(char *bname, char *fname, char *fpath)
     /* append record to .DIR */
 
     memset(&header, 0, sizeof(fileheader_t));
-    strlcpy(header.owner, "[皑隔贝]", sizeof(header.owner));
-    snprintf(header.title, sizeof(header.title), "[%s] 狾 匡薄厨旧", bname);
+    strlcpy(header.owner, SHM->i18nstr[cuser.language][2378], sizeof(header.owner));
+    snprintf(header.title, sizeof(header.title), SHM->i18nstr[cuser.language][2379], bname);
     {
 	register struct tm *ptime = localtime(&dtime);
 
@@ -261,10 +261,10 @@ b_result_one(boardheader_t * fh, int ind, int *total)
 
     if ((xfp = fopen(buf, "r"))) {
 	fgets(inbuf, sizeof(inbuf), xfp);
-	fprintf(tfp, "%s\n』 щ布嘿: %s\n\n", msg_seperator, inbuf);
+	fprintf(tfp, SHM->i18nstr[cuser.language][2380], msg_seperator, inbuf);
 	fclose(xfp);
     }
-    fprintf(tfp, "%s\n』 щ布いゎ: %s\n\n』 布匡肈ヘ磞瓃:\n\n",
+    fprintf(tfp, SHM->i18nstr[cuser.language][2381],
 	    msg_seperator, ctime(&closetime));
     fh->vtime = now;
 
@@ -276,13 +276,13 @@ b_result_one(boardheader_t * fh, int ind, int *total)
     if ((cfp = fopen(b_control, "r"))) {
 	fgets(inbuf, sizeof(inbuf), cfp);
 	fgets(inbuf, sizeof(inbuf), cfp);
-	fprintf(tfp, "\n』щ布挡狦:(Τ %d щ布,–程щ %hd 布)\n",
+	fprintf(tfp, SHM->i18nstr[cuser.language][2382],
 		people_num, junk);
-	fprintf(tfp, "    匡    兜                                   羆布计 眔布瞯   眔布だガ\n");
+	fprintf(tfp, SHM->i18nstr[cuser.language][2383]);
 	for (junk = 0; junk < item_num; junk++) {
 	    fgets(inbuf, sizeof(inbuf), cfp);
 	    inbuf[(strlen(inbuf) - 1)] = '\0';
-	    fprintf(tfp, "    %-42s %3d 布   %02.2f%%   %02.2f%%\n", inbuf + 3, counts[junk],                
+	    fprintf(tfp, SHM->i18nstr[cuser.language][2384], inbuf + 3, counts[junk],                
 		    (float)(counts[junk] * 100) / (float)(people_num),
 		    (float)(counts[junk] * 100) / (float)(*total));
 	}
@@ -291,12 +291,12 @@ b_result_one(boardheader_t * fh, int ind, int *total)
     unlink(b_control);
     free(counts);
 
-    fprintf(tfp, "%s\n』 ㄏノ某\n\n", msg_seperator);
+    fprintf(tfp, SHM->i18nstr[cuser.language][2385], msg_seperator);
     setbfile(buf, bname, STR_new_comments);
     b_suckinfile(tfp, buf);
     unlink(buf);
 
-    fprintf(tfp, "%s\n』 羆布计 = %d 布\n\n", msg_seperator, *total);
+    fprintf(tfp, SHM->i18nstr[cuser.language][2386], msg_seperator, *total);
     fclose(tfp);
 
     setbfile(b_report, bname, "report");
@@ -437,7 +437,7 @@ vote_view(char *bname, int vote_index)
 
     if ((fp = fopen(buf, "r"))) {
 	fgets(inbuf, sizeof(inbuf), fp);
-	prints("\nщ布嘿: %s", inbuf);
+	prints(SHM->i18nstr[cuser.language][2387], inbuf);
 	fclose(fp);
     }
     setbfile(buf, bname, STR_new_control);
@@ -449,13 +449,12 @@ vote_view(char *bname, int vote_index)
     fscanf(fp, "%hd,%hd\n%lu\n", &item_num, &i, &closetime);
     counts = (int *)malloc(item_num * sizeof(int));
 
-    prints("\n』 箇щ布ㄆ: –程щ %d 布,ヘ玡Τ %d 布,\n"
-	   "セΩщ布盢挡 %s", atoi(inbuf), (num / sizeof(short)),
+    prints(SHM->i18nstr[cuser.language][2388], atoi(inbuf), (num / sizeof(short)),
 	   ctime(&closetime));
 
     /* Thor: 秨 布计 箇 */
     setbfile(buf, bname, STR_new_flags);
-    prints("Τ %d щ布\n", b_nonzeroNum(buf));
+    prints(SHM->i18nstr[cuser.language][2389], b_nonzeroNum(buf));
 
     setbfile(buf, bname, STR_new_ballots);
 #if 0 // backward compatible
@@ -472,7 +471,7 @@ vote_view(char *bname, int vote_index)
 	inbuf[(strlen(inbuf) - 1)] = '\0';
 	inbuf[30] = '\0';	/* truncate */
 	move(num % 15 + 6, num / 15 * 40);
-	prints("  %-32s%3d 布", inbuf, counts[i]);
+	prints(SHM->i18nstr[cuser.language][2390], inbuf, counts[i]);
 	total += counts[i];
 	if (num == 29) {
 	    num = -1;
@@ -486,8 +485,8 @@ vote_view(char *bname, int vote_index)
     pos = getbnum(bname);
     fhp = bcache + pos - 1;
     move(t_lines - 3, 0);
-    prints("』 ヘ玡羆布计 = %d 布", total);
-    getdata(b_lines - 1, 0, "(A)щ布 (B)矗Ν秨布 (C)膥尿[C] ", genbuf,
+    prints(SHM->i18nstr[cuser.language][2391], total);
+    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][2392], genbuf,
 	    4, LCECHO);
     if (genbuf[0] == 'a') {
 	setbfile(buf, bname, STR_new_control);
@@ -544,7 +543,7 @@ vote_view_all(char *bname)
 	    fgets(inbuf, sizeof(inbuf), xfp);
 	    fclose(xfp);
 	} else
-	    strlcpy(inbuf, "礚夹肈", sizeof(inbuf));
+	    strlcpy(inbuf, SHM->i18nstr[cuser.language][2393], sizeof(inbuf));
 	prints("%s\n", inbuf);
     }
     for (i = 1; i < 20; i++) {
@@ -563,14 +562,14 @@ vote_view_all(char *bname)
 		fgets(inbuf, sizeof(inbuf), xfp);
 		fclose(xfp);
 	    } else
-		strlcpy(inbuf, "礚夹肈", sizeof(inbuf));
+		strlcpy(inbuf, SHM->i18nstr[cuser.language][2394], sizeof(inbuf));
 	    prints("%s\n", inbuf);
 	}
     }
 
     if (x < 0)
 	return FULLUPDATE;
-    snprintf(buf, sizeof(buf), "璶碭腹щ布 [%d] ", x);
+    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][2395], x);
 
     getdata(b_lines - 1, 0, buf, genbuf, 4, LCECHO);
 
@@ -606,13 +605,13 @@ vote_maintain(char *bname)
     if ((pos = getbnum(bname)) <= 0)
 	return 0;
 
-    stand_title("羭快щ布");
+    stand_title(SHM->i18nstr[cuser.language][2396]);
     fhp = bcache + pos - 1;
 
     /* CharlieL */
     if (fhp->bvote != 2 && fhp->bvote != 0) {
 	getdata(b_lines - 1, 0,
-		"(V)芠诡ヘ玡щ布 (M)羭快穝щ布 (A)┮Τщ布 (Q)膥尿 [Q]",
+		SHM->i18nstr[cuser.language][2397],
 		genbuf, 4, LCECHO);
 	if (genbuf[0] == 'v')
 	    return vote_view_all(bname);
@@ -699,22 +698,22 @@ vote_maintain(char *bname)
     }
     clear();
     move(0, 0);
-    prints("材 %d 腹щ布\n", x);
+    prints(SHM->i18nstr[cuser.language][2398], x);
     setbfile(buf, bname, STR_new_title);
-    getdata(4, 0, "叫块щ布嘿:", inbuf, 50, LCECHO);
+    getdata(4, 0, SHM->i18nstr[cuser.language][2399], inbuf, 50, LCECHO);
     if (inbuf[0] == '\0')
-	strlcpy(inbuf, "ぃ", sizeof(inbuf));
+	strlcpy(inbuf, SHM->i18nstr[cuser.language][2400], sizeof(inbuf));
     fp = fopen(buf, "w");
     assert(fp);
     fprintf(fp, "%s", inbuf);
     fclose(fp);
 
-    prints("ヴ龄秨﹍絪胯Ω [щ布﹙Ξ]");
+    prints(SHM->i18nstr[cuser.language][2401]);
     pressanykey();
     setbfile(buf, bname, STR_new_desc);
     aborted = vedit(buf, NA, NULL);
     if (aborted == -1) {
-	vmsg("Ωщ布");
+	vmsg(SHM->i18nstr[cuser.language][2402]);
 	return FULLUPDATE;
     }
     aborted = 0;
@@ -722,13 +721,13 @@ vote_maintain(char *bname)
     unlink(buf);
 
     getdata(4, 0,
-	    "琌﹚щ布虫(y)絪胯щ布虫[n]ヴщ布:[N]",
+	    SHM->i18nstr[cuser.language][2403],
 	    inbuf, 2, LCECHO);
     setbfile(buf, bname, STR_new_limited);
     if (inbuf[0] == 'y') {
 	fp = fopen(buf, "w");
 	assert(fp);
-	//fprintf(fp, "Ωщ布砞");
+	//fprintf(fp, SHM->i18nstr[cuser.language][2404]);
 	fclose(fp);
 	friend_edit(FRIEND_CANVOTE);
     } else {
@@ -736,7 +735,7 @@ vote_maintain(char *bname)
 	    unlink(buf);
     }
     clear();
-    getdata(0, 0, "Ωщ布秈︽碭ぱ (ぱ)", inbuf, 4, DOECHO);
+    getdata(0, 0, SHM->i18nstr[cuser.language][2405], inbuf, 4, DOECHO);
 
     closetime = atoi(inbuf);
     if (closetime <= 0)
@@ -750,7 +749,7 @@ vote_maintain(char *bname)
     assert(fp);
     fprintf(fp, "000,000\n%lu\n", closetime);
 
-    outs("\n叫ㄌ块匡兜,  ENTER ЧΘ砞﹚");
+    outs(SHM->i18nstr[cuser.language][2406]);
     num = 0;
     x = 0;	/* x is the page number */
     while (!aborted) {
@@ -775,7 +774,7 @@ vote_maintain(char *bname)
 	    num = 0;
 	}
     }
-    snprintf(buf, sizeof(buf), "叫拜–程щ碭布([1]°%d): ", x * 30 + num);
+    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][2407], x * 30 + num);
 
     getdata(t_lines - 3, 0, buf, inbuf, 3, DOECHO);
 
@@ -800,7 +799,7 @@ vote_maintain(char *bname)
     if (substitute_record(fn_board, fhp, sizeof(*fhp), pos) == -1)
 	outs(err_board_update);
     reset_board(pos);
-    outs("秨﹍щ布");
+    outs(SHM->i18nstr[cuser.language][2408]);
 
     return FULLUPDATE;
 }
@@ -873,22 +872,22 @@ user_vote_one(char *bname, int ind)
 	setbfile(buf, bname, FN_CANVOTE);
 	if (!belong(buf, cuser.userid)) {
 	    fclose(cfp);
-	    vmsg("癸ぃ癬! 硂琌╬щ布..⊿Τ淋!");
+	    vmsg(SHM->i18nstr[cuser.language][2409]);
 	    return FULLUPDATE;
 	} else {
-	    vmsg("尺淋Ω╬щ布.   <浪跌Ω淋虫>");
+	    vmsg(SHM->i18nstr[cuser.language][2410]);
 	    more(buf, YEA);
 	}
     }
     if (vote_flag(bname, ind, '\0')) {
-	vmsg("Ωщ布щ筁");
+	vmsg(SHM->i18nstr[cuser.language][2411]);
 	return FULLUPDATE;
     }
     setutmpmode(VOTING);
     setbfile(buf, bname, STR_new_desc);
     more(buf, YEA);
 
-    stand_title("щ布絚");
+    stand_title(SHM->i18nstr[cuser.language][2412]);
     if ((pos = getbnum(bname)) <= 0)
 	return 0;
 
@@ -904,9 +903,7 @@ user_vote_one(char *bname, int ind)
     memset(choices, 0, sizeof(choices));
     max_page = (item_num - 1)/ 30 + 1;
 
-    prints("щ布よΑ絋﹚眤匡拒块ㄤ絏(A, B, C...)\n"
-	   "Ωщ布щ %1hd 布 0 щ布, 1 ЧΘщ布, > , < \n"
-	   "Ωщ布盢挡%s \n",
+    prints(SHM->i18nstr[cuser.language][2413],
 	   tickets, ctime(&closetime));
 
 #define REDO_DRAW	1
@@ -941,14 +938,14 @@ user_vote_one(char *bname, int ind)
 
 	vote[0] = vote[1] = '\0';
 	move(t_lines - 2, 0);
-	prints("临щ %2d 布", tickets - i);
-	getdata(t_lines - 4, 0, "块眤匡拒: ", vote, sizeof(vote), DOECHO);
+	prints(SHM->i18nstr[cuser.language][2414], tickets - i);
+	getdata(t_lines - 4, 0, SHM->i18nstr[cuser.language][2415], vote, sizeof(vote), DOECHO);
 	*vote = toupper(*vote);
 
 #define CURRENT_CHOICE \
     chosen[curr_page * 30 + vote[0] - 'A']
 	if (vote[0] == '0' || (!vote[0] && !i)) {
-	    outs("癘眔ㄓщ翅!!");
+	    outs(SHM->i18nstr[cuser.language][2416]);
 	    break;
 	} else if (vote[0] == '1' && i);
 	else if (!vote[0])
@@ -990,11 +987,11 @@ user_vote_one(char *bname, int ind)
 	}
 
 	if (vote_flag(bname, ind, vote[0]) != 0)
-	    prints("狡щ布! ぃぉ璸布");
+	    prints(SHM->i18nstr[cuser.language][2417]);
 	else {
 	    setbfile(buf, bname, STR_new_ballots);
 	    if ((fd = open(buf, O_WRONLY | O_CREAT | O_APPEND, 0600)) == 0)
-		outs("礚猭щ布詏\n");
+		outs(SHM->i18nstr[cuser.language][2418]);
 	    else {
 		struct stat     statb;
 		char            buf[3], mycomments[3][74], b_comments[80];
@@ -1011,20 +1008,18 @@ user_vote_one(char *bname, int ind)
 		fstat(fd, &statb);
 		close(fd);
 		getdata(b_lines - 2, 0,
-			"眤癸硂Ωщ布Τぐ或腳禥種ǎ盾(y/n)[N]",
+			SHM->i18nstr[cuser.language][2419],
 			buf, 3, DOECHO);
 		if (buf[0] == 'Y' || buf[0] == 'y') {
 		    do {
 			move(5, 0);
 			clrtobot();
-			outs("叫拜眤癸硂Ωщ布Τぐ或腳禥種ǎ"
-			     "程︽[Enter]挡");
+			outs(SHM->i18nstr[cuser.language][2420]);
 			for (i = 0; (i < 3) &&
-			     getdata(7 + i, 0, "",
+			     getdata(7 + i, 0, SHM->i18nstr[cuser.language][2421],
 				     mycomments[i], sizeof(mycomments[i]),
 				     DOECHO); i++);
-			getdata(b_lines - 2, 0, "(S)纗 (E)穝ㄓ筁 "
-				"(Q)[S]", buf, 3, LCECHO);
+			getdata(b_lines - 2, 0, SHM->i18nstr[cuser.language][2422], buf, 3, LCECHO);
 		    } while (buf[0] == 'E' || buf[0] == 'e');
 		    if (buf[0] == 'Q' || buf[0] == 'q')
 			break;
@@ -1032,8 +1027,7 @@ user_vote_one(char *bname, int ind)
 		    if (mycomments[0])
 			if ((fcm = fopen(b_comments, "a"))) {
 			    fprintf(fcm,
-				    "\033[36m〕ㄏノ\033[1;36m %s "
-				    "\033[;36m某\033[m\n",
+				    SHM->i18nstr[cuser.language][2423],
 				    cuser.userid);
 			    for (i = 0; i < 3; i++)
 				fprintf(fcm, "    %s\n", mycomments[i]);
@@ -1042,7 +1036,7 @@ user_vote_one(char *bname, int ind)
 			}
 		}
 		move(b_lines - 1, 0);
-		prints("ЧΘщ布\n");
+		prints(SHM->i18nstr[cuser.language][2424]);
 	    }
 	}
 	break;
@@ -1073,11 +1067,11 @@ user_vote(char *bname)
     clrtobot();
 
     if (fhp->bvote == 2 || fhp->bvote == 0) {
-	vmsg("ヘ玡⊿Τヴщ布羭︽");
+	vmsg(SHM->i18nstr[cuser.language][2425]);
 	return FULLUPDATE;
     }
     if (!HAS_PERM(PERM_LOGINOK)) {
-	vmsg("癸ぃ癬! 眤ゼ骸烦, 临⊿Τщ布舦翅!");
+	vmsg(SHM->i18nstr[cuser.language][2426]);
 	return FULLUPDATE;
     }
     strlcpy(STR_new_control, STR_bv_control, sizeof(STR_new_control));
@@ -1094,7 +1088,7 @@ user_vote(char *bname)
 	    fgets(inbuf, sizeof(inbuf), xfp);
 	    fclose(xfp);
 	} else
-	    strlcpy(inbuf, "礚夹肈", sizeof(inbuf));
+	    strlcpy(inbuf, SHM->i18nstr[cuser.language][2427], sizeof(inbuf));
 	prints("%s\n", inbuf);
     }
     for (i = 1; i < 20; i++) {
@@ -1113,7 +1107,7 @@ user_vote(char *bname)
 		fgets(inbuf, sizeof(inbuf), xfp);
 		fclose(xfp);
 	    } else
-		strlcpy(inbuf, "礚夹肈", sizeof(inbuf));
+		strlcpy(inbuf, SHM->i18nstr[cuser.language][2428], sizeof(inbuf));
 	    prints("%s\n", inbuf);
 	}
     }
@@ -1121,7 +1115,7 @@ user_vote(char *bname)
     if (x < 0)
 	return FULLUPDATE;
 
-    snprintf(buf, sizeof(buf), "璶щ碭腹щ布 [%d] ", x);
+    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][2429], x);
 
     getdata(b_lines - 1, 0, buf, genbuf, 4, LCECHO);
 
@@ -1151,7 +1145,7 @@ vote_results(char *bname)
 
     setbfile(buf, bname, STR_bv_results);
     if (more(buf, YEA) == -1)
-	vmsg("ヘ玡⊿Τヴщ布挡狦");
+	vmsg(SHM->i18nstr[cuser.language][2430]);
     return FULLUPDATE;
 }
 

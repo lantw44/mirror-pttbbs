@@ -40,7 +40,7 @@ CFLAGS+= -c -I. -I$(BBS_SRC)/include -I$(BBS_SRC)/mbbsd -D$(BBS_DEP) \
 	 $(EXTRAFLAGS) -DDBZDEBUG -DBBSHOME='"$(BBSHOME)"' \
 	 -D_PATH_BBSHOME=\"$(BBSHOME)\" \
 	 -DVERSION=\"$(VERSION)\" -DADMINUSER=\"$(ADMINUSER)\" 
-LDFLAGS+= -liconv
+#LDFLAGS+= -liconv
 #
 ####################################################
 

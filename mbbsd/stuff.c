@@ -594,7 +594,7 @@ show_help(char **helptext, int start, int num)
     int             i;
 
     clear();
-    for (i = 0; i < num, start + i < MAX_STRING; i++) {
+    for (i = 0; i < num && start + i < MAX_STRING; i++) {
 	    str = helptext[start + i];
 		if (*str == '\0')
 		    prints(SHM->i18nstr[cuser.language][1888], str + 1);

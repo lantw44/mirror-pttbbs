@@ -8,59 +8,70 @@
 
 #ifdef I18N
 int parse_hex(unsigned char *buf, unsigned char *ret) {
+	int len = 0;
 	unsigned char table[] = "0123456789ABCDEF";
 	unsigned char digit[2];
-	char ptr[2];
+	unsigned char *ptr;
 	digit[0] = toupper(*buf);
 	digit[1] = toupper(*(buf + 1));
-	if ((ptr[0] = strchr(table, digit[0])) && 
-		(ptr[1] = strchr(table, digit[1]))) {
-		*ret = (char)((ptr[0] - table) << 4 + (ptr[1] - table));
-		return 0;
+	if ((ptr = strchr(table, digit[0]))) {
+		len++;
+		*ret = (unsigned char)(ptr - table);
+		if ((ptr = strchr(table, digit[1]))) {
+			len++;
+			*ret = *ret * 16 + (unsigned char)(ptr - table);
+		}
 	}
-	return -1;
+	return len;
 }
 
 int parse_oct(unsigned char *buf, unsigned char *ret) {
-	int i;
-	*ret = 0;
-	for (i = 0; i < 3; i++) {
-		if (buf[i] - '0' < 0 && buf[i] - '0' > 8)
-			return -1;
-		*ret = (char)(*ret * 8 + buf[i] - '0');
+	int i = 0, length = 0;
+	int ret_val = 0;
+	while(buf[i] >= '0' && buf[i] <= '7' && i < 3) {
+		ret_val = ret_val * 8 + buf[i] - '0';
+		length++;
+		i++;
 	}
-	return 0;
+	if (ret_val > 255)
+		length = 0;
+	else
+		*ret = (unsigned char)ret_val;
+	return length;
 }
 unsigned char parse_escape(char *buf, int *length) {
 	unsigned char input[] = "abfnrtv\\?'\"";
 	unsigned char output[] = "\a\b\f\n\r\t\v\\\?\'\"";
-	unsigned char ret = *buf;
+	unsigned char ret = *buf, *ptr;
+	int len = 1;
 	*length = 1;
-	for (unsigned char *ptr = input; *ptr != 0; ptr++)
+	for (ptr = input; *ptr != 0; ptr++)
 		if (*buf == *ptr)
 			return output[ptr - input];
 	
 	/* hexidecimal number*/
-	if (*buf == 'x')
-		if (parse_hex(buf + 1, &ret) != -1)
-			length = 2;	
+	if (*buf == 'x') {
+		len = parse_hex(buf + 1, &ret);
+		*length = len;	
 				
 	/* octal number */
-	else if(isdigit(*buf))
-		if (parse_oct(buf, &ret) != -1)
-			length = 3;
+	}
+	else if(isdigit(*buf)) {
+		len = parse_oct(buf, &ret);
+		*length = len;
+	}
 	return ret;
 }
 
 void load_language(char *filename, char *lang_str[MAX_STRING], int *_offset) {
 	int i, num_string, string_index, filesize;
 	int inside_string, digit, length;
-	char *buf, *start, temp[256];
+	char *buf = 0, *start = 0, temp[256];
 	char escape_sequence;
 	FILE *f;	
 	char *p_str_head = SHM->i18nstrbody;
 	int offset = *_offset;
-	sprintf (temp, "~bbs/etc/%s", filename);
+	sprintf (temp, BBSHOME"/etc/%s", filename);
 	f = fopen(temp, "r");
 	if (f) {
 		if ((buf = (char *)(malloc(sizeof(char) * MAX_LANGFILE_SIZE)))) {
@@ -90,6 +101,7 @@ void load_language(char *filename, char *lang_str[MAX_STRING], int *_offset) {
 					p_str_head[offset] = 0;
 					if (string_index >= 0 && string_index < MAX_STRING) {
 						lang_str[string_index] = start;
+						printf("%d \"%s\"\n", string_index, start);
 					}
 					string_index = 0;
 					offset++;
@@ -97,8 +109,12 @@ void load_language(char *filename, char *lang_str[MAX_STRING], int *_offset) {
 				}
 				else if (buf[i] == '\\' && inside_string == TRUE) {
 					escape_sequence = parse_escape(buf + i + 1, &length);
-					i += length;
-					buf[i] = escape_sequence;
+					if (length) {
+						i += length;
+						buf[i] = escape_sequence;
+					}
+					else
+						i++;
 				}
 				if (inside_string == TRUE) {
 					if (offset < MAX_BUFFER_SIZE) {
@@ -108,9 +124,13 @@ void load_language(char *filename, char *lang_str[MAX_STRING], int *_offset) {
 				}
 			}	
 			for (i = 0; i < MAX_STRING; i++)
-				if (lang_str[i] == 0)
+				if (lang_str[i] == 0) {
+					printf ("DEBUG: %d\n", i);
 					lang_str[i] = p_str_head;
+				}
 			free(buf);
+			printf("%s loaded..\n", temp);
+			fflush(0);
 		}
 		else
 			printf("Warning: out of memory!!\n");
@@ -122,12 +142,13 @@ void load_language(char *filename, char *lang_str[MAX_STRING], int *_offset) {
 	*_offset = offset;
 }
 
-char *lang_file[] = {LANG_FILE};
+char *lang_file[] = LANG_FILE;
 void load_i18nstring() {
 	int i, offset;
 	*SHM->i18nstrbody = 0;
 	offset = 1;
-	for (i = 0; i < MAX_LANG; i++)
+	for (i = 0; i < MAX_LANG; i++) {
 		load_language(lang_file[i], SHM->i18nstr[i], &offset);
+	}
 }
 #endif

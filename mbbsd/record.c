@@ -127,6 +127,66 @@ substitute_record(char *fpath, void *rptr, int size, int id)
     return 0;
 }
 
+int
+substitute_ref_record(char *direct, fileheader_t * fhdr, int ent)
+{
+    fileheader_t    hdr;
+    char            genbuf[256];
+    int             num = 0;
+
+    /* rocker.011018: 串接模式用reference增進效率 */
+    if ((fhdr->money & FHR_REFERENCE) &&
+        (num = fhdr->money & ~FHR_REFERENCE)){
+        setdirpath(genbuf, direct, ".DIR");
+        get_record(genbuf, &hdr, sizeof(hdr), num);
+        if (strcmp(hdr.filename, fhdr->filename))
+           {
+            if((num = getindex(genbuf, fhdr, num))>0)
+             {
+               substitute_record(genbuf, fhdr, sizeof(*fhdr), num);
+             }
+           }
+        else if(num>0)
+           {
+             fhdr->money = hdr.money;
+             substitute_record(genbuf, fhdr, sizeof(*fhdr), num);
+           }
+        fhdr->money = FHR_REFERENCE | num ; // Ptt: update now!
+    }
+    substitute_record(direct, fhdr, sizeof(*fhdr), ent);
+    return num;
+}
+
+int
+getindex(char *direct, fileheader_t *fh_o, int end)
+{ // Ptt: 從前面找很費力 太暴力
+    int             fd=-1, begin=1, i, stamp, s; 
+    fileheader_t    fh;
+
+    i = get_num_records(direct, sizeof(fileheader_t));
+    if(end>i) end = i;
+    stamp = atoi(fh_o->filename+2); 
+    i=(begin+end)/2;
+    for(; end>begin+1; i=(begin+end)/2)
+    {
+        if(get_record_keep(direct, &fh, sizeof(fileheader_t), i, &fd)==-1)
+              break;  
+        if(!fh.filename[0]) break;
+        s = atoi(fh.filename+2); 
+        if (s > stamp) end = i+1;
+        else if(s == stamp) 
+             {
+              close(fd);
+              fh_o->money = fh.money; 
+              return i;
+             } 
+        else begin = i; 
+    }
+    if(fd==-1) close(fd);
+    return 0;
+}
+
+
 /* rocker.011022: 避免lock檔開啟時不正常斷線,造成永久lock */
 #ifndef _BBS_UTIL_C_
 static int
@@ -311,26 +371,6 @@ delete_range(char *fpath, int id1, int id2)
     return 0;
 }
 #endif
-int
-search_rec(char *dirname, int (*filecheck) ())
-{
-    fileheader_t    fhdr;
-    FILE           *fp;
-    int             ans = 0;
-
-    if (!(fp = fopen(dirname, "r")))
-	return 0;
-
-    while (fread(&fhdr, sizeof(fhdr), 1, fp)) {
-	ans++;
-	if ((*filecheck) (&fhdr)) {
-	    fclose(fp);
-	    return ans;
-	}
-    }
-    fclose(fp);
-    return 0;
-}
 
 
 #ifdef SAFE_ARTICLE_DELETE

@@ -24,20 +24,14 @@ setforward()
 	getdata(b_lines, 0, "確定開啟自動轉信功\能?(Y/n)", yn, sizeof(yn),
 		LCECHO);
 	if (yn[0] != 'n' && (fp = fopen(buf, "w"))) {
-	    move(b_lines, 0);
-	    clrtoeol();
 	    fprintf(fp, "%s", ip);
 	    fclose(fp);
-	    outs("設定完成!");
-	    refresh();
+	    vmsg("設定完成!");
 	    return 0;
 	}
     }
-    move(b_lines, 0);
-    clrtoeol();
-    outs("取消自動轉信!");
     unlink(buf);
-    refresh();
+    vmsg("取消自動轉信!");
     return 0;
 }
 
@@ -163,27 +157,13 @@ chkmailbox()
 	mailmaxkeep = max_keepmail + cuser.exmailbox;
 	m_init();
 	if ((mailkeep = get_num_records(currmaildir, sizeof(fileheader_t))) >
-	    mailmaxkeep) {
-	    move(b_lines, 0);
-	    clrtoeol();
+	    mailmaxkeep ||
+	    (mailsum = get_sum_records(currmaildir, sizeof(fileheader_t))) >
+            mailsumlimit) {
 	    bell();
-	    prints("您保存信件數目 %d 超出上限 %d, 請整理",
+	    bell();
+	    vmsg("您保存信件數目或容量 %d 超出上限 %d, 請整理",
 		   mailkeep, mailmaxkeep);
-	    bell();
-	    refresh();
-	    igetch();
-	    return mailkeep;
-	}
-	if ((mailsum = get_sum_records(currmaildir, sizeof(fileheader_t))) >
-	    mailsumlimit) {
-	    move(b_lines, 0);
-	    clrtoeol();
-	    bell();
-	    prints("您保存信件容量 %d(k)超出上限 %d(k), 請整理",
-		   mailsum, mailsumlimit);
-	    bell();
-	    refresh();
-	    igetch();
 	    return mailkeep;
 	}
     }
@@ -498,13 +478,9 @@ multi_send(char *title)
 	if (vedit(fpath, YEA, NULL) == -1) {
 	    unlink(fpath);
 	    curredit = 0;
-	    outs(msg_cancel);
-	    pressanykey();
+	    vmsg(msg_cancel);
 	    return;
 	}
-	stand_title("寄信中...");
-	refresh();
-
 	listing = 80;
 
 	for (p = toplev; p; p = p->next) {
@@ -530,15 +506,14 @@ multi_send(char *title)
 	    mymail.filemode |= FILE_MULTI;	/* multi-send flag */
 	    sethomedir(genbuf, p->word);
 	    if (append_record_forward(genbuf, &mymail, sizeof(mymail)) == -1)
-		outs(err_uid);
+		vmsg(err_uid);
 	    mailalert(p->word);
 	}
 	hold_mail(fpath, NULL);
 	unlink(fpath);
 	curredit = 0;
     } else
-	outs(msg_cancel);
-    pressanykey();
+	vmsg(msg_cancel);
 }
 
 static int
@@ -636,8 +611,7 @@ mail_all()
 		outs(err_uid);
 	    snprintf(genbuf, sizeof(genbuf),
 		     "%*s %5d / %5d", IDLEN + 1, userid, i + 1, unum);
-	    outmsg(genbuf);
-	    refresh();
+	    vmsg(genbuf);
 	}
     }
     return 0;
@@ -726,32 +700,21 @@ read_new_mail(fileheader_t * fptr)
     while (!done) {
 	int             more_result = more(fname, YEA);
 
-	switch (more_result) {
-	case 1:
-	    return READ_PREV;
-	case 2:
-	    return RELATE_PREV;
-	case 3:
-	    return READ_NEXT;
-	case 4:
-	    return RELATE_NEXT;
-	case 5:
-	    return RELATE_FIRST;
-	case 6:
-	    return 0;
-	case 7:
+        switch (more_result) {
+        case 999:
 	    mail_reply(idc, fptr, currmaildir);
-	    return FULLUPDATE;
-	case 8:
-	    multi_reply(idc, fptr, currmaildir);
-	    return FULLUPDATE;
-	}
-	move(b_lines, 0);
-	clrtoeol();
-	outs(msg_mailer);
-	refresh();
+            return FULLUPDATE;
+        case -1:
+            return READ_SKIP;
+        case 0:
+            break;
+        default:
+            return more_result;
+        }
 
-	switch (egetch()) {
+	outmsg(msg_mailer);
+
+	switch (igetch()) {
 	case 'r':
 	case 'R':
 	    mail_reply(idc, fptr, currmaildir);
@@ -860,22 +823,19 @@ mail_del(int ent, fileheader_t * fhdr, char *direct)
     if (fhdr->filemode & FILE_MARKED)
 	return DONOTHING;
 
-    getdata(1, 0, msg_del_ny, genbuf, 3, LCECHO);
-    if (genbuf[0] == 'y') {
-	strlcpy(currfile, fhdr->filename, sizeof(currfile));
+    if (currmode & MODE_SELECT) {
+        vmsg("請先回到正常模式後再進行刪除...");
+        return READ_REDRAW;
+    }
+
+    if (getans(msg_del_ny) == 'y') {
 	if (!delete_record(direct, sizeof(*fhdr), ent)) {
 	    setdirpath(genbuf, direct, fhdr->filename);
 	    unlink(genbuf);
-	    if ((currmode & MODE_SELECT)) {
-		int             index;
-		sethomedir(genbuf, cuser.userid);
-		index = getindex(genbuf, fhdr->filename, sizeof(fileheader_t));
-		delete_record(genbuf, sizeof(fileheader_t), index);
-	    }
 	    return DIRCHANGED;
 	}
     }
-    return TITLE_REDRAW;
+    return READ_REDRAW;
 }
 
 static int
@@ -893,42 +853,22 @@ mail_read(int ent, fileheader_t * fhdr, char *direct)
 
 	if (more_result != -1) {
 	    fhdr->filemode |= FILE_READ;
-	    if ((currmode & MODE_SELECT)) {
-		int             index;
-
-		index = getindex(currmaildir, fhdr->filename,
-				 sizeof(fileheader_t));
-		substitute_record(currmaildir, fhdr, sizeof(*fhdr), index);
-		substitute_record(direct, fhdr, sizeof(*fhdr), ent);
-	    } else
-		substitute_record(currmaildir, fhdr, sizeof(*fhdr), ent);
+            substitute_ref_record(direct, fhdr, ent);
 	}
 	switch (more_result) {
-	case 1:
-	    return READ_PREV;
-	case 2:
-	    return RELATE_PREV;
-	case 3:
-	    return READ_NEXT;
-	case 4:
-	    return RELATE_NEXT;
-	case 5:
-	    return RELATE_FIRST;
-	case 6:
-	    return FULLUPDATE;
-	case 7:
+	case 999:
 	    mail_reply(ent, fhdr, direct);
 	    return FULLUPDATE;
-	case 8:
-	    multi_reply(ent, fhdr, direct);
-	    return FULLUPDATE;
+        case -1:
+            return READ_SKIP;
+        case 0:
+            break;
+	default:
+            return more_result;
 	}
-	move(b_lines, 0);
-	clrtoeol();
-	refresh();
-	outs(msg_mailer);
+	outmsg(msg_mailer);
 
-	switch (egetch()) {
+	switch (igetch()) {
 	case 'r':
 	case 'R':
 	    replied = YEA;
@@ -950,14 +890,7 @@ mail_read(int ent, fileheader_t * fhdr, char *direct)
 	mail_del(ent, fhdr, direct);
     else {
 	fhdr->filemode |= FILE_READ;
-	if ((currmode & MODE_SELECT)) {
-	    int             index;
-
-	    index = getindex(currmaildir, fhdr->filename, sizeof(fileheader_t));
-	    substitute_record(currmaildir, fhdr, sizeof(*fhdr), index);
-	    substitute_record(direct, fhdr, sizeof(*fhdr), ent);
-	} else
-	    substitute_record(currmaildir, fhdr, sizeof(*fhdr), ent);
+        substitute_ref_record(direct, fhdr, ent);
     }
     return FULLUPDATE;
 }
@@ -1049,14 +982,7 @@ mail_mark(int ent, fileheader_t * fhdr, char *direct)
 {
     fhdr->filemode ^= FILE_MARKED;
 
-    if ((currmode & MODE_SELECT)) {
-	int             index;
-
-	index = getindex(currmaildir, fhdr->filename, sizeof(fileheader_t));
-	substitute_record(currmaildir, fhdr, sizeof(*fhdr), index);
-	substitute_record(direct, fhdr, sizeof(*fhdr), ent);
-    } else
-	substitute_record(currmaildir, fhdr, sizeof(*fhdr), ent);
+    substitute_ref_record(direct, fhdr, ent);
     return PART_REDRAW;
 }
 
@@ -1606,8 +1532,7 @@ doforward(char *direct, fileheader_t * fh, int mode)
 	strlcpy(address, cuser.email, sizeof(address));
 
     if( mode == 'U' ){
-	move(b_lines, 0);
-	prints("將進行 uuencode 。若您不清楚什麼是 uuencode 請改用 F轉寄。");
+	vmsg("將進行 uuencode 。若您不清楚什麼是 uuencode 請改用 F轉寄。");
     }
 
     if (address[0]) {
@@ -1632,7 +1557,7 @@ doforward(char *direct, fileheader_t * fh, int mode)
 		    snprintf(address, sizeof(address),
 			     "%s.bbs@%s", fname, MYHOSTNAME);
 	    } else {
-		outmsg("取消轉寄");
+		vmsg("取消轉寄");
 		return 1;
 	    }
 	} while (mode == 'Z' && strstr(address, MYHOSTNAME));
@@ -1640,19 +1565,12 @@ doforward(char *direct, fileheader_t * fh, int mode)
     if (invalidaddr(address))
 	return -2;
 
-    snprintf(fname, sizeof(fname), "正轉寄給 %s, 請稍候...", address);
-    outmsg(fname);
-    move(b_lines, 0);
+    outmsg("正轉寄請稍候...");
     refresh();
 
     /* 追蹤使用者 */
-    if (HAS_PERM(PERM_LOGUSER)) {
-	char            msg[200];
-
-	snprintf(msg, sizeof(msg), "%s mailforward to %s at %s",
-		 cuser.userid, address, Cdate(&now));
-	log_user(msg);
-    }
+    if (HAS_PERM(PERM_LOGUSER)) 
+	log_user("mailforward to %s ",address);
     if (mode == 'Z') {
 	snprintf(fname, sizeof(fname),
 		 TAR_PATH " cfz /tmp/home.%s.tgz home/%c/%s; "

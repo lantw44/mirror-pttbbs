@@ -34,7 +34,7 @@
 #endif
 
 #ifndef LANG_FILE
-#define LANG_FILE	  "lang.big5"    /* 預設語言檔 */
+#define LANG_FILE	  {"lang.big5"}    /* 預設語言檔 */
 #endif
 
 #ifndef MAX_POST_MONEY                      /* 發表文章稿費的上限 */

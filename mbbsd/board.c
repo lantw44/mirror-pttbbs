@@ -95,27 +95,6 @@ HasPerm(boardheader_t * bptr)
     return 1;
 }
 
-#if 0
-static int
-have_author(char *brdname)
-{
-    char            dirname[100];
-
-    snprintf(dirname, sizeof(dirname),
-	     SHM->i18nstr[cuser.language][470],
-	     currauthor, brdname);
-    move(b_lines, 0);
-    clrtoeol();
-    outs(dirname);
-    refresh();
-
-    setbdir(dirname, brdname);
-    str_lower(currowner, currauthor);
-
-    return search_rec(dirname, cmpfowner);
-}
-#endif
-
 static int
 check_newpost(boardstat_t * ptr)
 {				/* Ptt 改 */
@@ -207,10 +186,9 @@ load_boards(char *key)
     int             type = cuser.uflag & BRDSORT_FLAG ? 1 : 0;
     int             i, n;
     int             state;
-    char            byMALLOC = 0, needREALLOC = 0;
 
     if (class_bid > 0) {
-	bptr = &bcache[class_bid - 1];
+	bptr = getbcache(class_bid);
 	if (bptr->firstchild[type] == NULL || bptr->childcount <= 0)
 	    load_uidofgid(class_bid, type);
     }
@@ -235,7 +213,7 @@ load_boards(char *key)
 		    else if (get_item_type(&fav->favh[i]) == FAVT_FOLDER )
 			state = NBRD_FOLDER;
 		    else {
-			bptr = &bcache[ fav_getid(&fav->favh[i]) - 1];
+			bptr = getbcache(fav_getid(&fav->favh[i]));
 			state = NBRD_BOARD;
 			if (is_set_attr(&fav->favh[i], FAVH_UNREAD))
 			    state |= NBRD_UNREAD;
@@ -252,7 +230,7 @@ load_boards(char *key)
 			else
 			    continue;
 		    }else{
-			bptr = &bcache[ fav_getid(&fav->favh[i]) - 1];
+			bptr = getbcache(fav_getid(&fav->favh[i]));
 			if( HasPerm(bptr) && strcasestr(bptr->title, key))
 			    state = NBRD_BOARD;
 			else
@@ -270,8 +248,6 @@ load_boards(char *key)
 	    }
 	    if (brdnum == 0)
 		addnewbrdstat(0, 0);
-	    byMALLOC = 0;
-	    needREALLOC = (get_data_number(fav) != brdnum);
 	}
 #if HOTBOARDCACHE
 	else if( class_bid == -1 ){
@@ -298,12 +274,6 @@ load_boards(char *key)
 		    continue;
 		addnewbrdstat(n, state);
 	    }
-#ifdef CRITICAL_MEMORY
-	    byMALLOC = 1;
-#else
-	    byMALLOC = 0;
-#endif
-	    needREALLOC = 1;
 	}
 #if ! HOTBOARDCACHE
 	if (class_bid == -1)
@@ -311,9 +281,10 @@ load_boards(char *key)
 #endif
     } else { /* load boards of a subclass */
 	int     childcount = bptr->childcount;
-	nbrd = (boardstat_t *) malloc(childcount * sizeof(boardstat_t));
-	for (bptr = bptr->firstchild[type]; bptr != NULL;
-	     bptr = bptr->next[type]) {
+	nbrd = (boardstat_t *) malloc((childcount+2) * sizeof(boardstat_t));
+        // 預留兩個以免大量開版時掛調
+	for (bptr = bptr->firstchild[type]; bptr != NULL && 
+             brdnum < childcount+2; bptr = bptr->next[type]) {
 	    n = getbid(bptr);
 	    state = HasPerm(bptr);
 	    if ( !(state || GROUPOP()) || TITLE_MATCH(bptr, key) )
@@ -329,21 +300,10 @@ load_boards(char *key)
 	    }
 	    addnewbrdstat(n, state);
 	}
-	byMALLOC = 0;
-	needREALLOC = (childcount != brdnum);
-    }
-
-    if( needREALLOC ){
-	if( byMALLOC ){
-	    boardstat_t *newnbrd;
-	    newnbrd = (boardstat_t *)malloc(sizeof(boardstat_t) * brdnum);
-	    memcpy(newnbrd, nbrd, sizeof(boardstat_t) * brdnum);
-	    FREE(nbrd);
-	    nbrd = newnbrd;
-	}
-	else {
-	    nbrd = (boardstat_t *)realloc(nbrd, sizeof(boardstat_t) * brdnum);
-	}
+        if(childcount < brdnum) //Ptt: dirty fix fix soon 
+                getbcache(class_bid)->childcount = 0;
+           
+                 
     }
 }
 
@@ -458,7 +418,7 @@ show_brdlist(int head, int clsflag, int newflag)
 
 	if (yank_flag == 0 && get_fav_type(&nbrd[0]) == 0){
 	    move(3, 0);
-	    prints(SHM->i18nstr[cuser.language][483]);
+	    outs(SHM->i18nstr[cuser.language][483]);
 	    return;
 	}
 
@@ -494,7 +454,7 @@ show_brdlist(int head, int clsflag, int newflag)
 		}
 
 		if (class_bid == 1)
-		    prints("          ");
+		    outs("          ");
 		if (!newflag) {
 		    prints("%5d%c%s", head,
 			   !(B_BH(ptr)->brdattr & BRD_HIDE) ? ' ' :
@@ -504,14 +464,14 @@ show_brdlist(int head, int clsflag, int newflag)
 			   unread[ptr->myattr & NBRD_UNREAD ? 1 : 0]);
 		} else {
 		    if (B_BH(ptr)->brdattr & BRD_GROUPBOARD)
-			prints("        ");
+			outs("        ");
 		    else
 			prints("%6d%s", (int)(B_TOTAL(ptr)),
 				unread[ptr->myattr & NBRD_UNREAD ? 1 : 0]);
 		}
 		if (class_bid != 1) {
 		    if (!GROUPOP() && !HasPerm(B_BH(ptr))) {
-			prints(SHM->i18nstr[cuser.language][486]);
+				outs(SHM->i18nstr[cuser.language][486]);
 		    }
 		    else {
 			prints("%s%-13s\033[m%s%5.5s\033[0;37m%2.2s\033[m%-34.34s",
@@ -524,15 +484,15 @@ show_brdlist(int head, int clsflag, int newflag)
 				B_BH(ptr)->title, B_BH(ptr)->title + 5, B_BH(ptr)->title + 7);
 
 			if (B_BH(ptr)->brdattr & BRD_BAD)
-			    prints(" X ");
+			    outs(" X ");
 			else if (B_BH(ptr)->nuser >= 5000)
-			    prints(SHM->i18nstr[cuser.language][487]);
+			    outs(SHM->i18nstr[cuser.language][487]);
 			else if (B_BH(ptr)->nuser >= 2000)
-			    prints(SHM->i18nstr[cuser.language][488]);
+			    outs(SHM->i18nstr[cuser.language][488]);
 			else if (B_BH(ptr)->nuser >= 1000)
-			    prints(SHM->i18nstr[cuser.language][489]);
+			    outs(SHM->i18nstr[cuser.language][489]);
 			else if (B_BH(ptr)->nuser >= 100)
-			    prints("\033[1mHOT\033[m");
+			    outs("\033[1mHOT\033[m");
 			else if (B_BH(ptr)->nuser > 50)
 			    prints("\033[1;31m%2d\033[m ", B_BH(ptr)->nuser);
 			else if (B_BH(ptr)->nuser > 10)
@@ -564,8 +524,34 @@ set_menu_BM(char *BM)
 
 static void replace_link_by_target(boardstat_t *board)
 {
-    board->bid = BRD_LINK_TARGET(&bcache[board->bid - 1]);
+    board->bid = BRD_LINK_TARGET(getbcache(board->bid));
     board->myattr &= ~NBRD_SYMBOLIC;
+}
+static int
+paste_taged_brds(int gid)
+{
+    fav_t *fav;
+    int  bid, tmp;
+
+    if (gid == 0  || ! (HAS_PERM(PERM_SYSOP) || GROUPOP()) ||
+        getans("貼上標記的看板?(y/N)")=='n') return 0;
+    fav = get_current_fav();
+    for (tmp = 0; tmp < fav->DataTail; tmp++) {
+            bid = fav_getid(&fav->favh[tmp]);
+	    boardheader_t  *bh = getbcache(bid);
+	    if( !is_set_attr(&fav->favh[tmp], FAVH_ADM_TAG))
+		continue;
+	    set_attr(&fav->favh[tmp], FAVH_ADM_TAG, 0);
+	    if (bh->gid != gid) {
+		bh->gid = gid;
+		substitute_record(FN_BOARD, bh,
+				  sizeof(boardheader_t), bid);
+		reset_board(bid);
+		log_usies("SetBoardGID", bh->brdname);
+	    }
+	}
+    sort_bcache();
+    return 1;
 }
 
 static void
@@ -590,8 +576,7 @@ choose_board(int newflag)
 	    load_boards(keyword);
 	    if (brdnum <= 0 && yank_flag > 0) {
 		if (keyword[0] != 0) {
-		    mprints(b_lines - 1, 0, SHM->i18nstr[cuser.language][510]);
-		    pressanykey();
+		    vmsg(SHM->i18nstr[cuser.language][510]);
 		    keyword[0] = 0;
 		    brdnum = -1;
 		    continue;
@@ -602,7 +587,8 @@ choose_board(int newflag)
 		    continue;
 		}
 		if (HAS_PERM(PERM_SYSOP) || GROUPOP()) {
-		    if (m_newbrd(0) == -1)
+                    if (paste_taged_brds(class_bid) || 
+		        m_newbrd(0) == -1)
 			break;
 		    brdnum = -1;
 		    continue;
@@ -730,7 +716,7 @@ choose_board(int newflag)
 	case 'F':
 	case 'f':
 	    if (class_bid>0 && HAS_PERM(PERM_SYSOP)) {
-		bcache[class_bid - 1].firstchild[cuser.uflag & BRDSORT_FLAG ? 1 : 0]
+		getbcache(class_bid)->firstchild[cuser.uflag & BRDSORT_FLAG ? 1 : 0]
 		    = NULL;
 		brdnum = -1;
 	    }
@@ -768,7 +754,7 @@ choose_board(int newflag)
 		ptr = &nbrd[num];
 		if (ptr->myattr & NBRD_SYMBOLIC) {
 		    if (getans(SHM->i18nstr[cuser.language][514]) == 'y')
-			delete_symbolic_link(&bcache[ptr->bid - 1], ptr->bid);
+			delete_symbolic_link(getbcache(ptr->bid), ptr->bid);
 		}
 		brdnum = -1;
 	    }
@@ -792,26 +778,9 @@ choose_board(int newflag)
 	    }
 	    break;
 	case Ctrl('P'):
-	    if (class_bid != 0 &&
-		(HAS_PERM(PERM_SYSOP) || GROUPOP())) {
-		fav_t *fav = get_current_fav();
-		for (tmp = 0; tmp < fav->DataTail; tmp++) {
-		    short   bid = fav_getid(&fav->favh[tmp]);
-		    boardheader_t  *bh = &bcache[ bid - 1 ];
-		    if( !is_set_attr(&fav->favh[tmp], FAVH_ADM_TAG))
-			continue;
-		    set_attr(&fav->favh[tmp], FAVH_ADM_TAG, 0);
-		    if (bh->gid != class_bid) {
-			bh->gid = class_bid;
-			substitute_record(FN_BOARD, bh,
-					  sizeof(boardheader_t), bid);
-			reset_board(bid);
-			log_usies("SetBoardGID", bh->brdname);
-		    }
-		}
-		brdnum = -1;
-	    }
-	    break;
+            if (paste_taged_brds(class_bid))
+                brdnum = -1;
+            break;
 	case 'L':
 	    if (HAS_PERM(PERM_SYSOP) && class_bid > 0) {
 		if (make_symbolic_link_interactively(class_bid) < 0)
@@ -1009,7 +978,7 @@ choose_board(int newflag)
 	case 'W':
 	    if (class_bid > 0 &&
 		(HAS_PERM(PERM_SYSOP) || GROUPOP())) {
-		setbpath(buf, bcache[class_bid - 1].brdname);
+		setbpath(buf, getbcache(class_bid)->brdname);
 		mkdir(buf, 0755);	/* Ptt:開群組目錄 */
 		b_note_edit_bname(class_bid);
 		brdnum = -1;

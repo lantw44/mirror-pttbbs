@@ -401,59 +401,69 @@ capture_screen()
     }
 }
 
-void
-pressanykey()
+int
+vmsg_lines(const int lines, const char msg[])
 {
     int             ch;
 
-    outmsg(SHM->i18nstr[cuser.language][1883]);
-    do {
-	ch = igetkey();
-
-	if (ch == Ctrl('T')) {
-	    capture_screen();
-	    break;
-	}
-    } while ((ch != ' ') && (ch != KEY_LEFT) && (ch != '\r') && (ch != '\n'));
-    move(b_lines, 0);
+    move(lines, 0);
     clrtoeol();
-    refresh();
+
+    if (msg)
+        outs((char *)msg);
+    else
+        outs("\033[45;1m                        \033[37m"
+	     "\033[200m\033[1431m\033[506m□ 請按 \033[33m(Space/Return)\033[37m 繼續 □\033[201m     (^T) 收到暫存檔   \033[m");
+
+    do {
+	if( (ch = igetch()) == Ctrl('T') )
+	    capture_screen();
+    } while( ch == 0 );
+
+    move(lines, 0);
+    clrtoeol();
+    return ch;
+}
+
+char getans(const char *fmt,...)
+{
+    char   msg[256];
+    char   ans[5];
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(msg , 128, fmt, ap);
+    va_end(ap);
+
+    getdata(b_lines, 0, msg, ans, sizeof(ans), LCECHO);
+    return ans[0];
+}
+
+int
+getkey(const char *fmt,...)
+{
+    char   msg[256], i;
+    va_list ap;
+    va_start(ap, fmt);
+    i = vsnprintf(msg , 128, fmt, ap);
+    va_end(ap);
+    return vmsg_lines(b_lines, msg);
 }
 
 int
 vmsg(const char *fmt,...)
 {
-    va_list         ap;
-    char            msg[80] = {0};
-    int             ch;
-
+    char   msg[256] = "\033[1;36;44m ◆ ", i;
+    va_list ap;
     va_start(ap, fmt);
-    vsnprintf(msg, sizeof(msg), fmt, ap);
+    i = vsnprintf(msg + 14, 128, fmt, ap);
     va_end(ap);
-
-    move(b_lines, 0);
-    clrtoeol();
-
-    if (*msg)
-	prints(SHM->i18nstr[cuser.language][1884], msg);
-    else
-	outs(SHM->i18nstr[cuser.language][1885]);
-
-    do {
-	ch = igetkey();
-
-	if (ch == Ctrl('T')) {
-	    capture_screen();
-	    break;
-	}
-    } while ((ch != ' ') && (ch != KEY_LEFT) && (ch != '\r') && (ch != '\n'));
-
-
-    move(b_lines, 0);
-    clrtoeol();
-    refresh();
-    return ch;
+    for(i = i + 14; i < 71; i++) 
+	msg[(int)i] = ' ';
+    strcat(msg + 71,
+	   "\033[33;46m \033[200m\033[1431m\033[506m[按任意鍵繼續]\033[201m \033[m");
+    return vmsg_lines(b_lines, msg);
 }
+
 
 void
 bell()
@@ -544,7 +554,7 @@ cursor_key(int row, int column)
     int             ch;
 
     cursor_show(row, column);
-    ch = egetch();
+    ch = igetch();
     move(row, column);
     outs(STR_UNCUR);
     return ch;
@@ -573,13 +583,33 @@ printdash(char *mesg)
     outch('\n');
 }
 
-int log_file(char *fn, char *buf, int ifcreate)
+int
+log_user(const char *fmt, ...)
+{
+    char msg[256], filename[256];
+    va_list ap;
+
+    va_start(ap, fmt);
+    vsnprintf(msg , 128, fmt, ap);
+    va_end(ap);
+
+    sethomefile(filename, cuser.userid, "USERLOG");
+    return log_file(filename, 1, "%s: %s %s", cuser.userid, msg,  Cdate(&now));
+}
+
+int log_file(char *fn, int ifcreate, const char *fmt,...)
 {
     int     fd;
+    char   msg[256];
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(msg , 128, fmt, ap);
+    va_end(ap);
+
     if( (fd = open(fn, O_APPEND | O_WRONLY | (ifcreate ? O_CREAT : 0),
 		   (ifcreate ? 0664 : 0))) < 0 )
 	return -1;
-    if( write(fd, buf, strlen(buf)) < 0 ){
+    if( write(fd, msg, strlen(msg)) < 0 ){
 	close(fd);
 	return -1;
     }

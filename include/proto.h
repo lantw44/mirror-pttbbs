@@ -58,7 +58,6 @@ int Select(void);
 void do_reply_title(int row, char *title);
 int cmpfmode(fileheader_t *fhdr);
 int cmpfilename(fileheader_t *fhdr);
-int getindex(char *fpath, char *fname, int size);
 void outgo_post(fileheader_t *fh, char *board);
 int edit_title(int ent, fileheader_t *fhdr, char *direct);
 int whereami(int ent, fileheader_t *fhdr, char *direct);
@@ -102,7 +101,7 @@ void brc_addlist(const char* fname);
 #define moneyof(uid) SHM->money[uid - 1]
 #define getbtotal(bid) SHM->total[bid - 1]
 #define getbottomtotal(bid) SHM->n_bottom[bid-1]
-
+void sort_bcache(void);
 int getuser(char *userid);
 void setuserid(int num, char *userid);
 int searchuser(char *userid);
@@ -312,7 +311,6 @@ void init_alarm(void);
 int num_in_buf(void);
 int ochar(int c);
 int rget(int x,char *prompt);
-char getans(char *prompt);
 
 /* kaede */
 int Rename(char* src, char* dst);
@@ -353,7 +351,6 @@ void my_send(char *uident);
 void show_call_in(int save, int which);
 void write_request (int sig);
 void log_usies(char *mode, char *mesg);
-void log_user(char *msg);
 void system_abort(void);
 void abort_bbs(int sig);
 void del_distinct(char *fname, char *line);
@@ -444,6 +441,8 @@ int apply_record(char *fpath, int (*fptr)(), int size);
 int search_rec(char* dirname, int (*filecheck)());
 int append_record_forward(char *fpath, fileheader_t *record, int size);
 int get_sum_records(char* fpath, int size);
+int substitute_ref_record(char* direct, fileheader_t *fhdr, int ent);
+int getindex(char *fpath, fileheader_t *fh, int start);
 
 /* register */
 int getnewuserid(void);
@@ -454,13 +453,13 @@ void check_register(void);
 char *genpasswd(char *pw);
 
 /* screen */
+void mouts(int y, int x, char *str);
 void move(int y, int x);
 void outs(char *str);
 void clrtoeol(void);
 void clear(void);
 void refresh(void);
 void clrtobot(void);
-void mprints(int y, int x, char *str);
 void outmsg(char *msg);
 void region_scroll_up(int top, int bottom);
 void outc(unsigned char ch);
@@ -480,11 +479,15 @@ void out_lines(char *str, int line);
 #define isprint2(ch) ((ch & 0x80) || isprint(ch))
 #define not_alpha(ch) (ch < 'A' || (ch > 'Z' && ch < 'a') || ch > 'z')
 #define not_alnum(ch) (ch < '0' || (ch > '9' && ch < 'A') || (ch > 'Z' && ch < 'a') || ch > 'z')
+#define pressanykey() vmsg_lines(b_lines, NULL)
+int vmsg_lines(int lines, const char *msg);
+int log_user(const char *fmt, ...);
 time_t gettime(int line, time_t dt, char* head);
 void setcalfile(char *buf, char *userid);
 void stand_title(char *title);
-void pressanykey(void);
-int  vmsg (const char *fmt,...) GCC_CHECK_FORMAT(1,2);
+char getans(const char *fmt,...);
+int getkey(const char *fmt,...) GCC_CHECK_FORMAT(1,2);
+int vmsg(const char *fmt,...) GCC_CHECK_FORMAT(1,2);
 void trim(char *buf);
 void bell(void);
 void setbpath(char *buf, char *boardname);
@@ -493,7 +496,7 @@ void sethomepath(char *buf, char *userid);
 void sethomedir(char *buf, char *userid);
 char *Cdate(time_t *clock);
 void sethomefile(char *buf, char *userid, char *fname);
-int log_file(char *filename, char *buf, int flags);
+int log_file(char *fn, int ifcreate, const char *fmt,...);
 void str_lower(char *t, char *s);
 int strstr_lower(char *str, char *tag);
 int cursor_key(int row, int column);

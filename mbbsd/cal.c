@@ -59,13 +59,12 @@ unlockutmpmode()
 int
 vice(int money, char *item)
 {
-   char            buf[128], vice[12];
+   char            buf[128];
    unsigned int viceserial = (currutmp->lastact % 1000000) * 100 + rand() % 100;
 
     demoney(-money);
     setuserfile(buf, VICE_NEW);
-    sprintf(vice,"%8.8d\n", viceserial);
-    log_file(buf, vice, 1);
+    log_file(buf, 1, "%8.8d\n", viceserial);
     snprintf(buf, sizeof(buf),
 	     SHM->i18nstr[cuser.language][534], item, money, viceserial);
     mail_id(cuser.userid, buf, "etc/vice.txt", SHM->i18nstr[cuser.language][535]);
@@ -96,18 +95,13 @@ osong(char *defaultid)
     /* Jaky 一人一天點一首 */
     if (!strcmp(buf, Cdatedate(&cuser.lastsong)) && !HAS_PERM(PERM_SYSOP)) {
 	move(22, 0);
-	outs(SHM->i18nstr[cuser.language][536]);
-	refresh();
-	pressanykey();
-
+	vmsg(SHM->i18nstr[cuser.language][536]);
 	unlockutmpmode();
 	return 0;
     }
     if (cuser.money < 200) {
 	move(22, 0);
-	outs(SHM->i18nstr[cuser.language][537]);
-	refresh();
-	pressanykey();
+	vmsg(SHM->i18nstr[cuser.language][537]);
 	unlockutmpmode();
 	return 0;
     }
@@ -256,18 +250,12 @@ inmailbox(int m)
 int
 p_cloak()
 {
-    char            buf[4];
-    getdata(b_lines - 1, 0,
-	    currutmp->invisible ? SHM->i18nstr[cuser.language][557] : SHM->i18nstr[cuser.language][558],
-	    buf, sizeof(buf), LCECHO);
-    if (buf[0] != 'y')
+    if (getans(currutmp->invisible ? SHM->i18nstr[cuser.language][557] : SHM->i18nstr[cuser.language][558]) != 'y')
 	return 0;
     if (cuser.money >= 19) {
 	vice(19, SHM->i18nstr[cuser.language][559]);
 	currutmp->invisible %= 2;
-	outs((currutmp->invisible ^= 1) ? MSG_CLOAKED : MSG_UNCLOAK);
-	refresh();
-	safe_sleep(1);
+	vmsg((currutmp->invisible ^= 1) ? MSG_CLOAKED : MSG_UNCLOAK);
     }
     return 0;
 }
@@ -276,10 +264,7 @@ p_cloak()
 int
 p_from()
 {
-    char            ans[4];
-
-    getdata(b_lines - 2, 0, SHM->i18nstr[cuser.language][560], ans, sizeof(ans), LCECHO);
-    if (ans[0] != 'y')
+    if (getans(SHM->i18nstr[cuser.language][560]) != 'y')
 	return 0;
     reload_money();
     if (cuser.money < 49)
@@ -299,8 +284,7 @@ p_exmail()
     int             n;
 
     if (cuser.exmailbox >= MAX_EXKEEPMAIL) {
-	prints(SHM->i18nstr[cuser.language][563], MAX_EXKEEPMAIL);
-	refresh();
+	vmsg(SHM->i18nstr[cuser.language][563], MAX_EXKEEPMAIL);
 	return 0;
     }
     snprintf(buf, sizeof(buf),
@@ -364,14 +348,14 @@ int
 p_give()
 {
     int             money, tax;
-    char            id[IDLEN + 1], genbuf[90];
+    char            id[IDLEN + 1], money_buf[20];
 
     move(1, 0);
     usercomplete(SHM->i18nstr[cuser.language][568], id);
     if (!id[0] || !strcmp(cuser.userid, id) ||
-	!getdata(2, 0, SHM->i18nstr[cuser.language][569], genbuf, 7, LCECHO))
+	!getdata(2, 0, SHM->i18nstr[cuser.language][569], money_buf, 7, LCECHO))
 	return 0;
-    money = atoi(genbuf);
+    money = atoi(money_buf);
     reload_money();
     if (money > 0 && cuser.money >= money) {
 	tax = give_tax(money);
@@ -379,12 +363,9 @@ p_give()
 	    return 0;		/* 繳完稅就沒錢給了 */
 	deumoney(searchuser(id), money - tax);
 	demoney(-money);
-	snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][570],
-		 cuser.userid, id, money - tax, ctime(&now));
-	log_file(FN_MONEY, genbuf, 1);
-	genbuf[0] = 'n';
-	getdata(3, 0, SHM->i18nstr[cuser.language][571], genbuf, 2, LCECHO);
-	mail_redenvelop(cuser.userid, id, money - tax, genbuf[0]);
+	log_file(FN_MONEY,1, SHM->i18nstr[cuser.language][570],
+                 cuser.userid, id, money - tax, ctime(&now));
+	mail_redenvelop(cuser.userid, id, money - tax, getans(SHM->i18nstr[cuser.language][571]));
     }
     return 0;
 }
@@ -432,26 +413,3 @@ p_sysinfo(void)
     return 0;
 }
 
-/* 小計算機 */
-#if 0
-static void
-ccount(float *a, float b, int cmode)
-{
-    switch (cmode) {
-	case 0:
-	case 1:
-	case 2:
-	*a += b;
-	break;
-    case 3:
-	*a -= b;
-	break;
-    case 4:
-	*a *= b;
-	break;
-    case 5:
-	*a /= b;
-	break;
-    }
-}
-#endif

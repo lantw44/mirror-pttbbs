@@ -98,36 +98,22 @@ reapchild(int sig)
 }
 
 void
-log_user(char *msg)
-{
-    char            filename[200], buf[200];
-
-    snprintf(filename, sizeof(filename), BBSHOME "/home/%c/%s/USERLOG",
-	     cuser.userid[0], cuser.userid);
-    snprintf(buf, sizeof(buf), "%s\n", msg);
-    log_file(filename, msg, 1);
-}
-
-
-void
 log_usies(char *mode, char *mesg)
 {
-    char            genbuf[200];
 
     if (!mesg)
-        snprintf(genbuf, sizeof(genbuf),
+        log_file(FN_USIES, 1, 
                  "%s %s %-12s Stay:%d (%s)\n",
                  Cdate(&now), mode, cuser.userid ,
                  (int)(now - login_start_time) / 60, cuser.username);
     else
-        snprintf(genbuf, sizeof(genbuf),
+        log_file(FN_USIES, 1,
                  "%s %s %-12s %s\n",
                  Cdate(&now), mode, cuser.userid, mesg);
-    log_file(FN_USIES, genbuf, 1);
 
     /* 追蹤使用者 */
     if (HAS_PERM(PERM_LOGUSER))
-        log_user(genbuf);
+        log_user("logout");
 }
 
 
@@ -168,7 +154,7 @@ u_exit(char *mode)
     cuser.pager = currutmp->pager;
     memcpy(cuser.mind, currutmp->mind, 4);
     setutmpbid(0);
-    if (!(HAS_PERM(PERM_SYSOP) && HAS_PERM(PERM_DENYPOST)) &&
+    if (!(HAS_PERM(PERM_SYSOP) && HAS_PERM(PERM_SYSOPHIDE)) &&
 	!currutmp->invisible)
 	do_aloha("<<下站通知>> -- 我走囉！");
 
@@ -180,18 +166,6 @@ u_exit(char *mode)
     }
     passwd_update(usernum, &cuser);
     log_usies(mode, NULL);
-}
-
-void
-system_abort()
-{
-    if (currmode)
-	u_exit("ABORT");
-
-    clear();
-    refresh();
-    fprintf(stdout, "謝謝光臨, 記得常來喔 !\n");
-    exit(0);
 }
 
 void
@@ -424,7 +398,7 @@ write_request(int sig)
 			memmove(&currutmp->msgs[0],
 				&currutmp->msgs[1],
 				sizeof(msgque_t) * currutmp->msgcount);
-		    igetkey();
+		    igetch();
 		}
 	    }
 
@@ -473,14 +447,12 @@ multi_user_check()
 	    log_usies("KICK ", cuser.username);
 	} else {
 	    if (search_ulistn(usernum, 3) != NULL)
-		system_abort();	/* Goodbye(); */
+		abort_bbs(0);	/* Goodbye(); */
 	}
     } else {
 	/* allow multiple guest user */
 	if (search_ulistn(usernum, 100) != NULL) {
-	    outs("\n抱歉，目前已有太多 guest 在站上, 請用new註冊。\n");
-	    pressanykey();
-	    oflush();
+	    vmsg("\n抱歉，目前已有太多 guest 在站上, 請用new註冊。\n");
 	    exit(1);
 	}
     }
@@ -604,7 +576,7 @@ login_query()
 		    cuser.userlevel = PERM_BASIC | PERM_CHAT | PERM_PAGE |
 			PERM_POST | PERM_LOGINOK | PERM_MAILLIMIT |
 			PERM_CLOAK | PERM_SEECLOAK | PERM_XEMPT |
-			PERM_DENYPOST | PERM_BM | PERM_ACCOUNTS |
+			PERM_SYSOPHIDE | PERM_BM | PERM_ACCOUNTS |
 			PERM_CHATROOM | PERM_BOARD | PERM_SYSOP | PERM_BBSADM;
 		    mkuserdir(cuser.userid);
 #endif
@@ -873,7 +845,7 @@ static void init_guest_info(void)
     currutmp->pager = 2;
 }
 
-#ifdef FOREIGN_REG
+#ifdef FOREIGN_REG_DAY
 inline static void foreign_warning(void){
     if ((cuser.uflag2 & FOREIGN) && !(cuser.uflag2 & LIVERIGHT)){
 	if (login_start_time - cuser.firstlogin > (FOREIGN_REG_DAY - 5) * 24 * 3600){
@@ -949,7 +921,7 @@ user_login()
 	SHM->max_time = now;
     }
 
-    if (!(HAS_PERM(PERM_SYSOP) && HAS_PERM(PERM_DENYPOST)) &&
+    if (!(HAS_PERM(PERM_SYSOP) && HAS_PERM(PERM_SYSOPHIDE)) &&
 	!currutmp->invisible)
 	do_aloha("<<上站通知>> -- 我來啦！");
 
@@ -981,7 +953,7 @@ user_login()
     if (!PERM_HIDE(currutmp))
 	cuser.lastlogin = login_start_time;
 
-#ifdef FOREIGN_REG
+#ifdef FOREIGN_REG_DAY
     foreign_warning();
 #endif
     passwd_update(usernum, &cuser);

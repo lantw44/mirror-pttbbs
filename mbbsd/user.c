@@ -23,7 +23,6 @@ u_loginview()
 {
     int             i;
     unsigned int    pbits = cuser.loginview;
-    char            choice[5];
 
     clear();
     move(4, 0);
@@ -32,9 +31,9 @@ u_loginview()
 	       loginview_file[i][1], ((pbits >> i) & 1 ? "ˇ" : "Ｘ"));
 
     clrtobot();
-    while (getdata(b_lines - 1, 0, "請按 [A-N] 切換設定，按 [Return] 結束：",
-		   choice, 3, LCECHO)) {
-	i = choice[0] - 'a';
+    while ((i = getkey("請按 [A-N] 切換設定，按 [Return] 結束："))!='\r')
+       {
+	i = i - 'a';
 	if (i >= NUMVIEWFILE || i < 0)
 	    bell();
 	else {
@@ -217,7 +216,7 @@ violate_law(userec_t * u, int unum)
 
 static void Customize(void)
 {
-    char    ans[4], done = 0, mindbuf[5];
+    char    done = 0, mindbuf[5];
     char    *wm[3] = {"一般", "進階", "未來"};
 
     showtitle("個人化設定", "個人化設定");
@@ -236,11 +235,7 @@ static void Customize(void)
 	prints("%-30s%10s\n", "D. 目前的心情", mindbuf);
 	prints("%-30s%10s\n", "E. 高亮度顯示我的最愛", 
 	       ((cuser.uflag2 & FAVNOHILIGHT) ? "否" : "是"));
-	getdata(b_lines - 1, 0, "請按 [A-E] 切換設定，按 [Return] 結束：",
-		ans, 3, DOECHO);
-
-	switch( ans[0] ){
-	case 'A':
+	switch(getkey("請按 [A-E] 切換設定，按 [Return] 結束：")){
 	case 'a':{
 	    int     currentset = cuser.uflag2 & WATER_MASK;
 	    currentset = (currentset + 1) % 3;
@@ -249,17 +244,14 @@ static void Customize(void)
 	    vmsg("修正水球模式後請正常離線再重新上線");
 	}
 	    break;
-	case 'B':
 	case 'b':
 	    cuser.userlevel ^= PERM_NOOUTMAIL;
 	    break;
-	case 'C':
 	case 'c':
 	    cuser.uflag2 ^= FAVNEW_FLAG;
 	    if (cuser.uflag2 & FAVNEW_FLAG)
 		subscribe_newfav();
 	    break;
-	case 'D':
 	case 'd':{
 	    getdata(b_lines - 1, 0, "現在的心情? ",
 		    mindbuf, sizeof(mindbuf), DOECHO);
@@ -271,7 +263,6 @@ static void Customize(void)
 		memcpy(currutmp->mind, mindbuf, 4);
 	}
 	    break;
-	case 'E':
 	case 'e':
 	    cuser.uflag2 ^= FAVNOHILIGHT;
 	    break;
@@ -280,7 +271,7 @@ static void Customize(void)
 	}
 	passwd_update(usernum, &cuser);
     }
-    pressanykey();
+    vmsg("設定完成");
 }
 
 void
@@ -288,8 +279,8 @@ uinfo_query(userec_t * u, int real, int unum)
 {
     userec_t        x;
     register int    i = 0, fail, mail_changed;
-    int             uid;
-    char            ans[4], buf[STRLEN], *p;
+    int             uid, ans;
+    char            buf[STRLEN], *p;
     char            genbuf[200], reason[50];
     int money = 0;
     fileheader_t    fhdr;
@@ -300,23 +291,22 @@ uinfo_query(userec_t * u, int real, int unum)
     fail = mail_changed = 0;
 
     memcpy(&x, u, sizeof(userec_t));
-    getdata(b_lines - 1, 0, real ?
+    ans = getans(real ?
 	    "(1)改資料(2)設密碼(3)設權限(4)砍帳號(5)改ID"
 	    "(6)殺/復活寵物(7)審判 [0]結束 " :
-	    "請選擇 (1)修改資料 (2)設定密碼 (C) 個人化設定 ==> [0]結束 ",
-	    ans, sizeof(ans), DOECHO);
+	    "請選擇 (1)修改資料 (2)設定密碼 (C) 個人化設定 ==> [0]結束 ");
 
-    if (ans[0] > '2' && ans[0] != 'C' && ans[0] != 'c' && !real)
-	ans[0] = '0';
+    if (ans > '2' && ans != 'C' && ans != 'c' && !real)
+	ans = '0';
 
-    if (ans[0] == '1' || ans[0] == '3') {
+    if (ans == '1' || ans == '3') {
 	clear();
 	i = 1;
 	move(i++, 0);
 	outs(msg_uid);
 	outs(x.userid);
     }
-    switch (ans[0]) {
+    switch (ans) {
     case 'C':
     case 'c':
 	Customize();
@@ -588,8 +578,7 @@ uinfo_query(userec_t * u, int real, int unum)
 	pressanykey();
 	return;
     }
-    getdata(b_lines - 1, 0, msg_sure_ny, ans, 3, LCECHO);
-    if (*ans == 'y') {
+    if (getans(msg_sure_ny) == 'y') {
 	if (flag)
 	    post_change_perm(temp, i, cuser.userid, x.userid);
 	if (strcmp(u->userid, x.userid)) {
@@ -1061,6 +1050,7 @@ toregister(char *email, char *genbuf, char *phone, char *career,
     }
 }
 
+#ifndef FOREIGN_REG
 static int HaveRejectStr(char *s, char **rej)
 {
     int     i;
@@ -1088,6 +1078,7 @@ static int HaveRejectStr(char *s, char **rej)
     }
     return 0;
 }
+#endif
 
 static char *isvalidname(char *rname)
 {
@@ -1368,11 +1359,11 @@ u_register(void)
 	    getfield(11, "含\033[1;33m縣市\033[m及門寢號碼"
 		     "(台北請加\033[1;33m行政區\033[m)",
 		     "目前住址", addr, 50);
-	    if( (errcode = isvalidaddr(addr) 
+	    if( (errcode = isvalidaddr(addr)) == NULL
 #ifdef FOREIGN_REG
-                && fore[0] ==0 
+                && fore[0] == 0
 #endif
-                ) == NULL )
+		)
 		break;
 	    else
 		vmsg(errcode);
@@ -1500,7 +1491,7 @@ u_list_CB(int num, userec_t * uentp)
 	permstr[0] = 'S';
     else if (level & PERM_ACCOUNTS)
 	permstr[0] = 'A';
-    else if (level & PERM_DENYPOST)
+    else if (level & PERM_SYSOPHIDE)
 	permstr[0] = 'p';
 
     if (level & (PERM_BOARD))
@@ -1551,6 +1542,6 @@ u_list()
     clrtoeol();
     prints("\033[34;46m  已顯示 %d/%d 的使用者(系統容量無上限)  "
 	   "\033[31;47m  (請按任意鍵繼續)  \033[m", usercounter, totalusers);
-    egetch();
+    igetch();
     return 0;
 }

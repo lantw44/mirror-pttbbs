@@ -84,9 +84,7 @@ char            paste_title[STRLEN];
 char            paste_path[256];
 char            currtitle[TTLEN + 1] = "\0";
 char            vetitle[TTLEN + 1] = "\0";
-char            currowner[IDLEN + 2] = "\0";
 char            currauthor[IDLEN + 2] = "\0";
-char            currfile[FNLEN];/* current file name @ bbs.c mail.c */
 char           *currboard = "\0";
 char            currBM[IDLEN * 3 + 10];
 char            reset_color[4] = "\033[m";
@@ -382,7 +380,6 @@ char            real_name[IDLEN + 1];
 int             local_article;
 
 /* mbbsd.c */
-int             talkrequest = NA;
 char            fromhost[STRLEN] = "\0";
 char            water_usies = 0;
 FILE           *fp_writelog = NULL;

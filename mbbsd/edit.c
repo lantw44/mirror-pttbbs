@@ -258,7 +258,7 @@ ask(char *prompt)
     standout();
     prints("%s", prompt);
     standend();
-    ch = igetkey();
+    ch = igetch();
     move(0, 0);
     clrtoeol();
     return (ch);
@@ -966,7 +966,6 @@ write_file(char *fpath, int saveheader, int *islocal)
     switch (ans[0]) {
     case 'a':
 	outs("文章\033[1m 沒有 \033[m存入");
-	safe_sleep(1);
 	aborted = -1;
 	break;
     case 'r':
@@ -1051,7 +1050,7 @@ write_file(char *fpath, int saveheader, int *islocal)
     }
     currline = NULL;
 
-    if (postrecord.times > MAX_CROSSNUM - 1)
+    if (postrecord.times > MAX_CROSSNUM-1 && hbflcheck(currbid, currutmp->uid))
 	anticrosspost();
 
     if (po && sum == 3) {
@@ -1682,7 +1681,7 @@ vedit(char *fpath, int saveheader, int *islocal)
 	move(curr_window_line, ch);
 	if (!line_dirty && strcmp(line, currline->data))
 	    strcpy(line, currline->data);
-	ch = igetkey();
+	ch = igetch();
 	/* jochang debug */
 	if ((interval = (now - th))) {
 	    th = now;
@@ -1697,19 +1696,6 @@ vedit(char *fpath, int saveheader, int *islocal)
 	    count = 0;
 	    tin = interval;
 	}
-	/* 連續240個interval一樣 , 分明是在斂財 
-	if (count >= 240) {
-	    char buf[200];
-	    snprintf(buf, sizeof(buf), "\033[1;33;46m%s\033[37m在\033[37;45m%s\n"
-		    "\033[37m板違法賺錢 , %s\033[m", cuser.userid,
-		    currboard, ctime(&now));
-	    log_file("etc/illegal_money", buf, 1);
-	    money = 0;
-	    post_violatelaw(cuser.userid, "Ptt 系統警察", "違法賺錢", "扣除不法所得");
-	    mail_violatelaw(cuser.userid, "Ptt 系統警察", "違法賺錢", "扣除不法所得");
-	    demoney(10000);
-	    abort_bbs(0);
-	} */
 	if (raw_mode)
 	    switch (ch) {
 	    case Ctrl('S'):
@@ -1836,28 +1822,27 @@ vedit(char *fpath, int saveheader, int *islocal)
 			char           *tmp, *apos = ans;
 			int             fg, bg;
 
-			strlcpy(color, "\033[", sizeof(color));
+			strcpy(color, "\033[");
 			if (isdigit(*apos)) {
-			    snprintf(color, sizeof(color),
-				     "%s%c", color, *(apos++));
+			    sprintf(color,"%s%c", color, *(apos++)); 
 			    if (*apos)
-				snprintf(color, sizeof(color), "%s;", color);
+				strcat(color, ";");
 			}
 			if (*apos) {
 			    if ((tmp = strchr(t, toupper(*(apos++)))))
 				fg = tmp - t + 30;
 			    else
 				fg = 37;
-			    snprintf(color, sizeof(color), "%s%d", color, fg);
+			    sprintf(color, "%s%d", color, fg);
 			}
 			if (*apos) {
 			    if ((tmp = strchr(t, toupper(*(apos++)))))
 				bg = tmp - t + 40;
 			    else
 				bg = 40;
-			    snprintf(color, sizeof(color), "%s;%d", color, bg);
+			    sprintf(color, "%s;%d", color, bg);
 			}
-			snprintf(color, sizeof(color), "%sm", color);
+			strcat(color, "m");
 			insert_string(color);
 		    } else
 			insert_string(reset_color);
@@ -2023,7 +2008,7 @@ vedit(char *fpath, int saveheader, int *islocal)
 	    case '\n':
 #ifdef MAX_EDIT_LINE
 		if( totaln == MAX_EDIT_LINE ){
-		    vmsg("MAX_EDIT_LINE exceed");
+		    outs("MAX_EDIT_LINE exceed");
 		    break;
 		}
 #endif

@@ -428,9 +428,9 @@ typedef struct {
 
     /* i18n(internationlization) */
     char	*i18nstr[MAX_LANG][MAX_STRING];
-    char	i18nstrbody[20 * MAX_LANG * MAX_STRING]; 
-    	/* Based on the statistis, we found the lengh of one string
-    	   is 20 bytes approximately.
+    char	i18nstrbody[22 * MAX_LANG * MAX_STRING]; 
+    	/* Based on the statistics, we found the lengh of one string
+    	   is 22 bytes approximately.
     	*/
 } SHM_t;
 

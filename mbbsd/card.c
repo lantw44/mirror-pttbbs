@@ -41,7 +41,7 @@ card_select(int *now)
 	       (*now == 2) ? cc[1] : cc[0],
 	       (*now == 3) ? cc[1] : cc[0],
 	       (*now == 4) ? cc[1] : cc[0]);
-	switch (egetch()) {
+	switch (igetch()) {
 	case 'Q':
 	case 'q':
 	    return 0;
@@ -449,16 +449,12 @@ card_jack(int *db)
     if ((card_number(me[0]) == 0 && card_number(me[1]) == 12) ||
 	(card_number(me[1]) == 0 && card_number(me[0]) == 12)) {
 	if (card_flower(me[0]) == 0 && card_flower(me[1]) == 0) {
-	    move(b_lines - 1, 0);
-	    prints(SHM->i18nstr[cuser.language][639], JACK * 10);
 	    game_log(JACK, JACK * 10);
-	    pressanykey();
+	    vmsg(SHM->i18nstr[cuser.language][639], JACK * 10);
 	    return 0;
 	} else {
-	    move(b_lines - 1, 0);
-	    prints(SHM->i18nstr[cuser.language][640], JACK * 5);
 	    game_log(JACK, JACK * 5);
-	    pressanykey();
+	    vmsg(SHM->i18nstr[cuser.language][640], JACK * 5);
 	    return 0;
 	}
     }
@@ -466,10 +462,8 @@ card_jack(int *db)
 	(card_number(cpu[1]) == 0 && card_number(cpu[0]) == 12)) {
 	c[0] = 1;
 	card_show(cpu, c, me, m);
-	move(b_lines - 1, 0);
-	prints(SHM->i18nstr[cuser.language][641]);
 	game_log(JACK, 0);
-	pressanykey();
+	vmsg(SHM->i18nstr[cuser.language][641]);
 	return 0;
     }
     if ((*db < 0) && (card_number(me[0]) == card_number(me[1])) &&
@@ -484,27 +478,21 @@ card_jack(int *db)
 	m[i] = 1;
 	card_show(cpu, c, me, m);
 	if (card_alls_lower(me) > 21) {
-	    move(b_lines - 1, 0);
-	    prints(SHM->i18nstr[cuser.language][642]);
 	    game_log(JACK, 0);
-	    pressanykey();
+	    vmsg(SHM->i18nstr[cuser.language][642]);
 	    return 0;
 	}
 	i++;
 	if ((i == 3) && (card_number(me[0]) == 7) &&
 	    (card_number(me[1]) == 7) && (card_number(me[2]) == 7)) {
-	    move(b_lines - 1, 0);
-	    prints(SHM->i18nstr[cuser.language][643], JACK * 7);
 	    game_log(JACK, JACK * 7);
-	    pressanykey();
+	    vmsg(SHM->i18nstr[cuser.language][643], JACK * 7);
 	    return 0;
 	}
     }
     if (i == 5) {		/* 過五關 */
-	move(b_lines - 1, 0);
-	prints(SHM->i18nstr[cuser.language][644], 5 * JACK);
 	game_log(JACK, JACK * 5);
-	pressanykey();
+	vmsg(SHM->i18nstr[cuser.language][644], 5 * JACK);
 	return 0;
     }
     j = 2;
@@ -515,19 +503,15 @@ card_jack(int *db)
 	c[j] = 1;
 	if (card_alls_lower(cpu) > 21) {
 	    card_show(cpu, c, me, m);
-	    move(b_lines - 1, 0);
-	    prints(SHM->i18nstr[cuser.language][645], JACK * 2);
 	    game_log(JACK, JACK * 2);
-	    pressanykey();
+	    vmsg(SHM->i18nstr[cuser.language][645], JACK * 2);
 	    return 0;
 	}
 	j++;
     }
     card_show(cpu, c, me, m);
-    move(b_lines - 1, 0);
-    prints(SHM->i18nstr[cuser.language][646]);
     game_log(JACK, 0);
-    pressanykey();
+    vmsg(SHM->i18nstr[cuser.language][646]);
     return 0;
 }
 
@@ -594,19 +578,15 @@ ten_helf()
 	m[i] = 1;
 	card_show(cpu, c, me, m);
 	if (card_all(me) > 21) {
-	    move(b_lines - 1, 0);
-	    prints(SHM->i18nstr[cuser.language][651]);
 	    game_log(TEN_HALF, 0);
-	    pressanykey();
+	    vmsg(SHM->i18nstr[cuser.language][651]);
 	    return 0;
 	}
 	i++;
     }
     if (i == 5) {		/* 過五關 */
-	move(b_lines - 1, 0);
-	prints(SHM->i18nstr[cuser.language][652], 5 * PMONEY);
 	game_log(TEN_HALF, PMONEY * 5);
-	pressanykey();
+	vmsg(SHM->i18nstr[cuser.language][652], 5 * PMONEY);
 	return 0;
     }
     j = 1;
@@ -617,19 +597,15 @@ ten_helf()
 	c[j] = 1;
 	if (card_all(cpu) > 21) {
 	    card_show(cpu, c, me, m);
-	    move(b_lines - 1, 0);
-	    prints(SHM->i18nstr[cuser.language][653], PMONEY * 2);
 	    game_log(TEN_HALF, PMONEY * 2);
-	    pressanykey();
+	    vmsg(SHM->i18nstr[cuser.language][653], PMONEY * 2);
 	    return 0;
 	}
 	j++;
     }
     card_show(cpu, c, me, m);
-    move(b_lines - 1, 0);
-    prints(SHM->i18nstr[cuser.language][654]);
     game_log(TEN_HALF, 0);
-    pressanykey();
+    vmsg(SHM->i18nstr[cuser.language][654]);
     return 0;
 }
 

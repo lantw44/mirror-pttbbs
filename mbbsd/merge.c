@@ -160,7 +160,7 @@ m_fpg()
 	merge_dir(buf, genbuf, 1);
         strcat(msg, "匯入個人信箱\n");
     }
-   if(getans("是否匯入個人信箱精華區? (Y/n)")!='n')
+   if(getans("是否匯入個人信箱精華區? (會覆蓋\現有設定) (y/N)")=='y')
    {
         sprintf(buf,
 	   "rm -rd home/%c/%s/man>/dev/null ; mv fpg/home/bbs/home/%c/%s/man home/%c/%s", 

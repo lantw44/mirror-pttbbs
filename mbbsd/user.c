@@ -90,8 +90,9 @@ user_display(userec_t * u, int real)
 	   u->exmailbox, u->mobile,
 	   u->month, u->day, u->year % 100, u->mychicken.name);
 #ifdef PLAY_ANGEL
-    prints("                小 天 使: %s\n",
-	    u->myangel[0] ? u->myangel : "無");
+    if (real)
+	prints("                小 天 使: %s\n",
+		u->myangel[0] ? u->myangel : "無");
 #endif
     prints("                註冊日期: %s", ctime(&u->firstlogin));
     prints("                前次光臨: %s", ctime(&u->lastlogin));

@@ -2856,6 +2856,7 @@ NoAngelFound(const char* msg){
     outs(msg);
     if (currutmp->mode != EDITING)
 	outs("，請先在新手板上尋找答案或按 Ctrl-P 發問");
+    clrtoeol();
     refresh();
     sleep(1);
     if (currutmp->mode != EDITING){

@@ -8,6 +8,8 @@
 #define BRC_MAXNUM      80      /* Upper bound of brc_num, size of brc_list  */
 #endif
 
+#define BRC_BLOCKSIZE   1024
+
 #if MAX_BOARD > 32767 || BRC_MAXSIZE > 32767
 #error Max number of boards or BRC_MAXSIZE cannot fit in unsighed short, \
 please rewrite brc.c
@@ -29,6 +31,7 @@ static int      brc_changed = 0;
 /* The below two will be filled by read_brc_buf() and brc_update() */
 static char     *brc_buf = NULL;
 static int       brc_size;
+static int       brc_alloc;
 
 static char * const fn_oldboardrc = ".boardrc";
 static char * const fn_brc = ".brc2";
@@ -128,6 +131,31 @@ brc_putrecord(char *ptr, char *endp, brcbid_t bid, brcnbrd_t num, const time_t *
     return ptr;
 }
 
+static inline int
+brc_enlarge_buf()
+{
+    char buffer[BRC_MAXSIZE - BRC_BLOCKSIZE];
+    if (brc_alloc >= BRC_MAXSIZE)
+	return 0;
+    memcpy(buffer, brc_buf, brc_alloc);
+    free(brc_buf);
+    brc_alloc += BRC_BLOCKSIZE;
+    brc_buf = (char*)malloc(brc_alloc);
+    memcpy(brc_buf, buffer, brc_alloc - BRC_BLOCKSIZE);
+    return 1;
+}
+
+static inline void
+brc_get_buf(int size){
+    if (!size)
+	brc_alloc = BRC_BLOCKSIZE;
+    else
+	brc_alloc = (size + BRC_BLOCKSIZE - 1) / BRC_BLOCKSIZE * BRC_BLOCKSIZE;
+    if (brc_alloc > BRC_MAXSIZE)
+	brc_alloc = BRC_MAXSIZE;
+    brc_buf = (char*)malloc(brc_alloc);
+}
+
 static inline void
 brc_insert_record(brcbid_t bid, brcnbrd_t num, time_t* list)
 {
@@ -148,7 +176,7 @@ brc_insert_record(brcbid_t bid, brcnbrd_t num, time_t* list)
 	if (num && (new_size =
 		sizeof(brcbid_t) + sizeof(brcnbrd_t) + num * sizeof(time_t))){
 	    brc_size += new_size;
-	    if (brc_size > BRC_MAXSIZE)
+	    if (brc_size > brc_alloc && !brc_enlarge_buf())
 		brc_size = BRC_MAXSIZE;
 	    if (brc_size > new_size)
 		memmove(brc_buf + new_size, brc_buf, brc_size - new_size);
@@ -164,13 +192,13 @@ brc_insert_record(brcbid_t bid, brcnbrd_t num, time_t* list)
 	    new_size = sizeof(brcbid_t) + sizeof(brcnbrd_t)
 		+ num * sizeof(time_t);
 	    brc_size += new_size - (tmpp - ptr);
-	    if (brc_size - BRC_MAXSIZE > 0) {
+	    if (brc_size > brc_alloc && ! brc_enlarge_buf() ) {
 		end_size -= brc_size - BRC_MAXSIZE;
 		brc_size = BRC_MAXSIZE;
 	    }
 	    if (end_size > 0 && ptr + new_size != tmpp)
 		memmove(ptr + new_size, tmpp, end_size);
-	    brc_putrecord(ptr, brc_buf + BRC_MAXSIZE, bid, num, list);
+	    brc_putrecord(ptr, brc_buf + brc_alloc, bid, num, list);
 	} else { /* deleting record */
 	    memmove(ptr, tmpp, end_size);
 	    brc_size -= (tmpp - ptr);
@@ -188,35 +216,28 @@ brc_update(){
 
 /* return 1 if successfully read from old .boardrc file.
  * otherwise, return 0. */
-inline static int
-read_old_brc()
+inline static void
+read_old_brc(int fd)
 {
-    char       brcfile[STRLEN];
-    char       brdname[BRC_STRLEN + 1];
-    char      *ptr;
-    int        fd;
-    brcnbrd_t  num;
+    char        brdname[BRC_STRLEN + 1];
+    char       *ptr;
+    brcnbrd_t   num;
 
-    setuserfile(brcfile, fn_oldboardrc);
-    if ((fd = open(brcfile, O_RDONLY)) != -1) {
-	ptr = brc_buf;
-	brc_size = 0;
-	while (read(fd, brdname, BRC_STRLEN + 1) == BRC_STRLEN + 1) {
-	    num = brdname[BRC_STRLEN];
-	    brdname[BRC_STRLEN] = 0;
-	    *(brcbid_t*)ptr = getbnum(brdname);
-	    ptr += sizeof(brcbid_t);
-	    *(brcnbrd_t*)ptr = num;
-	    ptr += sizeof(brcnbrd_t);
-	    if (read(fd, ptr, sizeof(int) * num) != sizeof(int) * num)
-		break;
-	    brc_size += sizeof(brcbid_t) + sizeof(brcnbrd_t)
-		+ sizeof(time_t) * num;
-	    ptr += sizeof(time_t) * num;
-	}
-	return 1;
+    ptr = brc_buf;
+    brc_size = 0;
+    while (read(fd, brdname, BRC_STRLEN + 1) == BRC_STRLEN + 1) {
+	num = brdname[BRC_STRLEN];
+	brdname[BRC_STRLEN] = 0;
+	*(brcbid_t*)ptr = getbnum(brdname);
+	ptr += sizeof(brcbid_t);
+	*(brcnbrd_t*)ptr = num;
+	ptr += sizeof(brcnbrd_t);
+	if (read(fd, ptr, sizeof(int) * num) != sizeof(int) * num)
+	    break;
+	brc_size += sizeof(brcbid_t) + sizeof(brcnbrd_t)
+	    + sizeof(time_t) * num;
+	ptr += sizeof(time_t) * num;
     }
-    return 0;
 }
 
 inline static void
@@ -225,16 +246,23 @@ read_brc_buf()
     if (brc_buf == NULL) {
 	char            brcfile[STRLEN];
 	int             fd;
+	struct stat     brcstat;
 
-	brc_buf = malloc(BRC_MAXSIZE);
 	setuserfile(brcfile, fn_brc);
 	if ((fd = open(brcfile, O_RDONLY)) != -1) {
-	    brc_size = read(fd, brc_buf, BRC_MAXSIZE);
+	    fstat(fd, &brcstat);
+	    brc_get_buf(brcstat.st_size);
+	    brc_size = read(fd, brc_buf, brc_alloc);
 	    close(fd);
 	} else {
-	    if ( ! read_old_brc()) {
+	    setuserfile(brcfile, fn_oldboardrc);
+	    if ((fd = open(brcfile, O_RDONLY)) != -1) {
+		fstat(fd, &brcstat);
+		brc_get_buf(brcstat.st_size);
+		read_old_brc(fd);
+		close(fd);
+	    } else
 		brc_size = 0;
-	    }
 	}
     }
 }

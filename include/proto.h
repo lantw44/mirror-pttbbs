@@ -338,6 +338,11 @@ int Xyz(void);
 int Play_Play(void);
 int Name_Menu(void);
 
+#ifdef MERGEBBS
+/* merge */
+int m_fpg(void);
+#endif
+
 /* more */
 int more(char *fpath, int promptend);
 

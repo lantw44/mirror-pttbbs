@@ -18,12 +18,12 @@ addword(char *database,char word[])
     if (HAVE_PERM(PERM_LOGINOK)) {
 	clear();
 	move(4, 0);
-	outs(" \033[31m警告\033[m:若蓄意填寫假資料將\033[36m砍id\033[m處份\n");
-	prints("\n輸入範例\n:\033[33m%s\033[m", buf);
-	outs("\n請依上列範例輸入一行資料(直接enter放棄)\n");
+	outs(SHM->i18nstr[cuser.language][1179]);
+	prints(SHM->i18nstr[cuser.language][1180], buf);
+	outs(SHM->i18nstr[cuser.language][1181]);
 	getdata(10, 0, ":", buf, 65, DOECHO);
 	if (buf[0]) {
-	    getdata(13, 0, "確定新增?(Y/n)", a, sizeof(a), LCECHO);
+	    getdata(13, 0, SHM->i18nstr[cuser.language][1182], a, sizeof(a), LCECHO);
 	    if (a[0] != 'n')
 		fprintf(fp, "%-65s[%s]\n", buf, cuser.userid);
 	}
@@ -42,17 +42,15 @@ choose_dict(char *dict,int dictlen,char *database,int databaselen)
 
     move(12, 0);
     clrtobot();
-    outs("                        "
-	 "● \033[45;33m字典唷 ◇ 要查哪一本？\033[m ●");
+    outs(SHM->i18nstr[cuser.language][1183]);
 
     if ((fp = fopen(REFER, "r"))) {
 	for(n=0; n<MAX_DICT && fscanf(fp,"%s %s",buf[n],data[n])==2; n++) { // XXX check buffer size
-	    prints("\n                     "
-		    "(\033[36m%d\033[m) %-20s大字典", n + 1, buf[n]);
+	    prints(SHM->i18nstr[cuser.language][1184], n + 1, buf[n]);
 	}
 	fclose(fp);
 
-	getdata(22, 14, "          ★ 請選擇，[Enter]離開：", cho, 3, LCECHO);
+	getdata(22, 14, SHM->i18nstr[cuser.language][1185], cho, 3, LCECHO);
 	c=atoi(cho);
 
 	if (c >= 1 && c <= n) {
@@ -70,9 +68,10 @@ use_dict(char *dict,char *database)
 {
     FILE           *fp;
     char            lang[150], word[80] = "";
-    char            j, f, buf[120], sys[] = "|\033[31me\033[m:編輯字典";
+    char            j, f, buf[120], sys[100];
     int             i = 0;
 
+	strlcpy(sys, SHM->i18nstr[cuser.language][1186], sizeof(sys));
     setutmpmode(DICT);
     if (!HAS_PERM(PERM_SYSOP))
 	sys[0] = 0;
@@ -80,16 +79,14 @@ use_dict(char *dict,char *database)
     clear();
 
     snprintf(buf, sizeof(buf),
-	     "\033[45m                           ●\033[1;44;33m"
-	     "  %-14s\033[3;45m ●                              ", dict);
+	     SHM->i18nstr[cuser.language][1187], dict);
     strlcpy(&buf[100], "\033[m\n", sizeof(buf) - 100);
     for (;;) {
 	move(0, 0);
-	prints("  請輸入關鍵字串(%s) 或指令(h,t,a)\n", dict);
-	prints("[\033[32m<關鍵字>\033[m|\033[32mh\033[m:help|\033[32m"
-		 "t\033[m:所有資料|\033[32ma\033[m:新增資料%s]\n:", sys);
+	prints(SHM->i18nstr[cuser.language][1188], dict);
+	prints(SHM->i18nstr[cuser.language][1189], sys);
 	getdata(2, 0, ":", word, 18, DOECHO);
-	outs("資料搜尋中請稍候....");
+	outs(SHM->i18nstr[cuser.language][1190]);
 	str_lower(word, word);
 	if (word[0] == 0)
 	    return 0;
@@ -114,7 +111,7 @@ use_dict(char *dict,char *database)
 		clear();
 		continue;
 	    } else {
-		outs("字串太短,請輸入多一點關鍵字");
+		outs(SHM->i18nstr[cuser.language][1191]);
 		continue;
 	    }
 	}
@@ -133,9 +130,7 @@ use_dict(char *dict,char *database)
 		    i++;
 		    if (!((i + 1) % 17)) {
 			move(23, 0);
-			outs("\033[45m                               "
-			   "任意鍵繼續  Q:離開                             "
-			     "\033[m ");
+			outs(SHM->i18nstr[cuser.language][1192]);
 			j = igetch();
 			if (j == 'q')
 			    break;
@@ -150,7 +145,7 @@ use_dict(char *dict,char *database)
 	    fclose(fp);
 	}
 	if (i == 0) {
-	    getdata(5, 0, "沒這個資料耶,新增嗎?(y/N)", lang, 3, LCECHO);
+	    getdata(5, 0, SHM->i18nstr[cuser.language][1193], lang, 3, LCECHO);
 	    if (lang[0] == 'y') {
 		clear();
 		move(4, 0);

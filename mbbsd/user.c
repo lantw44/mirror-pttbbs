@@ -1092,6 +1092,9 @@ static int HaveRejectStr(char *s, char **rej)
 
 static char *isvalidname(char *rname)
 {
+#ifdef FOREIGN_REG
+    return NULL;
+#else
     char    *rejectstr[] =
 	{"肥", "胖", "豬頭", "小白", "小明", "路人", "老王", "老李", "寶貝",
 	 "先生", "帥哥", "老頭", "小姊", "小姐", "美女", "小妹", "大頭", 
@@ -1107,6 +1110,8 @@ static char *isvalidname(char *rname)
 	!(strlen(rname) >= 4 && strncmp(&rname[0], &rname[2], 2) == 0))
 	return NULL;
     return "您的輸入不正確";
+#endif
+
 }
 
 static char *isvalidcareer(char *career)
@@ -1313,10 +1318,10 @@ u_register(void)
 	else{
 	    int i;
 	    while( 1 ){
-		getfield(3, "0123456789","身分證號 護照號碼 或 SSN", ident, 11);
-		move(5, 2);
-		prints("  號碼有誤者將無法取得進一步的權限！");
-		getdata(6, 0, "是否確定(Y/N)", ans, sizeof(ans), LCECHO);
+		getfield(4, "0123456789","身分證號 護照號碼 或 SSN", ident, 11);
+		move(6, 2);
+		prints("號碼有誤者將無法取得進一步的權限！");
+		getdata(7, 2, "是否確定(Y/N)", ans, sizeof(ans), LCECHO);
 		if (ans[0] == 'y' || ans[0] == 'Y')
 		    break;
 		vmsg("請重新輸入(若有問題麻煩至SYSOP板)");
@@ -1331,7 +1336,13 @@ u_register(void)
 	}
 #endif
 	while (1) {
-	    getfield(8, "請用中文", "真實姓名", rname, 20);
+	    getfield(8, 
+#ifdef FOREIGN_REG
+                     "請用本名",
+#else
+                     "請用中文",
+#endif
+                     "真實姓名", rname, 20);
 	    if( (errcode = isvalidname(rname)) == NULL )
 		break;
 	    else

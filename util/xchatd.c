@@ -3135,7 +3135,7 @@ start_daemon()
     if (fd >= 0)
     {
 	/* sprintf(buf, "%5d\n", value); */
-	sprintf(buf, "%5d\n", getpid());
+	sprintf(buf, "%5d\n", (int)getpid());
 	write(fd, buf, 6);
 	close(fd);
     }

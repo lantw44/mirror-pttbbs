@@ -28,7 +28,7 @@ LDFLAGS_Linux=	-pipe -Wall
 LIBS_Linux=	
 
 # SunOS特有的環境
-CFLAGS_Solaris= -DSolaris -I/usr/local/include 
+CFLAGS_Solaris= -DSolaris -DHAVE_DES_CRYPT -I/usr/local/include 
 LDFLAGS_Solaris= -L/usr/local/lib -L/usr/lib/
 LIBS_Solaris= -lnsl -lsocket -liconv -lkstat
 

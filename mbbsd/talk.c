@@ -1502,7 +1502,11 @@ t_showhelp()
 	outs("(Y)             顯示正在看什麼板\n");
 #endif
     }
+#ifdef PLAY_ANGEL
+    pressanykey_or_callangel();
+#else
     pressanykey();
+#endif
 }
 
 /*
@@ -2833,7 +2837,7 @@ NoAngelFound(const char* msg){
     move(b_lines, 0);
     outs(msg);
     if (currutmp->mode != EDITING)
-	outs("，請先在新手板上尋找答案或發問");
+	outs("，請先在新手板上尋找答案或按 Ctrl-P 發問");
     refresh();
     sleep(1);
     if (currutmp->mode != EDITING){

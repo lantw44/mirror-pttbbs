@@ -318,16 +318,16 @@ igetch()
 		    my_write(currutmp->msgs[0].pid, "水球丟過去： ",
 			    currutmp->msgs[0].userid, WATERBALL_GENERAL, NULL);
 #else
-		    switch (currutmp->msgs[0].msgmode){
-			case MSG_GENERAL:
+		    switch (currutmp->msgs[0].msgmode) {
+			case MSGMODE_WRITE:
 			    my_write(currutmp->msgs[0].pid, "水球丟過去： ",
 				    currutmp->msgs[0].userid, WATERBALL_GENERAL, NULL);
 			    break;
-			case MSG_FROMANGEL:
+			case MSGMODE_FROMANGEL:
 			    my_write(currutmp->msgs[0].pid, "再問他一次： ",
 				    currutmp->msgs[0].userid, WATERBALL_ANGEL, NULL);
 			    break;
-			case MSG_TOANGEL:
+			case MSGMODE_TOANGEL:
 			    my_write(currutmp->msgs[0].pid, "回答小主人： ",
 				    currutmp->msgs[0].userid, WATERBALL_ANSWER, NULL);
 			    break;

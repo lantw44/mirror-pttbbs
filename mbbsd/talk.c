@@ -457,6 +457,11 @@ water_scr(water_t * tw, int which, char type)
 	move(0, 0);
 	prints(" ");
 	move(0, 0);
+#ifdef PLAY_ANGEL
+	if (tw->msg[0].msgmode == MSGMODE_TOANGEL)
+	    prints("\033[0m回答小主人:");
+	else
+#endif
 	prints("\033[0m反擊 %s:", tw->userid);
 	clrtoeol();
 	move(0, strlen(tw->userid) + 6);
@@ -555,13 +560,13 @@ my_write2(void)
 	    snprintf(genbuf, sizeof(genbuf), "攻擊 %s:", tw->userid);
 	    i = WATERBALL_CONFIRM;
 #else
-	    if (tw->msg[0].msgmode == MSG_GENERAL){
+	    if (tw->msg[0].msgmode == MSGMODE_WRITE) {
 		snprintf(genbuf, sizeof(genbuf), "攻擊 %s:", tw->userid);
 		i = WATERBALL_CONFIRM;
-	    }else if (tw->msg[0].msgmode == MSG_TOANGEL){
-		strcpy(genbuf, "回答 小主人:");
+	    } else if (tw->msg[0].msgmode == MSGMODE_TOANGEL) {
+		strcpy(genbuf, "回答小主人:");
 		i = WATERBALL_CONFIRM_ANSWER;
-	    }else{ /* tw->msg[0].msgmode == MSG_FROMANGEL */
+	    } else { /* tw->msg[0].msgmode == MSGMODE_FROMANGEL */
 		strcpy(genbuf, "再問他一次：");
 		i = WATERBALL_CONFIRM_ANGEL;
 	    }
@@ -580,7 +585,7 @@ my_write2(void)
     currstat = currstat0;
     currutmp->chatid[0] = c0;
     currutmp->mode = mode0;
-    if (wmofo == RECVINREPLYING){
+    if (wmofo == RECVINREPLYING) {
 	wmofo = NOTREPLYING;
 	write_request(0);
     }
@@ -741,18 +746,20 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
 			sizeof(uin->msgs[write_pos].userid));
 	    strlcpy(uin->msgs[write_pos].last_call_in, msg,
 		    sizeof(uin->msgs[write_pos].last_call_in));
-#ifdef PLAY_ANGEL
-	    switch (flag){
+#ifndef PLAY_ANGEL
+	    uin->msgs[write_pos].msgmode = MSGMODE_WRITE;
+#else
+	    switch (flag) {
 		case WATERBALL_ANGEL:
 		case WATERBALL_CONFIRM_ANGEL:
-		    uin->msgs[write_pos].msgmode = MSG_TOANGEL;
+		    uin->msgs[write_pos].msgmode = MSGMODE_TOANGEL;
 		    break;
 		case WATERBALL_ANSWER:
 		case WATERBALL_CONFIRM_ANSWER:
-		    uin->msgs[write_pos].msgmode = MSG_FROMANGEL;
+		    uin->msgs[write_pos].msgmode = MSGMODE_FROMANGEL;
 		    break;
 		default:
-		    uin->msgs[write_pos].msgmode = MSG_GENERAL;
+		    uin->msgs[write_pos].msgmode = MSGMODE_WRITE;
 	    }
 #endif
 	    uin->pager = pager0;
@@ -851,8 +858,9 @@ t_display_new(void)
 	    }
 	}
 	for (i = 0; i < water_which->count; i++) {
-	    int             a = (water_which->top - i - 1 + MAX_REVIEW) % MAX_REVIEW, len = 75 - strlen(water_which->msg[a].last_call_in)
-	    - strlen(water_which->msg[a].userid);
+	    int a = (water_which->top - i - 1 + MAX_REVIEW) % MAX_REVIEW;
+	    int len = 75 - strlen(water_which->msg[a].last_call_in)
+		- strlen(water_which->msg[a].userid);
 	    if (len < 0)
 		len = 0;
 
@@ -2719,6 +2727,7 @@ talkreply(void)
     strlcpy(currutmp->msgs[0].userid, uip->userid, sizeof(currutmp->msgs[0].userid));
     strlcpy(currutmp->msgs[0].last_call_in, "呼叫、呼叫，聽到請回答 (Ctrl-R)",
 	    sizeof(currutmp->msgs[0].last_call_in));
+    currutmp->msgs[0].msgmode = MSGMODE_TALK;
     prints("對方來自 [%s]，共上站 %d 次，文章 %d 篇\n",
 	    uip->from, xuser.numlogins, xuser.numposts);
     showplans(uip->userid);

@@ -242,7 +242,7 @@ show_call_in(int save, int which)
 {
     char            buf[200];
 #ifdef PLAY_ANGEL
-    if (save && currutmp->msgs[which].msgmode == MSG_TOANGEL)
+    if (currutmp->msgs[which].msgmode == MSGMODE_TOANGEL)
 	snprintf(buf, sizeof(buf), "\033[1;37;46m¡¹%s\033[37;45m %s \033[m",
 		currutmp->msgs[which].userid, currutmp->msgs[which].last_call_in);
     else

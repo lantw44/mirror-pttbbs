@@ -868,25 +868,28 @@ reload_fcache(void)
 	FILE           *fp;
 
 	SHM->Fbusystate = 1;
-	bzero(SHM->domain, sizeof(SHM->domain));
 	if ((fp = fopen("etc/domain_name_query", "r"))) {
-	    char            buf[256], *po;
+	    char            buf[256], *ip, *mask;
 
-	    SHM->top = 0;
+	    SHM->home_num = 0;
 	    while (fgets(buf, sizeof(buf), fp)) {
-		if (buf[0] && buf[0] != '#' && buf[0] != ' ' &&
-		    buf[0] != '\n') {
-		    sscanf(buf, "%s", SHM->domain[SHM->top]); // XXX check buffer size
-		    po = buf + strlen(SHM->domain[SHM->top]);
-		    while (*po == ' ' || *po == '\t')
-			po++;
-		    strncpy(SHM->replace[SHM->top], po, 49);
-		    SHM->replace[SHM->top]
-			[strlen(SHM->replace[SHM->top]) - 1] = 0;
-		    (SHM->top)++;
-		    if (SHM->top == MAX_FROM)
-			break;
+		if (!buf[0] || buf[0] == '#' || buf[0] == ' ' || buf[0] == '\n') {
+		    continue;
 		}
+		ip = strtok(buf, " \t");
+		if ((mask = strchr(ip, '/')) != NULL) {
+		    SHM->home_ip[SHM->home_num] = ipstr2int(ip);
+		    SHM->home_mask[SHM->home_num] = atoi(mask);
+		}
+		else
+		    SHM->home_ip[SHM->home_num] = ipstr2int(ip);
+		ip = strtok(NULL, " \t");
+		strncpy(SHM->home_desc[SHM->home_num], ip, sizeof(SHM->home_desc[SHM->home_num]));
+		SHM->home_desc[SHM->home_num]
+		    [strlen(SHM->home_desc[SHM->home_num]) - 1] = 0;
+		(SHM->home_num)++;
+		if (SHM->home_num == MAX_FROM)
+		    break;
 	    }
 	    fclose(fp);
 	}

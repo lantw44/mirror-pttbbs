@@ -317,6 +317,22 @@ belong(char *filelist, char *key)
     return rc;
 }
 
+unsigned int
+ipstr2int(char *ip)
+{
+    unsigned int i, val = 0;
+    char *p = strtok(ip, ".");
+    val = atoi(p);
+    for (i = 0; i < 3; i++) {
+	p = strtok(NULL, ".");
+	val *= 256;
+	if (p == NULL)
+	    continue;
+	val += atoi(p);
+    }
+    return val;
+}
+
 #ifndef _BBS_UTIL_C_ /* getdata_buf */
 time_t
 gettime(int line, time_t dt, char*head)

@@ -483,6 +483,7 @@ void out_lines(const char *str, int line);
 #define pressanykey() vmsg_lines(b_lines, NULL)
 int vmsg_lines(int lines, const char *msg);
 int log_user(const char *fmt, ...);
+unsigned int ipstr2int(char *ip);
 time_t gettime(int line, time_t dt, char* head);
 void setcalfile(char *buf, char *userid);
 void stand_title(char *title);

@@ -1584,7 +1584,7 @@ descript(int show_mode, userinfo_t * uentp, time_t diff)
 	return (((uentp->pager != 2 && uentp->pager != 3 && diff) ||
 		 HAS_PERM(PERM_SYSOP)) ?
 #ifdef WHERE
-		uentp->from_alias ? SHM->replace[uentp->from_alias] :
+		uentp->from_alias ? SHM->home_desc[uentp->from_alias] :
 		uentp->from
 #else
 		uentp->from

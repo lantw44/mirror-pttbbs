@@ -121,7 +121,7 @@ brd_prints()
 {
     clear();
     move(1, 0);
-    outs(I18N[950]);
+    outs(gettext[950]);
 }
 
 static void
@@ -135,18 +135,18 @@ draw_line(sint y, sint f)
     strlcpy(buf, "\033[43;30m", sizeof(buf));
     for (i = 0; i < 8; i++) {
 	if (brd[y][i].die == 1)
-	    snprintf(tmp, sizeof(tmp), I18N[951]);
+	    snprintf(tmp, sizeof(tmp), gettext[951]);
 	else if (brd[y][i].out == 0)
-	    snprintf(tmp, sizeof(tmp), I18N[952]);
+	    snprintf(tmp, sizeof(tmp), gettext[952]);
 	else {
-	    snprintf(tmp, sizeof(tmp), I18N[953],
+	    snprintf(tmp, sizeof(tmp), gettext[953],
 		     (f == i) ? "1;47;" : "", (brd[y][i].color) ? 31 : 34,
-		     (brd[y][i].color) ? I18N[936 + brd[y][i].value] :
-		     I18N[943 + brd[y][i].value]);
+		     (brd[y][i].color) ? gettext[936 + brd[y][i].value] :
+		     gettext[943 + brd[y][i].value]);
 	}
 	strcat(buf, tmp);
     }
-    strcat(buf, I18N[954]);
+    strcat(buf, gettext[954]);
 
     move(cury[y], 3);
     clrtoeol();
@@ -272,7 +272,7 @@ playing(sint fd, sint color, sint ch, sint * b, userinfo_t * uin)
     case 'u':
 	move(0, 0);
 	clrtoeol();
-	prints(I18N[955], (brd[my][mx].color == RED) ? I18N[956] : I18N[957], I18N[936 + brd[my][mx].value], cont);
+	prints(gettext[955], (brd[my][mx].color == RED) ? gettext[956] : gettext[957], gettext[936 + brd[my][mx].value], cont);
 	*b = -1;
 	break;
     case '\r':			/* 吃 or 移動  ly跟lx必須大於0 */
@@ -294,7 +294,7 @@ playing(sint fd, sint color, sint ch, sint * b, userinfo_t * uin)
 		else
 		    rcount--;
 		move(cur_eaty, cur_eatx);
-		prints("%s", (color) ? I18N[943 + brd[my][mx].value] : I18N[brd[my][mx].value]);
+		prints("%s", (color) ? gettext[943 + brd[my][mx].value] : gettext[brd[my][mx].value]);
 		if (cur_eatx >= 26) {
 		    cur_eatx = 5;
 		    cur_eaty++;
@@ -349,15 +349,15 @@ main_dark(int fd, userinfo_t * uin)
     if (currutmp->turn) {
 	brd_rand();
 	send(fd, &brd, sizeof(brd), 0);
-	mouts(21, 0, I18N[958]);
-	mouts(22, 0, I18N[959]);
+	mouts(21, 0, gettext[958]);
+	mouts(22, 0, gettext[959]);
     } else {
 	recv(fd, &brd, sizeof(brd), 0);
-	mouts(21, 0, I18N[960]);
+	mouts(21, 0, gettext[960]);
     }
     move(12, 3);
-    prints(I18N[961], currutmp->userid, currutmp->mateid);
-    outs(I18N[962]);
+    prints(gettext[961], currutmp->userid, currutmp->mateid);
+    outs(gettext[962]);
 
     if (currutmp->turn)
 	move(cury[0], curx[0]);
@@ -384,11 +384,11 @@ main_dark(int fd, userinfo_t * uin)
 		break;
 	    }
 	    if (curr.end == -3)
-		mouts(23, 30, I18N[963]);
+		mouts(23, 30, gettext[963]);
 	    else if (curr.end == -4)
-		mouts(23, 30, I18N[964]);
+		mouts(23, 30, gettext[964]);
 	    else if (curr.end == -5)
-		mouts(23, 30, I18N[965]);
+		mouts(23, 30, gettext[965]);
 	    else
 		mouts(23, 30, "");
 
@@ -397,7 +397,7 @@ main_dark(int fd, userinfo_t * uin)
 	    mx = curr.x;
 	    redraw();
 	    if (curr.end)
-		mouts(22, 0, I18N[966]);
+		mouts(22, 0, gettext[966]);
 	    move(cury[my], curx[mx]);
 	} else {
 	    if (currutmp->turn == 'p') {
@@ -414,7 +414,7 @@ main_dark(int fd, userinfo_t * uin)
 		if (ch == 'y') {
 		    currutmp->color = (currutmp->color == '1') ? '0' : '1';
 		    uin->color = (uin->color == '1') ? '0' : '1';
-		    mouts(21, 0, (currutmp->color == '1') ? I18N[967] : I18N[968]);
+		    mouts(21, 0, (currutmp->color == '1') ? gettext[967] : gettext[968]);
 		} else {
 		    mouts(23, 30, "");
 		    currutmp->turn = (uin->turn) ? 0 : 1;
@@ -422,7 +422,7 @@ main_dark(int fd, userinfo_t * uin)
 	    } else if (currutmp->turn == 'g') {
 		if (ch == 'y') {
 		    cont = 1;
-		    mouts(21, 0, I18N[969]);
+		    mouts(21, 0, gettext[969]);
 		} else {
 		    mouts(23, 30, "");
 		    currutmp->turn = (uin->turn) ? 0 : 1;
@@ -432,7 +432,7 @@ main_dark(int fd, userinfo_t * uin)
 		if (uin->turn == 'g') {
 		    cont = 1;
 		    uin->turn = (currutmp->turn) ? 0 : 1;
-		    mouts(21, 10, I18N[970]);
+		    mouts(21, 10, gettext[970]);
 		}
 		end = playing(fd, currutmp->color - '0', ch, &go_on, uin);
 
@@ -465,12 +465,12 @@ main_dark(int fd, userinfo_t * uin)
 		    continue;
 		}
 		if (!i && currutmp->color == '1') {
-		    mouts(21, 0, I18N[971]);
+		    mouts(21, 0, gettext[971]);
 		    i++;
 		    move(cury[my], curx[mx]);
 		}
 		if (!i && currutmp->color == '0') {
-		    mouts(21, 0, I18N[972]);
+		    mouts(21, 0, gettext[972]);
 		    i++;
 		    move(cury[my], curx[mx]);
 		}
@@ -483,7 +483,7 @@ main_dark(int fd, userinfo_t * uin)
 
 		move(22, 0);
 		clrtoeol();
-		prints(I18N[973], currutmp->mateid);
+		prints(gettext[973], currutmp->mateid);
 		currutmp->turn = 0;
 		uin->turn = 1;
 	    } else {
@@ -493,7 +493,7 @@ main_dark(int fd, userinfo_t * uin)
 		}
 		move(22, 0);
 		clrtoeol();
-		prints(I18N[974], currutmp->mateid);
+		prints(gettext[974], currutmp->mateid);
 	    }
 	}
     }
@@ -504,15 +504,15 @@ main_dark(int fd, userinfo_t * uin)
 	if (currutmp->turn == 'w') {
 	    move(22, 0);
 	    clrtoeol();
-	    prints(I18N[975]);
+	    prints(gettext[975]);
 	} else {
 	    move(22, 0);
 	    clrtoeol();
-	    prints(I18N[976]);
+	    prints(gettext[976]);
 	}
 	break;
     case -3:
-	mouts(22, 0, I18N[977]);
+	mouts(22, 0, gettext[977]);
 	break;
     default:
 	add_io(0, 0);

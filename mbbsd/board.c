@@ -38,10 +38,10 @@ void imovefav(int old)
     char buf[5];
     int new;
     
-    getdata(b_lines - 1, 0, I18N[468], buf, sizeof(buf), DOECHO);
+    getdata(b_lines - 1, 0, gettext[468], buf, sizeof(buf), DOECHO);
     new = atoi(buf) - 1;
     if (new < 0 || brdnum <= new){
-	vmsg(I18N[469]);
+	vmsg(gettext[469]);
 	return;
     }
     move_in_current_folder(old, new);
@@ -131,8 +131,7 @@ load_uidofgid(const int gid, const int type)
     int             n, childcount = 0;
     currbptr = &bcache[gid - 1];
     for (n = 0; n < numboards; ++n) {
-	bptr = SHM->bsorted[type][n];
-	if (bptr->brdname[0] == '\0')
+	if( !(bptr = SHM->bsorted[type][n]) || bptr->brdname[0] == '\0' )
 	    continue;
 	if (bptr->gid == gid) {
 	    if (currbptr == &bcache[gid - 1])
@@ -385,129 +384,202 @@ get_fav_type(boardstat_t *ptr)
 static void
 brdlist_foot()
 {
-    prints(I18N[471],
-	   yank_flag == 0 ? I18N[472] : yank_flag == 1 ? I18N[473] : I18N[474]);
+    prints(gettext[471],
+	   yank_flag == 0 ? gettext[472] : yank_flag == 1 ? gettext[473] : gettext[474]);
 }
+
+
+static inline char * 
+make_class_color(char *name)
+{
+    char    *colorset[8] = {"", "\033[32m",
+	"\033[33m", "\033[36m", "\033[34m", "\033[1m",
+	"\033[1;32m", "\033[1;33m"};
+
+    return colorset[(unsigned int)
+	(name[0] + name[1] +
+	 name[2] + name[3]) & 07];
+}
+
+#define HILIGHT_COLOR	"\033[1;36m"
 
 static void
 show_brdlist(int head, int clsflag, int newflag)
 {
     int             myrow = 2;
-    if (class_bid == 1) {
+    if (unlikely(class_bid == 1)) {
 	currstat = CLASS;
 	myrow = 6;
-	showtitle(I18N[475], BBSName);
+	showtitle(gettext[475], BBSName);
 	movie(0);
 	move(1, 0);
 	outs(
-	    I18N[476]);
+	    gettext[476]);
     } else if (clsflag) {
-	showtitle(I18N[477], BBSName);
-	prints(I18N[478],
-	       newflag ? I18N[479] : I18N[480],
-	       I18N[481]);
+	showtitle(gettext[477], BBSName);
+	prints(gettext[478],
+	       newflag ? gettext[479] : gettext[480],
+	       gettext[481]);
 	move(b_lines, 0);
 	brdlist_foot();
     }
     if (brdnum > 0) {
 	boardstat_t    *ptr;
-	char    *color[8] = {"", "\033[32m",
-	    "\033[33m", "\033[36m", "\033[34m", "\033[1m",
-	"\033[1;32m", "\033[1;33m"};
-	char    *unread[2] = {"\33[37m  \033[m", I18N[482]};
+	char    *unread[2] = {"\33[37m  \033[m", gettext[482]};
 
-	if (yank_flag == 0 && get_fav_type(&nbrd[0]) == 0){
+	char priv, *mark, *favcolor, *brdname, *color, *class, *icon, *desc, *bm;
+	short number, nuser;
+
+	if (yank_flag == 0 && get_data_number(get_current_fav()) == 0){
+	    // brdnum > 0 ???
 	    move(3, 0);
-	    outs(I18N[483]);
+	    outs(gettext[483]);
 	    return;
 	}
 
 	while (++myrow < b_lines) {
 	    move(myrow, 0);
 	    clrtoeol();
-	    if (head < brdnum) {
-		ptr = &nbrd[head++];
-		if (ptr->myattr & NBRD_LINE){
-		    if( !newflag )
-			prints("%5d %c %s------------      ------------------------------------------\033[m",
-				head,
-				ptr->myattr & NBRD_TAG ? 'D' : ' ',
-				ptr->myattr & NBRD_FAV ? "" : "\033[1;30m");
-		    else
-			prints("        %s------------      ------------------------------------------\033[m", ptr->myattr & NBRD_FAV ? "" : "\033[1;30m");
-		    continue;
-		}
-		else if (ptr->myattr & NBRD_FOLDER){
-		    char *title = get_folder_title(ptr->bid);
-		    if( !newflag )
-			prints(I18N[484],
-				head,
-				ptr->myattr & NBRD_TAG ? 'D' : ' ',
-				!(cuser.uflag2 & FAVNOHILIGHT) ? "\033[1;36m" : "",
-				title);
-		    else
-			prints(I18N[485],
-				get_data_number(get_fav_folder(getfolder(ptr->bid))),
-				!(cuser.uflag2 & FAVNOHILIGHT) ? "\033[1;36m" : "",
-				title);
-		    continue;
-		}
+	    if (unlikely(head >= brdnum))
+		continue;
 
-		if (class_bid == 1)
-		    outs("          ");
-		if (!newflag) {
-		    prints("%5d%c%s", head,
-			   !(B_BH(ptr)->brdattr & BRD_HIDE) ? ' ' :
-			   (B_BH(ptr)->brdattr & BRD_POSTMASK) ? ')' : '-',
-			   (ptr->myattr & NBRD_TAG) ? "D " :
-			   (B_BH(ptr)->brdattr & BRD_GROUPBOARD) ? "  " :
-			   unread[ptr->myattr & NBRD_UNREAD ? 1 : 0]);
-		} else {
-		    if (B_BH(ptr)->brdattr & BRD_GROUPBOARD)
-			outs("        ");
-		    else
-			prints("%6d%s", (int)(B_TOTAL(ptr)),
-				unread[ptr->myattr & NBRD_UNREAD ? 1 : 0]);
-		}
-		if (class_bid != 1) {
-		    if (!GROUPOP() && !HasPerm(B_BH(ptr))) {
-				outs(I18N[486]);
-		    }
-		    else {
-			prints("%s%-13s\033[m%s%5.5s\033[0;37m%2.2s\033[m%-34.34s",
-				((!(cuser.uflag2 & FAVNOHILIGHT) &&
-				  getboard(ptr->bid) != NULL))? "\033[1;36m" : "",
-				B_BH(ptr)->brdname,
-				color[(unsigned int)
-				(B_BH(ptr)->title[1] + B_BH(ptr)->title[2] +
-				 B_BH(ptr)->title[3] + B_BH(ptr)->title[0]) & 07],
-				B_BH(ptr)->title, B_BH(ptr)->title + 5, B_BH(ptr)->title + 7);
+	    ptr = &nbrd[head++];
 
-			if (B_BH(ptr)->brdattr & BRD_BAD)
-			    outs(" X ");
-			else if (B_BH(ptr)->nuser >= 5000)
-			    outs(I18N[487]);
-			else if (B_BH(ptr)->nuser >= 2000)
-			    outs(I18N[488]);
-			else if (B_BH(ptr)->nuser >= 1000)
-			    outs(I18N[489]);
-			else if (B_BH(ptr)->nuser >= 100)
-			    outs("\033[1mHOT\033[m");
-			else if (B_BH(ptr)->nuser > 50)
-			    prints("\033[1;31m%2d\033[m ", B_BH(ptr)->nuser);
-			else if (B_BH(ptr)->nuser > 10)
-			    prints("\033[1;33m%2d\033[m ", B_BH(ptr)->nuser);
-			else if (B_BH(ptr)->nuser > 0)
-			    prints("%2d ", B_BH(ptr)->nuser);
-			else
-			    prints(" %c ", B_BH(ptr)->bvote ? 'V' : ' ');
-			prints("%.*s\033[K", t_columns - 67, B_BH(ptr)->BM);
-		    }
-		} else {
-		    prints("%-40.40s %.*s", B_BH(ptr)->title + 7,
-			   t_columns - 67, B_BH(ptr)->BM);
-		}
+/* board_flag_checking */
+
+	    priv = !(B_BH(ptr)->brdattr & BRD_HIDE) ? ' ' :
+		(B_BH(ptr)->brdattr & BRD_POSTMASK) ? ')' : '-';
+
+	    if (newflag) {
+		priv = ' ';
+		mark = unread[ptr->myattr & NBRD_UNREAD ? 1 : 0];
+	    } else {
+		mark = (unlikely(ptr->myattr & NBRD_TAG)) ? "D " :
+		       (B_BH(ptr)->brdattr & BRD_GROUPBOARD) ? "  " :
+		       unread[ptr->myattr & NBRD_UNREAD ? 1 : 0];
 	    }
+
+	    /* special case */
+	    if (unlikely(class_bid == 1)) {
+		prints("          %5d%c%2s%-40.40s ", head, priv, mark, B_BH(ptr)->title + 7);
+		bm = B_BH(ptr)->BM;
+		goto show_BM;
+	    }
+
+
+/* start_of_board_decoration */
+
+	    if (yank_flag == 0)
+		favcolor = !(cuser.uflag2 & FAVNOHILIGHT) ? "\033[1;36m" : "";
+	    else
+		favcolor = "";
+
+	    color = make_class_color(B_BH(ptr)->title);
+
+
+/* board_description */
+
+	    if (yank_flag == 0) {
+
+		if (ptr->myattr & NBRD_LINE) {
+		    number = -1;
+		    priv = ptr->myattr & NBRD_TAG ? 'D' : ' ',
+		    favcolor = "";
+		    brdname = "------------";
+		    class = "    ";
+		    icon = "  ";
+		    desc = "------------------------------------------";
+		}
+		else if (ptr->myattr & NBRD_FOLDER) {
+		    number = get_data_number(get_fav_folder(getfolder(ptr->bid)));
+		    priv = ' ';
+		    brdname = "MyFavFolder";
+		    class = gettext[484];
+		    icon = gettext[485];
+		    desc = get_folder_title(ptr->bid);
+		}
+		else if (!HasPerm(B_BH(ptr))) {
+		    number = -1;
+		    priv = ' ';
+		    brdname = "Unknown??";
+		    class = gettext[3607];
+		    icon = gettext[3608];
+		    desc = gettext[3609];
+		}
+		else {
+		    goto ugly_normal_case;
+		}
+
+		mark = "";
+		color = "";
+		bm = "";
+		nuser = 0;
+	    }
+	    else if (unlikely(B_BH(ptr)->brdattr & BRD_GROUPBOARD)) {
+		number = -1;
+		priv = ' ';
+		mark = "";
+		brdname = B_BH(ptr)->brdname;
+		class = B_BH(ptr)->title;
+		icon = B_BH(ptr)->title + 5;
+		desc = B_BH(ptr)->title + 7;
+		bm = B_BH(ptr)->BM;
+		nuser = 0;
+	    }
+
+	    else {
+		/* XXX: non-null terminated string */
+ugly_normal_case:
+		brdname = B_BH(ptr)->brdname;
+		class = B_BH(ptr)->title;
+		icon = B_BH(ptr)->title + 5;
+		desc = B_BH(ptr)->title + 7;
+		bm = B_BH(ptr)->BM;
+		number = newflag ? (short)(B_TOTAL(ptr)) : head;
+		nuser = B_BH(ptr)->nuser;
+	    }
+
+
+	    if (!newflag)
+		prints("%5hd", head);
+	    else {
+		if (number < 0)
+		    outs("     ");
+		else
+		    prints("%5hd", number);
+	    }
+
+	    prints("%c%2s" "%s%-13s\033[m" "%s%4.4s\033[0;37m " "%2.2s\033[m%-34.34s", priv, mark,  favcolor, brdname,  color, class, icon, desc); 
+
+	    if (strcmp(bm, "") == 0 ||
+		    (unlikely(B_BH(ptr)->brdattr & BRD_GROUPBOARD))) {
+		outs("   ");
+		goto ignore_hot_status;
+	    }
+
+	    if (unlikely(B_BH(ptr)->brdattr & BRD_BAD))
+		outs(" X ");
+	    else if (unlikely(nuser >= 5000))
+		outs("\033[1;34m爆!\033[m");
+	    else if (unlikely(nuser >= 2000))
+		outs("\033[1;31m爆!\033[m");
+	    else if (unlikely(nuser >= 1000))
+		outs("\033[1m爆!\033[m");
+	    else if (unlikely(nuser >= 100))
+		outs("\033[1mHOT\033[m");
+	    else if (unlikely(nuser > 50))
+		prints("\033[1;31m%2d\033[m ", B_BH(ptr)->nuser);
+	    else if (nuser > 10)
+		prints("\033[1;33m%2d\033[m ", B_BH(ptr)->nuser);
+	    else if (nuser > 0)
+		prints("%2d ", B_BH(ptr)->nuser);
+	    else
+		prints(" %c ", B_BH(ptr)->bvote ? 'V' : ' ');
+
+ignore_hot_status:
+show_BM:
+	    prints("%.*s\033[K", t_columns - 67, bm);
+
 	    clrtoeol();
 	}
     }
@@ -534,7 +606,7 @@ paste_taged_brds(int gid)
     int  bid, tmp;
 
     if (gid == 0  || ! (HAS_PERM(PERM_SYSOP) || GROUPOP()) ||
-        getans("貼上標記的看板?(y/N)")=='n') return 0;
+        getans(gettext[3610])=='n') return 0;
     fav = get_current_fav();
     for (tmp = 0; tmp < fav->DataTail; tmp++) {
             bid = fav_getid(&fav->favh[tmp]);
@@ -578,7 +650,7 @@ choose_board(int newflag)
 	    load_boards(keyword);
 	    if (brdnum <= 0 && yank_flag > 0) {
 		if (keyword[0] != 0) {
-		    vmsg(I18N[510]);
+		    vmsg(gettext[510]);
 		    keyword[0] = 0;
 		    brdnum = -1;
 		    continue;
@@ -728,15 +800,15 @@ choose_board(int newflag)
 	    show_brdlist(head, 1, newflag);
 	    break;
 	case '/':
-	    getdata_buf(b_lines - 1, 0, I18N[511],
+	    getdata_buf(b_lines - 1, 0, gettext[511],
 			keyword, sizeof(keyword), DOECHO);
 	    brdnum = -1;
 	    break;
 	case 'S':
 	    if(yank_flag == 0){
 		move(b_lines - 2, 0);
-		prints(I18N[512]);
-		tmp = getans(I18N[513]);
+		prints(gettext[512]);
+		tmp = getans(gettext[513]);
 		if( tmp == '1' )
 		    fav_sort_by_name();
 		else if( tmp == '2' )
@@ -755,7 +827,7 @@ choose_board(int newflag)
 	    if (HAS_PERM(PERM_SYSOP)) {
 		ptr = &nbrd[num];
 		if (ptr->myattr & NBRD_SYMBOLIC) {
-		    if (getans(I18N[514]) == 'y')
+		    if (getans(gettext[514]) == 'y')
 			delete_symbolic_link(getbcache(ptr->bid), ptr->bid);
 		}
 		brdnum = -1;
@@ -792,7 +864,7 @@ choose_board(int newflag)
 	    }
 	    else if (HAS_PERM(PERM_LOGINOK) && yank_flag == 0) {
 		if (fav_add_line() == NULL) {
-		    vmsg(I18N[515]);
+		    vmsg(gettext[515]);
 		    break;
 		}
 		/* done move if it's the first item. */
@@ -815,7 +887,7 @@ choose_board(int newflag)
 		ptr = &nbrd[num];
 		if (yank_flag == 0) {
 		    if (ptr->myattr & NBRD_FAV) {
-			if (getans(I18N[516]) != 'y')
+			if (getans(gettext[516]) != 'y')
 			    break;
 			fav_remove_item(ptr->bid, get_fav_type(ptr));
 			ptr->myattr &= ~NBRD_FAV;
@@ -828,7 +900,7 @@ choose_board(int newflag)
 		    }
 		    else {
 			if (fav_add_board(ptr->bid) == NULL)
-			    vmsg(I18N[517]);
+			    vmsg(gettext[517]);
 			else
 			    ptr->myattr |= NBRD_FAV;
 		    }
@@ -850,14 +922,14 @@ choose_board(int newflag)
 	    if (HAS_PERM(PERM_LOGINOK) && yank_flag == 0) {
 		fav_type_t  *ft;
 		if (fav_stack_full()){
-		    vmsg(I18N[518]);
+		    vmsg(gettext[518]);
 		    break;
 		}
 		if ((ft = fav_add_folder()) == NULL) {
-		    vmsg(I18N[519]);
+		    vmsg(gettext[519]);
 		    break;
 		}
-		fav_set_folder_title(ft, I18N[520]);
+		fav_set_folder_title(ft, gettext[520]);
 		/* don't move if it's the first item */
 		if (get_fav_type(&nbrd[0]) != 0)
 		    move_in_current_folder(brdnum, num);
@@ -869,7 +941,7 @@ choose_board(int newflag)
 	    if (HAS_PERM(PERM_LOGINOK) && nbrd[num].myattr & NBRD_FOLDER) {
 		fav_type_t *ft = getfolder(nbrd[num].bid);
 		strlcpy(buf, get_item_title(ft), sizeof(buf));
-		getdata_buf(b_lines - 1, 0, I18N[521], buf, 65, DOECHO);
+		getdata_buf(b_lines - 1, 0, gettext[521], buf, 65, DOECHO);
 		fav_set_folder_title(ft, buf);
 		brdnum = -1;
 	    }
@@ -878,14 +950,14 @@ choose_board(int newflag)
 	    if (HAS_PERM(PERM_LOGINOK)) {
 		char c, fname[80];
 		if (!current_fav_at_root()) {
-		    vmsg(I18N[522]);
+		    vmsg(gettext[522]);
 		    break;
 		}
 
-		c = getans(I18N[523]);
+		c = getans(gettext[523]);
 		if(!c)
 		    break;
-		if(getans(I18N[524]) != 'y')
+		if(getans(gettext[524]) != 'y')
 		    break;
 		switch(c){
 		    case '1':
@@ -901,7 +973,7 @@ choose_board(int newflag)
 			setuserfile(fname, FAV4);
 			sprintf(buf, "%s.bak", fname);
 			if (!dashf(buf)){
-			    vmsg(I18N[525]);
+			    vmsg(gettext[525]);
 			    break;
 			}
                         Copy(buf, fname);
@@ -914,22 +986,22 @@ choose_board(int newflag)
 	    break;
 	case 'z':
 	    if (HAS_PERM(PERM_LOGINOK))
-		vmsg(I18N[526]);
+		vmsg(gettext[526]);
 	    break;
 	case 'Z':
 	    if (HAS_PERM(PERM_LOGINOK)) {
 		char genbuf[256];
-		sprintf(genbuf, I18N[527], cuser.uflag2 & FAVNEW_FLAG ? I18N[528] : "");
+		sprintf(genbuf, gettext[527], cuser.uflag2 & FAVNEW_FLAG ? gettext[528] : "");
 		if (getans(genbuf) != 'y')
 		    break;
 
 		cuser.uflag2 ^= FAVNEW_FLAG;
 		if (cuser.uflag2 & FAVNEW_FLAG) {
 		    subscribe_newfav();
-		    vmsg(I18N[529]);
+		    vmsg(gettext[529]);
 		}
 		else
-		    vmsg(I18N[530]);
+		    vmsg(gettext[530]);
 	    }
 	    break;
 

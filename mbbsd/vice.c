@@ -106,7 +106,7 @@ vice_main()
     i = 0;
     move(10, 24);
     clrtoeol();
-    prints(SHM->i18nstr[cuser.language][2373]);
+    prints(gettext[2373]);
     while (fgets(serial, 15, fd)) {
 	if ((ptr = strchr(serial, '\r')))
 	    *ptr = 0;
@@ -119,27 +119,27 @@ vice_main()
 	j += 9;
 	j %= 45;
     }
-    getdata(8, 0, SHM->i18nstr[cuser.language][2374],
+    getdata(8, 0, gettext[2374],
 	    ch, sizeof(ch), LCECHO);
     if (ch[0] != 'c' || lockutmpmode(VICE, LOCK_MULTI)) {
 	fclose(fd);
 	return 0;
     }
-    showtitle(SHM->i18nstr[cuser.language][2375], BBSNAME);
+    showtitle(gettext[2375], BBSNAME);
     rewind(fd);
     while (fgets(serial, 15, fd)) {
 	if ((ptr = strchr(serial, '\n')))
 	    *ptr = 0;
 	money = TABLE[check(tbingo, serial)];
 	total += money;
-	prints(SHM->i18nstr[cuser.language][2376], serial, money);
+	prints(gettext[2376], serial, money);
     }
     pressanykey();
     if (total > 0) {
 	ran_showmfile(VICE_WIN, MAX_WIN_PICTURE);
 	move(22, 0);
 	clrtoeol();
-	prints(SHM->i18nstr[cuser.language][2377], total);
+	prints(gettext[2377], total);
 	demoney(total);
     } else
 	ran_showmfile(VICE_LOST, MAX_LOST_PICTURE);

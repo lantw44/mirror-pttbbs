@@ -64,7 +64,6 @@ void
 setbdir(char *buf, char *boardname)
 {
     sprintf(buf, str_board_file, boardname[0], boardname,
-	    currmode & MODE_ETC ? ".ETC" :
 	    (currmode & MODE_DIGEST ? fn_mandex : str_dotdir));
 }
 
@@ -331,19 +330,19 @@ gettime(int line, time_t dt, char*head)
     move(line, 0); prints("%s",head);
     i=strlen(head);
     do {
-	getdata_buf(line, i, I18N[1878], yn, 5, LCECHO);
+	getdata_buf(line, i, gettext[1878], yn, 5, LCECHO);
     } while ((endtime.tm_year = atoi(yn) - 1900) < 0 || endtime.tm_year > 200);
     snprintf(yn, sizeof(yn), "%d", ptime->tm_mon + 1);
     do {
-	getdata_buf(line, i+15, I18N[1879], yn, 3, LCECHO);
+	getdata_buf(line, i+15, gettext[1879], yn, 3, LCECHO);
     } while ((endtime.tm_mon = atoi(yn) - 1) < 0 || endtime.tm_mon > 11);
     snprintf(yn, sizeof(yn), "%d", ptime->tm_mday);
     do {
-	getdata_buf(line, i+24, I18N[1880], yn, 3, LCECHO);
+	getdata_buf(line, i+24, gettext[1880], yn, 3, LCECHO);
     } while ((endtime.tm_mday = atoi(yn)) < 1 || endtime.tm_mday > 31);
     snprintf(yn, sizeof(yn), "%d", ptime->tm_hour);
     do {
-	getdata_buf(line, i+33, I18N[1881], yn, 3, LCECHO);
+	getdata_buf(line, i+33, gettext[1881], yn, 3, LCECHO);
     } while ((endtime.tm_hour = atoi(yn)) < 0 || endtime.tm_hour > 23);
     return mktime(&endtime);
 }
@@ -388,7 +387,7 @@ capture_screen()
     FILE           *fp;
     int             i;
 
-    getdata(b_lines - 2, 0, I18N[1882],
+    getdata(b_lines - 2, 0, gettext[1882],
 	    fname, 4, LCECHO);
     if (fname[0] != 'y')
 	return;
@@ -412,7 +411,7 @@ vmsg_lines(const int lines, const char msg[])
     if (msg)
         outs((char *)msg);
     else
-		outs(I18N[1883]);
+		outs(gettext[1883]);
     do {
 	if( (ch = igetch()) == Ctrl('T') )
 	    capture_screen();
@@ -479,7 +478,7 @@ search_num(int ch, int max)
     int             x, y;
     char            genbuf[10];
 
-    outmsg(I18N[1886]);
+    outmsg(gettext[1886]);
     outc(ch);
     genbuf[0] = ch;
     getyx(&y, &x);
@@ -528,7 +527,7 @@ void
 stand_title(char *title)
 {
     clear();
-    prints(I18N[1887], title);
+    prints(gettext[1887], title);
 }
 
 void
@@ -592,22 +591,29 @@ log_user(const char *fmt, ...)
     va_end(ap);
 
     sethomefile(filename, cuser.userid, "USERLOG");
-    return log_file(filename, 1, "%s: %s %s", cuser.userid, msg,  Cdate(&now));
+    return log_file(filename, LOG_CREAT | LOG_VF,
+		    "%s: %s %s", cuser.userid, msg,  Cdate(&now));
 }
 
-int log_file(char *fn, int ifcreate, const char *fmt,...)
+int log_file(char *fn, int flag, const char *fmt,...)
 {
     int     fd;
-    char   msg[256];
-    va_list ap;
-    va_start(ap, fmt);
-    vsnprintf(msg , 128, fmt, ap);
-    va_end(ap);
+    char    msg[256], *realmsg;
+    if( !(flag & LOG_VF) ){
+	realmsg = (char *)fmt;
+    }
+    else{
+	va_list ap;
+	va_start(ap, fmt);
+	vsnprintf(msg , 128, fmt, ap);
+	va_end(ap);
+	realmsg = msg;
+    }
 
-    if( (fd = open(fn, O_APPEND | O_WRONLY | (ifcreate ? O_CREAT : 0),
-		   (ifcreate ? 0664 : 0))) < 0 )
+    if( (fd = open(fn, O_APPEND | O_WRONLY | ((flag & LOG_CREAT)? O_CREAT : 0),
+		   ((flag & LOG_CREAT) ? 0664 : 0))) < 0 )
 	return -1;
-    if( write(fd, msg, strlen(msg)) < 0 ){
+    if( write(fd, realmsg, strlen(realmsg)) < 0 ){
 	close(fd);
 	return -1;
     }
@@ -622,11 +628,11 @@ show_help(int *index)
 
     clear();
     while (*index > 0 && *index < MAX_STRING) {
-    	str = I18N[*index];
+    	str = gettext[*index];
     	if (*str == '\0')
-    		prints(I18N[1888], str + 1);
+    		prints(gettext[1888], str + 1);
     	else if (*str == '\01')
-    		prints(I18N[1889], str + 1);
+    		prints(gettext[1889], str + 1);
     	else
     		prints("        %s\n", str);
     	index++;

@@ -32,20 +32,20 @@ show_ticket_data(char betname[MAX_ITEM][MAX_ITEM_LEN],char *direct, int *price, 
 
     clear();
     if (bh) {
-	snprintf(genbuf, sizeof(genbuf), I18N[1061], bh->brdname);
+	snprintf(genbuf, sizeof(genbuf), gettext[1061], bh->brdname);
 	if (bh->endgamble && now < bh->endgamble &&
 	    bh->endgamble - now < 3600) {
 	    snprintf(t, sizeof(t),
-		     I18N[1062], (int)(bh->endgamble - now));
+		     gettext[1062], (int)(bh->endgamble - now));
 	    showtitle(genbuf, t);
 	} else
 	    showtitle(genbuf, BBSNAME);
     } else
-	showtitle(I18N[1063], BBSNAME);
+	showtitle(gettext[1063], BBSNAME);
     move(2, 0);
     snprintf(genbuf, sizeof(genbuf), "%s/" FN_TICKET_ITEMS, direct);
     if (!(fp = fopen(genbuf, "r"))) {
-	prints(I18N[1064]);
+	prints(gettext[1064]);
 	snprintf(genbuf, sizeof(genbuf), "%s/" FN_TICKET_OUTCOME, direct);
 	more(genbuf, NA);
 	return 0;
@@ -56,11 +56,11 @@ show_ticket_data(char betname[MAX_ITEM][MAX_ITEM_LEN],char *direct, int *price, 
 	strtok(betname[count], "\r\n");
     fclose(fp);
 
-    prints(I18N[1065], *price,
-	   bh ? I18N[1066] :
-	        I18N[1067],
-	   bh ? I18N[1068] : "",
-	   bh ? I18N[1069] : I18N[1070]);
+    prints(gettext[1065], *price,
+	   bh ? gettext[1066] :
+	        gettext[1067],
+	   bh ? gettext[1068] : "",
+	   bh ? gettext[1069] : gettext[1070]);
 
 
     snprintf(genbuf, sizeof(genbuf), "%s/" FN_TICKET, direct);
@@ -70,7 +70,7 @@ show_ticket_data(char betname[MAX_ITEM][MAX_ITEM_LEN],char *direct, int *price, 
     }
     show_file(genbuf, 8, -1, NO_RELOAD);
     move(15, 0);
-    prints(I18N[1071]);
+    prints(gettext[1071]);
 
     total = load_ticket_record(direct, ticket);
 
@@ -80,9 +80,9 @@ show_ticket_data(char betname[MAX_ITEM][MAX_ITEM_LEN],char *direct, int *price, 
 	if (i == 3)
 	    prints("\n");
     }
-    prints(I18N[1072], total * (*price));
+    prints(gettext[1072], total * (*price));
     if (end) {
-	prints(I18N[1073]);
+	prints(gettext[1073]);
 	return -count;
     }
     return count;
@@ -136,7 +136,7 @@ ticket(int bid)
 	}
 	move(20, 0);
 	reload_money();
-	prints(I18N[1074], cuser.money, count);
+	prints(gettext[1074], cuser.money, count);
 	ch = igetch();
 	/*--
 	  Tim011127
@@ -154,7 +154,7 @@ ticket(int bid)
 	ch_buyitem(price, "etc/buyticket", &n, 0);
 
 	if (bid && !dashf(fn_ticket)) {
-	    vmsg(I18N[1075]);
+	    vmsg(gettext[1075]);
 	    break;
 	}
 
@@ -186,7 +186,7 @@ openticket(int bid)
     do {
 	do {
 	    getdata(20, 0,
-		    I18N[1076], buf, 3, LCECHO);
+		    gettext[1076], buf, 3, LCECHO);
 	    bet = atoi(buf);
 	    move(0, 0);
 	    clrtoeol();
@@ -195,13 +195,13 @@ openticket(int bid)
 	    unlockutmpmode();
 	    return 0;
 	}
-	getdata(21, 0, I18N[1077], buf, 3, LCECHO);
+	getdata(21, 0, gettext[1077], buf, 3, LCECHO);
     } while (bet != atoi(buf));
 
     if (fork()) {
 	/* Ptt: 用 fork() 防止不正常斷線洗錢 */
 	move(22, 0);
-	prints(I18N[1078]);
+	prints(gettext[1078]);
 	pressanykey();
 	unlockutmpmode();
 	return 0;
@@ -230,20 +230,20 @@ openticket(int bid)
     if (bet != 98) {
 	money = total * price;
 	demoney(money * 0.02);
-	mail_redenvelop(I18N[1079], cuser.userid, money * 0.02, 'n');
+	mail_redenvelop(gettext[1079], cuser.userid, money * 0.02, 'n');
 	money = ticket[bet] ? money * 0.95 / ticket[bet] : 9999999;
     } else {
-	vice(price * 10, I18N[1080]);
+	vice(price * 10, gettext[1080]);
 	money = price;
     }
     setbfile(outcome, bh->brdname, FN_TICKET_OUTCOME);
     if ((fp = fopen(outcome, "w"))) {
-	fprintf(fp, I18N[1081]);
+	fprintf(fp, gettext[1081]);
 	while (fgets(buf, sizeof(buf), fp1)) {
 	    buf[sizeof(buf)-1] = 0;
 	    fprintf(fp, "%s", buf);
 	}
-	fprintf(fp, I18N[1082]);
+	fprintf(fp, gettext[1082]);
 
 	fprintf(fp, "\033[33m");
 	for (i = 0; i < count; i++) {
@@ -254,15 +254,15 @@ openticket(int bid)
 	fprintf(fp, "\033[m\n");
 
 	if (bet != 98) {
-	    fprintf(fp, I18N[1083],
+	    fprintf(fp, gettext[1083],
 	    Cdatelite(&now), betname[bet], total * price, ticket[bet], total,
 		    (float)ticket[bet] / total, money);
 
-	    fprintf(fp, I18N[1084],
+	    fprintf(fp, gettext[1084],
 		    Cdatelite(&now), betname[bet], total * price, money,
 		    total ? (float)ticket[bet] / total : 0);
 	} else
-	    fprintf(fp, I18N[1085], Cdatelite(&now));
+	    fprintf(fp, gettext[1085], Cdatelite(&now));
 
     } // XXX somebody may use fp even fp==NULL
     fclose(fp1);
@@ -281,37 +281,37 @@ openticket(int bid)
 	while (fscanf(fp1, "%s %d %d\n", userid, &mybet, &i) != EOF) {
 	    if (bet == 98 && mybet >= 0 && mybet < count) {
 		if (fp)
-		    fprintf(fp, I18N[1086]
+		    fprintf(fp, gettext[1086]
 			    ,userid, i, betname[mybet], money * i);
 		snprintf(buf, sizeof(buf),
-			 I18N[1087], bh->brdname, money * i);
+			 gettext[1087], bh->brdname, money * i);
 	    } else if (mybet == bet) {
 		if (fp)
-		    fprintf(fp, I18N[1088]
+		    fprintf(fp, gettext[1088]
 			    ,userid, i, betname[mybet], money * i);
-		snprintf(buf, sizeof(buf), I18N[1089], bh->brdname, money * i);
+		snprintf(buf, sizeof(buf), gettext[1089], bh->brdname, money * i);
 	    } else
 		continue;
 	    if ((uid = searchuser(userid)) == 0)
 		continue;
 	    deumoney(uid, money * i);
-	    mail_id(userid, buf, "etc/ticket.win", I18N[1090]);
+	    mail_id(userid, buf, "etc/ticket.win", gettext[1090]);
 	}
 	fclose(fp1);
     }
     if (fp)
       {
-        fprintf(fp, "%s"BBSNAME"("MYHOSTNAME"%s%s\n", I18N[1091],
-                I18N[1092], fromhost);
+        fprintf(fp, "%s"BBSNAME"("MYHOSTNAME"%s%s\n", gettext[1091],
+                gettext[1092], fromhost);
 	fclose(fp);
       }
 
     if (bet != 98)
-	snprintf(buf, sizeof(buf), I18N[1093], bh->brdname);
+	snprintf(buf, sizeof(buf), gettext[1093], bh->brdname);
     else
-	snprintf(buf, sizeof(buf), I18N[1094], bh->brdname);
-    post_file(bh->brdname, buf, outcome, I18N[1095]);
-    post_file("Record", buf + 7, outcome, I18N[1096]);
+	snprintf(buf, sizeof(buf), gettext[1094], bh->brdname);
+    post_file(bh->brdname, buf, outcome, gettext[1095]);
+    post_file("Record", buf + 7, outcome, gettext[1096]);
 
     setbfile(buf, bh->brdname, FN_TICKET_RECORD);
     unlink(buf);

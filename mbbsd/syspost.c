@@ -17,8 +17,8 @@ post_msg(char *bname, char *title, char *msg, char *author)
     if (!fp)
 	return -1;
 
-    fprintf(fp, I18N[2551], author, bname, title);
-    fprintf(fp, I18N[2552], ctime(&now));
+    fprintf(fp, gettext[2551], author, bname, title);
+    fprintf(fp, gettext[2552], ctime(&now));
 
     /* 文章的內容 */
     fprintf(fp, "%s", msg);
@@ -67,13 +67,13 @@ post_change_perm(int oldperm, int newperm, char *sysopid, char *userid)
     if (!(fp = fopen(genbuf, "w")))
 	return;
 
-    fprintf(fp, I18N[2553], ctime(&now));
+    fprintf(fp, gettext[2553], ctime(&now));
     for (i = 5; i < NUMPERMS; i++) {
 	if (((oldperm >> i) & 1) != ((newperm >> i) & 1)) {
-	    fprintf(fp, I18N[2554],
+	    fprintf(fp, gettext[2554],
 		    sysopid,
-	       (((oldperm >> i) & 1) ? I18N[2555] : I18N[2556]),
-		    userid, I18N[str_permid[i]]);
+	       (((oldperm >> i) & 1) ? gettext[2555] : gettext[2556]),
+		    userid, gettext[str_permid[i]]);
 	    flag++;
 	}
     }
@@ -81,16 +81,16 @@ post_change_perm(int oldperm, int newperm, char *sysopid, char *userid)
     if (flag) {
 	clrtobot();
 	clear();
-	while (!getdata_str(5, 0, I18N[2557],
-			    reason, sizeof(reason), DOECHO, I18N[2558]));
-	fprintf(fp, I18N[2559],
+	while (!getdata_str(5, 0, gettext[2557],
+			    reason, sizeof(reason), DOECHO, gettext[2558]));
+	fprintf(fp, gettext[2559],
 		cuser.userid, reason);
 	fclose(fp);
 
 	snprintf(fhdr.title, sizeof(fhdr.title),
-		 I18N[2560],
+		 gettext[2560],
 		 cuser.userid, userid);
-	strlcpy(fhdr.owner, I18N[2561], sizeof(fhdr.owner));
+	strlcpy(fhdr.owner, gettext[2561], sizeof(fhdr.owner));
 	append_record("boards/S/Security/.DIR", &fhdr, sizeof(fhdr));
     } else
 	fclose(fp);
@@ -124,12 +124,12 @@ post_violatelaw(char *crime, char *police, char *reason, char *result)
     stampfile(genbuf, &fhdr);
     if (!(fp = fopen(genbuf, "w")))
 	return;
-    fprintf(fp, I18N[2562],
+    fprintf(fp, gettext[2562],
 	    crime, ctime(&now), police, crime, reason, result);
     fclose(fp);
     snprintf(fhdr.title, sizeof(fhdr.title),
-	     I18N[2563], crime);
-    strlcpy(fhdr.owner, I18N[2564], sizeof(fhdr.owner));
+	     gettext[2563], crime);
+    strlcpy(fhdr.owner, gettext[2564], sizeof(fhdr.owner));
 
     append_record("boards/V/ViolateLaw/.DIR", &fhdr, sizeof(fhdr));
 
@@ -139,11 +139,11 @@ void
 post_newboard(char *bgroup, char *bname, char *bms)
 {
     char            genbuf[256], title[128];
-    snprintf(title, sizeof(title), I18N[2565], bname);
+    snprintf(title, sizeof(title), gettext[2565], bname);
     snprintf(genbuf, sizeof(genbuf),
-	     I18N[2566],
+	     gettext[2566],
 	     cuser.userid, bname, bgroup, bms);
-    post_msg("Record", title, genbuf, I18N[2567]);
+    post_msg("Record", title, genbuf, gettext[2567]);
 }
 
 void
@@ -158,15 +158,15 @@ give_money_post(char *userid, int money)
     stampfile(genbuf, &fhdr);
     if (!(fp = fopen(genbuf, "w")))
 	return;
-    fprintf(fp, I18N[2568], cuser.userid, ctime(&now));
+    fprintf(fp, gettext[2568], cuser.userid, ctime(&now));
     clrtobot();
     clear();
-    fprintf(fp, I18N[2569],
+    fprintf(fp, gettext[2569],
 	    cuser.userid, userid, money);
 
     fclose(fp);
-    snprintf(fhdr.title, sizeof(fhdr.title), I18N[2570],
+    snprintf(fhdr.title, sizeof(fhdr.title), gettext[2570],
 	     cuser.userid);
-    strlcpy(fhdr.owner, I18N[2571], sizeof(fhdr.owner));
+    strlcpy(fhdr.owner, gettext[2571], sizeof(fhdr.owner));
     append_record("boards/S/Security/.DIR", &fhdr, sizeof(fhdr));
 }

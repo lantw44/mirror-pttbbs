@@ -637,3 +637,6 @@ char    reentrant_write_request = 0;
 #else
     #define COMMON_TIME (now)
 #endif
+
+/* I18N */
+char **gettext;

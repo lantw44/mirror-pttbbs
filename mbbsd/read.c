@@ -342,18 +342,19 @@ select_read(keeploc_t * locmem, int sr_mode)
    if(sr_mode & RS_AUTHOR)
            {
 	     if(!getdata(b_lines, 0,
-                 currmode & MODE_SELECT ? "增加條件 作者:":"搜尋作者:",
+                 currmode & MODE_SELECT ? gettext[3603]:gettext[3604],
                   keyword, IDLEN+1, LCECHO))
                 return READ_REDRAW; 
            }
    else if(sr_mode  & RS_KEYWORD)
           {
              if(!getdata(b_lines, 0, 
-                 currmode & MODE_SELECT ? "增加條件 標題:":"搜尋標題:",
+                 currmode & MODE_SELECT ? gettext[3605]:gettext[3606],
                  keyword, TTLEN, DOECHO))
                 return READ_REDRAW;
 #ifdef KEYWORD_LOG
-             log_file("keyword_search_log", 1, "%s:%s\n", currboard, keyword);
+             log_file("keyword_search_log", LOG_CREAT | LOG_VF,
+		      "%s:%s\n", currboard, keyword);
 #endif
           }
    else 
@@ -471,7 +472,7 @@ i_read_key(onekey_t * rcmdlist, keeploc_t * locmem,
 		mode =  NEWDIRECT;
 	    }
 	    else
-		mode =  (currmode & MODE_ETC) ? board_etc() :
+		mode =  
 		    (currmode & MODE_DIGEST) ? board_digest() : DOQUIT;
 	    break;
         case Ctrl('L'):
@@ -643,7 +644,7 @@ i_read_key(onekey_t * rcmdlist, keeploc_t * locmem,
     case KEY_RIGHT:
 	ch = 'r';
     default:
-	if( ch == 'h' && currmode & (MODE_ETC | MODE_DIGEST) )
+	if( ch == 'h' && currmode & (MODE_DIGEST) )
 	    break;
 	if (ch > 0 && ch <= onekey_size) {
 	    int (*func)() = rcmdlist[ch - 1];

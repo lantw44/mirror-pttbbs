@@ -95,18 +95,18 @@ static void
 show_data(void)
 {
     move(0, 0);
-    prints(I18N[3441]);
-    prints(I18N[3442]);
-    prints(I18N[3443]);
-    prints(I18N[3444]);
-    prints(I18N[3445]);
-    prints(I18N[3446]);
-    prints(I18N[3447]);
-    prints(I18N[3448]);
-    prints(I18N[3449]);
-    prints(I18N[3450]);
-    prints(I18N[3451]);
-    prints(I18N[3452]);
+    prints(gettext[3441]);
+    prints(gettext[3442]);
+    prints(gettext[3443]);
+    prints(gettext[3444]);
+    prints(gettext[3445]);
+    prints(gettext[3446]);
+    prints(gettext[3447]);
+    prints(gettext[3448]);
+    prints(gettext[3449]);
+    prints(gettext[3450]);
+    prints(gettext[3451]);
+    prints(gettext[3452]);
 }
 
 static void
@@ -175,7 +175,7 @@ del(int value[100],int total, dicedata_t * table)
 	do {
 	    move(22, 0);
 	    clrtoeol();
-	    getdata(21, 0, I18N[3453], data, 3, LCECHO);
+	    getdata(21, 0, gettext[3453], data, 3, LCECHO);
 	    if (data[0] == 'q' || data[0] == 'Q')
 		return 0;
 	} while (!IsNum(data, strlen(data)));
@@ -184,20 +184,20 @@ del(int value[100],int total, dicedata_t * table)
 	for (i = 0; i < total; i++) {
 	    if (table[i].mybet == index) {
 		do {
-		    getdata(21, 0, I18N[3454], data, 10, LCECHO);
+		    getdata(21, 0, gettext[3454], data, 10, LCECHO);
 		} while (!IsNum(data, strlen(data)));
 		money = atoi(data);
 		if (money > table[i].mymoney) {
 		    move(22, 0);
 		    clrtoeol();
-		    prints(I18N[3455]);
+		    prints(gettext[3455]);
 		    i--;
 		    continue;
 		}
 		demoney(money);
 		move(19, 0);
 		clrtoeol();
-		prints(I18N[3456], cuser.money);
+		prints(gettext[3456], cuser.money);
 		table[i].mymoney -= money;
 		show_count(value, index, -money);
 		break;
@@ -229,81 +229,81 @@ show_output(int bet[])
 	prints("                               ");
     }
     move(12, 0);
-    prints(I18N[3457]);
-    prints(I18N[3458]);
+    prints(gettext[3457]);
+    prints(gettext[3458]);
     for (i = 0; i < 3; i++, j += 25) {
 	switch (bet[i]) {
 	case 1:
 	    move(13, j);
-	    prints(I18N[3459]);
+	    prints(gettext[3459]);
 	    move(14, j);
-	    prints(I18N[3460]);
+	    prints(gettext[3460]);
 	    move(15, j);
-	    prints(I18N[3461]);
+	    prints(gettext[3461]);
 	    move(16, j);
-	    prints(I18N[3462]);
+	    prints(gettext[3462]);
 	    move(17, j);
-	    prints(I18N[3463]);
+	    prints(gettext[3463]);
 	    break;
 	case 2:
 	    move(13, j);
-	    prints(I18N[3464]);
+	    prints(gettext[3464]);
 	    move(14, j);
-	    prints(I18N[3465]);
+	    prints(gettext[3465]);
 	    move(15, j);
-	    prints(I18N[3466]);
+	    prints(gettext[3466]);
 	    move(16, j);
-	    prints(I18N[3467]);
+	    prints(gettext[3467]);
 	    move(17, j);
-	    prints(I18N[3468]);
+	    prints(gettext[3468]);
 	    break;
 	case 3:
 	    move(13, j);
-	    prints(I18N[3469]);
+	    prints(gettext[3469]);
 	    move(14, j);
-	    prints(I18N[3470]);
+	    prints(gettext[3470]);
 	    move(15, j);
-	    prints(I18N[3471]);
+	    prints(gettext[3471]);
 	    move(16, j);
-	    prints(I18N[3472]);
+	    prints(gettext[3472]);
 	    move(17, j);
-	    prints(I18N[3473]);
+	    prints(gettext[3473]);
 	    break;
 	case 4:
 	    move(13, j);
-	    prints(I18N[3474]);
+	    prints(gettext[3474]);
 	    move(14, j);
-	    prints(I18N[3475]);
+	    prints(gettext[3475]);
 	    move(15, j);
-	    prints(I18N[3476]);
+	    prints(gettext[3476]);
 	    move(16, j);
-	    prints(I18N[3477]);
+	    prints(gettext[3477]);
 	    move(17, j);
-	    prints(I18N[3478]);
+	    prints(gettext[3478]);
 	    break;
 	case 5:
 	    move(13, j);
-	    prints(I18N[3479]);
+	    prints(gettext[3479]);
 	    move(14, j);
-	    prints(I18N[3480]);
+	    prints(gettext[3480]);
 	    move(15, j);
-	    prints(I18N[3481]);
+	    prints(gettext[3481]);
 	    move(16, j);
-	    prints(I18N[3482]);
+	    prints(gettext[3482]);
 	    move(17, j);
-	    prints(I18N[3483]);
+	    prints(gettext[3483]);
 	    break;
 	case 6:
 	    move(13, j);
-	    prints(I18N[3484]);
+	    prints(gettext[3484]);
 	    move(14, j);
-	    prints(I18N[3485]);
+	    prints(gettext[3485]);
 	    move(15, j);
-	    prints(I18N[3486]);
+	    prints(gettext[3486]);
 	    move(16, j);
-	    prints(I18N[3487]);
+	    prints(gettext[3487]);
 	    move(17, j);
-	    prints(I18N[3488]);
+	    prints(gettext[3488]);
 	    break;
 	}
     }
@@ -324,7 +324,7 @@ dice_main(void)
     reload_money();
     if (cuser.money < 10) {
 	move(19, 0);
-	prints(I18N[3489]);
+	prints(gettext[3489]);
 	pressanykey();
 	return 0;
     }
@@ -347,15 +347,15 @@ dice_main(void)
 
 	while (1) {
 	    move(19, 0);
-	    prints(I18N[3490],
+	    prints(gettext[3490],
 		   cuser.money);
-	    getdata(20, 0, I18N[3491],
+	    getdata(20, 0, gettext[3491],
 		    input, 5, LCECHO);
 	    reload_money();
 	    if (input[0] != 's' && input[0] != 'd' && cuser.money < 10) {
 		move(21, 0);
 		clrtoeol();
-		prints(I18N[3492]);
+		prints(gettext[3492]);
 		continue;
 	    }
 	    if (input[0] == 'd' || input[0] == 'D') {
@@ -375,7 +375,7 @@ dice_main(void)
 	    while (1) {
 		if (cuser.money < 10)
 		    break;
-		getdata(21, 0, I18N[3493], input, sizeof(input), LCECHO);
+		getdata(21, 0, gettext[3493], input, sizeof(input), LCECHO);
 		if (!(money = IsLegal(input)) || input[0] == '0')
 		    continue;
 		reload_money();
@@ -389,7 +389,7 @@ dice_main(void)
 			    sig = 1;
 			    break;
 			} else {
-			    vice(money, I18N[3494]);
+			    vice(money, gettext[3494]);
 			    table[j].mymoney += money;
 			    j = -1;
 			    break;
@@ -403,13 +403,13 @@ dice_main(void)
 		    bzero((char *)&table[i], sizeof(dicedata_t));
 		    table[i].mybet = index;
 		    table[i++].mymoney = money;
-		    vice(money, I18N[3495]);
+		    vice(money, gettext[3495]);
 		}
 		break;
 	    }
 	    reload_money();
 	    move(19, 0);
-	    prints(I18N[3496],
+	    prints(gettext[3496],
 		   cuser.money);
 	    if (sig != 2)
 		show_count(value,index, money);
@@ -434,7 +434,7 @@ dice_main(void)
 	    total += table[j].mymoney * ya;
 	    if (table[j].mymoney * ya > 500) {	/* 超過500塊錢才做log 減少io */
 		snprintf(data, sizeof(data),
-			 I18N[3497],
+			 gettext[3497],
 			 cuser.userid, table[j].mybet,
 			 table[j].mymoney, ya, table[j].mymoney * ya);
 		fputs(data, winfp);
@@ -444,19 +444,19 @@ dice_main(void)
 
 	if (total > 0) {
 	    move(21, 0);
-	    prints(I18N[3498], total);
+	    prints(gettext[3498], total);
 	} else {
 	    move(21, 0);
 	    clrtoeol();
-	    prints(I18N[3499]);
+	    prints(gettext[3499]);
 	}
 
 	move(19, 0);
 	clrtoeol();
-	prints(I18N[3500],
+	prints(gettext[3500],
 	       cuser.money);
 
-	getdata(23, 0, I18N[3501],
+	getdata(23, 0, gettext[3501],
 		input, 2, LCECHO);
     } while (input[0] != 'n' && input[0] != 'N');
     fclose(winfp);

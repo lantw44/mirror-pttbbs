@@ -31,12 +31,12 @@ showtitle(char *title, char *mid)
     }
 #else
     else if (currutmp->mailalert) {
-    snprintf(buf1, sizeof(buf1), "%s"TITLE_COLOR, I18N[1380]);
+    snprintf(buf1, sizeof(buf1), "%s"TITLE_COLOR, gettext[1380]);
 	mid = buf1;
 	spc = 22;
     } else if (HAS_PERM(PERM_SYSOP) && (nreg = dashs(fn_register) / 163) > 10) {
 	snprintf(numreg, sizeof(numreg),
-		 I18N[1381],
+		 gettext[1381],
 		 nreg, (int)dashs("register.new.tmp") / 163, TITLE_COLOR);
 	mid = numreg;
 	spc = 22;
@@ -50,10 +50,10 @@ showtitle(char *title, char *mid)
     buf[spc] = '\0';
 
     clear();
-    prints(I18N[1382], TITLE_COLOR,
+    prints(gettext[1382], TITLE_COLOR,
 	   title, buf, mid, buf, " " + pad,
-	currmode & MODE_SELECT ? I18N[1383] : currmode & MODE_ETC ? I18N[1384] :
-	   currmode & MODE_DIGEST ? I18N[1385] : I18N[1386]);
+	currmode & MODE_SELECT ? gettext[1383] :
+	   currmode & MODE_DIGEST ? gettext[1385] : gettext[1386]);
 
     if (strcmp(currboard, lastboard)) {	/* change board */
 	if (currboard[0] != 0 &&
@@ -68,8 +68,8 @@ showtitle(char *title, char *mid)
 	prints("\033[32m%s", currboard);
     else
 	prints("%s", currboard);
-    prints(I18N[1387], currmode & MODE_SELECT ? 6 :
-	   currmode & MODE_ETC ? 5 : currmode & MODE_DIGEST ? 2 : 7);
+    prints(gettext[1387], currmode & MODE_SELECT ? 6 :
+	   currmode & MODE_DIGEST ? 2 : 7);
 }
 
 /* 動畫處理 */
@@ -83,15 +83,15 @@ show_status(void)
     int i;
     struct tm      *ptime = localtime(&now);
     char            mystatus[160];
-    char           *myweek = I18N[1388];
-    const char     *msgs[] = {I18N[1389], I18N[1390], I18N[1391], I18N[1392], I18N[1393]};
+    char           *myweek = gettext[1388];
+    const char     *msgs[] = {gettext[1389], gettext[1390], gettext[1391], gettext[1392], gettext[1393]};
 
     i = ptime->tm_wday << 1;
     snprintf(mystatus, sizeof(mystatus),
-	     I18N[1394],
+	     gettext[1394],
 	     ptime->tm_mon + 1, ptime->tm_mday, myweek[i], myweek[i + 1],
 	     ptime->tm_hour, ptime->tm_min, currutmp->birth ?
-	     I18N[1395] : SHM->today_is,
+	     gettext[1395] : SHM->today_is,
 	     SHM->UTMPnumber, cuser.userid, msgs[currutmp->pager]);
     outmsg(mystatus);
 }
@@ -155,8 +155,8 @@ show_menu(commands_t * p)
     move(menu_row, 0);
     while (p[n].desc > 0 && p[n].desc < MAX_STRING) {
 	if (HAS_PERM(p[n].level)) {
-		s = I18N[p[n].desc];
-	    snprintf(buf, sizeof(buf), s + 2, I18N[1396 + cuser.proverb % 4]);
+		s = gettext[p[n].desc];
+	    snprintf(buf, sizeof(buf), s + 2, gettext[1396 + cuser.proverb % 4]);
 	    prints("%*s  (\033[1;36m%c\033[0m)%s\n", menu_column, "", s[1],
 		   buf);
 	}
@@ -261,15 +261,15 @@ domenu(int cmdmode, char *cmdtitle, int cmd, commands_t cmdtable[])
 		    refscreen = YEA;
 
 		if (err != -1)
-		    cmd = I18N[cmdtable[lastcmdptr].desc][0];
+		    cmd = gettext[cmdtable[lastcmdptr].desc][0];
 		else
-		    cmd = I18N[cmdtable[lastcmdptr].desc][1];
-		cmd0[cmdmode] = I18N[cmdtable[lastcmdptr].desc][0];
+		    cmd = gettext[cmdtable[lastcmdptr].desc][1];
+		cmd0[cmdmode] = gettext[cmdtable[lastcmdptr].desc][0];
 	    }
 	    if (cmd >= 'a' && cmd <= 'z')
 		cmd &= ~0x20;
 	    while (++i <= total)
-		if (I18N[cmdtable[i].desc][1] == cmd)
+		if (gettext[cmdtable[i].desc][1] == cmd)
 		    break;
 	}
 
@@ -343,6 +343,11 @@ static commands_t talklist[] = {
     {t_talk, PERM_PAGE,     1426},
     {t_chat, PERM_CHAT,     1427},
     {t_display, 0,          1428},
+#if HAVE_FREECLOAK
+    {u_cloak, PERM_LOGINOK, 1443},
+#else
+    {u_cloak, PERM_CLOAK,   1444},
+#endif    
     {NULL, 0, -1}
 };
 
@@ -375,17 +380,14 @@ static commands_t userlist[] = {
     {u_editcalendar, PERM_LOGINOK,    1436},
     {u_loginview, PERM_LOGINOK,     1437},
     {u_ansi, 0, 1438},
+    {u_language, PERM_LOGINOK, 3612},
     {u_movie, 0,                    1439},
 #ifdef  HAVE_SUICIDE
     {u_kill, PERM_BASIC,            1440},
 #endif
     {u_editplan, PERM_LOGINOK,      1441},
     {u_editsig, PERM_LOGINOK,       1442},
-#if HAVE_FREECLOAK
-    {u_cloak, PERM_LOGINOK,           1443},
-#else
-    {u_cloak, PERM_CLOAK,           1444},
-#endif
+
     {u_register, PERM_BASIC,        1445},
     {u_list, PERM_SYSOP,            1446},
     {NULL, 0, -1}
@@ -428,7 +430,7 @@ static commands_t moneylist[] = {
 };
 
 static int p_money() {
-    domenu(PSALE, I18N[1467], '0', moneylist);
+    domenu(PSALE, gettext[1467], '0', moneylist);
     return 0;
 };
 
@@ -443,7 +445,7 @@ static commands_t jceelist[] = {
 };
 
 static int m_jcee() {
-    domenu(JCEE, I18N[1473], '0', jceelist);
+    domenu(JCEE, gettext[1473], '0', jceelist);
     return 0;
 }
 #endif
@@ -480,7 +482,7 @@ static commands_t chesslist[] = {
 };
 
 static int chessroom() {
-    domenu(CHC, I18N[1486], '1', chesslist);
+    domenu(CHC, gettext[1486], '1', chesslist);
     return 0;
 }
 
@@ -501,7 +503,7 @@ static commands_t plist[] = {
 };
 
 static int playground() {
-    domenu(AMUSE, I18N[1495],'1',plist);
+    domenu(AMUSE, gettext[1495],'1',plist);
     return 0;
 }
 
@@ -513,7 +515,7 @@ static commands_t slist[] = {
 };
 
 static int forsearch() {
-    domenu(SREG, I18N[1499], '1', slist);
+    domenu(SREG, gettext[1499], '1', slist);
     return 0;
 }
 
@@ -521,43 +523,43 @@ static int forsearch() {
 
 int admin()
 {
-    domenu(ADMIN, I18N[1500], 'X', adminlist);
+    domenu(ADMIN, gettext[1500], 'X', adminlist);
     return 0;
 }
 
 int Mail()
 {
-    domenu(MAIL, I18N[1501], 'R', maillist);
+    domenu(MAIL, gettext[1501], 'R', maillist);
     return 0;
 }
 
 int Talk()
 {
-    domenu(TMENU, I18N[1502], 'U', talklist);
+    domenu(TMENU, gettext[1502], 'U', talklist);
     return 0;
 }
 
 int User()
 {
-    domenu(UMENU, I18N[1503], 'A', userlist);
+    domenu(UMENU, gettext[1503], 'A', userlist);
     return 0;
 }
 
 int Xyz()
 {
-    domenu(XMENU, I18N[1504], 'M', xyzlist);
+    domenu(XMENU, gettext[1504], 'M', xyzlist);
     return 0;
 }
 
 int Play_Play()
 {
-    domenu(PMENU, I18N[1505], 'A', playlist);
+    domenu(PMENU, gettext[1505], 'A', playlist);
     return 0;
 }
 
 int Name_Menu()
 {
-    domenu(NMENU, I18N[1506], 'O', namelist);
+    domenu(NMENU, gettext[1506], 'O', namelist);
     return 0;
 }
  

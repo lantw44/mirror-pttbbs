@@ -68,7 +68,7 @@ sortsong()
     }
     qsort(songs, MAX_SONGS, sizeof(songcmp_t), (QCAST) count_cmp);
     fprintf(fo,
-	    I18N[2078], totalcount);
+	    gettext[2078], totalcount);
     for (n = 0; n < 100 && songs[n].name[0]; n++) {
 	fprintf(fo, "      %5d. %-38.38s %4ld \033[32m[%.2f]\033[m\n", n + 1,
 		songs[n].name, songs[n].count,

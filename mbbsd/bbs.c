@@ -1,11 +1,13 @@
 /* $Id$ */
 #include "bbs.h"
 
+#define WHEREAMI_LEVEL	16
+
 static int recommend(int ent, fileheader_t * fhdr, char *direct);
 
 #ifdef ASSESS
 static char *badpost_reason[] = {
-    I18N[245], I18N[246], I18N[247]
+    gettext[245], gettext[246], gettext[247]
 };
 #endif
 
@@ -30,11 +32,11 @@ mail_by_link(char *owner, char *title, char *path)
 void
 anticrosspost()
 {
-	log_file("etc/illegal_money", 1, I18N[248], cuser.userid, ctime(&now));
-    post_violatelaw(cuser.userid, I18N[249], "Cross-post", I18N[250]);
+	log_file("etc/illegal_money", 1, gettext[248], cuser.userid, ctime(&now));
+    post_violatelaw(cuser.userid, gettext[249], "Cross-post", gettext[250]);
     cuser.userlevel |= PERM_VIOLATELAW;
     cuser.vl_count++;
-    mail_by_link(I18N[251], I18N[252],
+    mail_by_link(gettext[251], gettext[252],
 		 BBSHOME "/etc/crosspost.txt");
     u_exit("Cross Post");
     exit(0);
@@ -48,39 +50,39 @@ save_violatelaw()
 
     setutmpmode(VIOLATELAW);
     clear();
-    stand_title(I18N[253]);
+    stand_title(gettext[253]);
 
     if (!(cuser.userlevel & PERM_VIOLATELAW)) {
-	mouts(22, 0, I18N[254]);
+	mouts(22, 0, gettext[254]);
 	pressanykey();
 	return 0;
     }
     reload_money();
     if (cuser.money < (int)cuser.vl_count * 1000) {
-	snprintf(buf, sizeof(buf), I18N[255],
+	snprintf(buf, sizeof(buf), gettext[255],
            (int)cuser.vl_count, (int)cuser.vl_count * 1000, cuser.money);
 	mouts(22, 0, buf);
 	pressanykey();
 	return 0;
     }
     move(5, 0);
-    prints(I18N[256]);
-    prints(I18N[257]);
+    prints(gettext[256]);
+    prints(gettext[257]);
 
-    if (!getdata(10, 0, I18N[258], ok, sizeof(ok), LCECHO) ||
+    if (!getdata(10, 0, gettext[258], ok, sizeof(ok), LCECHO) ||
 	ok[0] == 'n' || ok[0] == 'N') {
-	mouts(22, 0, I18N[259]);
+	mouts(22, 0, gettext[259]);
 	pressanykey();
 	return 0;
     }
-    snprintf(buf, sizeof(buf), I18N[260],
+    snprintf(buf, sizeof(buf), gettext[260],
 	     cuser.vl_count, cuser.vl_count * 1000);
     mouts(11, 0, buf);
 
-    if (!getdata(10, 0, I18N[261], ok, sizeof(ok), LCECHO) ||
+    if (!getdata(10, 0, gettext[261], ok, sizeof(ok), LCECHO) ||
 	ok[0] == 'N' || ok[0] == 'n') {
 
-	mouts(22, 0, I18N[262]);
+	mouts(22, 0, gettext[262]);
 	pressanykey();
 	return 0;
     }
@@ -109,9 +111,9 @@ set_board()
     }
     board_note_time = &bp->bupdate;
     if(bp->BM[0] <= ' ')
-	strcpy(currBM, I18N[263]);
+	strcpy(currBM, gettext[263]);
     else
-	snprintf(currBM, sizeof(currBM), I18N[264], bp->BM);
+	snprintf(currBM, sizeof(currBM), gettext[264], bp->BM);
 
     /* init basic perm, but post perm is checked on demand */
     currmode = (currmode & (MODE_DIRTY | MODE_GROUPOP)) | MODE_STARTED;
@@ -143,12 +145,12 @@ readtitle()
 
     bp = getbcache(currbid);
     if(bp->bvote != 2 && bp->bvote)
-	brd_title = I18N[265];
+	brd_title = gettext[265];
     else
 	brd_title = bp->title + 7;
 
     showtitle(currBM, brd_title);
-    prints(I18N[266], SHM->bcache[currbid - 1].nuser);
+    prints(gettext[266], SHM->bcache[currbid - 1].nuser);
 }
 
 static void
@@ -175,18 +177,18 @@ readdoent(int num, fileheader_t * ent)
     }
     title = subject(mark = ent->title);
     if (ent->filemode & FILE_VOTE)
-	color = '2', mark = I18N[267];
+	color = '2', mark = gettext[267];
     else if (ent->filemode & FILE_BID)
-	color = '6', mark = I18N[268];
+	color = '6', mark = gettext[268];
     else if (title == mark)
-	color = '1', mark = I18N[269];
+	color = '1', mark = gettext[269];
     else
 	color = '3', mark = "R:";
 
     if (title[45])
-	strlcpy(title + 42, I18N[270], sizeof(title) - 42);	/* 把多餘的 string 砍掉 */
+	strlcpy(title + 42, gettext[270], sizeof(title) - 42);	/* 把多餘的 string 砍掉 */
 
-    if (!strncmp(title, I18N[271], 6))
+    if (!strncmp(title, gettext[271], 6))
 	special = 1;
 #if 1
     if (!strchr(ent->owner, '.') && !SHM->GV2.e.noonlineuser &&
@@ -199,11 +201,15 @@ readdoent(int num, fileheader_t * ent)
 	isonline = 1;
 #endif
     if(ent->recommend>99)
-	  strcpy(recom,I18N[272]);
+	  strcpy(recom,gettext[272]);
     else if(ent->recommend>9)
 	  sprintf(recom,"3m%2d",ent->recommend);
     else if(ent->recommend>0)
 	  sprintf(recom,"2m%2d",ent->recommend);
+    else if(ent->recommend<-99)
+	  sprintf(recom,"1m劣");
+    else if(ent->recommend<-10)
+	  sprintf(recom,"0mX%d",-ent->recommend);
     else strcpy(recom,"0m  "); 
 
     prints(
@@ -229,7 +235,7 @@ readdoent(int num, fileheader_t * ent)
 int
 whereami(int ent, fileheader_t * fhdr, char *direct)
 {
-    boardheader_t  *bh, *p[32], *root;
+    boardheader_t  *bh, *p[WHEREAMI_LEVEL], *root;
     int             i, j;
 
     if (!currutmp->brc_id)
@@ -240,10 +246,10 @@ whereami(int ent, fileheader_t * fhdr, char *direct)
     bh = getbcache(currutmp->brc_id);
     root = getbcache(1);
     p[0] = bh;
-    for (i = 0; i < 31 && p[i]->parent != root && p[i]->parent; i++)
+    for (i = 0; i < WHEREAMI_LEVEL && p[i]->parent != root && p[i]->parent; i++)
 	p[i + 1] = p[i]->parent;
     j = i;
-    prints(I18N[273], p[j]->title + 7, p[j]->BM);
+    prints(gettext[273], p[j]->title + 7, p[j]->BM);
     for (j--; j >= 0; j--)
 	prints("%*s %-13.13s %-37.37s %.13s\n", (i - j) * 2, "",
 	       p[j]->brdname, p[j]->title,
@@ -370,10 +376,10 @@ do_reply_title(int row, char *title)
     else
 	strlcpy(save_title, title, sizeof(save_title));
     save_title[TTLEN - 1] = '\0';
-    snprintf(genbuf, sizeof(genbuf), I18N[274], save_title);
+    snprintf(genbuf, sizeof(genbuf), gettext[274], save_title);
     getdata(row, 0, genbuf, genbuf2, 4, LCECHO);
     if (genbuf2[0] == 'n' || genbuf2[0] == 'N')
-	getdata(++row, 0, I18N[275], save_title, TTLEN, DOECHO);
+	getdata(++row, 0, gettext[275], save_title, TTLEN, DOECHO);
 }
 
 static void
@@ -415,7 +421,7 @@ do_crosspost(char *brd, fileheader_t *postfile, const char *fpath)
     stampfile(genbuf, &fh);
     strcpy(fh.owner, postfile->owner);
     strcpy(fh.date, postfile->date);
-    sprintf(fh.title,I18N[276],  len, len, postfile->title, currboard);
+    sprintf(fh.title,gettext[276],  len, len, postfile->title, currboard);
     unlink(genbuf);
     Link((char *)fpath, genbuf);
     postfile->filemode = FILE_LOCAL;
@@ -428,53 +434,53 @@ static void
 setupbidinfo(bid_t *bidinfo)
 {
         char buf[256];
-        bidinfo->enddate = gettime(20, now+86400,I18N[277]);
+        bidinfo->enddate = gettime(20, now+86400,gettext[277]);
         do
-         getdata_str(21,0,I18N[278],buf, 8, LCECHO, "1");
+         getdata_str(21,0,gettext[278],buf, 8, LCECHO, "1");
         while((bidinfo->high=atoi(buf))<=0);
         do
-           getdata_str(21,20, I18N[279],buf, 5, LCECHO, "1");
+           getdata_str(21,20, gettext[279],buf, 5, LCECHO, "1");
         while((bidinfo->increment=atoi(buf))<=0);
-        getdata(21,44, I18N[280],buf, 10, LCECHO);
+        getdata(21,44, gettext[280],buf, 10, LCECHO);
         bidinfo->buyitnow=atoi(buf);
 	
         getdata_str(22,0,
-          I18N[281],
+          gettext[281],
           buf, 3, LCECHO,"1");
           bidinfo->payby=(buf[0]-'1');
         if(bidinfo->payby<0 ||bidinfo->payby>3)bidinfo->payby=0;
-        getdata_str(23,0, I18N[282], buf, 6, LCECHO, "0"); 
+        getdata_str(23,0, gettext[282], buf, 6, LCECHO, "0"); 
         bidinfo->shipping = atoi(buf);
         if(bidinfo->shipping<0)  bidinfo->shipping=0;
 }
 static void
 print_bidinfo(FILE *io, bid_t bidinfo)
 {
-    char *payby[4]={ I18N[283],I18N[284],I18N[285],I18N[286]};
+    char *payby[4]={ gettext[283],gettext[284],gettext[285],gettext[286]};
     if(io)
     {
      if(!bidinfo.userid[0])
-      fprintf(io,I18N[287],bidinfo.high);
+      fprintf(io,gettext[287],bidinfo.high);
      else 
-      fprintf(io, I18N[288],bidinfo.high, bidinfo.userid);
-     fprintf(io, I18N[289],payby[bidinfo.payby%4],Cdate(& bidinfo.enddate));
+      fprintf(io, gettext[288],bidinfo.high, bidinfo.userid);
+     fprintf(io, gettext[289],payby[bidinfo.payby%4],Cdate(& bidinfo.enddate));
      if(bidinfo.buyitnow)
-      fprintf(io, I18N[290],bidinfo.buyitnow);
+      fprintf(io, gettext[290],bidinfo.buyitnow);
      if(bidinfo.shipping)
-      fprintf(io, I18N[291], bidinfo.shipping);
+      fprintf(io, gettext[291], bidinfo.shipping);
      fprintf(io, "\n");
     }
     else
     {
      if(!bidinfo.userid[0])
-      prints(I18N[292],bidinfo.high);
+      prints(gettext[292],bidinfo.high);
      else 
-      prints(I18N[293],bidinfo.high, bidinfo.userid);
-     prints(I18N[294],payby[bidinfo.payby%4],Cdate(& bidinfo.enddate));
+      prints(gettext[293],bidinfo.high, bidinfo.userid);
+     prints(gettext[294],payby[bidinfo.payby%4],Cdate(& bidinfo.enddate));
      if(bidinfo.buyitnow)
-      prints(I18N[295],bidinfo.buyitnow);
+      prints(gettext[295],bidinfo.buyitnow);
      if(bidinfo.shipping)
-      prints(I18N[296], bidinfo.shipping);
+      prints(gettext[296], bidinfo.shipping);
      prints("\n");
     }
 
@@ -500,7 +506,7 @@ do_general(int isbid)
 	    && !((cuser.uflag2 & FOREIGN) && strcmp(bp->brdname, "PttForeign") == 0)
 #endif
 	) {
-	vmsg(I18N[305]);
+	vmsg(gettext[305]);
 	return READ_REDRAW;
     }
 #ifdef NO_WATER_POST
@@ -508,7 +514,7 @@ do_general(int isbid)
     /* 三分鐘內最多發表五篇文章 */
     if (currutmp->lastact - last_post_time < 60 * 3) {
 	if (water_counts >= 5) {
-	    vmsg(I18N[306]);
+	    vmsg(gettext[306]);
 	    return READ_REDRAW;
 	}
     } else {
@@ -531,8 +537,8 @@ do_general(int isbid)
    	   more("etc/" FN_POST_BID, NA);
       }
     move(19, 0);
-    prints(I18N[307],
-           isbid?I18N[308]:I18N[309],
+    prints(gettext[307],
+           isbid?gettext[308]:gettext[309],
 	  currboard, bp->title + 7);
 
     if(isbid)
@@ -549,15 +555,15 @@ do_general(int isbid)
 	if(!isbid)
         {
          move(21,0);
-         prints(I18N[310]);
+         prints(gettext[310]);
          for(i=0; i<8 ; i++)
-         	strlcpy(ctype[i], I18N[297 + i], sizeof(ctype[0]));
+         	strlcpy(ctype[i], gettext[297 + i], sizeof(ctype[0]));
          for(i=0; i<8 && bp->posttype[i*4]; i++)
             strncpy(ctype[i],bp->posttype+4*i,4);
          if(i==0) i=8;
          for(aborted=0; aborted<i; aborted++)
             prints("%d.%4.4s ", aborted+1, ctype[aborted]);
-         sprintf(buf,I18N[311],i);
+         sprintf(buf,gettext[311],i);
          getdata(21, 6+7*i, buf, save_title, 3, LCECHO); 
 	 posttype = save_title[0] - '1';
 	 if (posttype >= 0 && posttype < i)
@@ -569,7 +575,7 @@ do_general(int isbid)
             posttype=-1;
            }
 	}
-	getdata_buf(22, 0, I18N[312], save_title, TTLEN, DOECHO);
+	getdata_buf(22, 0, gettext[312], save_title, TTLEN, DOECHO);
 	strip_ansi(save_title, save_title, STRIP_ALL);
     }
     if (save_title[0] == '\0')
@@ -661,29 +667,29 @@ do_general(int isbid)
 	    (!bp->level || (currbrdattr & BRD_POSTMASK))) {
             do_crosspost(ALLPOST, &postfile, fpath);
 	}
-	outs(I18N[313]);
+	outs(gettext[313]);
 
 #ifdef MAX_POST_MONEY
 	aborted = (aborted > MAX_POST_MONEY) ? MAX_POST_MONEY : aborted;
 #endif
 	if (strcmp(currboard, "Test") && !ifuseanony) {
-	    prints(I18N[314],++cuser.numposts);
+	    prints(gettext[314],++cuser.numposts);
             if(postfile.filemode&FILE_BID)
-                prints(I18N[315]);
+                prints(gettext[315]);
             else if(currbrdattr&BRD_BAD)
-                prints(I18N[316]);
+                prints(gettext[316]);
             else
               {
-                prints(I18N[317],aborted);
+                prints(gettext[317],aborted);
                 demoney(aborted);    
               }
 	} else
-	    outs(I18N[318]);
+	    outs(gettext[318]);
 
 	/* 回應到原作者信箱 */
 
 	if (curredit & EDIT_BOTH) {
-	    char           *str, *msg = I18N[319];
+	    char           *str, *msg = gettext[319];
 
 	    if ((str = strchr(quote_user, '.'))) {
 		if (
@@ -693,7 +699,7 @@ do_general(int isbid)
 		    bsmtp(fpath, save_title, str + 1, 0)
 #endif
 		    < 0)
-		    msg = I18N[320];
+		    msg = gettext[320];
 	    } else {
 		sethomepath(genbuf, quote_user);
 		stampfile(genbuf, &postfile);
@@ -749,7 +755,7 @@ do_generalboardreply(fileheader_t * fhdr)
 {
     char            genbuf[3];
     getdata(b_lines - 1, 0,
-	    I18N[321],
+	    gettext[321],
 	    genbuf, sizeof(genbuf), LCECHO);
     switch (genbuf[0]) {
     case 'm':
@@ -813,7 +819,7 @@ b_posttype(int ent, fileheader_t * fhdr, char *direct)
    for(i=0; i<8; i++)
      {
        move(2,0);
-       outs(I18N[322]);
+       outs(gettext[322]);
        strncpy(genbuf, bp->posttype+i*4, 4);
        genbuf[4]=0;
        sprintf(title,"%d.",i+1);
@@ -821,14 +827,14 @@ b_posttype(int ent, fileheader_t * fhdr, char *direct)
        sprintf(posttype+i*4,"%-4.4s", genbuf); 
        if( posttype_f & (1<<i) )
           {
-            if(getdata(2, 20, I18N[323], genbuf, 3, LCECHO) &&
+            if(getdata(2, 20, gettext[323], genbuf, 3, LCECHO) &&
                 genbuf[0]=='n')
                 {
                  posttype_f &= ~(1<<i);
                  continue;
                 }
           }
-       else if (!getdata(2, 20, I18N[324], genbuf, 3, LCECHO) ||
+       else if (!getdata(2, 20, gettext[324], genbuf, 3, LCECHO) ||
               genbuf[0]!='y') continue;
 
        setbnfile(filepath, bp->brdname, "postsample", i);
@@ -927,7 +933,7 @@ cross_post(int ent, fileheader_t * fhdr, char *direct)
     boardheader_t  *bp;
     if (!CheckPostPerm()) {
 	move(5, 10);
-	outs(I18N[325]);
+	outs(gettext[325]);
 	pressanykey();
 	return FULLUPDATE;
     }
@@ -937,7 +943,7 @@ cross_post(int ent, fileheader_t * fhdr, char *direct)
     bp = getbcache(currbid);
     if (bp && (bp->brdattr & BRD_VOTEBOARD) )
 	return FULLUPDATE;
-    generalnamecomplete(I18N[326], xboard, sizeof(xboard),
+    generalnamecomplete(gettext[326], xboard, sizeof(xboard),
 			SHM->Bnumber,
 			completeboard_compar,
 			completeboard_permission,
@@ -957,27 +963,27 @@ cross_post(int ent, fileheader_t * fhdr, char *direct)
 
     ent = 1;
     if (HAS_PERM(PERM_SYSOP) || !strcmp(fhdr->owner, cuser.userid)) {
-	getdata(2, 0, I18N[327],
+	getdata(2, 0, gettext[327],
 		genbuf, 3, DOECHO);
 	if (genbuf[0] != '2') {
 	    ent = 0;
-	    getdata(2, 0, I18N[328], inputbuf, 3, DOECHO);
+	    getdata(2, 0, gettext[328], inputbuf, 3, DOECHO);
 	    if (inputbuf[0] != 'n' && inputbuf[0] != 'N')
 		author = 1;
 	}
     }
     if (ent)
-	snprintf(xtitle, sizeof(xtitle), I18N[329], fhdr->title);
+	snprintf(xtitle, sizeof(xtitle), gettext[329], fhdr->title);
     else
 	strlcpy(xtitle, fhdr->title, sizeof(xtitle));
 
-    snprintf(genbuf, sizeof(genbuf), I18N[330], xtitle);
+    snprintf(genbuf, sizeof(genbuf), gettext[330], xtitle);
     getdata(2, 0, genbuf, genbuf2, 4, LCECHO);
     if (genbuf2[0] == 'n' || genbuf2[0] == 'N') {
-	if (getdata_str(2, 0, I18N[331], genbuf, TTLEN, DOECHO, xtitle))
+	if (getdata_str(2, 0, gettext[331], genbuf, TTLEN, DOECHO, xtitle))
 	    strlcpy(xtitle, genbuf, sizeof(xtitle));
     }
-    getdata(2, 0, I18N[332], genbuf, 3, LCECHO);
+    getdata(2, 0, gettext[332], genbuf, 3, LCECHO);
     if (genbuf[0] == 'l' || genbuf[0] == 's') {
 	int             currmode0 = currmode;
 	char           *save_currboard;
@@ -1002,7 +1008,7 @@ cross_post(int ent, fileheader_t * fhdr, char *direct)
 	write_header(xptr);
 	currboard = save_currboard;
 
-	fprintf(xptr, I18N[333], currboard);
+	fprintf(xptr, gettext[333], currboard);
 
 	b_suckinfile(xptr, fname);
 	addsignature(xptr, 0);
@@ -1018,7 +1024,7 @@ cross_post(int ent, fileheader_t * fhdr, char *direct)
 	setbtotal(getbnum(xboard));
 	cuser.numposts++;
 	UPDATE_USEREC;
-	outs(I18N[334]);
+	outs(gettext[334]);
 	pressanykey();
 	currmode = currmode0;
     }
@@ -1105,7 +1111,7 @@ join_gamble(int ent, fileheader_t * fhdr, char *direct)
     if (!HAS_PERM(PERM_LOGINOK))
 	return DONOTHING;
     if (stop_gamble()) {
-	vmsg(I18N[336]);
+	vmsg(gettext[336]);
 	return DONOTHING;
     }
     ticket(currbid);
@@ -1126,7 +1132,7 @@ hold_gamble(int ent, fileheader_t * fhdr, char *direct)
     setbfile(fn_ticket_end, currboard, FN_TICKET_END);
     setbfile(genbuf, currboard, FN_TICKET_LOCK);
     if (dashf(fn_ticket)) {
-	getdata(b_lines - 1, 0, I18N[337], yn, 3, LCECHO);
+	getdata(b_lines - 1, 0, gettext[337], yn, 3, LCECHO);
 	if (yn[0] != 'y')
 	    return FULLUPDATE;
 	rename(fn_ticket, fn_ticket_end);
@@ -1138,26 +1144,26 @@ hold_gamble(int ent, fileheader_t * fhdr, char *direct)
 	return FULLUPDATE;
     }
     if (dashf(fn_ticket_end)) {
-	getdata(b_lines - 1, 0, I18N[338], yn, 3, LCECHO);
+	getdata(b_lines - 1, 0, gettext[338], yn, 3, LCECHO);
 	if (yn[0] != 'y')
 	    return FULLUPDATE;
 	openticket(currbid);
 	return FULLUPDATE;
     } else if (dashf(genbuf)) {
-	vmsg(I18N[339]);
+	vmsg(gettext[339]);
 	return FULLUPDATE;
     }
-    getdata(b_lines - 2, 0, I18N[340], yn, 3, LCECHO);
+    getdata(b_lines - 2, 0, gettext[340], yn, 3, LCECHO);
     if (yn[0] != 'y')
 	return FULLUPDATE;
-    getdata(b_lines - 1, 0, I18N[341],
+    getdata(b_lines - 1, 0, gettext[341],
 	    msg, 20, DOECHO);
     if (msg[0] == 0 ||
 	vedit(fn_ticket_end, NA, NULL) < 0)
 	return FULLUPDATE;
 
     clear();
-    showtitle(I18N[342], BBSNAME);
+    showtitle(gettext[342], BBSNAME);
     setbfile(genbuf, currboard, FN_TICKET_ITEMS);
 
     //sprintf(genbuf, "%s/" FN_TICKET_ITEMS, direct);
@@ -1165,25 +1171,25 @@ hold_gamble(int ent, fileheader_t * fhdr, char *direct)
     if (!(fp = fopen(genbuf, "w")))
 	return FULLUPDATE;
     do {
-	getdata(2, 0, I18N[343], yn, 6, LCECHO);
+	getdata(2, 0, gettext[343], yn, 6, LCECHO);
 	i = atoi(yn);
     } while (i < 10 || i > 10000);
     fprintf(fp, "%d\n", i);
-    if (!getdata(3, 0, I18N[344], yn, 3, LCECHO) || yn[0] != 'n') {
-	bp->endgamble = gettime(4, now, I18N[345]);
+    if (!getdata(3, 0, gettext[344], yn, 3, LCECHO) || yn[0] != 'n') {
+	bp->endgamble = gettime(4, now, gettext[345]);
 	substitute_record(fn_board, bp, sizeof(boardheader_t), currbid);
     }
     move(6, 0);
     snprintf(genbuf, sizeof(genbuf),
-	     I18N[346],
+	     gettext[346],
 	     currboard,
-	     i, i < 100 ? I18N[347] : i < 500 ? I18N[348] :
-	     i < 1000 ? I18N[349] : i < 5000 ? I18N[350] : I18N[351],
-	     bp->endgamble ? I18N[352] : "",
+	     i, i < 100 ? gettext[347] : i < 500 ? gettext[348] :
+	     i < 1000 ? gettext[349] : i < 5000 ? gettext[350] : gettext[351],
+	     bp->endgamble ? gettext[352] : "",
 	     bp->endgamble ? Cdate(&bp->endgamble) : ""
 	     );
     strcat(msg, genbuf);
-    prints(I18N[353]);
+    prints(gettext[353]);
     for (i = 0; i < 8; i++) {
 	snprintf(yn, sizeof(yn), " %d)", i + 1);
 	getdata(7 + i, 0, yn, genbuf, 9, DOECHO);
@@ -1199,10 +1205,10 @@ hold_gamble(int ent, fileheader_t * fhdr, char *direct)
     unlink(genbuf); // Ptt: 防堵利用不同id同時舉辦賭場
 
     move(8 + i, 0);
-    prints(I18N[354]);
-    snprintf(genbuf, sizeof(genbuf), I18N[355], currboard);
+    prints(gettext[354]);
+    snprintf(genbuf, sizeof(genbuf), gettext[355], currboard);
     post_msg(currboard, genbuf, msg, cuser.userid);
-    post_msg("Record", genbuf + 7, msg, I18N[356]);
+    post_msg("Record", genbuf + 7, msg, gettext[356]);
     /* Tim 控制CS, 以免正在玩的user把資料已經寫進來 */
     rename(fn_ticket_end, fn_ticket);
     /* 設定完才把檔名改過來 */
@@ -1218,7 +1224,7 @@ cite_post(int ent, fileheader_t * fhdr, char *direct)
     char            title[TTLEN + 1];
 
     setbfile(fpath, currboard, fhdr->filename);
-    strlcpy(title, I18N[357], sizeof(title));
+    strlcpy(title, gettext[357], sizeof(title));
     strlcpy(title + 3, fhdr->title, TTLEN - 3);
     title[TTLEN] = '\0';
     a_copyitem(fpath, title, 0, 1);
@@ -1234,23 +1240,23 @@ edit_title(int ent, fileheader_t * fhdr, char *direct)
     int             dirty = 0;
 
     if (currmode & MODE_BOARD || !strcmp(cuser.userid, fhdr->owner)) {
-	if (getdata(b_lines - 1, 0, I18N[358], genbuf, TTLEN, DOECHO)) {
+	if (getdata(b_lines - 1, 0, gettext[358], genbuf, TTLEN, DOECHO)) {
 	    strlcpy(tmpfhdr.title, genbuf, sizeof(tmpfhdr.title));
 	    dirty++;
 	}
     }
     if (HAS_PERM(PERM_SYSOP)) {
-	if (getdata(b_lines - 1, 0, I18N[359], genbuf, IDLEN + 2, DOECHO)) {
+	if (getdata(b_lines - 1, 0, gettext[359], genbuf, IDLEN + 2, DOECHO)) {
 	    strlcpy(tmpfhdr.owner, genbuf, sizeof(tmpfhdr.owner));
 	    dirty++;
 	}
-	if (getdata(b_lines - 1, 0, I18N[360], genbuf, 6, DOECHO)) {
+	if (getdata(b_lines - 1, 0, gettext[360], genbuf, 6, DOECHO)) {
 	    snprintf(tmpfhdr.date, sizeof(tmpfhdr.date), "%.5s", genbuf);
 	    dirty++;
 	}
     }
     if (currmode & MODE_BOARD || !strcmp(cuser.userid, fhdr->owner)) {
-	getdata(b_lines - 1, 0, I18N[361], genbuf, 3, DOECHO);
+	getdata(b_lines - 1, 0, gettext[361], genbuf, 3, DOECHO);
 	if ((genbuf[0] == 'y' || genbuf[0] == 'Y') && dirty) {
 	    *fhdr = tmpfhdr;
 	     substitute_ref_record(direct, fhdr, ent);
@@ -1277,7 +1283,7 @@ recommend_cancel(int ent, fileheader_t * fhdr, char *direct)
     char            yn[5];
     if (!(currmode & MODE_BOARD))
 	return DONOTHING;
-    getdata(b_lines - 1, 0, I18N[362], yn, 5, LCECHO);
+    getdata(b_lines - 1, 0, gettext[362], yn, 5, LCECHO);
     if (yn[0] != 'y')
 	return FULLUPDATE;
 #ifdef ASSESS
@@ -1291,10 +1297,10 @@ recommend_cancel(int ent, fileheader_t * fhdr, char *direct)
     return FULLUPDATE;
 }
 static int
-do_add_recommend(char *direct, fileheader_t *fhdr, int ent, char *buf)
+do_add_recommend(char *direct, fileheader_t *fhdr, int ent, char *buf, int type)
 {
     char    path[256];
-    int     fd;
+    int     update=0;
     /*
       race here:
       為了減少 system calls , 現在直接用當前的推文數 +1 寫入 .DIR 中.
@@ -1302,27 +1308,35 @@ do_add_recommend(char *direct, fileheader_t *fhdr, int ent, char *buf)
       1.若該文檔名被換掉的話, 推文將寫至舊檔名中 (造成幽靈檔)
       2.沒有重新讀一次, 所以推文數可能被少算
       3.若推的時候前文被刪, 將加到後文的推文數
+
      */
     setdirpath(path, direct, fhdr->filename);
     if( log_file(path, 0, buf) == -1 ){ // 不 CREATE
-	vmsg(I18N[363]);
+	vmsg(gettext[363]);
 	return -1;
     }
 
-    /* get_record(direct, fhdr, sizeof(fhdr), ent);
-     * This is a solution to avoid most racing (still some), but cost four
+    /* This is a solution to avoid most racing (still some), but cost four
      * system calls.                                                        */
-
-    if( fhdr->recommend < 100 ){
-	fileheader_t t;
-	if( (fd = open(direct, O_WRONLY)) < 0 )
+    if(type == 0 && fhdr->recommend < 100 )
+          update = 1;
+    else if(type == 1 && fhdr->recommend > -100)
+          update = -1;
+    
+    if( update ){
+        int fd;
+        //Ptt: update only necessary
+	if( (fd = open(direct, O_RDWR)) < 0 )
 	    return -1;
-
-	++(fhdr->recommend);
-	if( lseek(fd, (off_t)(sizeof(*fhdr) * (ent - 1) +
-			(int)&t.recommend - (int)&t), SEEK_SET) >= 0)
+	if( lseek(fd, (off_t)(sizeof(fileheader_t) * (ent - 1) +
+			(int)&fhdr->recommend - (int)fhdr), SEEK_SET) >= 0)
 	    // 如果 lseek 失敗就不會 write
+           {
+            read(fd, &fhdr->recommend, sizeof(char));
+            fhdr->recommend += update;
+            lseek(fd, -1, SEEK_CUR);
 	    write(fd, &fhdr->recommend, sizeof(char));
+           }
 
 	close(fd);
     }
@@ -1340,21 +1354,21 @@ do_bid(int ent, fileheader_t * fhdr, boardheader_t  *bp, char *direct,  struct t
     get_record(fpath, &bidinfo, sizeof(bidinfo), 1);
 
     move(18,0); clrtobot();
-    prints(I18N[364], fhdr->title);
+    prints(gettext[364], fhdr->title);
     print_bidinfo(0, bidinfo);
     if(!bidinfo.payby) money="Ptt$ "; else money=" NT$ ";
     if(now>bidinfo.enddate || bidinfo.high==bidinfo.buyitnow)
     {
-	prints(I18N[365]);
+	prints(gettext[365]);
 	if( bidinfo.userid[0]) {
 	    /*if(!payby && bidinfo.usermax!=-1)
 	      {以Ptt幣自動扣款
 	      }*/
-	    prints(I18N[366], bidinfo.userid, 
+	    prints(gettext[366], bidinfo.userid, 
 		    bidinfo.high);
 #ifdef ASSESS
 	    if (!(bidinfo.flag & SALE_COMMENTED) && strcmp(bidinfo.userid, currutmp->userid) == 0){
-		char tmp = getans(I18N[367]);
+		char tmp = getans(gettext[367]);
 		if ('1' <= tmp && tmp <= '3'){
 		    switch(tmp){
 			case 1:
@@ -1365,45 +1379,46 @@ do_bid(int ent, fileheader_t * fhdr, boardheader_t  *bp, char *direct,  struct t
 			    break;
 		    }
 		    bidinfo.flag |= SALE_COMMENTED;
+                    
 		    substitute_record(fpath, &bidinfo, sizeof(bidinfo), 1);
 		}
 	    }
 #endif
 	}
-	else prints(I18N[368]);
+	else prints(gettext[368]);
 	pressanykey();
 	return FULLUPDATE;
     }
     if(bidinfo.userid[0])
     {
-        prints(I18N[369], money,bidinfo.high + bidinfo.increment);
+        prints(gettext[369], money,bidinfo.high + bidinfo.increment);
 	if(bidinfo.buyitnow)
-	     prints(I18N[370],bidinfo.buyitnow);
+	     prints(gettext[370],bidinfo.buyitnow);
 	next=bidinfo.high + bidinfo.increment;
     }
     else
     {
-        prints(I18N[371], bidinfo.high);
+        prints(gettext[371], bidinfo.high);
 	next=bidinfo.high;
     }
     if(!strcmp(cuser.userid,bidinfo.userid))
     {
-	prints(I18N[372]);
+	prints(gettext[372]);
         pressanykey();
 	return FULLUPDATE;
     }
     if (strcmp(cuser.userid, fhdr->owner) == 0){
-	vmsg(I18N[373]);
+	vmsg(gettext[373]);
 	return FULLUPDATE;
     }
-    getdata_str(23,0,I18N[374], genbuf, 3, LCECHO,"n");
+    getdata_str(23,0,gettext[374], genbuf, 3, LCECHO,"n");
     if(genbuf[0]!='y') return FULLUPDATE;
 
-    getdata(23, 0, I18N[375], genbuf, 10, LCECHO);
+    getdata(23, 0, gettext[375], genbuf, 10, LCECHO);
 
     mymax=atoi(genbuf);
 
-    getdata(23,0,I18N[376],say,12,DOECHO);
+    getdata(23,0,gettext[376],say,12,DOECHO);
 
     get_record(fpath, &bidinfo, sizeof(bidinfo), 1);
 
@@ -1417,18 +1432,18 @@ do_bid(int ent, fileheader_t * fhdr, boardheader_t  *bp, char *direct,  struct t
 
     if(mymax< next || (bidinfo.payby==0 && cuser.money<mymax ))
     {
-	vmsg(I18N[377]);
+	vmsg(gettext[377]);
         return FULLUPDATE;
     }
     
     snprintf(genbuf, sizeof(genbuf),
- I18N[378],
+ gettext[378],
 	     cuser.userid,say,
 	     31 - strlen(cuser.userid) - strlen(say), " ", 
              money,
 	     next, fromhost,
 	     ptime->tm_mon + 1, ptime->tm_mday);
-    do_add_recommend(direct, fhdr,  ent, genbuf);
+    do_add_recommend(direct, fhdr,  ent, genbuf, 0);
     if(next > bidinfo.usermax)
     {
        bidinfo.usermax=mymax;
@@ -1443,12 +1458,12 @@ do_bid(int ent, fileheader_t * fhdr, boardheader_t  *bp, char *direct,  struct t
         strcpy(bidinfo.userid,cuser.userid);
 	
         snprintf(genbuf, sizeof(genbuf),
-I18N[379],
+gettext[379],
 	     cuser.userid, 
 	     20 - strlen(cuser.userid) , " ",money, 
 	     bidinfo.high, 
 	     ptime->tm_mon + 1, ptime->tm_mday);
-        do_add_recommend(direct, fhdr,  ent, genbuf);
+        do_add_recommend(direct, fhdr,  ent, genbuf, 0);
     }
     else
     {
@@ -1457,15 +1472,15 @@ I18N[379],
 	 else
 	  bidinfo.high=bidinfo.usermax; /*這邊怪怪的*/ 
         snprintf(genbuf, sizeof(genbuf),
-I18N[380],
+gettext[380],
 	     bidinfo.userid, 
 	     20 - strlen(bidinfo.userid) , " ", money, 
 	     bidinfo.high,
 	     ptime->tm_mon + 1, ptime->tm_mday);
-        do_add_recommend(direct, fhdr,  ent, genbuf);
+        do_add_recommend(direct, fhdr,  ent, genbuf, 0);
     }
     substitute_record(fpath, &bidinfo, sizeof(bidinfo), 1);
-    vmsg(I18N[381]);
+    vmsg(gettext[381]);
     return FULLUPDATE;
 }
 
@@ -1473,22 +1488,24 @@ static int
 recommend(int ent, fileheader_t * fhdr, char *direct)
 {
     struct tm      *ptime = localtime(&now);
-    char            buf[200], path[200], yn[5];
+    char            buf[200], path[200], 
+                   *ctype[3] = {"37m推","31m噓","31m→"};
+    int            type;
     boardheader_t  *bp;
     static time_t   lastrecommend = 0;
 
     bp = getbcache(currbid);
     if( bp->brdattr & BRD_NORECOMMEND ){
-	vmsg(I18N[382]);
+	vmsg(gettext[382]);
 	return FULLUPDATE;
     }
     if (!CheckPostPerm() || bp->brdattr & BRD_VOTEBOARD || fhdr->filemode & FILE_VOTE) {
-	vmsg(I18N[383]);
+	vmsg(gettext[383]);
 	return FULLUPDATE;
     }
 #ifdef SAFE_ARTICLE_DELETE
     if( fhdr->filename[0] == '.' ){
-	vmsg(I18N[384]);
+	vmsg(gettext[384]);
 	return FULLUPDATE;
     }
 #endif
@@ -1498,35 +1515,41 @@ recommend(int ent, fileheader_t * fhdr, char *direct)
     }
     setdirpath(path, direct, fhdr->filename);
 
-    if (fhdr->recommend == 0 && strcmp(cuser.userid, fhdr->owner) == 0){
-	vmsg(I18N[385]);
+    type = vmsg_lines(b_lines-2, gettext[3601]) - '1';
+    if(type > 2 || type < 0) type = 2;
+
+    if (type < 2)
+     {
+      if (fhdr->recommend == 0 && strcmp(cuser.userid, fhdr->owner) == 0){
+	vmsg(gettext[385]);
 	return FULLUPDATE;
-    }
+       }
 #ifndef DEBUG
     if (!(currmode & MODE_BOARD) && getuser(cuser.userid) &&
 	now - lastrecommend < 40) {
-	vmsg(I18N[386]);
+	vmsg(gettext[386]);
 	return FULLUPDATE;
-    }
+       }
 #endif
-
-
-    if (!getdata(b_lines - 2, 0, I18N[387], path, 40, DOECHO) ||
-	    path == NULL ||
-	!getdata(b_lines - 1, 0, I18N[388],
-		 yn, 5, LCECHO)
-	|| yn[0] != 'y')
+     }
+ 
+    if (!getdata(b_lines - 2, 0, gettext[387], path, 40, DOECHO) ||
+	    path == NULL || getans(gettext[388], ctype[type])!='y')
 	return FULLUPDATE;
 
     snprintf(buf, sizeof(buf),
-	     I18N[389],
-	     cuser.userid, path,
-	     51 - strlen(cuser.userid) - strlen(path), " ", fromhost,
+	     gettext[389],
+             ctype[type],
+	     cuser.userid, 
+             path,
+	     53 - strlen(cuser.userid) - strlen(path) ,
+             " ", 
+             fromhost,
 	     ptime->tm_mon + 1, ptime->tm_mday);
-    do_add_recommend(direct, fhdr,  ent, buf);
+    do_add_recommend(direct, fhdr,  ent, buf, type);
 #ifdef ASSESS
     /* 每 10 次推文 加一次 goodpost */
-    if ((fhdr->filemode & FILE_MARKED) && fhdr->recommend % 10 == 0) {
+    if (type ==0 && (fhdr->filemode & FILE_MARKED) && fhdr->recommend % 10 == 0) {
 	int uid = searchuser(fhdr->owner);
 	if (uid > 0)
 	    inc_goodpost(uid, 1);
@@ -1563,7 +1586,7 @@ mark_post(int ent, fileheader_t * fhdr, char *direct)
     	    inc_goodpost(searchuser(fhdr->owner), -1 * (fhdr->recommend / 10));
     }
 #endif
-	substitute_ref_record(direct, fhdr, ent);
+    substitute_ref_record(direct, fhdr, ent);
     return PART_REDRAW;
 }
 
@@ -1583,32 +1606,32 @@ del_range(int ent, fileheader_t *fhdr, char *direct)
 
     /* rocker.011018: 串接模式下還是不允許刪除比較好 */
     if (currmode & MODE_SELECT) {
-	vmsg(I18N[390]);
+	vmsg(gettext[390]);
 	return FULLUPDATE;
     }
 
     if ((currstat != READING) || (currmode & MODE_BOARD)) {
-	getdata(1, 0, I18N[391], num1, 6, DOECHO);
+	getdata(1, 0, gettext[391], num1, 6, DOECHO);
 	inum1 = atoi(num1);
 	if (inum1 <= 0) {
-	    vmsg(I18N[392]);
+	    vmsg(gettext[392]);
 	    return FULLUPDATE;
 	}
-	getdata(1, 28, I18N[393], num2, 6, DOECHO);
+	getdata(1, 28, gettext[393], num2, 6, DOECHO);
 	inum2 = atoi(num2);
 	if (inum2 < inum1) {
-	    vmsg(I18N[394]);
+	    vmsg(gettext[394]);
 	    return FULLUPDATE;
 	}
 	getdata(1, 48, msg_sure_ny, num1, 3, LCECHO);
 	if (*num1 == 'y') {
-	    outmsg(I18N[395]);
+	    outmsg(gettext[395]);
 	    refresh();
 #ifdef SAFE_ARTICLE_DELETE
-		if(bp && !(currmode & MODE_DIGEST) && bp->nuser > 20 )
-			safe_article_delete_range(direct, inum1, inum2);
-		else
-			delete_range(direct, inum1, inum2);
+	    if(bp && !(currmode & MODE_DIGEST) && bp->nuser > 20 )
+		safe_article_delete_range(direct, inum1, inum2);
+	    else
+		delete_range(direct, inum1, inum2);
 #else
 		delete_range(direct, inum1, inum2);
 #endif
@@ -1644,23 +1667,22 @@ del_post(int ent, fileheader_t * fhdr, char *direct)
 	!strcmp(cuser.userid, STR_GUEST))
 	return DONOTHING;
 
-    if (currmode & MODE_SELECT) {
-		vmsg("請回到一般模式再刪除文章");
-		return DONOTHING;
-	}
-                            
-
+    if (currmode & MODE_SELECT) { 
+        vmsg(gettext[3602]);
+        return DONOTHING;
+        }
     getdata(1, 0, msg_del_ny, genbuf, 3, LCECHO);
     if (genbuf[0] == 'y') {
 	if(
 #ifdef SAFE_ARTICLE_DELETE
-		(bp->nuser>20 && !(currmode & MODE_DIGEST) &&
-			!safe_article_delete(ent, fhdr, direct)) ||                   
+	   (bp->nuser>20 && !(currmode & MODE_DIGEST) &&
+            !safe_article_delete(ent, fhdr, direct)) ||
 #endif
 	   !delete_record(direct, sizeof(fileheader_t), ent)
 	   ) {
-		cancelpost(fhdr, not_owned, newpath);
-			if(fhdr->filemode & FILE_ANONYMOUS)
+
+	    cancelpost(fhdr, not_owned, newpath);
+            if(fhdr->filemode & FILE_ANONYMOUS)
 		/* When the file is anonymous posted, fhdr->money is author.
 		 * see do_general() */
 				num = fhdr->money;
@@ -1670,26 +1692,26 @@ del_post(int ent, fileheader_t * fhdr, char *direct)
 #define SIZE	sizeof(badpost_reason) / sizeof(char *)
 
 	    if (not_owned && num > 0 && !(currmode & MODE_DIGEST)) {
-                getdata(1, 40, I18N[396], genbuf, 3, LCECHO);
+                getdata(1, 40, gettext[396], genbuf, 3, LCECHO);
 		if(genbuf[0]=='y') {
 		    int i;
 		    char reason[64];
 		    move(b_lines - 2, 0);
 		    for (i = 0; i < SIZE; i++)
 			prints("%d.%s ", i + 1, badpost_reason[i]);
-		    prints("%d.%s", i + 1, I18N[397]);
-		    getdata(b_lines - 1, 0, I18N[398], reason, sizeof(reason), LCECHO);
+		    prints("%d.%s", i + 1, gettext[397]);
+		    getdata(b_lines - 1, 0, gettext[398], reason, sizeof(reason), LCECHO);
 		    i = reason[0] - '0';
 		    if (i <= 0 || i > SIZE)
-			getdata(b_lines, 0, I18N[399], reason, sizeof(reason), DOECHO);
+			getdata(b_lines, 0, gettext[399], reason, sizeof(reason), DOECHO);
 		    else
 			strcpy(reason, badpost_reason[i - 1]);
 		    if (!(inc_badpost(num, 1) % 10)){
-			post_violatelaw(xuser.userid, I18N[400], I18N[401], I18N[402]);
-			mail_violatelaw(xuser.userid, I18N[403], I18N[404], I18N[405]);
+			post_violatelaw(xuser.userid, gettext[400], gettext[401], gettext[402]);
+			mail_violatelaw(xuser.userid, gettext[403], gettext[404], gettext[405]);
 			xuser.userlevel |= PERM_VIOLATELAW;
 		    }
-		    sprintf(genbuf,I18N[406], reason, fhdr->title);
+		    sprintf(genbuf,gettext[406], reason, fhdr->title);
 		    mail_id(xuser.userid, genbuf, newpath, cuser.userid);
 		}
 	    }
@@ -1707,7 +1729,7 @@ del_post(int ent, fileheader_t * fhdr, char *direct)
 		    cuser.numposts--;
 		if (!(currmode & MODE_DIGEST && currmode & MODE_BOARD)){
 		    demoney(-fhdr->money);
-		    vmsg(I18N[407], msg_del_ok,
+		    vmsg(gettext[407], msg_del_ok,
 			    cuser.numposts, fhdr->money);
 		}
 	    }
@@ -1722,25 +1744,24 @@ show_filename(int ent, fileheader_t * fhdr, char *direct)
 {
     if(!HAS_PERM(PERM_SYSOP)) return DONOTHING;
 
-    vmsg(I18N[408], fhdr->filename);
+    vmsg(gettext[408], fhdr->filename);
     return PART_REDRAW;
 }
 
 static int
 view_postmoney(int ent, fileheader_t * fhdr, char *direct)
 {
-    move(b_lines - 1, 0);
     if(currmode & MODE_SELECT){
-	vmsg(I18N[409]);
+	vmsg(gettext[409]);
 	return FULLUPDATE;
     }
     if(fhdr->filemode & FILE_ANONYMOUS)
 	/* When the file is anonymous posted, fhdr->money is author.
 	 * see do_general() */
-	prints(I18N[410],
+	prints(gettext[410],
 		fhdr->money + currutmp->pid);
     else
-	vmsg(I18N[411], fhdr->money);
+	vmsg(gettext[411], fhdr->money);
     return FULLUPDATE;
 }
 
@@ -1753,37 +1774,37 @@ tar_addqueue(int ent, fileheader_t * fhdr, char *direct)
     FILE           *fp;
     char            bakboard, bakman;
     clear();
-    showtitle(I18N[412], BBSNAME);
+    showtitle(gettext[412], BBSNAME);
     move(2, 0);
     if (!((currmode & MODE_BOARD) || HAS_PERM(PERM_SYSOP))) {
 	move(5, 10);
-	outs(I18N[413]);
+	outs(gettext[413]);
 	pressanykey();
 	return FULLUPDATE;
     }
     snprintf(qfn, sizeof(qfn), BBSHOME "/jobspool/tarqueue.%s", currboard);
     if (access(qfn, 0) == 0) {
-	outs(I18N[414]);
+	outs(gettext[414]);
 	pressanykey();
 	return FULLUPDATE;
     }
-    if (!getdata(4, 0, I18N[415], email, sizeof(email), DOECHO))
+    if (!getdata(4, 0, gettext[415], email, sizeof(email), DOECHO))
 	return FULLUPDATE;
 
     /* check email -.-"" */
     if (strstr(email, "@") == NULL || strstr(email, ".bbs@") != NULL) {
 	move(6, 0);
-	outs(I18N[416]);
+	outs(gettext[416]);
 	pressanykey();
 	return FULLUPDATE;
     }
-    getdata(6, 0, I18N[417], ans, sizeof(ans), LCECHO);
+    getdata(6, 0, gettext[417], ans, sizeof(ans), LCECHO);
     bakboard = (ans[0] == 'n' || ans[0] == 'N') ? 0 : 1;
-    getdata(7, 0, I18N[418], ans, sizeof(ans), LCECHO);
+    getdata(7, 0, gettext[418], ans, sizeof(ans), LCECHO);
     bakman = (ans[0] == 'y' || ans[0] == 'Y') ? 1 : 0;
     if (!bakboard && !bakman) {
 	move(8, 0);
-	outs(I18N[419]);
+	outs(gettext[419]);
 	pressanykey();
 	return FULLUPDATE;
     }
@@ -1794,8 +1815,8 @@ tar_addqueue(int ent, fileheader_t * fhdr, char *direct)
     fclose(fp);
 
     move(10, 0);
-    outs(I18N[420]);
-    outs(I18N[421]);
+    outs(gettext[420]);
+    outs(gettext[421]);
     pressanykey();
     return FULLUPDATE;
 }
@@ -1825,7 +1846,7 @@ sequent_messages(fileheader_t * fptr)
     if (continue_flag)
 	genbuf[0] = 'y';
     else {
-	prints(I18N[422],
+	prints(gettext[422],
 	       currboard, fptr->owner, fptr->title);
 	getdata(3, 0, "(Y/N/Quit) [Y]: ", genbuf, 3, LCECHO);
     }
@@ -1838,7 +1859,7 @@ sequent_messages(fileheader_t * fptr)
     brc_addlist(fptr->filename);
 
     if (more(genbuf, YEA) == 0)
-	outmsg(I18N[423]);
+	outmsg(gettext[423]);
     continue_flag = 0;
 
     switch (igetch()) {
@@ -1900,10 +1921,10 @@ b_note_edit_bname(int bid)
 	outs(msg_cancel);
 	pressanykey();
     } else {
-	if (!getdata(2, 0, I18N[424], buf, 3, LCECHO)
+	if (!getdata(2, 0, gettext[424], buf, 3, LCECHO)
 	    || buf[0] != 'n')
 	    fh->bupdate = gettime(3, fh->bupdate ? fh->bupdate : now, 
-		      I18N[425]);
+		      gettext[425]);
 	else
 	    fh->bupdate = 0;
 	substitute_record(fn_board, fh, sizeof(boardheader_t), bid);
@@ -1950,7 +1971,7 @@ b_post_note()
 	setbfile(buf, currboard, FN_POST_NOTE);
 	if (more(buf, NA) == -1)
 	    more("etc/" FN_POST_NOTE, NA);
-	getdata(b_lines - 2, 0, I18N[426], yn, sizeof(yn), LCECHO);
+	getdata(b_lines - 2, 0, gettext[426], yn, sizeof(yn), LCECHO);
 	if (yn[0] == 'y')
 	    vedit(buf, NA, NULL);
 	else
@@ -1960,7 +1981,7 @@ b_post_note()
 	setbfile(buf, currboard, FN_POST_BID);
 	if (more(buf, NA) == -1)
 	    more("etc/" FN_POST_BID, NA);
-	getdata(b_lines - 2, 0, I18N[427], yn, sizeof(yn), LCECHO);
+	getdata(b_lines - 2, 0, gettext[427], yn, sizeof(yn), LCECHO);
 	if (yn[0] == 'y')
 	    vedit(buf, NA, NULL);
 	else
@@ -1993,7 +2014,7 @@ bh_title_edit()
 	bp = getbcache(currbid);
 	move(1, 0);
 	clrtoeol();
-	getdata_str(1, 0, I18N[428], genbuf,
+	getdata_str(1, 0, gettext[428], genbuf,
 		    BTLEN - 16, DOECHO, bp->title + 7);
 
 	if (!genbuf[0])
@@ -2016,7 +2037,7 @@ b_notes()
     if (more(buf, NA) == -1) {
 	clear();
 	move(4, 20);
-	outs(I18N[429]);
+	outs(gettext[429]);
     }
     pressanykey();
     return FULLUPDATE;
@@ -2054,20 +2075,6 @@ board_digest()
     return NEWDIRECT;
 }
 
-int
-board_etc()
-{
-    if (!HAS_PERM(PERM_SYSOP))
-	return DONOTHING;
-    currmode ^= MODE_ETC;
-    if (currmode & MODE_ETC)
-	currmode &= ~MODE_POST;
-    else if (haspostperm(currboard))
-	currmode |= MODE_POST;
-
-    setbdir(currdirect, currboard);
-    return NEWDIRECT;
-}
 
 static int
 push_bottom(int ent, fileheader_t * fhdr, char *direct)
@@ -2076,22 +2083,23 @@ push_bottom(int ent, fileheader_t * fhdr, char *direct)
     char buf[256];
     if ((currmode & MODE_DIGEST) || !(currmode & MODE_BOARD))
         return DONOTHING;
-    setbottomtotal(currbid);  // Ptt : will be remove when stable
+    setbottomtotal(currbid);  // <- Ptt : will be remove when stable
     num = getbottomtotal(currbid);
     if(getans(fhdr->filemode & FILE_BOTTOM ?
-       I18N[430]:
-       I18N[431])!='y') return READ_REDRAW;
+       gettext[430]:
+       gettext[431])!='y') return READ_REDRAW;
     fhdr->filemode ^= FILE_BOTTOM;
-    if(fhdr->filemode & FILE_BOTTOM)
+    if(fhdr->filemode & FILE_BOTTOM )
        {
           sprintf(buf, "%s.bottom", direct);
           if(num >= 5)
             {
-              vmsg(I18N[432]);
+              vmsg(gettext[432]);
               return READ_REDRAW;
             }
           fhdr->money = ent | FHR_REFERENCE;
           append_record(buf, fhdr, sizeof(fileheader_t)); 
+
        }
     else
        {
@@ -2112,7 +2120,7 @@ good_post(int ent, fileheader_t * fhdr, char *direct)
 	return DONOTHING;
 
     if(getans(fhdr->filemode & FILE_DIGEST ? 
-              I18N[433] : I18N[434]) == 'n')
+              gettext[433] : gettext[434]) == 'n')
 	return READ_REDRAW;
 
     if (fhdr->filemode & FILE_DIGEST) {
@@ -2149,7 +2157,7 @@ good_post(int ent, fileheader_t * fhdr, char *direct)
 
 #ifdef GLOBAL_DIGEST
 	if(!(getbcache(currbid)->brdattr & BRD_HIDE)) { 
-          getdata(1, 0, I18N[435], genbuf2, 3, LCECHO);
+          getdata(1, 0, gettext[435], genbuf2, 3, LCECHO);
           if(genbuf2[0] == 'y')
 	      do_crosspost(GLOBAL_DIGEST, &digest, genbuf);
         }
@@ -2200,8 +2208,8 @@ b_changerecommend(int ent, fileheader_t * fhdr, char *direct)
     bp = getbcache(currbid); 
     bp->brdattr ^= BRD_NORECOMMEND; 
     substitute_record(fn_board, bp, sizeof(boardheader_t), currbid);
-    vmsg(I18N[457],
-         (bp->brdattr & BRD_NORECOMMEND) ? I18N[458] : I18N[459]);
+    vmsg(gettext[457],
+         (bp->brdattr & BRD_NORECOMMEND) ? gettext[458] : gettext[459]);
     return FULLUPDATE;
 }
 
@@ -2219,19 +2227,19 @@ change_hidden(int ent, fileheader_t * fhdr, char *direct)
 
     bp = getbcache(currbid);
     if (((bp->brdattr & BRD_HIDE) && (bp->brdattr & BRD_POSTMASK))) {
-	if (getans(I18N[460]) != 'y')
+	if (getans(gettext[460]) != 'y')
 	    return FULLUPDATE;
 	bp->brdattr &= ~BRD_HIDE;
 	bp->brdattr &= ~BRD_POSTMASK;
-	outs(I18N[461]);
+	outs(gettext[461]);
 	board_hidden_status = 0;
 	hbflreload(currbid);
     } else {
-	if (getans(I18N[462]) != 'y')
+	if (getans(gettext[462]) != 'y')
 	    return FULLUPDATE;
 	bp->brdattr |= BRD_HIDE;
 	bp->brdattr |= BRD_POSTMASK;
-	outs(I18N[463]);
+	outs(gettext[463]);
 	board_hidden_status = 1;
     }
     substitute_record(fn_board, bp, sizeof(boardheader_t), currbid);
@@ -2252,15 +2260,15 @@ change_counting(int ent, fileheader_t * fhdr, char *direct)
 	return FULLUPDATE;
 
     if (bp->brdattr & BRD_BMCOUNT) {
-	if (getans(I18N[464]) != 'y')
+	if (getans(gettext[464]) != 'y')
 	    return FULLUPDATE;
 	bp->brdattr &= ~BRD_BMCOUNT;
-	outs(I18N[465]);
+	outs(gettext[465]);
     } else {
-	if (getans(I18N[466]) != 'y')
+	if (getans(gettext[466]) != 'y')
 	    return FULLUPDATE;
 	bp->brdattr |= BRD_BMCOUNT;
-	outs(I18N[467]);
+	outs(gettext[467]);
     }
     substitute_record(fn_board, bp, sizeof(boardheader_t), currbid);
     pressanykey();
@@ -2314,7 +2322,7 @@ onekey_t read_comms[] = {
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, // 'A' 65
     bh_title_edit, // 'B'
-    board_etc, // 'C'
+    NULL, // 'C'
     del_range, // 'D'
     edit_post, // 'E'
     NULL, // 'F'
@@ -2438,8 +2446,9 @@ static void
 log_board(char *mode, time_t usetime)
 {
     if (usetime > 30) {
-		log_file(FN_USEBOARD, 1, "USE %-20.20s Stay: %5ld (%s) %s\n", 
-			mode, usetime, cuser.userid, ctime(&now));                     
+	log_file(FN_USEBOARD, LOG_CREAT | LOG_VF,
+		 "USE %-20.20s Stay: %5ld (%s) %s\n", 
+                 mode, usetime, cuser.userid, ctime(&now));
     }
 }
 #endif

@@ -111,7 +111,7 @@ getstep(board_t board, rc_t *from, rc_t *to)
     fc = (turn == (chc_my ^ 1) ? from->c + 1 : 9 - from->c);
     tc = (turn == (chc_my ^ 1) ? to->c + 1 : 9 - to->c);
     if (from->r == to->r)
-	dir = I18N[758];
+	dir = gettext[758];
     else {
 	if (from->c == to->c)
 	    tc = from->r - to->r;
@@ -120,9 +120,9 @@ getstep(board_t board, rc_t *from, rc_t *to)
 
 	if ((turn == (chc_my ^ 1) && to->r > from->r) ||
 	    (turn == chc_my && to->r < from->r))
-	    dir = I18N[759];
+	    dir = gettext[759];
 	else
-	    dir = I18N[760];
+	    dir = gettext[760];
     }
     sprintf(buf, "%s%s%s%s",
 	   chess_str[turn][CHE_P(board[from->r][from->c])],
@@ -139,7 +139,7 @@ showstep(board_t board)
 
     eatten = board[chc_to.r][chc_to.c];
     if (eatten)
-	prints(I18N[761],
+	prints(gettext[761],
 	       CHE_O(eatten) == 0 ? BLACK_COLOR : RED_COLOR,
 	       chess_str[CHE_O(eatten)][CHE_P(eatten)]);
     prints("\033[m");
@@ -153,8 +153,8 @@ chc_drawline(board_t board, chcusr_t *user1, chcusr_t *user2, int line)
     move(line, 0);
     clrtoeol();
     if (line == 0) {
-	prints(I18N[762],
-	       user1->userid, user2->userid, chc_mode & CHC_WATCH ? I18N[763] : "");
+	prints(gettext[762],
+	       user1->userid, user2->userid, chc_mode & CHC_WATCH ? gettext[763] : "");
     } else if (line >= 3 && line <= 21) {
 	outs("   ");
 	for (i = 0; i < 9; i++) {
@@ -181,25 +181,25 @@ chc_drawline(board_t board, chcusr_t *user1, chcusr_t *user2, int line)
 	if (line >= 3 && line < 3 + (int)dim(hint_str)) {
 	    outs(hint_str[line - 3]);
 	} else if (line == SIDE_ROW) {
-	    prints(I18N[764],
+	    prints(gettext[764],
 		   chc_my == 0 ? BLACK_COLOR : RED_COLOR,
-		   I18N[710 + chc_my]);
+		   gettext[710 + chc_my]);
 	} else if (line == TURN_ROW) {
 	    prints("%s%s\033[m",
 		   TURN_COLOR,
-		   chc_my == chc_turn ? I18N[765] : I18N[766]);
+		   chc_my == chc_turn ? gettext[765] : gettext[766]);
 	} else if (line == STEP_ROW && !chc_firststep) {
 	    showstep(board);
 	} else if (line == TIME_ROW) {
-	    prints(I18N[767], chc_lefttime / 60, chc_lefttime % 60);
+	    prints(gettext[767], chc_lefttime / 60, chc_lefttime % 60);
 	} else if (line == WARN_ROW) {
 	    outs(chc_warnmsg);
 	} else if (line == MYWIN_ROW) {
-	    prints(I18N[768],
+	    prints(gettext[768],
 		   user1->userid,
 		   user1->win, user1->lose - 1, user1->tie);
 	} else if (line == HISWIN_ROW) {
-	    prints(I18N[769],
+	    prints(gettext[769],
 		   user2->userid,
 		   user2->win, user2->lose - 1, user2->tie);
 	}
@@ -334,21 +334,21 @@ chc_init_board(board_t board)
 	board[6][6] = board[6][8] = CHE(7, chc_my);	/* §L */
 	
 	for (i = 1; i < 10; i++) {
-		num_str[i] = I18N[711 + i];
+		num_str[i] = gettext[711 + i];
 	}
 	num_str[0] = "";
 	
 	for (i = 0; i < 2; i++)
 		for (j = 1; j < 8; j++) {
-			chess_str[i][j] = I18N[720 + i * 7 + j];
+			chess_str[i][j] = gettext[720 + i * 7 + j];
 		}
 	chess_str[0][0] = chess_str[1][0] = "  ";
 
 	for (i = 0; i < BRD_ROW * 2 - 1; i++)
-		chess_brd[i] = I18N[735 + i];            	
+		chess_brd[i] = gettext[735 + i];            	
 		
 	for (i = 0; i < 4; i++)
-		hint_str[i] = I18N[754 + i];
+		hint_str[i] = gettext[754 + i];
 }
 
 static void
@@ -579,7 +579,7 @@ hisplay(int s, chcusr_t *user1, chcusr_t *user2, board_t board, board_t tmpbrd)
 	    } else {
 		if (chc_from.r == -1) {
 		    chc_hepass = 1;
-		    strlcpy(chc_warnmsg, I18N[770], sizeof(chc_warnmsg));
+		    strlcpy(chc_warnmsg, gettext[770], sizeof(chc_warnmsg));
 		    chc_drawline(board, user1, user2, WARN_ROW);
 		} else {
 		    /* ®y¼ÐÅÜ´«
@@ -672,7 +672,7 @@ myplay(int s, chcusr_t *user1, chcusr_t *user2, board_t board, board_t tmpbrd)
 	    chc_ipass = 1;
 	    chc_from.r = -1;
 	    chc_broadcast_send(act_list, board);
-	    strlcpy(chc_warnmsg, I18N[771], sizeof(chc_warnmsg));
+	    strlcpy(chc_warnmsg, gettext[771], sizeof(chc_warnmsg));
 	    chc_drawline(board, user1, user2, WARN_ROW);
 	    bell();
 	    break;
@@ -703,7 +703,7 @@ myplay(int s, chcusr_t *user1, chcusr_t *user2, board_t board, board_t tmpbrd)
 			chc_drawline(board, user1, user2, LTR(chc_to.r));
 			endturn = 1;
 		    } else {
-			strlcpy(chc_warnmsg, I18N[772], sizeof(chc_warnmsg));
+			strlcpy(chc_warnmsg, gettext[772], sizeof(chc_warnmsg));
 			bell();
 			chc_drawline(board, user1, user2, WARN_ROW);
 		    }
@@ -733,7 +733,7 @@ mainloop(int s, chcusr_t *user1, chcusr_t *user2, board_t board, play_func_t pla
 	chc_firststep = 0;
 	chc_drawline(board, user1, user2, TURN_ROW);
 	if (chc_ischeck(board, chc_turn)) {
-	    strlcpy(chc_warnmsg, I18N[773], sizeof(chc_warnmsg));
+	    strlcpy(chc_warnmsg, gettext[773], sizeof(chc_warnmsg));
 	    bell();
 	} else
 	    chc_warnmsg[0] = 0;
@@ -743,15 +743,15 @@ mainloop(int s, chcusr_t *user1, chcusr_t *user2, board_t board, play_func_t pla
 
     if (chc_mode & CHC_VERSUS) {
 	if (endgame == 1) {
-	    strlcpy(chc_warnmsg, I18N[774], sizeof(chc_warnmsg));
+	    strlcpy(chc_warnmsg, gettext[774], sizeof(chc_warnmsg));
 	    user1->win++;
 	    currutmp->chc_win++;
 	} else if (endgame == 2) {
-	    strlcpy(chc_warnmsg, I18N[775], sizeof(chc_warnmsg));
+	    strlcpy(chc_warnmsg, gettext[775], sizeof(chc_warnmsg));
 	    user1->lose++;
 	    currutmp->chc_lose++;
 	} else {
-	    strlcpy(chc_warnmsg, I18N[776], sizeof(chc_warnmsg));
+	    strlcpy(chc_warnmsg, gettext[776], sizeof(chc_warnmsg));
 	    user1->tie++;
 	    currutmp->chc_tie++;
 	}
@@ -760,17 +760,17 @@ mainloop(int s, chcusr_t *user1, chcusr_t *user2, board_t board, play_func_t pla
 	passwd_update(usernum, &cuser);
     }
     else if (chc_mode & CHC_WATCH) {
-	strlcpy(chc_warnmsg, I18N[777], sizeof(chc_warnmsg));
+	strlcpy(chc_warnmsg, gettext[777], sizeof(chc_warnmsg));
     }
     else {
-	strlcpy(chc_warnmsg, I18N[778], sizeof(chc_warnmsg));
+	strlcpy(chc_warnmsg, gettext[778], sizeof(chc_warnmsg));
     }
 
     chc_log("=> ");
     if (endgame == 3)
-	chc_log(I18N[779]);
+	chc_log(gettext[779]);
     else{
-	sprintf(buf, I18N[780], chc_my && endgame == 1 ? I18N[781] : I18N[782]);
+	sprintf(buf, gettext[780], chc_my && endgame == 1 ? gettext[781] : gettext[782]);
 	chc_log(buf);
     }
 
@@ -911,7 +911,7 @@ chc(int s, int mode)
     
     setuserfile(file, CHC_LOG);
     if (chc_log_open(&user1, &user2, file) < 0)
-	vmsg(I18N[783]);
+	vmsg(gettext[783]);
     
     mainloop(s, &user1, &user2, board, play_func);
 
@@ -929,13 +929,13 @@ chc(int s, int mode)
 
     currutmp->mode = mode0;
 
-    if (getans(I18N[784]) == 'y') {
+    if (getans(gettext[784]) == 'y') {
 	char title[80];
 	sprintf(title, "%s V.S. %s", user1.userid, user2.userid);
 	chc_log("\n--\n\n");
 	chc_log_poem();
 	chc_log_close();
-	mail_id(cuser.userid, title, file, I18N[785]);
+	mail_id(cuser.userid, title, file, gettext[785]);
     }
     else
 	chc_log_close();
@@ -948,7 +948,7 @@ chc_init_utmp(void)
     char            uident[16];
     userinfo_t	   *uin;
 
-    stand_title(I18N[786]);
+    stand_title(gettext[786]);
     generalnamecomplete(msg_uid, uident, sizeof(uident),
 			SHM->UTMPnumber,
 			completeutmp_compar,
@@ -999,11 +999,11 @@ chc_watch(void)
     if (uin->uid == currutmp->uid || uin->mode != CHC)
 	return -1;
 
-    if (getans(I18N[787]) != 'y')
+    if (getans(gettext[787]) != 'y')
 	return 0;
 
     if ((sock = make_connection_to_somebody(uin, 10)) < 0) {
-	vmsg(I18N[788]);
+	vmsg(gettext[788]);
 	return -1;
     }
     msgsock = accept(sock, (struct sockaddr *) 0, (socklen_t *) 0);

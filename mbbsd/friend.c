@@ -78,9 +78,9 @@ friend_add(char *uident, int type, char* des)
 
 	if (type != FRIEND_ALOHA && type != FRIEND_POST){
            if(!des)
-	    getdata(2, 0, I18N[friend_desc[type]], buf, sizeof(buf), DOECHO);
+	    getdata(2, 0, gettext[friend_desc[type]], buf, sizeof(buf), DOECHO);
            else
-	    getdata_str(2, 0, I18N[friend_desc[type]], buf, sizeof(buf), DOECHO, des);
+	    getdata_str(2, 0, gettext[friend_desc[type]], buf, sizeof(buf), DOECHO, des);
 	}
 
 	if ((fp = fopen(fpath, "a"))) {
@@ -115,7 +115,7 @@ friend_special(void)
 	clrtoeol();
 	outs(genbuf);
     }
-    getdata(22, 0, I18N[1047], genbuf, 3, LCECHO);
+    getdata(22, 0, gettext[1047], genbuf, 3, LCECHO);
     if (genbuf[0] >= '0' && genbuf[0] <= '9') {
 	special_list[5] = genbuf[0];
 	special_des[5] = genbuf[0];
@@ -136,21 +136,21 @@ friend_append(int type, int count)
     do {
 	move(2, 0);
 	clrtobot();
-	outs(I18N[1048]);
+	outs(gettext[1048]);
 	for (j = i = 0; i <= 4; i++)
 	    if (i != type) {
 		++j;
-		prints("  (%d) %-s\n", j, I18N[1039 + (int)i]);
+		prints("  (%d) %-s\n", j, gettext[1039 + (int)i]);
 	    }
 	if (HAVE_PERM(PERM_SYSOP) || currmode & MODE_BOARD)
 	    for (; i < 8; ++i)
 		if (i != type) {
 		    ++j;
-		    prints(I18N[1049], j, currboard,
-			     I18N[1039 + (int)i]);
+		    prints(gettext[1049], j, currboard,
+			     gettext[1039 + (int)i]);
 		}
-	outs(I18N[1050]);
-	getdata(11, 0, I18N[1051], buf, 3, LCECHO);
+	outs(gettext[1050]);
+	getdata(11, 0, gettext[1051], buf, 3, LCECHO);
 	if (!buf[0])
 	    return;
 	if (buf[0] == 's')
@@ -224,7 +224,7 @@ friend_editdesc(char *uident, int type)
 		fputs(genbuf, nfp);
 	    else if (!strncmp(genbuf, uident, length)) {
 		char            buf[50] = "";
-		getdata(2, 0, I18N[1052], buf, 40, DOECHO);
+		getdata(2, 0, gettext[1052], buf, 40, DOECHO);
 		fprintf(nfp, "%-13s%s\n", uident, buf);
 	    }
 	}
@@ -326,9 +326,9 @@ friend_edit(int type)
     }
     dirty = 0;
     while (1) {
-	stand_title(I18N[1039 + type]);
+	stand_title(gettext[1039 + type]);
 	move(0, 40);
-	prints(I18N[1053], friend_max[type]);
+	prints(gettext[1053], friend_max[type]);
 	count = 0;
 	CreateNameList();
 
@@ -350,8 +350,8 @@ friend_edit(int type)
 	    fclose(fp);
 	}
 	getdata(1, 0, (count ?
-		       I18N[1054] :
-		       I18N[1055]),
+		       gettext[1054] :
+		       gettext[1055]),
 		uident, 3, LCECHO);
 	if (*uident == 'a') {
 	    move(1, 0);
@@ -379,16 +379,16 @@ friend_edit(int type)
 	} else if (*uident == 'l' && count)
 	    more(fpath, YEA);
 	else if (*uident == 'k' && count) {
-	    getdata(2, 0, I18N[1056], uident, 3,
+	    getdata(2, 0, gettext[1056], uident, 3,
 		    LCECHO);
 	    if (*uident == 'a')
 		unlink(fpath);
 	    dirty = 1;
 	} else if (*uident == 'w' && count) {
 	    char            wall[60];
-	    if (!getdata(0, 0, I18N[1057], wall, sizeof(wall), DOECHO))
+	    if (!getdata(0, 0, gettext[1057], wall, sizeof(wall), DOECHO))
 		continue;
-	    if (getdata(0, 0, I18N[1058], line, 4, LCECHO) &&
+	    if (getdata(0, 0, gettext[1058], line, 4, LCECHO) &&
 		*line == 'n')
 		continue;
 	    friend_water(wall, type);
@@ -397,7 +397,7 @@ friend_edit(int type)
     }
     if (dirty) {
 	move(2, 0);
-	outs(I18N[1059]);
+	outs(gettext[1059]);
 	refresh();
 	if (type == FRIEND_ALOHA || type == FRIEND_POST) {
 	    snprintf(genbuf, sizeof(genbuf), "%s.old", fpath);
@@ -427,7 +427,7 @@ friend_edit(int type)
 		fgets(genbuf, 30, fp);
 		fclose(fp);
 	    }
-	    getdata_buf(2, 0, I18N[1060], genbuf, 30,
+	    getdata_buf(2, 0, gettext[1060], genbuf, 30,
 			DOECHO);
 	    if ((fp = fopen(line, "w"))) {
 		fprintf(fp, "%s", genbuf);

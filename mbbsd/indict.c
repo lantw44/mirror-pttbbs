@@ -18,12 +18,12 @@ addword(char *database,char word[])
     if (HAVE_PERM(PERM_LOGINOK)) {
 	clear();
 	move(4, 0);
-	outs(I18N[1179]);
-	prints(I18N[1180], buf);
-	outs(I18N[1181]);
+	outs(gettext[1179]);
+	prints(gettext[1180], buf);
+	outs(gettext[1181]);
 	getdata(10, 0, ":", buf, 65, DOECHO);
 	if (buf[0]) {
-	    getdata(13, 0, I18N[1182], a, sizeof(a), LCECHO);
+	    getdata(13, 0, gettext[1182], a, sizeof(a), LCECHO);
 	    if (a[0] != 'n')
 		fprintf(fp, "%-65s[%s]\n", buf, cuser.userid);
 	}
@@ -42,15 +42,15 @@ choose_dict(char *dict,int dictlen,char *database,int databaselen)
 
     move(12, 0);
     clrtobot();
-    outs(I18N[1183]);
+    outs(gettext[1183]);
 
     if ((fp = fopen(REFER, "r"))) {
 	for(n=0; n<MAX_DICT && fscanf(fp,"%s %s",buf[n],data[n])==2; n++) { // XXX check buffer size
-	    prints(I18N[1184], n + 1, buf[n]);
+	    prints(gettext[1184], n + 1, buf[n]);
 	}
 	fclose(fp);
 
-	getdata(22, 14, I18N[1185], cho, 3, LCECHO);
+	getdata(22, 14, gettext[1185], cho, 3, LCECHO);
 	c=atoi(cho);
 
 	if (c >= 1 && c <= n) {
@@ -71,7 +71,7 @@ use_dict(char *dict,char *database)
     char            j, f, buf[120], sys[100];
     int             i = 0;
 
-	strlcpy(sys, I18N[1186], sizeof(sys));
+	strlcpy(sys, gettext[1186], sizeof(sys));
     setutmpmode(DICT);
     if (!HAS_PERM(PERM_SYSOP))
 	sys[0] = 0;
@@ -79,14 +79,14 @@ use_dict(char *dict,char *database)
     clear();
 
     snprintf(buf, sizeof(buf),
-	     I18N[1187], dict);
+	     gettext[1187], dict);
     strlcpy(&buf[100], "\033[m\n", sizeof(buf) - 100);
     for (;;) {
 	move(0, 0);
-	prints(I18N[1188], dict);
-	prints(I18N[1189], sys);
+	prints(gettext[1188], dict);
+	prints(gettext[1189], sys);
 	getdata(2, 0, ":", word, 18, DOECHO);
-	outs(I18N[1190]);
+	outs(gettext[1190]);
 	str_lower(word, word);
 	if (word[0] == 0)
 	    return 0;
@@ -111,7 +111,7 @@ use_dict(char *dict,char *database)
 		clear();
 		continue;
 	    } else {
-		outs(I18N[1191]);
+		outs(gettext[1191]);
 		continue;
 	    }
 	}
@@ -130,7 +130,7 @@ use_dict(char *dict,char *database)
 		    i++;
 		    if (!((i + 1) % 17)) {
 			move(23, 0);
-			outs(I18N[1192]);
+			outs(gettext[1192]);
 			j = igetch();
 			if (j == 'q')
 			    break;
@@ -145,7 +145,7 @@ use_dict(char *dict,char *database)
 	    fclose(fp);
 	}
 	if (i == 0) {
-	    getdata(5, 0, I18N[1193], lang, 3, LCECHO);
+	    getdata(5, 0, gettext[1193], lang, 3, LCECHO);
 	    if (lang[0] == 'y') {
 		clear();
 		move(4, 0);

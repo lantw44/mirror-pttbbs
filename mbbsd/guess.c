@@ -8,16 +8,16 @@ show_table(char TABLE[], char ifcomputer)
     int             i;
 
     move(0, 35);
-    prints(I18N[1139]);
+    prints(gettext[1139]);
     move(8, 1);
-    prints(I18N[1140]);
+    prints(gettext[1140]);
     prints("\033[1;33m=================\033[m\n");
     if (ifcomputer) {
-	prints(I18N[1141]);
-	prints(I18N[1142]);
+	prints(gettext[1141]);
+	prints(gettext[1142]);
     } else {
 	for (i = 1; i <= 6; i++)
-	    prints(I18N[1143], i, TABLE[i]);
+	    prints(gettext[1143], i, TABLE[i]);
     }
     prints("\033[33m=================\033[m");
 }
@@ -29,9 +29,9 @@ get_money(void)
     char            data[20];
 
     move(1, 0);
-    prints(I18N[1144], cuser.money);
+    prints(gettext[1144], cuser.money);
     do {
-	getdata(2, 0, I18N[1145], data, 9, LCECHO);
+	getdata(2, 0, gettext[1145], data, 9, LCECHO);
 	money = 0;
 	if (data[0] == 'q' || data[0] == 'Q') {
 	    unlockutmpmode();
@@ -53,7 +53,7 @@ get_money(void)
     move(1, 0);
     clrtoeol();
     reload_money();
-    prints(I18N[1146], cuser.money - money);
+    prints(gettext[1146], cuser.money - money);
     return money;
 }
 
@@ -78,7 +78,7 @@ static char    *
 get_data(char data[5], int count)
 {
     while (1) {
-	getdata(6, 0, I18N[1147], data, 5, LCECHO);
+	getdata(6, 0, gettext[1147], data, 5, LCECHO);
 	if (check_data(data) == 1)
 	    break;
     }
@@ -173,7 +173,7 @@ computer(int correct, int total, char flag[], int n[])
     if (k == 40) {
 	move(total + 8, 25);
 	snprintf(data, sizeof(data), "%04d", guess);
-	prints(I18N[1148], data);
+	prints(gettext[1148], data);
 	return 1;
     } else {
 	move(total + 8, 25);
@@ -227,28 +227,28 @@ guess_main()
     FILE           *file;
 
     clear();
-    showtitle(I18N[1149], BBSName);
+    showtitle(gettext[1149], BBSName);
     lockreturn0(GUESSNUM, LOCK_MULTI);
 
     reload_money();
     if (cuser.money < 5) {
 	clear();
 	move(12, 35);
-	prints(I18N[1150]);
+	prints(gettext[1150]);
 	unlockutmpmode();
 	pressanykey();
 	return 1;
     }
     if ((money = get_money()) == 0)
 	return 1;
-    vice(money, I18N[1151]);
+    vice(money, gettext[1151]);
 
     Diff_Random(answer);
     move(2, 0);
     clrtoeol();
-    prints(I18N[1152], money);
+    prints(gettext[1152], money);
 
-    getdata_str(4, 0, I18N[1153],
+    getdata_str(4, 0, gettext[1153],
 		ifcomputer, sizeof(ifcomputer), LCECHO, "y");
     if (ifcomputer[0] == 'y') {
 	ifcomputer[0] = 1;
@@ -259,17 +259,17 @@ guess_main()
     }
     if (ifcomputer[0]) {
 	do {
-	    getdata(5, 0, I18N[1154],
+	    getdata(5, 0, gettext[1154],
 		    yournum, sizeof(yournum), LCECHO);
 	} while (!legal(atoi(yournum)));
 	move(8, 25);
-	prints(I18N[1155]);
+	prints(gettext[1155]);
 	flag = malloc(sizeof(char) * 10000);
 	n = malloc(sizeof(int) * 1500);
 	initcomputer(flag);
     }
     move(8, 55);
-    prints(I18N[1156]);
+    prints(gettext[1156]);
     while (((!computerwin || !youwin) && count < 10 && (ifcomputer[0])) ||
 	   (!ifcomputer[0] && count < 10 && !youwin)) {
 	if (!computerwin && ifcomputer[0]) {
@@ -278,7 +278,7 @@ guess_main()
 		computerwin = 1;
 	}
 	move(20, 55);
-	prints(I18N[1157], count + 1);
+	prints(gettext[1157], count + 1);
 	if (!youwin) {
 	    ++count;
 	    if (guess_play(get_data(data, count), answer, count))
@@ -290,33 +290,33 @@ guess_main()
     free(n);
     if (ifcomputer[0]) {
 	if (count > c_count) {
-	    prints(I18N[1158]);
+	    prints(gettext[1158]);
 	    move(18, 35);
-	    prints(I18N[1159], money);
+	    prints(gettext[1159], money);
 	    if ((file = fopen(LOGPASS, "a"))) {
-		fprintf(file, I18N[1160], c_count);
+		fprintf(file, gettext[1160], c_count);
 		if (youwin)
-		    fprintf(file, I18N[1161], cuser.userid, count);
+		    fprintf(file, gettext[1161], cuser.userid, count);
 		else
-		    fprintf(file, I18N[1162], cuser.userid);
-		fprintf(file, I18N[1163], cuser.userid, money);
+		    fprintf(file, gettext[1162], cuser.userid);
+		fprintf(file, gettext[1163], cuser.userid, money);
 		fclose(file);
 	    }
 	} else if (count < c_count) {
-	    prints(I18N[1164]);
+	    prints(gettext[1164]);
 	    move(18, 35);
-	    prints(I18N[1165], money * 2);
+	    prints(gettext[1165], money * 2);
 	    demoney(money * 2);
 	    if ((file = fopen(LOGPASS, "a"))) {
-		fprintf(file, I18N[1166], cuser.userid, count,
+		fprintf(file, gettext[1166], cuser.userid, count,
 			c_count, money * 2);
 		fclose(file);
 	    }
 	} else {
-	    prints(I18N[1167], money);
+	    prints(gettext[1167], money);
 	    demoney(money);
 	    if ((file = fopen(LOGPASS, "a"))) {
-		fprintf(file, I18N[1168], cuser.userid);
+		fprintf(file, gettext[1168], cuser.userid);
 		fclose(file);
 	    }
 	}
@@ -327,26 +327,26 @@ guess_main()
     if (youwin) {
 	demoney(TABLE[count] * money);
 	if (count < 5) {
-	    prints(I18N[1169]);
+	    prints(gettext[1169]);
 	    if ((file = fopen(LOGPASS, "a"))) {
-		fprintf(file, I18N[1170],
+		fprintf(file, gettext[1170],
 			cuser.userid, count, TABLE[count] * money);
 		fclose(file);
 	    }
 	} else if (count > 5) {
-	    prints(I18N[1171]);
+	    prints(gettext[1171]);
 	    if ((file = fopen(LOGPASS, "a"))) {
-		fprintf(file, I18N[1172],
+		fprintf(file, gettext[1172],
 			cuser.userid, count, money);
 		fclose(file);
 	    }
 	} else {
-	    prints(I18N[1173]);
+	    prints(gettext[1173]);
 	    move(18, 35);
 	    clrtoeol();
-	    prints(I18N[1174], money);
+	    prints(gettext[1174], money);
 	    if ((file = fopen(LOGPASS, "a"))) {
-		fprintf(file, I18N[1175],
+		fprintf(file, gettext[1175],
 			cuser.userid, count, money);
 		fclose(file);
 	    }
@@ -356,11 +356,11 @@ guess_main()
 	return 1;
     }
     move(17, 35);
-    prints(I18N[1176], answer);
+    prints(gettext[1176], answer);
     move(18, 35);
-    prints(I18N[1177]);
+    prints(gettext[1177]);
     if ((file = fopen(BBSHOME "/etc/loseguess.log", "a"))) {
-	fprintf(file, I18N[1178], cuser.userid, money);
+	fprintf(file, gettext[1178], cuser.userid, money);
 	fclose(file);
     }
     unlockutmpmode();

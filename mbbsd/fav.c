@@ -143,7 +143,7 @@ static char *get_item_class(fav_type_t *ft)
 	case FAVT_BOARD:
 	    return bcache[cast_board(ft)->bid - 1].title;
 	case FAVT_FOLDER:
-	    return I18N[1032];
+	    return gettext[1032];
 	case FAVT_LINE:
 	    return "----";
     }
@@ -457,7 +457,8 @@ int fav_save(void)
     close(fd);
     if (dashs(buf) == 4) {
 	time_t now = time(NULL);
-	log_file(BBSHOME"/dirty.hack", 1, "%s %s", cuser.userid, ctime(&now));
+	log_file(BBSHOME "/dirty.hack", LOG_CREAT | LOG_VF,
+		 "%s %s", cuser.userid, ctime(&now));
 	return -1;
     }
     Rename(buf, buf2);

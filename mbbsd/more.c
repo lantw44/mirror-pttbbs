@@ -12,7 +12,6 @@ static int    more_help[] = {1507, 1508,
 1509, 1510, 1511, 1512, 1513, 1514, 1515, 1516, 1517, 1518, 1519,
 1520, 1521, 1522, 1523, 1524, 1525, 1526, 1527, -1};
 
-
 int             beep = 0;
 
 static void
@@ -114,7 +113,7 @@ more_readln(int fd, unsigned char *buf)
 int
 more(char *fpath, int promptend)
 {
-    char    *head[4] = {I18N[1528], I18N[1529], I18N[1530], I18N[1531]};
+    char    *head[4] = {gettext[1528], gettext[1529], gettext[1530], gettext[1531]};
     char           *ptr, *word = NULL, buf[ANSILINELEN + 1];
     struct stat     st;
 
@@ -207,7 +206,7 @@ more(char *fpath, int promptend)
 	    /* ※處理引用者 & 引言 */
 	    if ((buf[1] == ' ') && (buf[0] == ':' || buf[0] == '>'))
 		word = "\033[36m";
-	    else if (!strncmp(buf, I18N[1532], 2) || !strncmp(buf, "==>", 3))
+	    else if (!strncmp(buf, gettext[1532], 2) || !strncmp(buf, "==>", 3))
 		word = "\033[32m";
 
 	    if (word)
@@ -298,13 +297,13 @@ more(char *fpath, int promptend)
 	    } else
 		color = 2;
 
-	    prints(I18N[1533],
+	    prints(gettext[1533],
 		   printcolor[(int)color],
 		   pageno,
 		   (int)((viewed * 100) / fsize),
 		   "\033[31;47m",
-		   I18N[1534],
-		   I18N[1535]);
+		   gettext[1534],
+		   gettext[1535]);
 
 
 	    while (line == b_lines || (line > 0 && viewed == fsize)) {
@@ -328,11 +327,11 @@ more(char *fpath, int promptend)
 			char            ans[4] = "n";
 
 			*search_str = search_char0;
-			getdata_buf(b_lines - 1, 0, I18N[1536], search_str,
+			getdata_buf(b_lines - 1, 0, gettext[1536], search_str,
 				    40, DOECHO);
 			if (*search_str) {
 			    searching = 1;
-			    if (getdata(b_lines - 1, 0, I18N[1537],
+			    if (getdata(b_lines - 1, 0, gettext[1537],
 				   ans, sizeof(ans), LCECHO) && *ans == 'y')
 				fptr = strstr;
 			    else
@@ -361,7 +360,7 @@ more(char *fpath, int promptend)
 			lino = line = 0;
 		    }
 		    break;
-		case 'r':
+		case 'r': // Ptt: put all reply/recommend function here
 		case 'R':
 		case 'Y':
 		case 'y':
@@ -460,11 +459,11 @@ more(char *fpath, int promptend)
 		    break;
 
 		case Ctrl('T'):
-		    getdata(b_lines - 2, 0, I18N[1538],
+		    getdata(b_lines - 2, 0, gettext[1538],
 			    buf, 4, LCECHO);
 		    if (buf[0] == 'y') {
-		    	setuserfile(buf, ask_tmpbuf(b_lines - 1));
-		    	Copy(fpath, buf);
+			setuserfile(buf, ask_tmpbuf(b_lines - 1));
+                        Copy(fpath, buf);
 		    }
 		    if (pageno)
 			pageno--;

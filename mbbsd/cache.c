@@ -414,7 +414,7 @@ count_logins(int uid, int show)
 	    for (count = 0; (ulist[i + count] &&
 			     uid == ulist[i + count]->uid); count++) {
 		if (show)
-		    prints(I18N[531],
+		    prints(gettext[531],
 			   count + 1, modestring(ulist[i + count], 0),
 			   ulist[i + count]->from);
 	    }
@@ -626,7 +626,7 @@ setbottomtotal(int bid)
     if(n>5)
       {
 #ifdef DEBUG_BOTTOM
-        log_file("fix_bottom", 1, "%s n:%d\n", genbuf, n);
+        log_file("fix_bottom", LOG_CREAT | LOG_VF, "%s n:%d\n", genbuf, n);
 #endif
         unlink(genbuf);
         SHM->n_bottom[bid-1]=0;
@@ -877,7 +877,7 @@ reload_fcache(void)
 		    buf[0] != '\n') {
 		    sscanf(buf, "%s", SHM->domain[SHM->top]); // XXX check buffer size
 		    po = buf + strlen(SHM->domain[SHM->top]);
-		    while (*po == ' ')
+		    while (*po == ' ' || *po == '\t')
 			po++;
 		    strncpy(SHM->replace[SHM->top], po, 49);
 		    SHM->replace[SHM->top]

@@ -159,7 +159,7 @@ getnewuserid()
 	    close(fd);
 	    log_usies("CLEAN", "dated users");
 
-	    fprintf(stdout, I18N[1856]);
+	    fprintf(stdout, gettext[1856]);
 
 	    if ((fd = open(fn_passwd, O_RDWR | O_CREAT, 0600)) == -1)
 		return -1;
@@ -175,8 +175,7 @@ getnewuserid()
     i = searchnewuser(1);
     if ((i <= 0) || (i > MAX_USERS)) {
 	passwd_unlock();
-	vmsg(I18N[1857]);
-	safe_sleep(2);
+	vmsg(gettext[1857]);
 	exit(1);
     }
     snprintf(genbuf, sizeof(genbuf), "uid %d", i);
@@ -197,15 +196,15 @@ new_register()
 #ifdef HAVE_USERAGREEMENT
     more(HAVE_USERAGREEMENT, YEA);
     while( 1 ){
-	getdata(b_lines - 1, 0, I18N[1858],
+	getdata(b_lines - 1, 0, gettext[1858],
 		passbuf, 4, LCECHO);
 	if( passbuf[0] == 'y' )
 	    break;
 	if( passbuf[0] == 'n' ){
-	    vmsg(I18N[1859]);
+	    vmsg(gettext[1859]);
 	    exit(1);
 	}
-	vmsg(I18N[1860]);
+	vmsg(gettext[1860]);
     }
 #endif
     memset(&newuser, 0, sizeof(newuser));
@@ -213,20 +212,20 @@ new_register()
     try = 0;
     while (1) {
 	if (++try >= 6) {
-	    vmsg(I18N[1861]);
+	    vmsg(gettext[1861]);
 	    exit(1);
 	}
 	getdata(17, 0, msg_uid, newuser.userid,
 		sizeof(newuser.userid), DOECHO);
 
 	if (bad_user_id(newuser.userid))
-	    outs(I18N[1862]);
+	    outs(gettext[1862]);
 	else if ((id = getuser(newuser.userid)) &&
 		 (id = check_and_expire_account(id, &xuser)) >= 0) {
 	    if (id == 999999)
-		outs(I18N[1863]);
+		outs(gettext[1863]);
 	    else {
-		prints(I18N[1864], id / (60 * 24));
+		prints(gettext[1864], id / (60 * 24));
 	    }
 	} else
 	    break;
@@ -235,19 +234,19 @@ new_register()
     try = 0;
     while (1) {
 	if (++try >= 6) {
-	    vmsg(I18N[1865]);
+	    vmsg(gettext[1865]);
 	    exit(1);
 	}
-	if ((getdata(19, 0, I18N[1866], passbuf,
+	if ((getdata(19, 0, gettext[1866], passbuf,
 		     sizeof(passbuf), NOECHO) < 3) ||
 	    !strcmp(passbuf, newuser.userid)) {
-	    outs(I18N[1867]);
+	    outs(gettext[1867]);
 	    continue;
 	}
 	strncpy(newuser.passwd, passbuf, PASSLEN);
-	getdata(20, 0, I18N[1868], passbuf, sizeof(passbuf), NOECHO);
+	getdata(20, 0, gettext[1868], passbuf, sizeof(passbuf), NOECHO);
 	if (strncmp(passbuf, newuser.passwd, PASSLEN)) {
-	    outs(I18N[1869]);
+	    outs(gettext[1869]);
 	    continue;
 	}
 	passbuf[8] = '\0';
@@ -262,18 +261,18 @@ new_register()
     newuser.pager = 1;
     allocid = getnewuserid();
     if (allocid > MAX_USERS || allocid <= 0) {
-	fprintf(stderr, I18N[1870]);
+	fprintf(stderr, gettext[1870]);
 	exit(1);
     }
     if (passwd_update(allocid, &newuser) == -1) {
-	fprintf(stderr, I18N[1871]);
+	fprintf(stderr, gettext[1871]);
 	exit(1);
     }
     setuserid(allocid, newuser.userid);
     if( (uid = initcuser(newuser.userid)) )
 	setumoney(uid, 0);
     else{
-	fprintf(stderr, I18N[1872]);
+	fprintf(stderr, gettext[1872]);
 	exit(1);
     }
 }
@@ -294,10 +293,10 @@ check_register()
     if (currutmp->mailalert)
 	m_read();
 
-    stand_title(I18N[1873]);
+    stand_title(gettext[1873]);
 
     while (strlen(cuser.username) < 2)
-	getdata(2, 0, I18N[1874], cuser.username,
+	getdata(2, 0, gettext[1874], cuser.username,
 		sizeof(cuser.username), DOECHO);
 
     for (ptr = cuser.username; *ptr; ptr++) {
@@ -305,11 +304,11 @@ check_register()
 	    *ptr = ' ';
     }
     while (strlen(cuser.realname) < 4)
-	getdata(4, 0, I18N[1875], cuser.realname,
+	getdata(4, 0, gettext[1875], cuser.realname,
 		sizeof(cuser.realname), DOECHO);
 
     while (strlen(cuser.address) < 8)
-	getdata(6, 0, I18N[1876], cuser.address,
+	getdata(6, 0, gettext[1876], cuser.address,
 		sizeof(cuser.address), DOECHO);
 
 
@@ -329,7 +328,7 @@ check_register()
 	/* 回覆過身份認證信函，或曾經 E-mail post 過 */
 	clear();
 	move(9, 3);
-	prints(I18N[1877]);
+	prints(gettext[1877]);
 	u_register();
 
 #ifdef NEWUSER_LIMIT

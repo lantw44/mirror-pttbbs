@@ -188,15 +188,15 @@ FreeCalBuffer(char **buf)
 static int
 GenerateCalendar(char **buf, int y, int m, int today, event_t * e)
 {
-    char    *week_str[7] = {SHM->i18nstr[cuser.language][2741], SHM->i18nstr[cuser.language][2742], SHM->i18nstr[cuser.language][2743], SHM->i18nstr[cuser.language][2744], SHM->i18nstr[cuser.language][2745], SHM->i18nstr[cuser.language][2746], SHM->i18nstr[cuser.language][2747]};
+    char    *week_str[7] = {gettext[2741], gettext[2742], gettext[2743], gettext[2744], gettext[2745], gettext[2746], gettext[2747]};
     char    *month_color[12] = {
 	"\33[1;32m", "\33[1;33m", "\33[1;35m", "\33[1;36m",
 	"\33[1;32m", "\33[1;33m", "\33[1;35m", "\33[1;36m",
 	"\33[1;32m", "\33[1;33m", "\33[1;35m", "\33[1;36m"
     };
     char    *month_str[12] = {
-	SHM->i18nstr[cuser.language][2748], SHM->i18nstr[cuser.language][2749], SHM->i18nstr[cuser.language][2750], SHM->i18nstr[cuser.language][2751], SHM->i18nstr[cuser.language][2752], SHM->i18nstr[cuser.language][2753],
-	SHM->i18nstr[cuser.language][2754], SHM->i18nstr[cuser.language][2755], SHM->i18nstr[cuser.language][2756], SHM->i18nstr[cuser.language][2757], SHM->i18nstr[cuser.language][2758], SHM->i18nstr[cuser.language][2759]
+	gettext[2748], gettext[2749], gettext[2750], gettext[2751], gettext[2752], gettext[2753],
+	gettext[2754], gettext[2755], gettext[2756], gettext[2757], gettext[2758], gettext[2759]
     };
 
     char           *p, attr1[16], *attr2;
@@ -292,7 +292,7 @@ calendar()
     for (i = 0; i < 22; i++) {
 	outs(buf[i]);
 	if (i == 0) {
-	    prints(SHM->i18nstr[cuser.language][2760],
+	    prints(gettext[2760],
 		   snow.tm_year + 1900, snow.tm_mon + 1, snow.tm_mday,
 		   (snow.tm_hour == 0 || snow.tm_hour == 12) ?
 		   12 : snow.tm_hour % 12, snow.tm_min, snow.tm_sec,

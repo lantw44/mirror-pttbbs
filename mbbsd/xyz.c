@@ -7,7 +7,7 @@
 int
 x_90()
 {
-    use_dict(I18N[2431], "etc/90");
+    use_dict(gettext[2431], "etc/90");
     return 0;
 }
 
@@ -15,21 +15,21 @@ x_90()
 int
 x_89()
 {
-    use_dict(I18N[2432], "etc/89");
+    use_dict(gettext[2432], "etc/89");
     return 0;
 }
 /* Ptt88年度大學聯招查榜系統  */
 int
 x_88()
 {
-    use_dict(I18N[2433], "etc/88");
+    use_dict(gettext[2433], "etc/88");
     return 0;
 }
 /* Ptt87年度大學聯招查榜系統  */
 int
 x_87()
 {
-    use_dict(I18N[2434], "etc/87");
+    use_dict(gettext[2434], "etc/87");
     return 0;
 }
 
@@ -37,7 +37,7 @@ x_87()
 int
 x_86()
 {
-    use_dict(I18N[2435], "etc/86");
+    use_dict(gettext[2435], "etc/86");
     return 0;
 }
 
@@ -180,7 +180,7 @@ note()
     notedata_t      myitem;
 
     if (cuser.money < 5) {
-	vmsg(I18N[2436]);
+	vmsg(gettext[2436]);
 	return 0;
     }
     setutmpmode(EDNOTE);
@@ -188,11 +188,11 @@ note()
 	myitem.buf[0][0] = myitem.buf[1][0] = myitem.buf[2][0] = '\0';
 	move(12, 0);
 	clrtobot();
-	outs(I18N[2437]);
-	for (i = 0; (i < 3) && getdata(16 + i, 0, I18N[2438], myitem.buf[i],
+	outs(gettext[2437]);
+	for (i = 0; (i < 3) && getdata(16 + i, 0, gettext[2438], myitem.buf[i],
 				       sizeof(myitem.buf[i]) - 5, DOECHO)
 	     && *myitem.buf[i]; i++);
-	getdata(b_lines - 1, 0, I18N[2439],
+	getdata(b_lines - 1, 0, gettext[2439],
 		buf, 3, LCECHO);
 
 	if (buf[0] == 'q' || (i == 0 && *buf != 'e'))
@@ -226,33 +226,33 @@ note()
 	if (total > MAX_NOTE)
 	    total = MAX_NOTE;
     }
-    fputs(I18N[2440], fp);
+    fputs(gettext[2440], fp);
     collect = 1;
 
     while (total) {
-	snprintf(buf, sizeof(buf), I18N[2441],
+	snprintf(buf, sizeof(buf), gettext[2441],
 		myitem.userid, myitem.username);
 	len = strlen(buf);
 
 	for (i = len; i < 71; i++)
 	    strcat(buf, " ");
-	snprintf(buf2, sizeof(buf2), I18N[2442],
+	snprintf(buf2, sizeof(buf2), gettext[2442],
 		Cdate(&(myitem.date)));
 	strcat(buf, buf2);
 	fputs(buf, fp);
 	if (collect)
 	    fputs(buf, foo);
 	for (i = 0; i < 3 && *myitem.buf[i]; i++) {
-	    fprintf(fp, I18N[2443],
+	    fprintf(fp, gettext[2443],
 		    myitem.buf[i]);
 	    if (collect)
-		fprintf(foo, I18N[2444],
+		fprintf(foo, gettext[2444],
 			myitem.buf[i]);
 	}
-	fputs(I18N[2445], fp);
+	fputs(gettext[2445], fp);
 
 	if (collect) {
-	    fputs(I18N[2446], foo);
+	    fputs(gettext[2446], foo);
 	    fclose(foo);
 	    collect = 0;
 	}
@@ -261,7 +261,7 @@ note()
 	if (--total)
 	    read(fd, (char *)&myitem, sizeof(myitem));
     }
-    fputs(I18N[2447], fp);
+    fputs(gettext[2447], fp);
     fclose(fp);
     close(fd);
     close(fx);
@@ -306,15 +306,13 @@ mail_sysop()
 
 	move(12, 0);
 	clrtobot();
-	outs(I18N[2448]);
-	outs(I18N[2449]);
-	outs(I18N[2450]);
+	outs(gettext[2448]);
 
 	for (i = 0; i < j; i++)
 	    prints("%15d.   \033[1;%dm%-16s%s\033[0m\n",
 		 i + 1, 31 + i % 7, sysoplist[i].userid, sysoplist[i].duty);
-	prints(I18N[2451], "", 31 + j % 7);
-	getdata(b_lines - 1, 0, I18N[2452],
+	prints(gettext[2451], "", 31 + j % 7);
+	getdata(b_lines - 1, 0, gettext[2452],
 		genbuf, 4, DOECHO);
 	i = genbuf[0] - '0' - 1;
 	if (i >= 0 && i < j) {
@@ -349,7 +347,7 @@ Goodbye()
     char            genbuf[100];
     char			genbuf1[100];
 
-	snprintf(genbuf1, sizeof(genbuf1), "%s%s%s", I18N[2453], BBSNAME, I18N[2454]);
+	snprintf(genbuf1, sizeof(genbuf1), "%s%s%s", gettext[2453], BBSNAME, gettext[2454]);
     getdata(b_lines - 1, 0, genbuf1,
 	    genbuf, 3, LCECHO);
 
@@ -359,7 +357,7 @@ Goodbye()
     movie(999);
     if (cuser.userlevel) {
 	getdata(b_lines - 1, 0,
-		I18N[2455],
+		gettext[2455],
 		genbuf, 3, LCECHO);
 	if (genbuf[0] == 'm')
 	    mail_sysop();
@@ -368,7 +366,7 @@ Goodbye()
     }
     log_memoryusage();
     clear();
-    prints(I18N[2456],
+    prints(gettext[2456],
 	   cuser.userid, cuser.username, BBSName);
     user_display(&cuser, 0);
     pressanykey();

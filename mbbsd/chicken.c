@@ -85,8 +85,8 @@ new_chicken()
 
     clear();
     move(2, 0);
-    outs(I18N[867]);
-    i = getans(I18N[868]);
+    outs(gettext[867]);
+    i = getans(gettext[868]);
 
     i -= 'a';
     if (i < 0 || i > NUM_KINDS - 1)
@@ -97,15 +97,15 @@ new_chicken()
     reload_money();
     price = egg_price[(int)mychicken->type];
     if (cuser.money < price) {
-	vmsg(I18N[869], price);
+	vmsg(gettext[869], price);
 	return 0;
     }
-    vice(price, I18N[870]);
+    vice(price, gettext[870]);
     while (strlen(mychicken->name) < 3)
-	getdata(8, 0, I18N[871], mychicken->name,
+	getdata(8, 0, gettext[871], mychicken->name,
 		sizeof(mychicken->name), DOECHO);
 
-    log_file(CHICKENLOG, 1, I18N[872],
+    log_file(CHICKENLOG, 1, gettext[872],
               cuser.userid,
               mychicken->name, chicken_type[(int)mychicken->type], ctime(&now));
     mychicken->lastvisit = mychicken->birthday = mychicken->cbirth = now;
@@ -151,11 +151,11 @@ show_chicken_stat(chicken_t * thechicken)
     struct tm      *ptime;
 
     ptime = localtime(&thechicken->birthday);
-    prints(I18N[873],
+    prints(gettext[873],
 	   thechicken->name, chicken_type[(int)thechicken->type],
 	   15 - strlen(thechicken->name), "",
 	   ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday,
-	   I18N[age > 16 ? 789 : age + 789],
+	   gettext[age > 16 ? 789 : age + 789],
 	   age, thechicken->hp, thechicken->hp_max,
 	   thechicken->mm, thechicken->mm_max,
 	   thechicken->attack, thechicken->run, thechicken->book,
@@ -180,7 +180,7 @@ show_chicken_data(chicken_t * thechicken, chicken_t * pkchicken)
     /* Ptt:debug */
     thechicken->type %= NUM_KINDS;
     clear();
-    showtitle(pkchicken ? I18N[874] : I18N[875], BBSName);
+    showtitle(pkchicken ? gettext[874] : gettext[875], BBSName);
     move(1, 0);
 
     show_chicken_stat(thechicken);
@@ -192,48 +192,48 @@ show_chicken_data(chicken_t * thechicken, chicken_t * pkchicken)
     move(18, 0);
 
     if (thechicken->sick)
-	outs(I18N[876]);
+	outs(gettext[876]);
     if (thechicken->sick > thechicken->hp / 5)
-	outs(I18N[877]);
+	outs(gettext[877]);
 
     if (thechicken->clean > 150)
-	outs(I18N[878]);
+	outs(gettext[878]);
     else if (thechicken->clean > 80)
-	outs(I18N[879]);
+	outs(gettext[879]);
     else if (thechicken->clean < 20)
-	outs(I18N[880]);
+	outs(gettext[880]);
 
     if (thechicken->weight > thechicken->hp_max * 4)
-	outs(I18N[881]);
+	outs(gettext[881]);
     else if (thechicken->weight > thechicken->hp_max * 3)
-	outs(I18N[882]);
+	outs(gettext[882]);
     else if (thechicken->weight < (thechicken->hp_max / 4))
-	outs(I18N[883]);
+	outs(gettext[883]);
     else if (thechicken->weight < (thechicken->hp_max / 2))
-	outs(I18N[884]);
+	outs(gettext[884]);
 
     if (thechicken->tiredstrong > thechicken->hp * 1.7)
-	outs(I18N[885]);
+	outs(gettext[885]);
     else if (thechicken->tiredstrong > thechicken->hp)
-	outs(I18N[886]);
+	outs(gettext[886]);
     else if (thechicken->tiredstrong < thechicken->hp / 4)
-	outs(I18N[887]);
+	outs(gettext[887]);
 
     if (thechicken->hp < thechicken->hp_max / 4)
-	outs(I18N[888]);
+	outs(gettext[888]);
     if (thechicken->happy > 500)
-	outs(I18N[889]);
+	outs(gettext[889]);
     else if (thechicken->happy < 100)
-	outs(I18N[890]);
+	outs(gettext[890]);
     if (thechicken->satis > 500)
-	outs(I18N[891]);
+	outs(gettext[891]);
     else if (thechicken->satis < 50)
-	outs(I18N[892]);
+	outs(gettext[892]);
 
     if (pkchicken) {
 	outs("\n");
 	show_chicken_stat(pkchicken);
-	outs(I18N[893]);
+	outs(gettext[893]);
     }
 }
 
@@ -271,7 +271,7 @@ ch_clean()
 static void
 ch_guess()
 {
-    char           *guess[3] = {I18N[894], I18N[895], I18N[896]}, me, ch, win;
+    char           *guess[3] = {gettext[894], gettext[895], gettext[896]}, me, ch, win;
 
     chicken_t *mychicken = &cuser.mychicken;
     mychicken->happy += time_change[(int)mychicken->type][HAPPY] * 1.5;
@@ -280,7 +280,7 @@ ch_guess()
     mychicken->attack += time_change[(int)mychicken->type][ATTACK] / 4;
     move(20, 0);
     clrtobot();
-    outs(I18N[897]);
+    outs(gettext[897]);
     me = igetch();
     me -= '1';
     if (me > 2 || me < 0)
@@ -289,7 +289,7 @@ ch_guess()
     ch = (me + win + 3) % 3;
     prints("%s:%s !      %s:%s !.....%s",
 	   cuser.userid, guess[(int)me], mychicken->name, guess[(int)ch],
-	   win == 0 ? I18N[898] : win < 0 ? I18N[899] : I18N[900]);
+	   win == 0 ? gettext[898] : win < 0 ? gettext[899] : gettext[900]);
     pressanykey();
 }
 
@@ -343,7 +343,7 @@ ch_buyitem(int money, char *picture, int *item, int haveticket)
     int             num = 0;
     char            buf[5];
 
-    getdata_str(b_lines - 1, 0, I18N[901],
+    getdata_str(b_lines - 1, 0, gettext[901],
 		buf, sizeof(buf), DOECHO, "1");
     num = atoi(buf);
     if (num < 1)
@@ -352,13 +352,13 @@ ch_buyitem(int money, char *picture, int *item, int haveticket)
     if (cuser.money > money * num) {
 	*item += num;
 	if( haveticket )
-	    vice(money * num, I18N[902]);
+	    vice(money * num, gettext[902]);
 	else
 	    demoney(-money * num);
 	show_file(picture, 5, 14, NO_RELOAD);
         pressanykey();
     } else {
-	vmsg(I18N[903]);
+	vmsg(gettext[903]);
     }
 }
 
@@ -399,13 +399,13 @@ ch_kill()
     chicken_t *mychicken = &cuser.mychicken;
     int        ans;
 
-    ans = getans(I18N[904]);
+    ans = getans(gettext[904]);
     if (ans == 'y') {
 
-	vice(100, I18N[905]);
+	vice(100, gettext[905]);
 	more(CHICKEN_PIC "/deadth", YEA);
-	log_file(CHICKENLOG, 1,
-		 I18N[906], cuser.userid, mychicken->name,
+	log_file(CHICKENLOG, LOG_CREAT | LOG_VF,
+		 gettext[906], cuser.userid, mychicken->name,
 		 chicken_type[(int)mychicken->type], ctime(&now));
 	mychicken->name[0] = 0;
     }
@@ -443,24 +443,24 @@ ch_sell()
 	money = MAX_CHICKEN_MONEY;
     //¨¾¤î©ÇÂû
     if (mychicken->type == 1 || mychicken->type == 7) {
-	outs(I18N[907]);
+	outs(gettext[907]);
 	pressanykey();
 	return 0;
     }
     if (age < 5) {
-	outs(I18N[908]);
+	outs(gettext[908]);
 	pressanykey();
 	return 0;
     }
     if (age > 30) {
-	outs(I18N[909]);
+	outs(gettext[909]);
 	pressanykey();
 	return 0;
     }
-    ans = getans(I18N[910], age, 
+    ans = getans(gettext[910], age, 
                  chicken_type[(int)mychicken->type], money);
     if (ans == 'y') {
-	log_file(CHICKENLOG, 1, I18N[911],
+	log_file(CHICKENLOG, LOG_CREAT | LOG_VF, gettext[911],
                  cuser.userid, mychicken->name, 
                  chicken_type[(int)mychicken->type], money, ctime(&now));
 	mychicken->lastvisit = mychicken->name[0] = 0;
@@ -615,8 +615,8 @@ deadtype(chicken_t * thechicken)
 	return 0;
 
     if (thechicken == mychicken) {
-	log_file(CHICKENLOG, 1,
-				I18N[912],
+	log_file(CHICKENLOG, LOG_CREAT | LOG_VF,
+				gettext[912],
                  cuser.userid, thechicken->name,
                  chicken_type[(int)thechicken->type], ctime(&now));
 	mychicken->name[0] = 0;
@@ -667,12 +667,12 @@ ch_changename()
     chicken_t *mychicken = &cuser.mychicken;
     char      newname[20] = "";
 
-    getdata_str(b_lines - 1, 0, I18N[913], newname, 18, DOECHO,
+    getdata_str(b_lines - 1, 0, gettext[913], newname, 18, DOECHO,
 		mychicken->name);
 
     if (strlen(newname) >= 3 && strcmp(newname, mychicken->name)) {
 	strlcpy(mychicken->name, newname, sizeof(mychicken->name));
-	log_file(CHICKENLOG, 1, I18N[914],
+	log_file(CHICKENLOG, LOG_CREAT | LOG_VF, gettext[914],
                  cuser.userid, mychicken->name,
                  chicken_type[(int)mychicken->type], newname, ctime(&now));
     }
@@ -686,7 +686,7 @@ select_menu()
 
     reload_money();
     move(19, 0);
-    prints(I18N[915],
+    prints(gettext[915],
 	   cuser.money,
     /*
      * chicken_food[(int)mychicken->type],
@@ -766,38 +766,38 @@ recover_chicken(chicken_t * thechicken)
 
     if (now - thechicken->lastvisit > (60 * 60 * 24 * 7))
 	return 0;
-    outmsg(I18N[916]);
+    outmsg(gettext[916]);
     bell();
     igetch();
-    outmsg(I18N[917]);
+    outmsg(gettext[917]);
     bell();
     igetch();
-    snprintf(buf, sizeof(buf), I18N[918],
+    snprintf(buf, sizeof(buf), gettext[918],
 	     chicken_type[(int)thechicken->type], price * 2);
     outmsg(buf);
     bell();
-    getdata_str(21, 0, I18N[919], buf, 3, LCECHO, "N");
+    getdata_str(21, 0, gettext[919], buf, 3, LCECHO, "N");
     if (buf[0] == 'y' || buf[0] == 'Y') {
 	reload_money();
 	if (cuser.money < price * 2) {
-	    outmsg(I18N[920]);
+	    outmsg(gettext[920]);
 	    bell();
 	    igetch();
 	    return 0;
 	}
-	strlcpy(thechicken->name, I18N[921], sizeof(thechicken->name));
+	strlcpy(thechicken->name, gettext[921], sizeof(thechicken->name));
 	thechicken->hp = thechicken->hp_max;
 	thechicken->sick = 0;
 	thechicken->satis = 2;
-	vice(money, I18N[922]);
+	vice(money, gettext[922]);
 	snprintf(buf, sizeof(buf),
-		 I18N[923], money);
+		 gettext[923], money);
 	outmsg(buf);
 	bell();
 	igetch();
 	return 1;
     }
-    outmsg(I18N[924]);
+    outmsg(gettext[924]);
     bell();
     igetch();
     thechicken->lastvisit = 0;
@@ -807,21 +807,21 @@ recover_chicken(chicken_t * thechicken)
 
 #define lockreturn0(unmode, state) if(lockutmpmode(unmode, state)) return 0
 
-void copy_i18nstring() {
+void copy_gettextstring() {
 	int i;
 	for (i = 0; i < NUM_KINDS; i++) {
-		chicken_type[i] = I18N[806 + i];
-		chicken_food[i] = I18N[821 + i];
-		attack_type[i] = I18N[836 + i];
+		chicken_type[i] = gettext[806 + i];
+		chicken_food[i] = gettext[821 + i];
+		attack_type[i] = gettext[836 + i];
 	}
 	for (i = 0; i < 16; i++)
-		damage_degree[i] = I18N[851 + i];
+		damage_degree[i] = gettext[851 + i];
 }
 int
 chicken_main()
 {
     chicken_t *mychicken = &cuser.mychicken;
-    copy_i18nstring();
+    copy_gettextstring();
     lockreturn0(CHICKEN, LOCK_MULTI);
     reload_chicken();
     age = ((now - mychicken->cbirth) / (60 * 60 * 24));
@@ -864,7 +864,7 @@ chickenpk(int fd)
     reload_chicken();
     if (!ochicken->name[0] || !mychicken->name[0]) {
 	bell();
-	vmsg(I18N[925]);	/* Ptt:§«¤îpage®É§âÃdª«½æ±¼ */
+	vmsg(gettext[925]);	/* Ptt:§«¤îpage®É§âÃdª«½æ±¼ */
 	add_io(0, 0);
 	close(fd);
 	unlockutmpmode();
@@ -895,11 +895,11 @@ chickenpk(int fd)
 	    case 'c':
 		catched = 1;
 		move(16, 0);
-		outs(I18N[926]);
+		outs(gettext[926]);
 		break;
 	    case 'd':
 		move(16, 0);
-		outs(I18N[927]);
+		outs(gettext[927]);
 		break;
 	    }
 	    if (data[0] == 'd' || data[0] == 'q' || data[0] == 'l')
@@ -914,7 +914,7 @@ chickenpk(int fd)
 	    case 'y':
 		if (catched == 1) {
 		    snprintf(data, sizeof(data),
-			     I18N[928], ochicken->name);
+			     gettext[928], ochicken->name);
 		}
 		break;
 	    case 'n':
@@ -924,14 +924,14 @@ chickenpk(int fd)
 		r = r % (attmax + 2);
 		if (r) {
 		    snprintf(data, sizeof(data),
-			     I18N[929], mychicken->name,
+			     gettext[929], mychicken->name,
 			     damage_degree[r / 3 > 15 ? 15 : r / 3],
 			     attack_type[(int)mychicken->type],
 			     ochicken->name, r);
 		    ochicken->hp -= r;
 		} else
 		    snprintf(data, sizeof(data),
-			     I18N[930], mychicken->name);
+			     gettext[930], mychicken->name);
 		break;
 	    case 'o':
 		if (mychicken->oo > 0) {
@@ -940,27 +940,27 @@ chickenpk(int fd)
 		    if (mychicken->hp > mychicken->hp_max)
 			mychicken->hp = mychicken->hp_max;
 		    mychicken->tiredstrong = 0;
-		    snprintf(data, sizeof(data), I18N[931],
+		    snprintf(data, sizeof(data), gettext[931],
 			     mychicken->name);
 		} else
 		    snprintf(data, sizeof(data),
-			    I18N[932],
+			    gettext[932],
 			    mychicken->name);
 		break;
 	    case 'q':
 		if (r % (mychicken->run + 1) > r % (ochicken->run + 1))
-		    snprintf(data, sizeof(data), I18N[933],
+		    snprintf(data, sizeof(data), gettext[933],
 			     mychicken->name);
 		else
 		    snprintf(data, sizeof(data),
-			     I18N[934],
+			     gettext[934],
 			     mychicken->name, ochicken->name);
 		break;
 	    }
 	    if (deadtype(ochicken)) {
 		strtok(data, "\n");
 		strlcpy(buf, data, sizeof(buf));
-		snprintf(data, sizeof(data), I18N[935],
+		snprintf(data, sizeof(data), gettext[935],
 			 buf + 1, ochicken->name, mychicken->name);
 	    }
 	    move(17, 0);

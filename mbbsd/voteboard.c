@@ -22,7 +22,7 @@ do_voteboardreply(fileheader_t * fhdr)
     clear();
     if (!CheckPostPerm()) {
 	move(5, 10);
-	prints(SHM->i18nstr[cuser.language][2457]);
+	prints(gettext[2457]);
 	pressanykey();
 	return;
     }
@@ -48,12 +48,12 @@ do_voteboardreply(fileheader_t * fhdr)
            }
         if (yes>3) prints(genbuf);
 
-	if (!strncmp(genbuf, SHM->i18nstr[cuser.language][2458], 12)) {
+	if (!strncmp(genbuf, gettext[2458], 12)) {
 	    ptr = strchr(genbuf, '(');
 	    assert(ptr);
 	    sscanf(ptr + 1, "%ld", &endtime);
 	    if (endtime < now) {
-		prints(SHM->i18nstr[cuser.language][2459]);
+		prints(gettext[2459]);
 		pressanykey();
 		fclose(fi);
 		return;
@@ -64,8 +64,8 @@ do_voteboardreply(fileheader_t * fhdr)
         strtok(genbuf+4," \n");
 	if (!strncmp(genbuf + 4, cuser.userid, IDLEN)) {
 	    move(5, 10);
-	    prints(SHM->i18nstr[cuser.language][2460]);
-	    getdata(17, 0, SHM->i18nstr[cuser.language][2461], opnion, 3, LCECHO);
+	    prints(gettext[2460]);
+	    getdata(17, 0, gettext[2461], opnion, 3, LCECHO);
 	    if (opnion[0] != 'y') {
 		fclose(fi);
 		return;
@@ -76,12 +76,12 @@ do_voteboardreply(fileheader_t * fhdr)
     }
     fclose(fi);
     do {
-	if (!getdata(19, 0, SHM->i18nstr[cuser.language][2462], opnion, 3, LCECHO)) {
+	if (!getdata(19, 0, gettext[2462], opnion, 3, LCECHO)) {
 	    return;
 	}
     } while (opnion[0] != 'y' && opnion[0] != 'n');
-    sprintf(genbuf, SHM->i18nstr[cuser.language][2463],
-	    opnion[0] == 'y' ? SHM->i18nstr[cuser.language][2464] : SHM->i18nstr[cuser.language][2465]);
+    sprintf(genbuf, gettext[2463],
+	    opnion[0] == 'y' ? gettext[2464] : gettext[2465]);
     if (!getdata_buf(20, 0, genbuf, reason, 35, DOECHO)) {
 	return;
     }
@@ -107,7 +107,7 @@ do_voteboardreply(fileheader_t * fhdr)
     }
     if (!endtime) {
 	now += 14 * 24 * 60 * 60;
-	fprintf(fo, SHM->i18nstr[cuser.language][2466], now, ctime(&now));
+	fprintf(fo, gettext[2466], now, ctime(&now));
 	now -= 14 * 24 * 60 * 60;
     }
     fprintf(fo, "%s", genbuf);
@@ -120,7 +120,7 @@ do_voteboardreply(fileheader_t * fhdr)
 	fprintf(fo, "%3d.%s", ++yes, genbuf + 4);
       }
     if (opnion[0] == 'y')
-	fprintf(fo, SHM->i18nstr[cuser.language][2467], ++yes, cuser.userid, reason, cuser.lasthost);
+	fprintf(fo, gettext[2467], ++yes, cuser.userid, reason, cuser.lasthost);
     fprintf(fo, "%s", genbuf);
 
     for(no=0; fgets(genbuf, sizeof(genbuf), fi);) {
@@ -131,11 +131,11 @@ do_voteboardreply(fileheader_t * fhdr)
 	fprintf(fo, "%3d.%s", ++no, genbuf + 4);
     }
     if (opnion[0] == 'n')
-	fprintf(fo, SHM->i18nstr[cuser.language][2468], ++no, cuser.userid, reason, cuser.lasthost);
-    fprintf(fo, SHM->i18nstr[cuser.language][2469]);
-    fprintf(fo, SHM->i18nstr[cuser.language][2470], yes, no);
-    fprintf(fo, "%s"BBSNAME"("MYHOSTNAME"%s", SHM->i18nstr[cuser.language][2471],
-                SHM->i18nstr[cuser.language][2472]);
+	fprintf(fo, gettext[2468], ++no, cuser.userid, reason, cuser.lasthost);
+    fprintf(fo, gettext[2469]);
+    fprintf(fo, gettext[2470], yes, no);
+    fprintf(fo, "%s"BBSNAME"("MYHOSTNAME"%s", gettext[2471],
+                gettext[2472]);
 
     flock(fd, LOCK_UN);
     close(fd);
@@ -159,176 +159,176 @@ do_voteboard(int type)
     clear();
     if (!CheckPostPerm()) {
 	move(5, 10);
-	prints(SHM->i18nstr[cuser.language][2473]);
+	prints(gettext[2473]);
 	pressanykey();
 	return FULLUPDATE;
     }
     move(0, 0);
     clrtobot();
-    prints(SHM->i18nstr[cuser.language][2474]);
-    prints(SHM->i18nstr[cuser.language][2475]);
-    prints(SHM->i18nstr[cuser.language][2476]);
+    prints(gettext[2474]);
+    prints(gettext[2475]);
+    prints(gettext[2476]);
     move(4, 0);
     clrtobot();
-    prints(SHM->i18nstr[cuser.language][2477]);
+    prints(gettext[2477]);
     if(type==0)
-      prints(SHM->i18nstr[cuser.language][2478]);
+      prints(gettext[2478]);
 
     do {
-	getdata(6, 0, SHM->i18nstr[cuser.language][2479], topic, 3, DOECHO);
+	getdata(6, 0, gettext[2479], topic, 3, DOECHO);
 	temp = atoi(topic);
     } while (temp < 0 || temp > 9 || (type && temp>2));
     switch (temp) {
     case 0:
          return FULLUPDATE;
     case 1:
-	if (!getdata(7, 0, SHM->i18nstr[cuser.language][2480], topic, 30, DOECHO))
+	if (!getdata(7, 0, gettext[2480], topic, 30, DOECHO))
 	    return FULLUPDATE;
-	snprintf(title, sizeof(title), "%s %s", SHM->i18nstr[cuser.language][2481], topic);
+	snprintf(title, sizeof(title), "%s %s", gettext[2481], topic);
 	snprintf(genbuf, sizeof(genbuf),
-		 "%s\n\n%s%s\n", SHM->i18nstr[cuser.language][2482], SHM->i18nstr[cuser.language][2483], topic);
-	strcat(genbuf, SHM->i18nstr[cuser.language][2484]);
+		 "%s\n\n%s%s\n", gettext[2482], gettext[2483], topic);
+	strcat(genbuf, gettext[2484]);
 	break;
     case 2:
-	if (!getdata(7, 0, SHM->i18nstr[cuser.language][2485], topic, 30, DOECHO))
+	if (!getdata(7, 0, gettext[2485], topic, 30, DOECHO))
 	    return FULLUPDATE;
-	snprintf(title, sizeof(title), "%s %s", SHM->i18nstr[cuser.language][2486], topic);
+	snprintf(title, sizeof(title), "%s %s", gettext[2486], topic);
 	snprintf(genbuf, sizeof(genbuf),
-		 "%s\n\n%s%s\n", SHM->i18nstr[cuser.language][2487], SHM->i18nstr[cuser.language][2488], topic);
-	strcat(genbuf, SHM->i18nstr[cuser.language][2489]);
+		 "%s\n\n%s%s\n", gettext[2487], gettext[2488], topic);
+	strcat(genbuf, gettext[2489]);
 	break;
     case 3:
 	do {
-	    if (!getdata(7, 0, SHM->i18nstr[cuser.language][2490], topic, IDLEN + 1, DOECHO))
+	    if (!getdata(7, 0, gettext[2490], topic, IDLEN + 1, DOECHO))
 		return FULLUPDATE;
 	    else if (invalid_brdname(topic))
-		outs(SHM->i18nstr[cuser.language][2491]);
+		outs(gettext[2491]);
 	    else if (getbnum(topic) > 0)
-		outs(SHM->i18nstr[cuser.language][2492]);
+		outs(gettext[2492]);
 	    else
 		break;
 	} while (temp > 0);
-	snprintf(title, sizeof(title), SHM->i18nstr[cuser.language][2493], topic);
+	snprintf(title, sizeof(title), gettext[2493], topic);
 	snprintf(genbuf, sizeof(genbuf),
-		 "%s\n\n%s%s\n%s", SHM->i18nstr[cuser.language][2494], SHM->i18nstr[cuser.language][2495], topic, SHM->i18nstr[cuser.language][2496]);
+		 "%s\n\n%s%s\n%s", gettext[2494], gettext[2495], topic, gettext[2496]);
 
-	if (!getdata(8, 0, SHM->i18nstr[cuser.language][2497], topic, 20, DOECHO))
+	if (!getdata(8, 0, gettext[2497], topic, 20, DOECHO))
 	    return FULLUPDATE;
 	strcat(genbuf, topic);
-	strcat(genbuf, SHM->i18nstr[cuser.language][2498]);
-	if (!getdata(9, 0, SHM->i18nstr[cuser.language][2499], topic, 20, DOECHO))
+	strcat(genbuf, gettext[2498]);
+	if (!getdata(9, 0, gettext[2499], topic, 20, DOECHO))
 	    return FULLUPDATE;
 	strcat(genbuf, topic);
-	strcat(genbuf, SHM->i18nstr[cuser.language][2500]);
-	getdata(10, 0, SHM->i18nstr[cuser.language][2501], topic, IDLEN * 3 + 3, DOECHO);
+	strcat(genbuf, gettext[2500]);
+	getdata(10, 0, gettext[2501], topic, IDLEN * 3 + 3, DOECHO);
 	strcat(genbuf, topic);
-	strcat(genbuf, SHM->i18nstr[cuser.language][2502]);
+	strcat(genbuf, gettext[2502]);
 	break;
     case 4:
         move(1,0); clrtobot();
-        generalnamecomplete(SHM->i18nstr[cuser.language][2503],
+        generalnamecomplete(gettext[2503],
                             topic, IDLEN+1,
                             SHM->Bnumber,
                             completeboard_compar,
                             completeboard_permission,
                             completeboard_getname);
-	snprintf(title, sizeof(title), SHM->i18nstr[cuser.language][2504], topic);
+	snprintf(title, sizeof(title), gettext[2504], topic);
 	snprintf(genbuf, sizeof(genbuf),
-		 "%s\n\n%s%s\n", SHM->i18nstr[cuser.language][2505], SHM->i18nstr[cuser.language][2506], topic);
-	strcat(genbuf, SHM->i18nstr[cuser.language][2507]);
+		 "%s\n\n%s%s\n", gettext[2505], gettext[2506], topic);
+	strcat(genbuf, gettext[2507]);
 	break;
     case 5:
         move(1,0); clrtobot();
-        generalnamecomplete(SHM->i18nstr[cuser.language][2508],
+        generalnamecomplete(gettext[2508],
                             topic, IDLEN+1,
                             SHM->Bnumber,
                             completeboard_compar,
                             completeboard_permission,
                             completeboard_getname);
-	snprintf(title, sizeof(title), SHM->i18nstr[cuser.language][2509], topic);
-	snprintf(genbuf, sizeof(genbuf), "%s\n\n%s%s\n%s%s", SHM->i18nstr[cuser.language][2510], SHM->i18nstr[cuser.language][2511], topic, SHM->i18nstr[cuser.language][2512], cuser.userid);
-	strcat(genbuf, SHM->i18nstr[cuser.language][2513]);
+	snprintf(title, sizeof(title), gettext[2509], topic);
+	snprintf(genbuf, sizeof(genbuf), "%s\n\n%s%s\n%s%s", gettext[2510], gettext[2511], topic, gettext[2512], cuser.userid);
+	strcat(genbuf, gettext[2513]);
 	break;
     case 6:
         move(1,0); clrtobot();
-        generalnamecomplete(SHM->i18nstr[cuser.language][2514],
+        generalnamecomplete(gettext[2514],
                             topic, IDLEN+1,
                             SHM->Bnumber,
                             completeboard_compar,
                             completeboard_permission,
                             completeboard_getname);
-	snprintf(title, sizeof(title), SHM->i18nstr[cuser.language][2515], topic);
+	snprintf(title, sizeof(title), gettext[2515], topic);
 	snprintf(genbuf, sizeof(genbuf),
-		 "%s\n\n%s%s\n%s", SHM->i18nstr[cuser.language][2516], SHM->i18nstr[cuser.language][2517],
-		 topic, SHM->i18nstr[cuser.language][2518]);
+		 "%s\n\n%s%s\n%s", gettext[2516], gettext[2517],
+		 topic, gettext[2518]);
         temp=getbnum(topic);
 	do {
-	    if (!getdata(7, 0, SHM->i18nstr[cuser.language][2519], topic, IDLEN + 1, DOECHO))
+	    if (!getdata(7, 0, gettext[2519], topic, IDLEN + 1, DOECHO))
 		return FULLUPDATE;
         }while (!userid_is_BM(topic, bcache[temp - 1].BM));
 	strcat(genbuf, topic);
-	strcat(genbuf, SHM->i18nstr[cuser.language][2520]);
+	strcat(genbuf, gettext[2520]);
 	break;
     case 7:
-	if (!getdata(7, 0, SHM->i18nstr[cuser.language][2521], topic, 30, DOECHO))
+	if (!getdata(7, 0, gettext[2521], topic, 30, DOECHO))
 	    return FULLUPDATE;
-	snprintf(title, sizeof(title), SHM->i18nstr[cuser.language][2522], topic);
+	snprintf(title, sizeof(title), gettext[2522], topic);
 	snprintf(genbuf, sizeof(genbuf),
-		 "%s\n\n%s%s\n%s%s", SHM->i18nstr[cuser.language][2523], SHM->i18nstr[cuser.language][2524],
-		 topic, SHM->i18nstr[cuser.language][2525], cuser.userid);
-	strcat(genbuf, SHM->i18nstr[cuser.language][2526]);
+		 "%s\n\n%s%s\n%s%s", gettext[2523], gettext[2524],
+		 topic, gettext[2525], cuser.userid);
+	strcat(genbuf, gettext[2526]);
 	break;
     case 8:
-	if (!getdata(7, 0, SHM->i18nstr[cuser.language][2527], topic, 30, DOECHO))
+	if (!getdata(7, 0, gettext[2527], topic, 30, DOECHO))
 	    return FULLUPDATE;
-	snprintf(title, sizeof(title), SHM->i18nstr[cuser.language][2528], topic);
+	snprintf(title, sizeof(title), gettext[2528], topic);
 	snprintf(genbuf, sizeof(genbuf), "%s\n\n%s%s\n%s",
-		 SHM->i18nstr[cuser.language][2529], SHM->i18nstr[cuser.language][2530], topic, SHM->i18nstr[cuser.language][2531]);
-	if (!getdata(8, 0, SHM->i18nstr[cuser.language][2532], topic, IDLEN + 1, DOECHO))
+		 gettext[2529], gettext[2530], topic, gettext[2531]);
+	if (!getdata(8, 0, gettext[2532], topic, IDLEN + 1, DOECHO))
 	    return FULLUPDATE;
 	strcat(genbuf, topic);
-	strcat(genbuf, SHM->i18nstr[cuser.language][2533]);
+	strcat(genbuf, gettext[2533]);
 	break;
     case 9:
-	if (!getdata(7, 0, SHM->i18nstr[cuser.language][2534], topic, 30, DOECHO))
+	if (!getdata(7, 0, gettext[2534], topic, 30, DOECHO))
 	    return FULLUPDATE;
-	snprintf(title, sizeof(title), SHM->i18nstr[cuser.language][2535], topic);
+	snprintf(title, sizeof(title), gettext[2535], topic);
 	snprintf(genbuf, sizeof(genbuf), "%s\n\n%s%s\n%s%s",
-		 SHM->i18nstr[cuser.language][2536], SHM->i18nstr[cuser.language][2537], topic, SHM->i18nstr[cuser.language][2538], cuser.userid);
-	strcat(genbuf, SHM->i18nstr[cuser.language][2539]);
+		 gettext[2536], gettext[2537], topic, gettext[2538], cuser.userid);
+	strcat(genbuf, gettext[2539]);
 	break;
     default:
 	return FULLUPDATE;
     }
-    outs(SHM->i18nstr[cuser.language][2540]);
+    outs(gettext[2540]);
     for (temp = 12; temp < 17; temp++) {
-	    if (!getdata(temp, 0, SHM->i18nstr[cuser.language][2541], topic, 60, DOECHO))
+	    if (!getdata(temp, 0, gettext[2541], topic, 60, DOECHO))
 		break;
 	    strcat(genbuf, topic);
 	    strcat(genbuf, "\n");
 	}
     if (temp == 11)
 	    return FULLUPDATE;
-    strcat(genbuf, SHM->i18nstr[cuser.language][2542]);
+    strcat(genbuf, gettext[2542]);
     now += 14 * 24 * 60 * 60;
     snprintf(topic, sizeof(topic), "(%ld)", now);
     strcat(genbuf, topic);
     strcat(genbuf, ctime(&now));
     now -= 14 * 24 * 60 * 60;
-    strcat(genbuf, SHM->i18nstr[cuser.language][2543]);
-    strcat(genbuf, SHM->i18nstr[cuser.language][2544]);
-    outs(SHM->i18nstr[cuser.language][2545]);
+    strcat(genbuf, gettext[2543]);
+    strcat(genbuf, gettext[2544]);
+    outs(gettext[2545]);
     setbpath(fpath, currboard);
     stampfile(fpath, &votefile);
 
     if (!(fp = fopen(fpath, "w"))) {
-	outs(SHM->i18nstr[cuser.language][2546]);
+	outs(gettext[2546]);
 	return FULLUPDATE;
     }
-    fprintf(fp, "%s%s %s%s\n%s%s\n%s%s", SHM->i18nstr[cuser.language][2547], cuser.userid,
-	    SHM->i18nstr[cuser.language][2548], currboard,
-	    SHM->i18nstr[cuser.language][2549], title,
-	    SHM->i18nstr[cuser.language][2550], ctime(&now));
+    fprintf(fp, "%s%s %s%s\n%s%s\n%s%s", gettext[2547], cuser.userid,
+	    gettext[2548], currboard,
+	    gettext[2549], title,
+	    gettext[2550], ctime(&now));
     fprintf(fp, "%s\n", genbuf);
     fclose(fp);
     strlcpy(votefile.owner, cuser.userid, sizeof(votefile.owner));

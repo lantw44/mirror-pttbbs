@@ -28,12 +28,12 @@ u_loginview()
     move(4, 0);
     for (i = 0; i < NUMVIEWFILE; i++)
 	prints("    %c. %-20s %-15s \n", 'A' + i,
-	       I18N[loginview_file[i].string_index]
-	       , ((pbits >> i) & 1 ? I18N[2079] : 
-	       I18N[2080]));
+	       gettext[loginview_file[i].string_index]
+	       , ((pbits >> i) & 1 ? gettext[2079] : 
+	       gettext[2080]));
 
     clrtobot();
-    while ((i = getkey(I18N[2081]))!='\r') {
+    while ((i = getkey(gettext[2081]))!='\r') {
 	i = i - 'a';
                	
 	if (i >= NUMVIEWFILE || i < 0)
@@ -41,7 +41,7 @@ u_loginview()
 	else {
 	    pbits ^= (1 << i);
 	    move(i + 4, 28);
-	    prints((pbits >> i) & 1 ? I18N[2082] : I18N[2083]);
+	    prints((pbits >> i) & 1 ? gettext[2082] : gettext[2083]);
 	}
     }
 
@@ -60,13 +60,13 @@ user_display(userec_t * u, int real)
 
     clrtobot();
     prints(
-	   I18N[2084]);
-    prints(I18N[2085],
+	   gettext[2084]);
+    prints(gettext[2085],
 	   u->userid, u->username, u->realname,
 #ifdef FOREIGN_REG
-	   u->uflag2 & FOREIGN ? I18N[2087] : "",
+	   u->uflag2 & FOREIGN ? gettext[2087] : "",
 	   u->uflag2 & FOREIGN ?
-		(u->uflag2 & LIVERIGHT) ? I18N[2088] : I18N[2089]
+		(u->uflag2 & LIVERIGHT) ? gettext[2088] : gettext[2089]
 		: "",
 #else
 		"","",
@@ -75,14 +75,14 @@ user_display(userec_t * u, int real)
 	   sex[u->sex % 8], u->money);
 
     sethomedir(genbuf, u->userid);
-    prints(I18N[2090],
+    prints(gettext[2090],
 	   get_num_records(genbuf, sizeof(fileheader_t)),
 	   u->exmailbox, u->mobile,
 	   u->month, u->day, u->year % 100, u->mychicken.name);
-    prints(I18N[2091], ctime(&u->firstlogin));
-    prints(I18N[2092], ctime(&u->lastlogin));
-    prints(I18N[2093], ctime(&u->lastsong));
-    prints(I18N[2094],
+    prints(gettext[2091], ctime(&u->firstlogin));
+    prints(gettext[2092], ctime(&u->lastlogin));
+    prints(gettext[2093], ctime(&u->lastsong));
+    prints(gettext[2094],
 	   u->numlogins, u->numposts);
 
     if (real) {
@@ -90,11 +90,11 @@ user_display(userec_t * u, int real)
 	for (diff = 0; diff < 32; diff++)
 	    if (!(u->userlevel & (1 << diff)))
 		genbuf[diff] = '-';
-	prints(I18N[2095],
+	prints(gettext[2095],
 	       u->justify, genbuf);
     } else {
 	diff = (now - login_start_time) / 60;
-	prints(I18N[2096],
+	prints(gettext[2096],
 	       diff / 60, diff % 60);
     }
 
@@ -103,7 +103,7 @@ user_display(userec_t * u, int real)
 	int             i;
 	boardheader_t  *bhdr;
 
-	outs(I18N[2097]);
+	outs(gettext[2097]);
 
 	for (i = 0, bhdr = bcache; i < numboards; i++, bhdr++) {
 	    if (is_uBM(bhdr->BM, u->userid)) {
@@ -113,15 +113,15 @@ user_display(userec_t * u, int real)
 	}
 	outc('\n');
     }
-    outs(I18N[2098]);
+    outs(gettext[2098]);
 
     outs((u->userlevel & PERM_LOGINOK) ?
-	 I18N[2099] :
-	 I18N[2100]);
+	 gettext[2099] :
+	 gettext[2100]);
 
 #ifdef NEWUSER_LIMIT
     if ((u->lastlogin - u->firstlogin < 3 * 86400) && !HAS_PERM(PERM_POST))
-	outs(I18N[2101]);
+	outs(gettext[2101]);
 #endif
 }
 
@@ -135,11 +135,11 @@ mail_violatelaw(char *crime, char *police, char *reason, char *result)
     stampfile(genbuf, &fhdr);
     if (!(fp = fopen(genbuf, "w")))
 	return;
-    fprintf(fp, I18N[2102],
+    fprintf(fp, gettext[2102],
 	    ctime(&now), police, crime, reason, result);
     fclose(fp);
-    strcpy(fhdr.title, I18N[2103]);
-    strcpy(fhdr.owner, I18N[2104]);
+    strcpy(fhdr.title, gettext[2103]);
+    strcpy(fhdr.owner, gettext[2104]);
     snprintf(genbuf, 200, "home/%c/%s/.DIR", crime[0], crime);
     append_record(genbuf, &fhdr, sizeof(fhdr));
 }
@@ -152,26 +152,26 @@ violate_law(userec_t * u, int unum)
     move(1, 0);
     clrtobot();
     move(2, 0);
-    prints(I18N[2105]);
-    prints(I18N[2106]);
-    getdata(5, 0, I18N[2107], ans, 3, DOECHO);
+    prints(gettext[2105]);
+    prints(gettext[2106]);
+    getdata(5, 0, gettext[2107], ans, 3, DOECHO);
     switch (ans[0]) {
     case '1':
 	strcpy(reason, "Cross-post");
 	break;
     case '2':
-	strcpy(reason, I18N[2108]);
+	strcpy(reason, gettext[2108]);
 	break;
     case '3':
-	strcpy(reason, I18N[2109]);
+	strcpy(reason, gettext[2109]);
 	break;
     case '4':
-	while (!getdata(7, 0, I18N[2110], reason, 50, DOECHO));
-	strcat(reason, I18N[2111]);
+	while (!getdata(7, 0, gettext[2110], reason, 50, DOECHO));
+	strcat(reason, gettext[2111]);
 	break;
     case '8':
     case '9':
-	while (!getdata(6, 0, I18N[2112], reason, 50, DOECHO));
+	while (!getdata(6, 0, gettext[2112], reason, 50, DOECHO));
 	break;
     default:
 	return;
@@ -184,15 +184,15 @@ violate_law(userec_t * u, int unum)
 	snprintf(src, sizeof(src), "home/%c/%s", u->userid[0], u->userid);
 	snprintf(dst, sizeof(dst), "tmp/%s", u->userid);
 	Rename(src, dst);
-	post_violatelaw(u->userid, cuser.userid, reason, I18N[2113]);
+	post_violatelaw(u->userid, cuser.userid, reason, gettext[2113]);
         kill_user(unum);
 
     } else {
 	u->userlevel |= PERM_VIOLATELAW;
 	u->vl_count++;
 	passwd_update(unum, u);
-	post_violatelaw(u->userid, cuser.userid, reason, I18N[2114]);
-	mail_violatelaw(u->userid, cuser.userid, reason, I18N[2115]);
+	post_violatelaw(u->userid, cuser.userid, reason, gettext[2114]);
+	mail_violatelaw(u->userid, cuser.userid, reason, gettext[2115]);
     }
     pressanykey();
 }
@@ -201,29 +201,29 @@ static void Customize(void)
 {
     char    done = 0, mindbuf[5];
 
-    showtitle(I18N[2119], I18N[2120]);
+    showtitle(gettext[2119], gettext[2120]);
     memcpy(mindbuf, &currutmp->mind, 4);
     mindbuf[4] = 0;
     while( !done ){
 	move(2, 0);
-	prints(I18N[2121]);
+	prints(gettext[2121]);
 	move(4, 0);
-	prints("%-30s%10s\n", I18N[2122],
-	       I18N[2116 + (cuser.uflag2 & WATER_MASK)]);
-	prints("%-30s%10s\n", I18N[2123],
-	       ((cuser.userlevel & PERM_NOOUTMAIL) ? I18N[2124] : I18N[2125]));
-	prints("%-30s%10s\n", I18N[2126],
-	       ((cuser.uflag2 & FAVNEW_FLAG) ? I18N[2127] : I18N[2128]));
-	prints("%-30s%10s\n", I18N[2129], mindbuf);
-	prints("%-30s%10s\n", I18N[2130], 
-	       ((cuser.uflag2 & FAVNOHILIGHT) ? I18N[2131] : I18N[2132]));
-	switch(getkey(I18N[2133])){
+	prints("%-30s%10s\n", gettext[2122],
+	       gettext[2116 + (cuser.uflag2 & WATER_MASK)]);
+	prints("%-30s%10s\n", gettext[2123],
+	       ((cuser.userlevel & PERM_NOOUTMAIL) ? gettext[2124] : gettext[2125]));
+	prints("%-30s%10s\n", gettext[2126],
+	       ((cuser.uflag2 & FAVNEW_FLAG) ? gettext[2127] : gettext[2128]));
+	prints("%-30s%10s\n", gettext[2129], mindbuf);
+	prints("%-30s%10s\n", gettext[2130], 
+	       ((cuser.uflag2 & FAVNOHILIGHT) ? gettext[2131] : gettext[2132]));
+	switch(getkey(gettext[2133])){
 	case 'a':{
 	    int     currentset = cuser.uflag2 & WATER_MASK;
 	    currentset = (currentset + 1) % 3;
 	    cuser.uflag2 &= ~WATER_MASK;
 	    cuser.uflag2 |= currentset;
-	    vmsg(I18N[2134]);
+	    vmsg(gettext[2134]);
 	}
 	    break;
 	case 'b':
@@ -235,12 +235,12 @@ static void Customize(void)
 		subscribe_newfav();
 	    break;
 	case 'd':{
-	    getdata(b_lines - 1, 0, I18N[2135],
+	    getdata(b_lines - 1, 0, gettext[2135],
 		    mindbuf, sizeof(mindbuf), DOECHO);
-	    if (strcmp(mindbuf, I18N[2136]) == 0)
-		vmsg(I18N[2137]);
-	    else if (strcmp(mindbuf, I18N[2138]) == 0)
-		vmsg(I18N[2139]);
+	    if (strcmp(mindbuf, gettext[2136]) == 0)
+		vmsg(gettext[2137]);
+	    else if (strcmp(mindbuf, gettext[2138]) == 0)
+		vmsg(gettext[2139]);
 	    else
 		memcpy(currutmp->mind, mindbuf, 4);
 	}
@@ -253,7 +253,7 @@ static void Customize(void)
 	}
 	passwd_update(usernum, &cuser);
     }
-    pressanykey();
+    vmsg("設定完成");
 }
 
 void
@@ -274,8 +274,9 @@ uinfo_query(userec_t * u, int real, int unum)
 
     memcpy(&x, u, sizeof(userec_t));
 	ans = getans(real ?
-		I18N[2140] :
-		I18N[2141]);
+		gettext[2140] :
+		gettext[2141]);
+
     if (ans > '2' && ans != 'C' && ans != 'c' && !real)
 	ans = '0';
 
@@ -296,32 +297,32 @@ uinfo_query(userec_t * u, int real, int unum)
 	return;
     case '1':
 	move(0, 0);
-	outs(I18N[2142]);
+	outs(gettext[2142]);
 
-	getdata_buf(i++, 0, I18N[2143], x.username,
+	getdata_buf(i++, 0, gettext[2143], x.username,
 		    sizeof(x.username), DOECHO);
 	if (real) {
-	    getdata_buf(i++, 0, I18N[2144],
+	    getdata_buf(i++, 0, gettext[2144],
 			x.realname, sizeof(x.realname), DOECHO);
 #ifdef FOREIGN_REG
-	    getdata_buf(i++, 0, cuser.uflag2 & FOREIGN ? I18N[2145] : I18N[2146], x.ident, sizeof(x.ident), DOECHO);
+	    getdata_buf(i++, 0, cuser.uflag2 & FOREIGN ? gettext[2145] : gettext[2146], x.ident, sizeof(x.ident), DOECHO);
 #else
-	    getdata_buf(i++, 0, I18N[2147], x.ident, sizeof(x.ident), DOECHO);
+	    getdata_buf(i++, 0, gettext[2147], x.ident, sizeof(x.ident), DOECHO);
 #endif
-	    getdata_buf(i++, 0, I18N[2148],
+	    getdata_buf(i++, 0, gettext[2148],
 			x.address, sizeof(x.address), DOECHO);
 	}
 	snprintf(buf, sizeof(buf), "%010d", x.mobile);
-	getdata_buf(i++, 0, I18N[2149], buf, 11, LCECHO);
+	getdata_buf(i++, 0, gettext[2149], buf, 11, LCECHO);
 	x.mobile = atoi(buf);
-	getdata_str(i++, 0, I18N[2150], buf, 50, DOECHO,
+	getdata_str(i++, 0, gettext[2150], buf, 50, DOECHO,
 		    x.email);
 	if (strcmp(buf, x.email) && strchr(buf, '@')) {
 	    strlcpy(x.email, buf, sizeof(x.email));
 	    mail_changed = 1 - real;
 	}
 	snprintf(genbuf, sizeof(genbuf), "%i", (u->sex + 1) % 8);
-	getdata_str(i++, 0, I18N[2151],
+	getdata_str(i++, 0, gettext[2151],
 		    buf, 3, DOECHO, genbuf);
 	if (buf[0] >= '1' && buf[0] <= '8')
 	    x.sex = (buf[0] - '1') % 8;
@@ -333,7 +334,7 @@ uinfo_query(userec_t * u, int real, int unum)
 
 	    snprintf(genbuf, sizeof(genbuf), "%02i/%02i/%02i",
 		     u->month, u->day, u->year % 100);
-	    len = getdata_str(i, 0, I18N[2152], buf, 9,
+	    len = getdata_str(i, 0, gettext[2152], buf, 9,
 			      DOECHO, genbuf);
 	    if (len && len != 8)
 		continue;
@@ -357,7 +358,7 @@ uinfo_query(userec_t * u, int real, int unum)
 	    int l;
 	    if (HAS_PERM(PERM_BBSADM)) {
 		snprintf(genbuf, sizeof(genbuf), "%d", x.money);
-		if (getdata_str(i++, 0, I18N[2153], buf, 10, DOECHO, genbuf))
+		if (getdata_str(i++, 0, gettext[2153], buf, 10, DOECHO, genbuf))
 		    if ((l = atol(buf)) != 0) {
 			if (l != x.money) {
 			    money_change = 1;
@@ -367,40 +368,40 @@ uinfo_query(userec_t * u, int real, int unum)
 		    }
 	    }
 	    snprintf(genbuf, sizeof(genbuf), "%d", x.exmailbox);
-	    if (getdata_str(i++, 0, I18N[2154], buf, 6,
+	    if (getdata_str(i++, 0, gettext[2154], buf, 6,
 			    DOECHO, genbuf))
 		if ((l = atol(buf)) != 0)
 		    x.exmailbox = (int)l;
 
-	    getdata_buf(i++, 0, I18N[2155], x.justify,
+	    getdata_buf(i++, 0, gettext[2155], x.justify,
 			sizeof(x.justify), DOECHO);
-	    getdata_buf(i++, 0, I18N[2156],
+	    getdata_buf(i++, 0, gettext[2156],
 			x.lasthost, sizeof(x.lasthost), DOECHO);
 
 	    snprintf(genbuf, sizeof(genbuf), "%d", x.numlogins);
-	    if (getdata_str(i++, 0, I18N[2157], buf, 10, DOECHO, genbuf))
+	    if (getdata_str(i++, 0, gettext[2157], buf, 10, DOECHO, genbuf))
 		if ((fail = atoi(buf)) >= 0)
 		    x.numlogins = fail;
 	    snprintf(genbuf, sizeof(genbuf), "%d", u->numposts);
-	    if (getdata_str(i++, 0, I18N[2158], buf, 10, DOECHO, genbuf))
+	    if (getdata_str(i++, 0, gettext[2158], buf, 10, DOECHO, genbuf))
 		if ((fail = atoi(buf)) >= 0)
 		    x.numposts = fail;
 	    snprintf(genbuf, sizeof(genbuf), "%d", u->goodpost);
-	    if (getdata_str(i++, 0, I18N[2159], buf, 10, DOECHO, genbuf))
+	    if (getdata_str(i++, 0, gettext[2159], buf, 10, DOECHO, genbuf))
 		if ((fail = atoi(buf)) >= 0)
 		    x.goodpost = fail;
 	    snprintf(genbuf, sizeof(genbuf), "%d", u->badpost);
-	    if (getdata_str(i++, 0, I18N[2160], buf, 10, DOECHO, genbuf))
+	    if (getdata_str(i++, 0, gettext[2160], buf, 10, DOECHO, genbuf))
 		if ((fail = atoi(buf)) >= 0)
 		    x.badpost = fail;
 	    snprintf(genbuf, sizeof(genbuf), "%d", u->vl_count);
-	    if (getdata_str(i++, 0, I18N[2161], buf, 10, DOECHO, genbuf))
+	    if (getdata_str(i++, 0, gettext[2161], buf, 10, DOECHO, genbuf))
 		if ((fail = atoi(buf)) >= 0)
 		    x.vl_count = fail;
 
 	    snprintf(genbuf, sizeof(genbuf),
 		     "%d/%d/%d", u->five_win, u->five_lose, u->five_tie);
-	    if (getdata_str(i++, 0, I18N[2162], buf, 16, DOECHO,
+	    if (getdata_str(i++, 0, gettext[2162], buf, 16, DOECHO,
 			    genbuf))
 		while (1) {
 		    p = strtok(buf, "/\r\n");
@@ -419,7 +420,7 @@ uinfo_query(userec_t * u, int real, int unum)
 		}
 	    snprintf(genbuf, sizeof(genbuf),
 		     "%d/%d/%d", u->chc_win, u->chc_lose, u->chc_tie);
-	    if (getdata_str(i++, 0, I18N[2163], buf, 16, DOECHO,
+	    if (getdata_str(i++, 0, gettext[2163], buf, 16, DOECHO,
 			    genbuf))
 		while (1) {
 		    p = strtok(buf, "/\r\n");
@@ -437,7 +438,7 @@ uinfo_query(userec_t * u, int real, int unum)
 		    break;
 		}
 #ifdef FOREIGN_REG
-	    if (getdata_str(i++, 0, I18N[2164], buf, 2, DOECHO, x.uflag2 & FOREIGN ? "2" : "1"))
+	    if (getdata_str(i++, 0, gettext[2164], buf, 2, DOECHO, x.uflag2 & FOREIGN ? "2" : "1"))
 		if ((fail = atoi(buf)) > 0){
 		    if (fail == 2){
 			x.uflag2 |= FOREIGN;
@@ -446,7 +447,7 @@ uinfo_query(userec_t * u, int real, int unum)
 			x.uflag2 &= ~FOREIGN;
 		}
 	    if (x.uflag2 & FOREIGN)
-		if (getdata_str(i++, 0, I18N[2165], buf, 2, DOECHO, x.uflag2 & LIVERIGHT ? "1" : "2")){
+		if (getdata_str(i++, 0, gettext[2165], buf, 2, DOECHO, x.uflag2 & LIVERIGHT ? "1" : "2")){
 		    if ((fail = atoi(buf)) > 0){
 			if (fail == 1){
 			    x.uflag2 |= LIVERIGHT;
@@ -466,29 +467,29 @@ uinfo_query(userec_t * u, int real, int unum)
     case '2':
 	i = 19;
 	if (!real) {
-	    if (!getdata(i++, 0, I18N[2166], buf, PASSLEN, NOECHO) ||
+	    if (!getdata(i++, 0, gettext[2166], buf, PASSLEN, NOECHO) ||
 		!checkpasswd(u->passwd, buf)) {
-		outs(I18N[2167]);
+		outs(gettext[2167]);
 		fail++;
 		break;
 	    }
 	} else {
 	    char            witness[3][32];
 	    for (i = 0; i < 3; i++) {
-		if (!getdata(19 + i, 0, I18N[2168],
+		if (!getdata(19 + i, 0, gettext[2168],
 			     witness[i], sizeof(witness[i]), DOECHO)) {
-		    outs(I18N[2169]);
+		    outs(gettext[2169]);
 		    fail++;
 		    break;
 		} else if (!(uid = getuser(witness[i]))) {
-		    outs(I18N[2170]);
+		    outs(gettext[2170]);
 		    fail++;
 		    break;
 		} else {
 		    userec_t        atuser;
 		    passwd_query(uid, &atuser);
 		    if (now - atuser.firstlogin < 6 * 30 * 24 * 60 * 60) {
-			outs(I18N[2171]);
+			outs(gettext[2171]);
 			i--;
 		    }
 		}
@@ -499,16 +500,16 @@ uinfo_query(userec_t * u, int real, int unum)
 		i = 20;
 	}
 
-	if (!getdata(i++, 0, I18N[2172], buf, PASSLEN, NOECHO)) {
-	    outs(I18N[2173]);
+	if (!getdata(i++, 0, gettext[2172], buf, PASSLEN, NOECHO)) {
+	    outs(gettext[2173]);
 	    fail++;
 	    break;
 	}
 	strncpy(genbuf, buf, PASSLEN);
 
-	getdata(i++, 0, I18N[2174], buf, PASSLEN, NOECHO);
+	getdata(i++, 0, gettext[2174], buf, PASSLEN, NOECHO);
 	if (strncmp(buf, genbuf, PASSLEN)) {
-	    outs(I18N[2175]);
+	    outs(gettext[2175]);
 	    fail++;
 	    break;
 	}
@@ -534,10 +535,10 @@ uinfo_query(userec_t * u, int real, int unum)
 	break;
 
     case '5':
-	if (getdata_str(b_lines - 3, 0, I18N[2176], genbuf, IDLEN + 1,
+	if (getdata_str(b_lines - 3, 0, gettext[2176], genbuf, IDLEN + 1,
 			DOECHO, x.userid)) {
 	    if (searchuser(genbuf)) {
-		outs(I18N[2177]);
+		outs(gettext[2177]);
 		fail++;
 	    } else
 		strlcpy(x.userid, genbuf, sizeof(x.userid));
@@ -547,7 +548,7 @@ uinfo_query(userec_t * u, int real, int unum)
 	if (x.mychicken.name[0])
 	    x.mychicken.name[0] = 0;
 	else
-	    strlcpy(x.mychicken.name, I18N[2178], sizeof(x.mychicken.name));
+	    strlcpy(x.mychicken.name, gettext[2178], sizeof(x.mychicken.name));
 	break;
     default:
 	return;
@@ -557,7 +558,7 @@ uinfo_query(userec_t * u, int real, int unum)
 	pressanykey();
 	return;
     }
-	if (getans(msg_sure_ny) == 'y') {
+    if (getans(msg_sure_ny) == 'y') {
 	if (flag)
 	    post_change_perm(temp, i, cuser.userid, x.userid);
 	if (strcmp(u->userid, x.userid)) {
@@ -594,21 +595,21 @@ uinfo_query(userec_t * u, int real, int unum)
 	    if (!(fp = fopen(genbuf, "w")))
 		return;
 
-	    fprintf(fp, I18N[2179],
+	    fprintf(fp, gettext[2179],
 		    ctime(&now), cuser.userid, x.userid, money, x.money);
 
 	    clrtobot();
 	    clear();
-	    while (!getdata(5, 0, I18N[2180],
+	    while (!getdata(5, 0, gettext[2180],
 			    reason, sizeof(reason), DOECHO));
 
-	    fprintf(fp, I18N[2181],
+	    fprintf(fp, gettext[2181],
 		    cuser.userid, reason);
 	    fclose(fp);
 	    snprintf(fhdr.title, sizeof(fhdr.title),
-		     I18N[2182], cuser.userid,
+		     gettext[2182], cuser.userid,
 		     x.userid);
-	    strlcpy(fhdr.owner, I18N[2183], sizeof(fhdr.owner));
+	    strlcpy(fhdr.owner, gettext[2183], sizeof(fhdr.owner));
 	    append_record("boards/S/Security/.DIR", &fhdr, sizeof(fhdr));
 	}
     }
@@ -634,6 +635,13 @@ u_ansi()
 }
 
 int
+u_language()
+{
+	cuser.language = (cuser.language + 1) % MAX_LANG;
+	gettext = SHM->i18nstr[cuser.language];
+	return 0;
+}
+int
 u_cloak()
 {
     outs((currutmp->invisible ^= 1) ? MSG_CLOAKED : MSG_UNCLOAK);
@@ -652,7 +660,7 @@ u_switchproverb()
 	FILE           *fp = fopen(buf, "a");
 	assert(fp);
 
-	fprintf(fp, I18N[2184]);
+	fprintf(fp, gettext[2184]);
 	fclose(fp);
     }
     passwd_update(usernum, &cuser);
@@ -668,7 +676,7 @@ u_editproverb()
     setuserfile(buf, fn_proverb);
     move(1, 0);
     clrtobot();
-    outs(I18N[2185]);
+    outs(gettext[2185]);
     pressanykey();
     vedit(buf, NA, NULL);
     return 0;
@@ -681,7 +689,7 @@ showplans(char *uid)
 
     sethomefile(genbuf, uid, fn_plans);
     if (!show_file(genbuf, 7, MAX_QUERYLINES, ONLY_COLOR))
-	prints(I18N[2186], uid);
+	prints(gettext[2186], uid);
 }
 
 int
@@ -700,7 +708,7 @@ showsignature(char *fname, int *j)
     for (ch = '1'; ch <= '9'; ch++) {
 	fname[*j] = ch;
 	if ((fp = fopen(fname, "r"))) {
-	    prints(I18N[2187], ch);
+	    prints(gettext[2187], ch);
 	    for (i = 0; i < MAX_SIGLINES && fgets(buf, sizeof(buf), fp); i++)
 		outs(buf);
 	    num++;
@@ -720,7 +728,7 @@ u_editsig()
 
     showsignature(genbuf, &j);
 
-    getdata(0, 0, I18N[2188],
+    getdata(0, 0, gettext[2188],
 	    ans, sizeof(ans), LCECHO);
 
     aborted = 0;
@@ -730,7 +738,7 @@ u_editsig()
 	aborted = 2;
 
     if (aborted) {
-	if (!getdata(1, 0, I18N[2189], ans, sizeof(ans), DOECHO))
+	if (!getdata(1, 0, gettext[2189], ans, sizeof(ans), DOECHO))
 	    ans[0] = '1';
 	if (ans[0] >= '1' && ans[0] <= '9') {
 	    genbuf[j] = ans[0];
@@ -741,7 +749,7 @@ u_editsig()
 		setutmpmode(EDITSIG);
 		aborted = vedit(genbuf, NA, NULL);
 		if (aborted != -1)
-		    outs(I18N[2190]);
+		    outs(gettext[2190]);
 	    }
 	}
 	pressanykey();
@@ -754,7 +762,7 @@ u_editplan()
 {
     char            genbuf[200];
 
-    getdata(b_lines - 1, 0, I18N[2191],
+    getdata(b_lines - 1, 0, gettext[2191],
 	    genbuf, 3, LCECHO);
 
     if (genbuf[0] == 'e') {
@@ -764,13 +772,13 @@ u_editplan()
 	setuserfile(genbuf, fn_plans);
 	aborted = vedit(genbuf, NA, NULL);
 	if (aborted != -1)
-	    outs(I18N[2192]);
+	    outs(gettext[2192]);
 	pressanykey();
 	return 0;
     } else if (genbuf[0] == 'd') {
 	setuserfile(genbuf, fn_plans);
 	unlink(genbuf);
-	outmsg(I18N[2193]);
+	outmsg(gettext[2193]);
     }
     return 0;
 }
@@ -780,7 +788,7 @@ u_editcalendar()
 {
     char            genbuf[200];
 
-    getdata(b_lines - 1, 0, I18N[2194],
+    getdata(b_lines - 1, 0, gettext[2194],
 	    genbuf, 3, LCECHO);
 
     sethomefile(genbuf, cuser.userid, "calendar");
@@ -791,11 +799,11 @@ u_editcalendar()
 	sethomefile(genbuf, cuser.userid, "calendar");
 	aborted = vedit(genbuf, NA, NULL);
 	if (aborted != -1)
-	    vmsg(I18N[2195]);
+	    vmsg(gettext[2195]);
 	return 0;
     } else if (genbuf[0] == 'd') {
 	unlink(genbuf);
-	vmsg(I18N[2196]);
+	vmsg(gettext[2196]);
     }
     return 0;
 }
@@ -808,12 +816,12 @@ getfield(int line, char *info, char *desc, char *buf, int len)
     char            genbuf[200];
 
     move(line, 2);
-    prints(I18N[2197], buf, info);
-    snprintf(prompt, sizeof(prompt), I18N[2198], desc);
+    prints(gettext[2197], buf, info);
+    snprintf(prompt, sizeof(prompt), gettext[2198], desc);
     if (getdata_str(line + 1, 2, prompt, genbuf, len, DOECHO, buf))
 	strcpy(buf, genbuf);
     move(line, 2);
-    prints(I18N[2199], desc, buf);
+    prints(gettext[2199], desc, buf);
     clrtoeol();
 }
 
@@ -916,47 +924,47 @@ toregister(char *email, char *genbuf, char *phone, char *career,
 	fclose(fn);
     }
     clear();
-    stand_title(I18N[2200]);
+    stand_title(gettext[2200]);
     if (cuser.userlevel & PERM_NOREGCODE){
 	strcpy(email, "x");
 	goto REGFORM2;
     }
     move(2, 0);
-    outs(I18N[2201]);
+    outs(gettext[2201]);
 
 #ifdef HAVEMOBILE
-    outs(I18N[2202]);
+    outs(gettext[2202]);
 #endif
 
     while (1) {
 	email[0] = 0;
-	getfield(15, I18N[2203], "E-Mail Address", email, 50);
+	getfield(15, gettext[2203], "E-Mail Address", email, 50);
 	if (strcmp(email, "x") == 0 || strcmp(email, "X") == 0)
 	    break;
 #ifdef HAVEMOBILE
 	else if (strcmp(email, "m") == 0 || strcmp(email, "M") == 0) {
 	    if (isvalidmobile(mobile)) {
 		char            yn[3];
-		getdata(16, 0, I18N[2204],
+		getdata(16, 0, gettext[2204],
 			yn, sizeof(yn), LCECHO);
 		if (yn[0] == 'Y' || yn[0] == 'y')
 		    break;
 	    } else {
 		move(17, 0);
-		prints(I18N[2205]);
+		prints(gettext[2205]);
 	    }
 
 	}
 #endif
 	else if (isvalidemail(email)) {
 	    char            yn[3];
-	    getdata(16, 0, I18N[2206],
+	    getdata(16, 0, gettext[2206],
 		    yn, sizeof(yn), LCECHO);
 	    if (yn[0] == 'Y' || yn[0] == 'y')
 		break;
 	} else {
 	    move(17, 0);
-	    prints(I18N[2207]);
+	    prints(gettext[2207]);
 	}
     }
     strncpy(cuser.email, email, sizeof(cuser.email));
@@ -990,7 +998,7 @@ toregister(char *email, char *genbuf, char *phone, char *career,
 	    sethomefile(buf, cuser.userid, "justify");
 	}
 	snprintf(buf, sizeof(buf), "%s%s%s%s",
-		 I18N[2208], BBSNAME, I18N[2209], getregcode(genbuf));
+		 gettext[2208], BBSNAME, gettext[2209], getregcode(genbuf));
 	strlcpy(tmp, cuser.userid, sizeof(tmp));
 	strlcpy(cuser.userid, "SYSOP", sizeof(cuser.userid));
 #ifdef HAVEMOBILE
@@ -1000,7 +1008,7 @@ toregister(char *email, char *genbuf, char *phone, char *career,
 #endif
 	    bsmtp("etc/registermail", buf, email, 0);
 	strlcpy(cuser.userid, tmp, sizeof(cuser.userid));
-	outs(I18N[2210]);
+	outs(gettext[2210]);
 	pressanykey();
 	return;
     }
@@ -1011,12 +1019,12 @@ static int HaveRejectStr(char *s, char **rej)
 {
     int     i;
     char    *ptr, *rejectstr[] =
-	{I18N[2211], I18N[2212], I18N[2213], I18N[2214], I18N[2215], I18N[2216], I18N[2217], "..", "xx",
-	 I18N[2218], I18N[2219], I18N[2220], I18N[2221], I18N[2222], 
-	 I18N[2223], I18N[2224], I18N[2225], I18N[2226], I18N[2227], I18N[2228], I18N[2229], I18N[2230], I18N[2231], I18N[2232], I18N[2233],
-	 I18N[2234], I18N[2235], I18N[2236], I18N[2237],/*"ㄔ",*/    I18N[2238], I18N[2239], I18N[2240], I18N[2241], I18N[2242],
-	 I18N[2243], I18N[2244], I18N[2245], I18N[2246], I18N[2247], I18N[2248], I18N[2249], I18N[2250], I18N[2251], I18N[2252], I18N[2253],
-	 I18N[2254], I18N[2255], I18N[2256], I18N[2257], I18N[2258], NULL};
+	{gettext[2211], gettext[2212], gettext[2213], gettext[2214], gettext[2215], gettext[2216], gettext[2217], "..", "xx",
+	 gettext[2218], gettext[2219], gettext[2220], gettext[2221], gettext[2222], 
+	 gettext[2223], gettext[2224], gettext[2225], gettext[2226], gettext[2227], gettext[2228], gettext[2229], gettext[2230], gettext[2231], gettext[2232], gettext[2233],
+	 gettext[2234], gettext[2235], gettext[2236], gettext[2237],/*"ㄔ",*/    gettext[2238], gettext[2239], gettext[2240], gettext[2241], gettext[2242],
+	 gettext[2243], gettext[2244], gettext[2245], gettext[2246], gettext[2247], gettext[2248], gettext[2249], gettext[2250], gettext[2251], gettext[2252], gettext[2253],
+	 gettext[2254], gettext[2255], gettext[2256], gettext[2257], gettext[2258], NULL};
 
     if( rej != NULL )
 	for( i = 0 ; rej[i] != NULL ; ++i )
@@ -1027,8 +1035,8 @@ static int HaveRejectStr(char *s, char **rej)
 	if( strstr(s, rejectstr[i]) )
 	    return 1;
 
-    if( (ptr = strstr(s, I18N[2259])) != NULL ){
-	if( ptr != s && strncmp(ptr - 1, I18N[2260], 4) == 0 )
+    if( (ptr = strstr(s, gettext[2259])) != NULL ){
+	if( ptr != s && strncmp(ptr - 1, gettext[2260], 4) == 0 )
 	    return 0;
 	return 1;
     }
@@ -1042,20 +1050,20 @@ static char *isvalidname(char *rname)
     return NULL;
 #else
     char    *rejectstr[] =
-	{I18N[2261], I18N[2262], I18N[2263], I18N[2264], I18N[2265], I18N[2266], I18N[2267], I18N[2268], I18N[2269],
-	 I18N[2270], I18N[2271], I18N[2272], I18N[2273], I18N[2274], I18N[2275], I18N[2276], I18N[2277], 
-	 I18N[2278], I18N[2279], I18N[2280], I18N[2281], I18N[2282], I18N[2283], I18N[2284], I18N[2285],
-	 I18N[2286], I18N[2287], I18N[2288], I18N[2289], I18N[2290], I18N[2291],
+	{gettext[2261], gettext[2262], gettext[2263], gettext[2264], gettext[2265], gettext[2266], gettext[2267], gettext[2268], gettext[2269],
+	 gettext[2270], gettext[2271], gettext[2272], gettext[2273], gettext[2274], gettext[2275], gettext[2276], gettext[2277], 
+	 gettext[2278], gettext[2279], gettext[2280], gettext[2281], gettext[2282], gettext[2283], gettext[2284], gettext[2285],
+	 gettext[2286], gettext[2287], gettext[2288], gettext[2289], gettext[2290], gettext[2291],
 	 NULL};
     if( removespace(rname) && rname[0] < 0 &&
 	strlen(rname) >= 4 &&
 	!HaveRejectStr(rname, rejectstr) &&
-	strncmp(rname, I18N[2292], 2) != 0   && //起頭是「小」
-	strncmp(rname, I18N[2293], 4) != 0 && //起頭是「我是」
-	!(strlen(rname) == 4 && strncmp(&rname[2], I18N[2294], 2) == 0) &&
+	strncmp(rname, gettext[2292], 2) != 0   && //起頭是「小」
+	strncmp(rname, gettext[2293], 4) != 0 && //起頭是「我是」
+	!(strlen(rname) == 4 && strncmp(&rname[2], gettext[2294], 2) == 0) &&
 	!(strlen(rname) >= 4 && strncmp(&rname[0], &rname[2], 2) == 0))
 	return NULL;
-    return I18N[2295];
+    return gettext[2295];
 #endif
 
 }
@@ -1065,14 +1073,17 @@ static char *isvalidcareer(char *career)
 #ifndef FOREIGN_REG
     char    *rejectstr[] = {NULL};
     if (!(removespace(career) && career[0] < 0 && strlen(career) >= 6) ||
-	strcmp(career, I18N[2296]) == 0 || HaveRejectStr(career, rejectstr) )
-	return I18N[2297];
-    if (strcmp(&career[strlen(career) - 2], I18N[2298]) == 0 ||
-	strcmp(&career[strlen(career) - 4], I18N[2299]) == 0 ||
-	strcmp(career, I18N[2300]) == 0)
-	return I18N[2301];
-    if (strcmp(career, I18N[2302]) == 0)
-	return I18N[2303];
+	strcmp(career, gettext[2296]) == 0 || HaveRejectStr(career, rejectstr) )
+	return gettext[2297];
+    if (strcmp(&career[strlen(career) - 2], gettext[2298]) == 0 ||
+	strcmp(&career[strlen(career) - 4], gettext[2299]) == 0 ||
+	strcmp(career, gettext[2300]) == 0)
+	return gettext[2301];
+    if (strcmp(career, gettext[2302]) == 0)
+	return gettext[2303];
+#else
+    if( strlen(career) < 6 )
+	return "您的輸入不正確";
 #endif
     return NULL;
 }
@@ -1081,23 +1092,23 @@ static char *isvalidaddr(char *addr)
 {
 #ifndef FOREIGN_REG
     char    *rejectstr[] =
-	{I18N[2304], I18N[2305], I18N[2306], NULL};
+	{gettext[2304], gettext[2305], gettext[2306], NULL};
 
     if (!removespace(addr) || addr[0] > 0 || strlen(addr) < 15) 
-	return I18N[2307];
-    if (strstr(addr, I18N[2308]) != NULL || strstr(addr, I18N[2309]) != NULL) 
-	return I18N[2310];
-    if ((strstr(addr, I18N[2311]) == NULL && strstr(addr, I18N[2312]) == NULL &&
-	 strstr(addr, I18N[2313]) == NULL && strstr(addr, I18N[2314]) == NULL) ||
+	return gettext[2307];
+    if (strstr(addr, gettext[2308]) != NULL || strstr(addr, gettext[2309]) != NULL) 
+	return gettext[2310];
+    if ((strstr(addr, gettext[2311]) == NULL && strstr(addr, gettext[2312]) == NULL &&
+	 strstr(addr, gettext[2313]) == NULL && strstr(addr, gettext[2314]) == NULL) ||
 	HaveRejectStr(addr, rejectstr)             ||
-	strcmp(&addr[strlen(addr) - 2], I18N[2315]) == 0 ||
-	strcmp(&addr[strlen(addr) - 2], I18N[2316]) == 0 ||
-	strcmp(&addr[strlen(addr) - 2], I18N[2317]) == 0 ||
-	strcmp(&addr[strlen(addr) - 2], I18N[2318]) == 0 ||
-	strcmp(&addr[strlen(addr) - 2], I18N[2319]) == 0 ||
-	strcmp(&addr[strlen(addr) - 2], I18N[2320]) == 0 ||
-	strcmp(&addr[strlen(addr) - 2], I18N[2321]) == 0    )
-	return I18N[2322];
+	strcmp(&addr[strlen(addr) - 2], gettext[2315]) == 0 ||
+	strcmp(&addr[strlen(addr) - 2], gettext[2316]) == 0 ||
+	strcmp(&addr[strlen(addr) - 2], gettext[2317]) == 0 ||
+	strcmp(&addr[strlen(addr) - 2], gettext[2318]) == 0 ||
+	strcmp(&addr[strlen(addr) - 2], gettext[2319]) == 0 ||
+	strcmp(&addr[strlen(addr) - 2], gettext[2320]) == 0 ||
+	strcmp(&addr[strlen(addr) - 2], gettext[2321]) == 0    )
+	return gettext[2322];
 #endif
     return NULL;
 }
@@ -1107,12 +1118,12 @@ static char *isvalidphone(char *phone)
     int     i;
     for( i = 0 ; phone[i] != 0 ; ++i )
 	if( !isdigit(phone[i]) )
-	    return I18N[2323];
+	    return gettext[2323];
     if (!removespace(phone) || 
 	strlen(phone) < 9 || 
 	strstr(phone, "00000000") != NULL ||
 	strstr(phone, "22222222") != NULL    ) {
-	return I18N[2324] ;
+	return gettext[2324] ;
     }
     return NULL;
 }
@@ -1132,7 +1143,7 @@ u_register(void)
     FILE           *fn;
 
     if (cuser.userlevel & PERM_LOGINOK) {
-	outs(I18N[2325]);
+	outs(gettext[2325]);
 	return XEASY;
     }
     if ((fn = fopen(fn_register, "r"))) {
@@ -1142,7 +1153,7 @@ u_register(void)
 	    if (strncmp(genbuf, "uid: ", 5) == 0 &&
 		strcmp(genbuf + 5, cuser.userid) == 0) {
 		fclose(fn);
-		outs(I18N[2326]);
+		outs(gettext[2326]);
 		return XEASY;
 	    }
 	}
@@ -1179,7 +1190,7 @@ u_register(void)
     }
 
     if (cuser.userlevel & PERM_NOREGCODE) {
-	vmsg(I18N[2327]);
+	vmsg(gettext[2327]);
 	goto REGFORM;
     }
 
@@ -1187,42 +1198,46 @@ u_register(void)
 	strcmp(cuser.email, "x") != 0 &&	/* 上次手動認證失敗 */
 	strcmp(cuser.email, "X") != 0) {
 	clear();
-	stand_title(I18N[2328]);
+	stand_title(gettext[2328]);
 	move(2, 0);
-	prints(I18N[2329],
+	prints(gettext[2329],
 	       cuser.userid, cuser.username);
 	inregcode[0] = 0;
 	do{
-	    getdata(10, 0, I18N[2330], inregcode, sizeof(inregcode), DOECHO);
+	    getdata(10, 0, gettext[2330], inregcode, sizeof(inregcode), DOECHO);
 	    if( strcmp(inregcode, "x") == 0 ||
 		strcmp(inregcode, "X") == 0 ||
 		strlen(inregcode) == 13 )
 		break;
 	    if( strlen(inregcode) != 13 )
-		vmsg(I18N[2331]);
+		vmsg(gettext[2331]);
 	} while( 1 );
 
 	if (strcmp(inregcode, getregcode(regcode)) == 0) {
 	    int             unum;
 	    if ((unum = getuser(cuser.userid)) == 0) {
-		vmsg(I18N[2332]);
+		vmsg(gettext[2332]);
 		u_exit("getuser error");
 		exit(0);
 	    }
-	    mail_muser(cuser, I18N[2333], "etc/registeredmail");
+	    mail_muser(cuser, gettext[2333], "etc/registeredmail");
 	    if(cuser.uflag2 & FOREIGN)
-		mail_muser(cuser, I18N[2334], "etc/foreign_welcome");
+		mail_muser(cuser, gettext[2334], "etc/foreign_welcome");
 	    cuser.userlevel |= (PERM_LOGINOK | PERM_POST);
-	    prints(I18N[2335]);
+	    prints(gettext[2335]);
 	    sethomefile(genbuf, cuser.userid, "justify.wait");
 	    unlink(genbuf);
+	    snprintf(cuser.justify, sizeof(cuser.justify),
+		     "%s:%s:auto", phone, career);
+	    sethomefile(genbuf, cuser.userid, "justify");
+	    log_file(genbuf, LOG_CREAT, cuser.justify);
 	    pressanykey();
 	    u_exit("registed");
 	    exit(0);
 	    return QUIT;
 	} else if (strcmp(inregcode, "x") != 0 &&
 		   strcmp(inregcode, "X") != 0) {
-	    vmsg(I18N[2336]);
+	    vmsg(gettext[2336]);
 	} else {
 	    toregister(email, genbuf, phone, career,
 		       ident, rname, addr, mobile);
@@ -1231,7 +1246,7 @@ u_register(void)
     }
 
     REGFORM:
-    getdata(b_lines - 1, 0, I18N[2337],
+    getdata(b_lines - 1, 0, gettext[2337],
 	    ans, 3, LCECHO);
     if (ans[0] != 'y')
 	return FULLUPDATE;
@@ -1241,12 +1256,12 @@ u_register(void)
     while (1) {
 	clear();
 	move(1, 0);
-	prints(I18N[2338],
+	prints(gettext[2338],
 	       cuser.userid, cuser.username);
 #ifdef FOREIGN_REG
 	fore[0] = 'y';
 	fore[1] = 0;
-	getfield(2, "Y/n", I18N[2339], fore, 2);
+	getfield(2, "Y/n", gettext[2339], fore, 2);
     	if (fore[0] == 'n')
 	    fore[0] |= FOREIGN;
 	else
@@ -1254,43 +1269,43 @@ u_register(void)
 	if (!fore[0]){
 #endif
 	    while( 1 ){
-		getfield(3, "D123456789", I18N[2340], ident, 11);
+		getfield(3, "D123456789", gettext[2340], ident, 11);
 		if ('a' <= ident[0] && ident[0] <= 'z')
 		    ident[0] -= 32;
 		if( ispersonalid(ident) )
 		    break;
-		vmsg(I18N[2341]);
+		vmsg(gettext[2341]);
 	    }
 #ifdef FOREIGN_REG
 	}
 	else{
 	    int i;
 	    while( 1 ){
-		getfield(4, "0123456789",I18N[2342], ident, 11);
+		getfield(4, "0123456789",gettext[2342], ident, 11);
 		move(6, 2);
-		prints(I18N[2343]);
-		getdata(7, 2, I18N[2344], ans, 3, LCECHO);
+		prints(gettext[2343]);
+		getdata(7, 2, gettext[2344], ans, 3, LCECHO);
 		if (ans[0] == 'y' || ans[0] == 'Y')
 		    break;
-		vmsg(I18N[2345]);
+		vmsg(gettext[2345]);
 	    }
 	    for(i = 0; ans[i] != 0; i++)
 		if ('a' <= ident[0] && ident[0] <= 'z')
 		    ident[0] -= 32;
 	    if( ispersonalid(ident) ){
 		fore[0] = 0;
-		vmsg(I18N[2346]);
+		vmsg(gettext[2346]);
 	    }
 	}
 #endif
 	while (1) {
 	    getfield(8, 
 #ifdef FOREIGN_REG
-                     I18N[2347],
+                     gettext[2347],
 #else
-                     I18N[2348],
+                     gettext[2348],
 #endif
-                     I18N[2349], rname, 20);
+                     gettext[2349], rname, 20);
 	    if( (errcode = isvalidname(rname)) == NULL )
 		break;
 	    else
@@ -1298,19 +1313,19 @@ u_register(void)
 	}
 
 	move(11, 0);
-	prints(I18N[2350]
+	prints(gettext[2350]
 	       );
 	while (1) {
-	    getfield(9, I18N[2351],
-		     I18N[2352], career, 40);
+	    getfield(9, gettext[2351],
+		     gettext[2352], career, 40);
 	    if( (errcode = isvalidcareer(career)) == NULL )
 		break;
 	    else
 		vmsg(errcode);
 	}
 	while (1) {
-	    getfield(11, I18N[2353],
-		     I18N[2354], addr, 50);
+	    getfield(11, gettext[2353],
+		     gettext[2354], addr, 50);
 	    if( (errcode = isvalidaddr(addr)) == NULL
 #ifdef FOREIGN_REG
                 && fore[0] == 0 
@@ -1321,18 +1336,18 @@ u_register(void)
 		vmsg(errcode);
 	}
 	while (1) {
-	    getfield(13, I18N[2355], I18N[2356], phone, 11);
+	    getfield(13, gettext[2355], gettext[2356], phone, 11);
 	    if( (errcode = isvalidphone(phone)) == NULL )
 		break;
 	    else
 		vmsg(errcode);
 	}
-	getfield(15, I18N[2357],
-		 I18N[2358], mobile, 20);
+	getfield(15, gettext[2357],
+		 gettext[2358], mobile, 20);
 	while (1) {
 	    int             len;
 
-	    getfield(17, I18N[2359], I18N[2360], birthday, 9);
+	    getfield(17, gettext[2359], gettext[2360], birthday, 9);
 	    len = strlen(birthday);
 	    if (!len) {
 		snprintf(birthday, 9, "%02i/%02i/%02i",
@@ -1345,18 +1360,18 @@ u_register(void)
 		day = (birthday[3] - '0') * 10 + (birthday[4] - '0');
 		year = (birthday[6] - '0') * 10 + (birthday[7] - '0');
 	    } else{
-		vmsg(I18N[2361]);
+		vmsg(gettext[2361]);
 		continue;
 	    }
 	    if (mon > 12 || mon < 1 || day > 31 || day < 1 || year > 90 ||
 		year < 40){
-		vmsg(I18N[2362]);
+		vmsg(gettext[2362]);
 		continue;
 	    }
 	    break;
 	}
-	getfield(19, I18N[2363], I18N[2364], sex_is, 2);
-	getdata(20, 0, I18N[2365],
+	getfield(19, gettext[2363], gettext[2364], sex_is, 2);
+	getdata(20, 0, gettext[2365],
 		ans, 3, LCECHO);
 	if (ans[0] == 'q')
 	    return 0;
@@ -1386,7 +1401,7 @@ u_register(void)
 
     clear();
     move(9, 3);
-    prints(I18N[2366]);
+    prints(gettext[2366]);
     pressanykey();
     cuser.userlevel |= PERM_POST;
     brc_initial_board("WhoAmI");
@@ -1410,9 +1425,9 @@ u_list_CB(int num, userec_t * uentp)
     if (uentp == NULL) {
 	move(2, 0);
 	clrtoeol();
-	prints(I18N[2367],
-	       I18N[2368],
-	       HAS_PERM(PERM_SEEULEVELS) ? I18N[2369] : "");
+	prints(gettext[2367],
+	       gettext[2368],
+	       HAS_PERM(PERM_SEEULEVELS) ? gettext[2369] : "");
 	i = 3;
 	return 0;
     }
@@ -1423,7 +1438,7 @@ u_list_CB(int num, userec_t * uentp)
 	return 0;
 
     if (i == b_lines) {
-	prints(I18N[2370],
+	prints(gettext[2370],
 	       usercounter, totalusers, usercounter * 100 / totalusers);
 	i = igetch();
 	if (i == 'q' || i == 'Q')
@@ -1477,7 +1492,7 @@ u_list()
     u_list_special = usercounter = 0;
     totalusers = SHM->number;
     if (HAS_PERM(PERM_SEEULEVELS)) {
-	getdata(b_lines - 1, 0, I18N[2371],
+	getdata(b_lines - 1, 0, gettext[2371],
 		genbuf, 3, DOECHO);
 	if (genbuf[0] != '2')
 	    u_list_special = PERM_BASIC | PERM_CHAT | PERM_PAGE | PERM_POST | PERM_LOGINOK | PERM_BM;
@@ -1489,7 +1504,7 @@ u_list()
     }
     move(b_lines, 0);
     clrtoeol();
-    prints(I18N[2372], usercounter, totalusers);
+    prints(gettext[2372], usercounter, totalusers);
     igetch();
     return 0;
 }

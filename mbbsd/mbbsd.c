@@ -102,12 +102,12 @@ log_usies(char *mode, char *mesg)
 {
 
     if (!mesg)
-        log_file(FN_USIES, 1,
+        log_file(FN_USIES, LOG_CREAT | LOG_VF, 
                  "%s %s %-12s Stay:%d (%s)\n",
                  Cdate(&now), mode, cuser.userid ,
                  (int)(now - login_start_time) / 60, cuser.username);
     else
-        log_file(FN_USIES, 1,
+        log_file(FN_USIES, LOG_CREAT | LOG_VF,
                  "%s %s %-12s %s\n",
                  Cdate(&now), mode, cuser.userid, mesg);
 
@@ -156,7 +156,7 @@ u_exit(char *mode)
     setutmpbid(0);
     if (!(HAS_PERM(PERM_SYSOP) && HAS_PERM(PERM_SYSOPHIDE)) &&
 	!currutmp->invisible)
-	do_aloha(I18N[1319]);
+	do_aloha(gettext[1319]);
 
     purge_utmp(currutmp);
     if ((cuser.uflag != enter_uflag) || (currmode & MODE_DIRTY) || diff) {
@@ -215,10 +215,10 @@ talk_request(int sig)
 
 	move(0, 0);
 	clrtoeol();
-	prints(I18N[1321],
+	prints(gettext[1321],
 		 SHM->uinfo[currutmp->destuip].userid, my_ctime(&now,timebuf,sizeof(timebuf)),
-		 (currutmp->sig == 2) ? I18N[1322]
-		 : I18N[1323]);
+		 (currutmp->sig == 2) ? gettext[1322]
+		 : gettext[1323]);
 	refresh();
     } else {
 	unsigned char   mode0 = currutmp->mode;
@@ -241,7 +241,7 @@ void
 show_call_in(int save, int which)
 {
     char            buf[200];
-    snprintf(buf, sizeof(buf), I18N[1324],
+    snprintf(buf, sizeof(buf), gettext[1324],
 	     currutmp->msgs[which].userid, currutmp->msgs[which].last_call_in);
     move(b_lines, 0);
     clrtoeol();
@@ -438,7 +438,7 @@ multi_user_check()
 	if (!pid /* || (kill(pid, 0) == -1) */ )
 	    return;		/* stale entry in utmp file */
 
-	getdata(b_lines - 1, 0, I18N[1325],
+	getdata(b_lines - 1, 0, gettext[1325],
 		genbuf, 3, LCECHO);
 
 	if (genbuf[0] != 'n') {
@@ -452,7 +452,7 @@ multi_user_check()
     } else {
 	/* allow multiple guest user */
 	if (search_ulistn(usernum, 100) != NULL) {
-	    vmsg(I18N[1326]);
+	    vmsg(gettext[1326]);
 	    exit(1);
 	}
     }
@@ -507,6 +507,7 @@ login_query()
     char            uid[IDLEN + 1], passbuf[PASSLEN];
     int             attempts;
 #endif
+	gettext = SHM->i18nstr[0];
     resolve_garbage();
     now = time(0);
 
@@ -530,7 +531,7 @@ login_query()
 	move(19, 0);
 	prints("current pid: %d ", getpid());
 #endif
-	getdata(20, 0, I18N[1327],
+	getdata(20, 0, SHM->i18nstr[0][1327],
 		uid, sizeof(uid), DOECHO);
 #ifdef CONVERT
 	/* switch to gb mode if uid end with '.' */
@@ -553,7 +554,7 @@ login_query()
 	    mkuserdir(cuser.userid);
 	    break;
 #else
-	    outs(I18N[1328]);
+	    outs(SHM->gettextstr[0][1328]);
 	    continue;
 #endif
 	} else if (uid[0] == '\0'){
@@ -568,6 +569,7 @@ login_query()
 		logattempt(cuser.userid , '-');
 		outs(ERR_PASSWD);
 	    } else {
+	    gettext = SHM->i18nstr[cuser.language];
 		logattempt(cuser.userid, ' ');
 		if (strcasecmp("SYSOP", cuser.userid) == 0){
 #ifdef NO_SYSOP_ACCOUNT
@@ -777,7 +779,7 @@ setup_utmp(int mode)
 }
 
 inline static void welcome_msg(void) {
-    prints(I18N[1329],
+    prints(gettext[1329],
 	    ++cuser.numlogins, cuser.lasthost, Cdate(&(cuser.lastlogin)));
     pressanykey();
 }
@@ -787,8 +789,8 @@ inline static void check_bad_login(void) {
     setuserfile(genbuf, str_badlogin);
     if (more(genbuf, NA) != -1) {
 	move(b_lines - 3, 0);
-	prints(I18N[1330]);
-	if (getans(I18N[1331]) != 'n')
+	prints(gettext[1330]);
+	if (getans(gettext[1331]) != 'n')
 	    unlink(genbuf);
     }
 }
@@ -816,23 +818,23 @@ static void init_guest_info(void)
 {
     int i;
     char           *nick[13] = {
-	I18N[1332], I18N[1333], I18N[1334], I18N[1335], I18N[1336],
-	I18N[1337], I18N[1338], I18N[1339], I18N[1340], I18N[1341],
-	I18N[1342], I18N[1343], I18N[1344]
+	gettext[1332], gettext[1333], gettext[1334], gettext[1335], gettext[1336],
+	gettext[1337], gettext[1338], gettext[1339], gettext[1340], gettext[1341],
+	gettext[1342], gettext[1343], gettext[1344]
     };
     char           *name[13] = {
-	I18N[1345], I18N[1346], I18N[1347], I18N[1348], I18N[1349],
-	I18N[1350], I18N[1351], "AIR Jordon", I18N[1352], I18N[1353],
-	I18N[1354], I18N[1355], I18N[1356]
+	gettext[1345], gettext[1346], gettext[1347], gettext[1348], gettext[1349],
+	gettext[1350], gettext[1351], "AIR Jordon", gettext[1352], gettext[1353],
+	gettext[1354], gettext[1355], gettext[1356]
     };
     char           *addr[13] = {
-	I18N[1357], I18N[1358], I18N[1359], I18N[1360], I18N[1361],
-	I18N[1362], I18N[1363], "NIKE", I18N[1364], I18N[1365],
-	I18N[1366], I18N[1367], I18N[1368]
+	gettext[1357], gettext[1358], gettext[1359], gettext[1360], gettext[1361],
+	gettext[1362], gettext[1363], "NIKE", gettext[1364], gettext[1365],
+	gettext[1366], gettext[1367], gettext[1368]
     };
     i = login_start_time % 13;
     snprintf(cuser.username, sizeof(cuser.username),
-	    I18N[1369], nick[(int)i]);
+	    gettext[1369], nick[(int)i]);
     strlcpy(currutmp->username, cuser.username,
 	    sizeof(currutmp->username));
     strlcpy(cuser.realname, name[(int)i], sizeof(cuser.realname));
@@ -845,11 +847,11 @@ static void init_guest_info(void)
 inline static void foreign_warning(void){
     if ((cuser.uflag2 & FOREIGN) && !(cuser.uflag2 & LIVERIGHT)){
 	if (login_start_time - cuser.firstlogin > (FOREIGN_REG_DAY - 5) * 24 * 3600){
-	    mail_muser(cuser, I18N[1370], "etc/foreign_expired_warn");
+	    mail_muser(cuser, gettext[1370], "etc/foreign_expired_warn");
 	}
 	else if (login_start_time - cuser.firstlogin > FOREIGN_REG_DAY * 24 * 3600){
 	    cuser.userlevel &= ~(PERM_LOGINOK | PERM_POST);
-	    vmsg(I18N[1371]);
+	    vmsg(gettext[1371]);
 	}
     }
 }
@@ -894,7 +896,7 @@ user_login()
     resolve_fcache();
     resolve_boards();
     memset(&water[0], 0, sizeof(water_t) * 6);
-    strlcpy(water[0].userid, I18N[1372], sizeof(water[0].userid));
+    strlcpy(water[0].userid, gettext[1372], sizeof(water[0].userid));
 
     if(getenv("SSH_CLIENT") != NULL){
 	char frombuf[50];
@@ -919,7 +921,7 @@ user_login()
 
     if (!(HAS_PERM(PERM_SYSOP) && HAS_PERM(PERM_SYSOPHIDE)) &&
 	!currutmp->invisible)
-	do_aloha(I18N[1373]);
+	do_aloha(gettext[1373]);
 
     if(SHM->loginmsg.pid)
       {
@@ -1048,7 +1050,7 @@ start_client()
 	showansi = 0;
     signal(SIGALRM, SIG_IGN);
 
-    domenu(MMENU, I18N[1374], (currutmp->mailalert ? 'M' : 'C'), cmdlist);
+    domenu(MMENU, gettext[1374], (currutmp->mailalert ? 'M' : 'C'), cmdlist);
 }
 
 /* FSA (finite state automata) for telnet protocol */
@@ -1438,7 +1440,7 @@ check_ban_and_load(int fd)
     write(fd, INSCREEN, sizeof(INSCREEN));
 #else
 #define BANNER \
-I18N[1375] BBSNAME I18N[1376] MYHOSTNAME I18N[1377] MYIP ") \r\n"
+gettext[1375] BBSNAME gettext[1376] MYHOSTNAME gettext[1377] MYIP ") \r\n"
     write(fd, BANNER, sizeof(BANNER));
 #endif
 
@@ -1463,9 +1465,9 @@ I18N[1375] BBSNAME I18N[1376] MYHOSTNAME I18N[1377] MYIP ") \r\n"
     }
 
     if(overload == 1)
-	write(fd, I18N[1378], 22);
+	write(fd, gettext[1378], 22);
     else if(overload == 2)
-	write(fd, I18N[1379], 28);
+	write(fd, gettext[1379], 28);
     else if (banned && (fp = fopen(BBSHOME "/" BAN_FILE, "r"))) {
 	char     buf[256];
 	while (fgets(buf, sizeof(buf), fp))

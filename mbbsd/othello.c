@@ -10,9 +10,9 @@
 #define STARTX 3
 #define STARTY 20
 #define NONE_CHESS "  "
-#define WHITE_CHESS I18N[1542]
-#define BLACK_CHESS I18N[1543]
-#define HINT_CHESS I18N[1544]
+#define WHITE_CHESS gettext[1542]
+#define BLACK_CHESS gettext[1543]
+#define HINT_CHESS gettext[1544]
 #define NONE  0
 #define HINT  1
 #define BLACK 2
@@ -79,43 +79,43 @@ printboard()
     int             i;
 
     move(STARTX, STARTY);
-    prints(I18N[1545]);
+    prints(gettext[1545]);
     for (i = 0; i < 7; i++) {
 	move(STARTX + 1 + i * 2, STARTY);
-	prints(I18N[1546]);
+	prints(gettext[1546]);
 	move(STARTX + 2 + i * 2, STARTY);
-	prints(I18N[1547]);
+	prints(gettext[1547]);
     }
     move(STARTX + 1 + i * 2, STARTY);
-    prints(I18N[1548]);
+    prints(gettext[1548]);
     move(STARTX + 2 + i * 2, STARTY);
-    prints(I18N[1549]);
+    prints(gettext[1549]);
     print_chess(4, 4, WHITE);
     print_chess(5, 5, WHITE);
     print_chess(4, 5, BLACK);
     print_chess(5, 4, BLACK);
     move(3, 56);
-    prints(I18N[1550], cuser.userid);
+    prints(gettext[1550], cuser.userid);
     move(3, 72);
     prints(": 02");
     move(4, 56);
-    prints(I18N[1551]);
+    prints(gettext[1551]);
     move(6, 56);
-    prints(I18N[1552]);
+    prints(gettext[1552]);
     move(7, 56);
-    prints(I18N[1553]);
+    prints(gettext[1553]);
     move(8, 56);
-    prints(I18N[1554]);
+    prints(gettext[1554]);
     move(9, 56);
-    prints(I18N[1555]);
+    prints(gettext[1555]);
     move(10, 56);
-    prints(I18N[1556]);
+    prints(gettext[1556]);
     move(11, 56);
-    prints(I18N[1557]);
+    prints(gettext[1557]);
     move(12, 56);
-    prints(I18N[1558]);
+    prints(gettext[1558]);
     move(13, 56);
-    prints(I18N[1559]);
+    prints(gettext[1559]);
 }
 
 static int
@@ -219,7 +219,7 @@ static void
 end_of_game(int quit)
 {
     FILE           *fp, *fp1;
-    char           *opponent[] = {"", "CD-65", "", I18N[1560], I18N[1561], "", I18N[1562], I18N[1563]};
+    char           *opponent[] = {"", "CD-65", "", gettext[1560], gettext[1561], "", gettext[1562], gettext[1563]};
 
     move(STARTX - 1, 30);
     prints("                         ");
@@ -239,36 +239,36 @@ end_of_game(int quit)
 		fclose(fp);
 	    return;
 	}
-	fprintf(fp, I18N[1564], opponent[think], cuser.userid);
+	fprintf(fp, gettext[1564], opponent[think], cuser.userid);
 	if (fp)
 	    fclose(fp);
 	return;
     }
     if (number[0] > number[1]) {
-	prints(I18N[1565], number[0] - number[1]);
+	prints(gettext[1565], number[0] - number[1]);
 	if (think == 6 && number[0] - number[1] >= 50)
 	    demoney(200);
 	if (think == 7 && number[0] - number[1] >= 40)
 	    demoney(200);
 	if (fp)
-	    fprintf(fp, I18N[1566],
+	    fprintf(fp, gettext[1566],
 		    opponent[think], cuser.userid, number[0], number[1],
 		    number[0] - number[1]);
     } else if (number[1] > number[0]) {
-	prints(I18N[1567], number[1] - number[0]);
+	prints(gettext[1567], number[1] - number[0]);
 	if (fp) {
-	    fprintf(fp, I18N[1568], opponent[think]);
+	    fprintf(fp, gettext[1568], opponent[think]);
 	    if (number[1] - number[0] > 20)
-		fprintf(fp, I18N[1569], number[1],
+		fprintf(fp, gettext[1569], number[1],
 			number[0], cuser.userid, number[1] - number[0]);
 	    else
-		fprintf(fp, I18N[1570], number[1],
+		fprintf(fp, gettext[1570], number[1],
 			number[0], cuser.userid, number[1] - number[0]);
 	}
     } else {
-	prints(I18N[1571]);
+	prints(gettext[1571]);
 	if (fp)
-	    fprintf(fp, I18N[1572],
+	    fprintf(fp, gettext[1572],
 		    opponent[think], cuser.userid, number[1], number[0]);
     }
     if (fp)
@@ -347,7 +347,7 @@ player(char color)
 	pass++;
 	if (pass == 1) {
 	    move(23, 34);
-	    prints(I18N[1573]);
+	    prints(gettext[1573]);
 	    igetch();
 	    move(28, 23);
 	    prints("                             ");
@@ -365,9 +365,9 @@ init()
     int             i, j, i1, j1;
 
 	CHESS_TYPE[0] = "  ";
-	CHESS_TYPE[1] = I18N[1544];
-	CHESS_TYPE[2] = I18N[1543];
-	CHESS_TYPE[3] = I18N[1542];
+	CHESS_TYPE[1] = gettext[1544];
+	CHESS_TYPE[2] = gettext[1543];
+	CHESS_TYPE[3] = gettext[1542];
 	
     nowx = 4;
     nowy = 4;
@@ -403,7 +403,7 @@ report()
     move(3, 72);
     prints(": %02d", number[0]);
     move(4, 60);
-    prints(I18N[1574], number[1]);
+    prints(gettext[1574], number[1]);
 }
 
 static int
@@ -482,7 +482,7 @@ Computer(int thinkstep, int table)
 	nowy = maxj;
     } else {
 	move(23, 30);
-	prints(I18N[1575]);
+	prints(gettext[1575]);
 	pass++;
 	if (pass == 2) {
 	    move(23, 24);
@@ -503,13 +503,13 @@ choose()
     char            thinkstep[2];
 
     move(2, 0);
-    prints(I18N[1576]);
+    prints(gettext[1576]);
     move(5, 0);
     prints("(1) CD-65\n");	/* 想 1 步 */
-    prints(I18N[1577]);	/* 想 3 步 */
-    prints(I18N[1578]);	/* 想 4 步 */
+    prints(gettext[1577]);	/* 想 3 步 */
+    prints(gettext[1578]);	/* 想 4 步 */
     do {
-	getdata(4, 0, I18N[1579],
+	getdata(4, 0, gettext[1579],
 		thinkstep, sizeof(thinkstep), LCECHO);
     } while (thinkstep[0] < '1' || thinkstep[0] > '3');
     clear();
@@ -536,12 +536,12 @@ othello_main()
     clear();
     init();
     think = choose();
-    showtitle(I18N[1580], BBSName);
+    showtitle(gettext[1580], BBSName);
     printboard();
     which_table = rand() % NR_TABLE;
     while (true) {
 	move(STARTX - 1, 30);
-	prints(I18N[1581]);
+	prints(gettext[1581]);
 	if (!player(BLACK))
 	    break;
 	report();
@@ -551,7 +551,7 @@ othello_main()
 	    break;
 	}
 	move(STARTX - 1, 30);
-	prints(I18N[1582]);
+	prints(gettext[1582]);
 	refresh();
 	if (!Computer(think, which_table))
 	    break;

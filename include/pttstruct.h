@@ -244,11 +244,12 @@ typedef struct {
 #define FAVGMAX    32             /* Max groups of Myfavorite */
 #define FAVGSLEN    8		  /* Max Length of Description String */
 
-#ifdef PLAY_ANGEL
 /* values of msgque_t::msgmode */
-#define MSG_GENERAL   0
-#define MSG_FROMANGEL 1
-#define MSG_TOANGEL   2
+#define MSGMODE_TALK      0
+#define MSGMODE_WRITE     1
+#ifdef PLAY_ANGEL
+#define MSGMODE_FROMANGEL 2
+#define MSGMODE_TOANGEL   3
 #endif
 
 typedef struct msgque_t {

@@ -1061,6 +1061,7 @@ toregister(char *email, char *genbuf, char *phone, char *career,
     }
 }
 
+#ifndef FOREIGN_REG
 static int HaveRejectStr(char *s, char **rej)
 {
     int     i;
@@ -1088,6 +1089,7 @@ static int HaveRejectStr(char *s, char **rej)
     }
     return 0;
 }
+#endif
 
 static char *isvalidname(char *rname)
 {
@@ -1368,11 +1370,11 @@ u_register(void)
 	    getfield(11, "含\033[1;33m縣市\033[m及門寢號碼"
 		     "(台北請加\033[1;33m行政區\033[m)",
 		     "目前住址", addr, 50);
-	    if( (errcode = isvalidaddr(addr) 
+	    if( (errcode = isvalidaddr(addr)) == NULL
 #ifdef FOREIGN_REG
-                && fore[0] ==0 
+                && fore[0] == 0
 #endif
-                ) == NULL )
+		)
 		break;
 	    else
 		vmsg(errcode);
@@ -1500,7 +1502,7 @@ u_list_CB(int num, userec_t * uentp)
 	permstr[0] = 'S';
     else if (level & PERM_ACCOUNTS)
 	permstr[0] = 'A';
-    else if (level & PERM_DENYPOST)
+    else if (level & PERM_SYSOPHIDE)
 	permstr[0] = 'p';
 
     if (level & (PERM_BOARD))
@@ -1551,6 +1553,6 @@ u_list()
     clrtoeol();
     prints("\033[34;46m  已顯示 %d/%d 的使用者(系統容量無上限)  "
 	   "\033[31;47m  (請按任意鍵繼續)  \033[m", usercounter, totalusers);
-    egetch();
+    igetch();
     return 0;
 }

@@ -23,7 +23,6 @@ static char    *more_help[] = {
     "(TAB)                 URL連結",
     "(Ctrl-T)              存到暫存檔",
     "(:/f/b)               跳至某頁/下/上篇",
-    "(F/B)                 跳至同一搜尋主題下/上篇",
     "(a/A)                 跳至同一作者下/上篇",
     "([/])                 主題式閱\讀 上/下",
     "(t)                   主題式循序閱\讀",
@@ -330,7 +329,7 @@ more(char *fpath, int promptend)
 
 
 	    while (line == b_lines || (line > 0 && viewed == fsize)) {
-		switch ((ch = egetch())) {
+		switch ((ch = igetch())) {
 		case ':':
 		    {
 			char            buf[10];

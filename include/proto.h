@@ -312,7 +312,6 @@ void init_alarm(void);
 int num_in_buf(void);
 int ochar(int c);
 int rget(int x,char *prompt);
-char getans(char *prompt);
 
 /* kaede */
 int Rename(char* src, char* dst);
@@ -454,13 +453,13 @@ void check_register(void);
 char *genpasswd(char *pw);
 
 /* screen */
+void mouts(int y, int x, char *str);
 void move(int y, int x);
 void outs(char *str);
 void clrtoeol(void);
 void clear(void);
 void refresh(void);
 void clrtobot(void);
-void mprints(int y, int x, char *str);
 void outmsg(char *msg);
 void region_scroll_up(int top, int bottom);
 void outc(unsigned char ch);
@@ -480,11 +479,13 @@ void out_lines(char *str, int line);
 #define isprint2(ch) ((ch & 0x80) || isprint(ch))
 #define not_alpha(ch) (ch < 'A' || (ch > 'Z' && ch < 'a') || ch > 'z')
 #define not_alnum(ch) (ch < '0' || (ch > '9' && ch < 'A') || (ch > 'Z' && ch < 'a') || ch > 'z')
+#define pressanykey() vmsg_lines(b_lines, NULL)
+int vmsg_lines(int lines, const char *msg);
 time_t gettime(int line, time_t dt, char* head);
 void setcalfile(char *buf, char *userid);
 void stand_title(char *title);
-void pressanykey(void);
-int  vmsg (const char *fmt,...) GCC_CHECK_FORMAT(1,2);
+int getans(const char *fmt,...) GCC_CHECK_FORMAT(1,2);
+int vmsg(const char *fmt,...) GCC_CHECK_FORMAT(1,2);
 void trim(char *buf);
 void bell(void);
 void setbpath(char *buf, char *boardname);

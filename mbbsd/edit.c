@@ -258,7 +258,7 @@ ask(char *prompt)
     standout();
     prints("%s", prompt);
     standend();
-    ch = igetkey();
+    ch = igetch();
     move(0, 0);
     clrtoeol();
     return (ch);
@@ -966,7 +966,6 @@ write_file(char *fpath, int saveheader, int *islocal)
     switch (ans[0]) {
     case 'a':
 	outs("文章\033[1m 沒有 \033[m存入");
-	safe_sleep(1);
 	aborted = -1;
 	break;
     case 'r':
@@ -1682,7 +1681,7 @@ vedit(char *fpath, int saveheader, int *islocal)
 	move(curr_window_line, ch);
 	if (!line_dirty && strcmp(line, currline->data))
 	    strcpy(line, currline->data);
-	ch = igetkey();
+	ch = igetch();
 	/* jochang debug */
 	if ((interval = (now - th))) {
 	    th = now;
@@ -1836,28 +1835,27 @@ vedit(char *fpath, int saveheader, int *islocal)
 			char           *tmp, *apos = ans;
 			int             fg, bg;
 
-			strlcpy(color, "\033[", sizeof(color));
+			strcpy(color, "\033[");
 			if (isdigit(*apos)) {
-			    snprintf(color, sizeof(color),
-				     "%s%c", color, *(apos++));
+			    sprintf(color,"%s%c", color, *(apos++)); 
 			    if (*apos)
-				snprintf(color, sizeof(color), "%s;", color);
+				strcat(color, ";");
 			}
 			if (*apos) {
 			    if ((tmp = strchr(t, toupper(*(apos++)))))
 				fg = tmp - t + 30;
 			    else
 				fg = 37;
-			    snprintf(color, sizeof(color), "%s%d", color, fg);
+			    sprintf(color, "%s%d", color, fg);
 			}
 			if (*apos) {
 			    if ((tmp = strchr(t, toupper(*(apos++)))))
 				bg = tmp - t + 40;
 			    else
 				bg = 40;
-			    snprintf(color, sizeof(color), "%s;%d", color, bg);
+			    sprintf(color, "%s;%d", color, bg);
 			}
-			snprintf(color, sizeof(color), "%sm", color);
+			strcat(color, "m");
 			insert_string(color);
 		    } else
 			insert_string(reset_color);
@@ -2023,7 +2021,7 @@ vedit(char *fpath, int saveheader, int *islocal)
 	    case '\n':
 #ifdef MAX_EDIT_LINE
 		if( totaln == MAX_EDIT_LINE ){
-		    vmsg("MAX_EDIT_LINE exceed");
+		    outs("MAX_EDIT_LINE exceed");
 		    break;
 		}
 #endif

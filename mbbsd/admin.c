@@ -134,7 +134,6 @@ search_key_user(char *passwdfile, int mode)
 			fclose(fp1);
 			return 0;
 		    } else {
-			move(b_lines - 1, 0);
 			getdata(0, 0,
 				"目前的 PASSWD 檔沒有此 ID，新增嗎？[y/N]",
 				genbuf, 3, LCECHO);
@@ -705,6 +704,7 @@ m_newbrd(int recover)
     }
 
     add_board_record(&newboard);
+    getbcache(class_bid)->childcount = 0;
     pressanykey();
     setup_man(&newboard);
 
@@ -954,15 +954,13 @@ scan_register_form(char *regfile, int automode, int neednum)
 		    prints("%d.%-12s：%s\n", n - 2, finfo[n], fdata[n]);
 		}
 		if (muser.userlevel & PERM_LOGINOK) {
-		    getdata(b_lines - 1, 0, "\033[1;32m此帳號已經完成註冊, "
-		    "更新(Y/N/Skip)？\033[m[N] ", ans, sizeof(ans), LCECHO);
+		    ans[0]=getans("此帳號已經完成註冊, "
+		                  "更新(Y/N/Skip)？[N] ");
 		    if (ans[0] != 'y' && ans[0] != 's')
 			ans[0] = 'd';
 		} else {
-		    move(b_lines - 1, 0);
-		    prints("是否接受此資料(Y/N/Q/Del/Skip)？[S] ");
 		    if (search_ulist(unum) == NULL)
-			ans[0] = igetch();
+		        ans[0] = getans("是否接受此資料(Y/N/Q/Del/Skip)？[S] ");
 		    else
 			ans[0] = 's';
 		    if ('A' <= ans[0] && ans[0] <= 'Z')
@@ -1160,10 +1158,9 @@ cat_register()
 {
     if (system("cat register.new.tmp >> register.new") == 0 &&
 	system("rm -f register.new.tmp") == 0)
-	mprints(22, 0, "OK 嚕~~ 繼續去奮鬥吧!!");
+	vmsg("OK 嚕~~ 繼續去奮鬥吧!!");
     else
-	mprints(22, 0, "沒辦法CAT過去呢 去檢查一下系統吧!!");
-    pressanykey();
+	vmsg("沒辦法CAT過去呢 去檢查一下系統吧!!");
     return 0;
 }
 

@@ -455,7 +455,7 @@ char *genpasswd(char *pw);
 
 /* screen */
 void move(int y, int x);
-void outs(char *str);
+void outs(const char *str);
 void clrtoeol(void);
 void clear(void);
 void refresh(void);
@@ -468,13 +468,13 @@ void redoscr(void);
 void clrtoline(int line);
 void standout(void);
 void standend(void);
-int edit_outs(char *text);
+int edit_outs(const char *text);
 void outch(unsigned char c);
 void rscroll(void);
 void scroll(void);
 void getyx(int *y, int *x);
 void initscr(void);
-void out_lines(char *str, int line);
+void out_lines(const char *str, int line);
 
 /* stuff */
 #define isprint2(ch) ((ch & 0x80) || isprint(ch))
@@ -580,6 +580,7 @@ int call_in(userinfo_t *uentp, int fri_stat);
 int make_connection_to_somebody(userinfo_t *uin, int timeout);
 int t_changeangel(void);
 void CallAngel(void);
+int t_switchangel(void);
 
 /* tmpjack */
 int reg_barbq(void);

@@ -237,6 +237,13 @@ typedef struct {
 #define FAVGMAX    32             /* Max groups of Myfavorite */
 #define FAVGSLEN    8		  /* Max Length of Description String */
 
+#ifdef PLAY_ANGEL
+/* values of msgque_t::msgmode */
+#define MSG_GENERAL   0
+#define MSG_FROMANGEL 1
+#define MSG_TOANGEL   2
+#endif
+
 typedef struct msgque_t {
     pid_t   pid;
     char    userid[IDLEN + 1];
@@ -253,6 +260,7 @@ typedef struct userinfo_t {
     unsigned char   active;         /* When allocated this field is true */
     unsigned char   invisible;      /* Used by cloaking function in Xyz menu */
     unsigned char   sockactive;     /* Used to coordinate talk requests */
+    unsigned char   being_angel;
     unsigned int    userlevel;
     unsigned char   mode;           /* UL/DL, Talk Mode, Chat Mode, ... */
     unsigned char   pager;          /* pager toggle, YEA, or NA */

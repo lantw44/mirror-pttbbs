@@ -24,6 +24,7 @@ int main(){
 	u.uflag2 &= 0x03ff; // clear 0x400 and 0x1000
 	if( u.userlevel & OLD_PERM_NOOUTMAIL )
 	    u.uflag2 |= REJ_OUTTAMAIL;
+	u.uflag2 |= BEING_ANGEL;
 	u.userlevel &= ~PERM_ANGEL;
 	bzero(u.myangel, IDLEN + 1);
 	write(new_fd, &u, sizeof(userec_t));

@@ -2,74 +2,74 @@
 #define INCLUDE_VAR_H
 #include "bbs.h"
 
-char           *str_permid[] = {
-    "基本權力",			/* PERM_BASIC */
-    "進入聊天室",		/* PERM_CHAT */
-    "找人聊天",			/* PERM_PAGE */
-    "發表文章",			/* PERM_POST */
-    "註冊程序認證",		/* PERM_LOGINOK */
-    "信件無上限",		/* PERM_MAILLIMIT */
-    "隱身術",			/* PERM_CLOAK */
-    "看見忍者",			/* PERM_SEECLOAK */
-    "永久保留帳號",		/* PERM_XEMPT */
-    "站長隱身術",		/* PERM_DENYPOST */
-    "板主",			/* PERM_BM */
-    "帳號總管",			/* PERM_ACCOUNTS */
-    "聊天室總管",		/* PERM_CHATCLOAK */
-    "看板總管",			/* PERM_BOARD */
-    "站長",			/* PERM_SYSOP */
-    "BBSADM",			/* PERM_POSTMARK */
-    "不列入排行榜",		/* PERM_NOTOP */
-    "違法通緝中",		/* PERM_VIOLATELAW */
-    "不接受站外的信",		/* PERM_ */
-    "不允許\認證碼註冊",	/* PERM_NOREGCODE */
-    "視覺站長",			/* PERM_VIEWSYSOP */
-    "觀察使用者行蹤",		/* PERM_LOGUSER */
-    "精華區總整理權",		/* PERM_Announce */
-    "公關組",			/* PERM_RELATION */
-    "特務組",			/* PERM_SMG */
-    "程式組",			/* PERM_PRG */
-    "活動組",			/* PERM_ACTION */
-    "美工組",			/* PERM_PAINT */
-    "立法組",			/* PERM_LAW */
-    "小組長",			/* PERM_SYSSUBOP */
-    "一級主管",			/* PERM_LSYSOP */
-    "Ｐｔｔ"			/* PERM_PTT */
+int           str_permid[] = {
+    2572,			/* PERM_BASIC */
+    2573,		/* PERM_CHAT */
+    2574,			/* PERM_PAGE */
+    2575,			/* PERM_POST */
+    2576,		/* PERM_LOGINOK */
+    2577,		/* PERM_MAILLIMIT */
+    2578,			/* PERM_CLOAK */
+    2579,			/* PERM_SEECLOAK */
+    2580,		/* PERM_XEMPT */
+    2581,		/* PERM_DENYPOST */
+    2582,			/* PERM_BM */
+    2583,			/* PERM_ACCOUNTS */
+    2584,		/* PERM_CHATCLOAK */
+    2585,			/* PERM_BOARD */
+    2586,			/* PERM_SYSOP */
+    3440,			/* PERM_POSTMARK */
+    2587,		/* PERM_NOTOP */
+    2588,		/* PERM_VIOLATELAW */
+    2589,		/* PERM_ */
+    2590,	/* PERM_NOREGCODE */
+    2591,			/* PERM_VIEWSYSOP */
+    2592,		/* PERM_LOGUSER */
+    2593,		/* PERM_Announce */
+    2594,			/* PERM_RELATION */
+    2595,			/* PERM_SMG */
+    2596,			/* PERM_PRG */
+    2597,			/* PERM_ACTION */
+    2598,			/* PERM_PAINT */
+    2599,			/* PERM_LAW */
+    2600,			/* PERM_SYSSUBOP */
+    2601,			/* PERM_LSYSOP */
+    2602			/* PERM_PTT */
 };
 
-char           *str_permboard[] = {
-    "不可 Zap",			/* BRD_NOZAP */
-    "不列入統計",		/* BRD_NOCOUNT */
-    "不轉信",			/* BRD_NOTRAN */
-    "群組板",			/* BRD_GROUPBOARD */
-    "隱藏板",			/* BRD_HIDE */
-    "限制(不需設定)",		/* BRD_POSTMASK */
-    "匿名板",			/* BRD_ANONYMOUS */
-    "預設匿名板",		/* BRD_DEFAULTANONYMOUS */
-    "違法改進中看板",		/* BRD_BAD */
-    "連署專用看板",		/* BRD_VOTEBOARD */
-    "已警告要廢除",		/* BRD_WARNEL */
-    "熱門看板群組",		/* BRD_TOP */
-    "不可推薦",                 /* BRD_NORECOMMEND */
-    "布落格",			/* BRD_BLOG */
-    "板主設定列入記錄",		/* BRD_BMCOUNT */
-    "沒想到",
-    "沒想到",
-    "沒想到",
-    "沒想到",
-    "沒想到",
-    "沒想到",
-    "沒想到",
-    "沒想到",
-    "沒想到",
-    "沒想到",
-    "沒想到",
-    "沒想到",
-    "沒想到",
-    "沒想到",
-    "沒想到",
-    "沒想到",
-    "沒想到",
+int           str_permboard[] = {
+    2603,			/* BRD_NOZAP */
+    2604,		/* BRD_NOCOUNT */
+    2605,			/* BRD_NOTRAN */
+    2606,			/* BRD_GROUPBOARD */
+    2607,			/* BRD_HIDE */
+    2608,		/* BRD_POSTMASK */
+    2609,			/* BRD_ANONYMOUS */
+    2610,		/* BRD_DEFAULTANONYMOUS */
+    2611,		/* BRD_BAD */
+    2612,		/* BRD_VOTEBOARD */
+    2613,		/* BRD_WARNEL */
+    2614,		/* BRD_TOP */
+    2615,                 /* BRD_NORECOMMEND */
+    2616,			/* BRD_BLOG */
+    2617,		/* BRD_BMCOUNT */
+    2618,
+    2619,
+    2620,
+    2621,
+    2622,
+    2623,
+    2624,
+    2625,
+    2626,
+    2627,
+    2628,
+    2629,
+    2630,
+    2631,
+    2632,
+    2633,
+    2634,
 };
 
 int             usernum;
@@ -121,21 +121,21 @@ char           *fn_proverb = "proverb";
 
 /* are descript in userec.loginview */
 
-char           *loginview_file[NUMVIEWFILE][2] = {
-    {FN_NOTE_ANS, "酸甜苦辣流言板"},
-    {FN_TOPSONG, "點歌排行榜"},
-    {"etc/topusr", "十大排行榜"},
-    {"etc/topusr100", "百大排行榜"},
-    {"etc/birth.today", "今日壽星"},
-    {"etc/weather.tmp", "天氣快報"},
-    {"etc/stock.tmp", "股市快報"},
-    {"etc/day", "今日十大話題"},
-    {"etc/week", "一週五十大話題"},
-    {"etc/today", "今天上站人次"},
-    {"etc/yesterday", "昨日上站人次"},
-    {"etc/history", "歷史上的今天"},
-    {"etc/topboardman", "精華區排行榜"},
-    {"etc/topboard.tmp", "看板人氣排行榜"}
+loginview_file_t	loginview_file[] = {
+    {FN_NOTE_ANS, 2635},
+    {FN_TOPSONG, 2636},
+    {"etc/topusr", 2637},
+    {"etc/topusr100", 2638},
+    {"etc/birth.today", 2639},
+    {"etc/weather.tmp", 2640},
+    {"etc/stock.tmp", 2641},
+    {"etc/day", 2642},
+    {"etc/week", 2643},
+    {"etc/today", 2644},
+    {"etc/yesterday", 2645},
+    {"etc/history", 2646},
+    {"etc/topboardman", 2647},
+    {"etc/topboard.tmp", 2648}
 };
 
 /* message */
@@ -179,136 +179,134 @@ char           *BBSName = BBSNAME;
 /* #define MAX_MODES 78 */
 /* MAX_MODES is defined in common.h */
 
-char           *ModeTypeTable[MAX_MODES] = {
-    "發呆",			/* IDLE */
-    "主選單",			/* MMENU */
-    "系統維護",			/* ADMIN */
-    "郵件選單",			/* MAIL */
-    "交談選單",			/* TMENU */
-    "使用者選單",		/* UMENU */
-    "XYZ 選單",			/* XMENU */
-    "分類看板",			/* CLASS */
-    "Play選單",			/* PMENU */
-    "編特別名單",		/* NMENU */
-    "Ｐtt量販店",		/* PSALE */
-    "發表文章",			/* POSTING */
-    "看板列表",			/* READBRD */
-    "閱\讀文章",		/* READING */
-    "新文章列表",		/* READNEW */
-    "選擇看板",			/* SELECT */
-    "讀信",			/* RMAIL */
-    "寫信",			/* SMAIL */
-    "聊天室",			/* CHATING */
-    "其他",			/* XMODE */
-    "尋找好友",			/* FRIEND */
-    "上線使用者",		/* LAUSERS */
-    "使用者名單",		/* LUSERS */
-    "追蹤站友",			/* MONITOR */
-    "呼叫",			/* PAGE */
-    "查詢",			/* TQUERY */
-    "交談",			/* TALK  */
-    "編名片檔",			/* EDITPLAN */
-    "編簽名檔",			/* EDITSIG */
-    "投票中",			/* VOTING */
-    "設定資料",			/* XINFO */
-    "寄給站長",			/* MSYSOP */
-    "汪汪汪",			/* WWW */
-    "打大老二",			/* BIG2 */
-    "回應",			/* REPLY */
-    "被水球打中",		/* HIT */
-    "水球準備中",		/* DBACK */
-    "筆記本",			/* NOTE */
-    "編輯文章",			/* EDITING */
-    "發系統通告",		/* MAILALL */
-    "摸兩圈",			/* MJ */
-    "電腦擇友",			/* P_FRIEND */
-    "上站途中",			/* LOGIN */
-    "查字典",			/* DICT */
-    "打橋牌",			/* BRIDGE */
-    "找檔案",			/* ARCHIE */
-    "打地鼠",			/* GOPHER */
-    "看News",			/* NEWS */
-    "情書產生器",		/* LOVE */
-    "編輯輔助器",		/* EDITEXP */
-    "申請IP位址",		/* IPREG */
-    "網管辦公中",		/* NetAdm */
-    "虛擬實業坊",		/* DRINK */
-    "計算機",			/* CAL */
-    "編輯座右銘",		/* PROVERB */
-    "公佈欄",			/* ANNOUNCE */
-    "刻流言板",			/* EDNOTE */
-    "英漢翻譯機",		/* CDICT */
-    "檢視自己物品",		/* LOBJ */
-    "點歌",			/* OSONG */
-    "正在玩小雞",		/* CHICKEN */
-    "玩彩券",			/* TICKET */
-    "猜數字",			/* GUESSNUM */
-    "遊樂場",			/* AMUSE */
-    "黑白棋",			/* OTHELLO */
-    "玩骰子",			/* DICE */
-    "發票對獎",			/* VICE */
-    "逼逼摳ing",		/* BBCALL */
-    "繳罰單",			/* CROSSPOST */
-    "五子棋",			/* M_FIVE */
-    "21點ing",			/* JACK_CARD */
-    "10點半ing",		/* TENHALF */
-    "超級九十九",		/* CARD_99 */
-    "火車查詢",			/* RAIL_WAY */
-    "搜尋選單",			/* SREG */
-    "下象棋",			/* CHC */
-    "下暗琪",			/* DARK */
-    "NBA大猜測"			/* TMPJACK */
-    "Ｐtt查榜系統",		/* JCEE */
-    "重編文章"			/* REEDIT */
-    "部落格",                   /* BLOGGING */
-    "", /* for future usage */
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    ""
+int           ModeTypeTable[MAX_MODES] = {
+    2649,			/* IDLE */
+    2650,			/* MMENU */
+    2651,			/* ADMIN */
+    2652,			/* MAIL */
+    2653,			/* TMENU */
+    2654,		/* UMENU */
+    2655,			/* XMENU */
+    2656,			/* CLASS */
+    2657,			/* PMENU */
+    2658,		/* NMENU */
+    2659,		/* PSALE */
+    2660,			/* POSTING */
+    2661,			/* READBRD */
+    2662,		/* READING */
+    2663,		/* READNEW */
+    2664,			/* SELECT */
+    2665,			/* RMAIL */
+    2666,			/* SMAIL */
+    2667,			/* CHATING */
+    2668,			/* XMODE */
+    2669,			/* FRIEND */
+    2670,		/* LAUSERS */
+    2671,		/* LUSERS */
+    2672,			/* MONITOR */
+    2673,			/* PAGE */
+    2674,			/* TQUERY */
+    2675,			/* TALK  */
+    2676,			/* EDITPLAN */
+    2677,			/* EDITSIG */
+    2678,			/* VOTING */
+    2679,			/* XINFO */
+    2680,			/* MSYSOP */
+    2681,			/* WWW */
+    2682,			/* BIG2 */
+    2683,			/* REPLY */
+    2684,		/* HIT */
+    2685,		/* DBACK */
+    2686,			/* NOTE */
+    2687,			/* EDITING */
+    2688,		/* MAILALL */
+    2689,			/* MJ */
+    2690,			/* P_FRIEND */
+    2691,			/* LOGIN */
+    2692,			/* DICT */
+    2693,			/* BRIDGE */
+    2694,			/* ARCHIE */
+    2695,			/* GOPHER */
+    2696,			/* NEWS */
+    2697,		/* LOVE */
+    2698,		/* EDITEXP */
+    2699,		/* IPREG */
+    2700,		/* NetAdm */
+    2701,		/* DRINK */
+    2702,			/* CAL */
+    2703,		/* PROVERB */
+    2704,			/* ANNOUNCE */
+    2705,			/* EDNOTE */
+    2706,		/* CDICT */
+    2707,		/* LOBJ */
+    2708,			/* OSONG */
+    2709,		/* CHICKEN */
+    2710,			/* TICKET */
+    2711,			/* GUESSNUM */
+    2712,			/* AMUSE */
+    2713,			/* OTHELLO */
+    2714,			/* DICE */
+    2715,			/* VICE */
+    2716,		/* BBCALL */
+    2717,			/* CROSSPOST */
+    2718,			/* M_FIVE */
+    2719,			/* JACK_CARD */
+    2720,		/* TENHALF */
+    2721,		/* CARD_99 */
+    2722,			/* RAIL_WAY */
+    2723,			/* SREG */
+    2724,			/* CHC */
+    2725,			/* DARK */
+    2726,			/* TMPJACK */
+    2727,		/* JCEE */
+    2728,			/* REEDIT */
+    2729,                   /* BLOGGING */
+    0, /* for future usage */
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
 };
 
 /* term.c */
@@ -598,18 +596,18 @@ word_t         *toplev;
 #ifndef _BBS_UTIL_C_
 /* menu.c */
 commands_t      cmdlist[] = {
-    {admin, PERM_SYSOP | PERM_VIEWSYSOP, "00Admin       【 系統維護區 】"},
-    {Announce, 0, "AAnnounce     【 精華公佈欄 】"},
-    {Boards, 0, "FFavorite     【 我 的 最愛 】"},
-    {root_board, 0, "CClass        【 分組討論區 】"},
-    {Mail, PERM_BASIC, "MMail         【 私人信件區 】"},
-    {Talk, 0, "TTalk         【 休閒聊天區 】"},
-    {User, 0, "UUser         【 個人設定區 】"},
-    {Xyz, 0, "XXyz          【 系統工具區 】"},
-    {Play_Play, PERM_BASIC, "PPlay         【 娛樂/休閒生活】"},
-    {Name_Menu, PERM_LOGINOK, "NNamelist     【 編特別名單 】"},
-    {Goodbye, 0, "GGoodbye       離開，再見……"},
-    {NULL, 0, NULL}
+    {admin, PERM_SYSOP | PERM_VIEWSYSOP, 2730},
+    {Announce, 0, 2731},
+    {Boards, 0, 2732},
+    {root_board, 0, 2733},
+    {Mail, PERM_BASIC, 2734},
+    {Talk, 0, 2735},
+    {User, 0, 2736},
+    {Xyz, 0, 2737},
+    {Play_Play, PERM_BASIC, 2738},
+    {Name_Menu, PERM_LOGINOK, 2739},
+    {Goodbye, 0, 2740},
+    {NULL, 0, 0}
 };
 #endif
 

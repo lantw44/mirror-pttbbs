@@ -11,7 +11,7 @@ extern char     board_hidden_status;
 void
 showtitle(char *title, char *mid)
 {
-    char            buf[40], numreg[50];
+    char            buf[40], buf1[40], numreg[50];
 #ifndef DEBUG
     int             nreg;
 #endif
@@ -31,12 +31,13 @@ showtitle(char *title, char *mid)
     }
 #else
     else if (currutmp->mailalert) {
-	mid = "\033[41;5m   郵差來按鈴囉   " TITLE_COLOR;
+    snprintf(buf1, sizeof(buf1), "%s"TITLE_COLOR, SHM->i18nstr[cuser.language][1380]);
+	mid = buf1;
 	spc = 22;
     } else if (HAS_PERM(PERM_SYSOP) && (nreg = dashs(fn_register) / 163) > 10) {
 	snprintf(numreg, sizeof(numreg),
-		 "\033[41;5m  有%03d/%03d未審核  " TITLE_COLOR,
-		 nreg, (int)dashs("register.new.tmp") / 163);
+		 SHM->i18nstr[cuser.language][1381],
+		 nreg, (int)dashs("register.new.tmp") / 163, TITLE_COLOR);
 	mid = numreg;
 	spc = 22;
     }
@@ -49,10 +50,10 @@ showtitle(char *title, char *mid)
     buf[spc] = '\0';
 
     clear();
-    prints(TITLE_COLOR "【%s】%s\033[33m%s%s%s\033[3%s《",
+    prints(SHM->i18nstr[cuser.language][1382], TITLE_COLOR,
 	   title, buf, mid, buf, " " + pad,
-	currmode & MODE_SELECT ? "6m系列" : currmode & MODE_ETC ? "5m其他" :
-	   currmode & MODE_DIGEST ? "2m文摘" : "7m看板");
+	currmode & MODE_SELECT ? SHM->i18nstr[cuser.language][1383] : currmode & MODE_ETC ? SHM->i18nstr[cuser.language][1384] :
+	   currmode & MODE_DIGEST ? SHM->i18nstr[cuser.language][1385] : SHM->i18nstr[cuser.language][1386]);
 
     if (strcmp(currboard, lastboard)) {	/* change board */
 	if (currboard[0] != 0 &&
@@ -67,7 +68,7 @@ showtitle(char *title, char *mid)
 	prints("\033[32m%s", currboard);
     else
 	prints("%s", currboard);
-    prints("\033[3%dm》\033[0m\n", currmode & MODE_SELECT ? 6 :
+    prints(SHM->i18nstr[cuser.language][1387], currmode & MODE_SELECT ? 6 :
 	   currmode & MODE_ETC ? 5 : currmode & MODE_DIGEST ? 2 : 7);
 }
 
@@ -82,17 +83,15 @@ show_status(void)
     int i;
     struct tm      *ptime = localtime(&now);
     char            mystatus[160];
-    char           *myweek = "天一二三四五六";
-    const char     *msgs[] = {"關閉", "打開", "拔掉", "防水", "好友"};
+    char           *myweek = SHM->i18nstr[cuser.language][1388];
+    const char     *msgs[] = {SHM->i18nstr[cuser.language][1389], SHM->i18nstr[cuser.language][1390], SHM->i18nstr[cuser.language][1391], SHM->i18nstr[cuser.language][1392], SHM->i18nstr[cuser.language][1393]};
 
     i = ptime->tm_wday << 1;
     snprintf(mystatus, sizeof(mystatus),
-	     "\033[34;46m[%d/%d 星期%c%c %d:%02d]\033[1;33;45m%-14s"
-	     "\033[30;47m 目前坊裡有\033[31m%d\033[30m人, 我是\033[31m%-12s"
-	     "\033[30m[扣機]\033[31m%s\033[0m",
+	     SHM->i18nstr[cuser.language][1394],
 	     ptime->tm_mon + 1, ptime->tm_mday, myweek[i], myweek[i + 1],
 	     ptime->tm_hour, ptime->tm_min, currutmp->birth ?
-	     "生日要請客唷" : SHM->today_is,
+	     SHM->i18nstr[cuser.language][1395] : SHM->today_is,
 	     SHM->UTMPnumber, cuser.userid, msgs[currutmp->pager]);
     outmsg(mystatus);
 }
@@ -149,15 +148,15 @@ show_menu(commands_t * p)
 {
     register int    n = 0;
     register char  *s;
-    const char     *state[4] = {"用功\型", "安逸型", "自定型", "SHUTUP"};
     char            buf[80];
 
     movie(currstat);
 
     move(menu_row, 0);
-    while ((s = p[n].desc)) {
+    while (p[n].desc > 0 && p[n].desc < MAX_STRING) {
 	if (HAS_PERM(p[n].level)) {
-	    snprintf(buf, sizeof(buf), s + 2, state[cuser.proverb % 4]);
+		s = SHM->i18nstr[cuser.language][p[n].desc];
+	    snprintf(buf, sizeof(buf), s + 2, SHM->i18nstr[cuser.language][1396 + cuser.proverb % 4]);
 	    prints("%*s  (\033[1;36m%c\033[0m)%s\n", menu_column, "", s[1],
 		   buf);
 	}
@@ -262,15 +261,15 @@ domenu(int cmdmode, char *cmdtitle, int cmd, commands_t cmdtable[])
 		    refscreen = YEA;
 
 		if (err != -1)
-		    cmd = cmdtable[lastcmdptr].desc[0];
+		    cmd = SHM->i18nstr[cuser.language][cmdtable[lastcmdptr].desc][0];
 		else
-		    cmd = cmdtable[lastcmdptr].desc[1];
-		cmd0[cmdmode] = cmdtable[lastcmdptr].desc[0];
+		    cmd = SHM->i18nstr[cuser.language][cmdtable[lastcmdptr].desc][1];
+		cmd0[cmdmode] = SHM->i18nstr[cuser.language][cmdtable[lastcmdptr].desc][0];
 	    }
 	    if (cmd >= 'a' && cmd <= 'z')
 		cmd &= ~0x20;
 	    while (++i <= total)
-		if (cmdtable[i].desc[1] == cmd)
+		if (SHM->i18nstr[cuser.language][cmdtable[i].desc][1] == cmd)
 		    break;
 	}
 
@@ -300,51 +299,51 @@ domenu(int cmdmode, char *cmdtitle, int cmd, commands_t cmdtable[])
 
 /* administrator's maintain menu */
 static commands_t adminlist[] = {
-    {m_user, PERM_ACCOUNTS,           "UUser          使用者資料"},
-    {search_user_bypwd, PERM_SYSOP,   "SSearch User   特殊搜尋使用者"},
-    {search_user_bybakpwd,PERM_SYSOP, "OOld User data 查閱\備份使用者資料"},
-    {m_board, PERM_SYSOP,             "BBoard         設定看板"},
-    {m_register, PERM_SYSOP,          "RRegister      審核註冊表單"},
-    {cat_register, PERM_SYSOP,        "CCatregister   無法審核時用的"},
-    {x_file, PERM_SYSOP|PERM_VIEWSYSOP,     "XXfile         編輯系統檔案"},
-    {give_money, PERM_SYSOP|PERM_VIEWSYSOP, "GGivemoney     紅包雞"},
-    {m_loginmsg, PERM_SYSOP,          "MMessage Login 進站水球"},
+    {m_user, PERM_ACCOUNTS,           1399},
+    {search_user_bypwd, PERM_SYSOP,   1400},
+    {search_user_bybakpwd,PERM_SYSOP, 1401},
+    {m_board, PERM_SYSOP,             1402},
+    {m_register, PERM_SYSOP,          1403},
+    {cat_register, PERM_SYSOP,        1404},
+    {x_file, PERM_SYSOP|PERM_VIEWSYSOP,     1405},
+    {give_money, PERM_SYSOP|PERM_VIEWSYSOP, 1406},
+    {m_loginmsg, PERM_SYSOP,          1407},
 #ifdef  HAVE_MAILCLEAN
-    {m_mclean, PERM_SYSOP,            "MMail Clean    清理使用者個人信箱"},
+    {m_mclean, PERM_SYSOP,            1408},
 #endif
 #ifdef  HAVE_REPORT
-    {m_trace, PERM_SYSOP,             "TTrace         設定是否記錄除錯資訊"},
+    {m_trace, PERM_SYSOP,             1409},
 #endif
-    {NULL, 0, NULL}
+    {NULL, 0, -1}
 };
 
 /* mail menu */
 static commands_t maillist[] = {
-    {m_new, PERM_READMAIL,      "RNew           閱\讀新進郵件"},
-    {m_read, PERM_READMAIL,     "RRead          多功\能讀信選單"},
-    {m_send, PERM_BASIC,        "RSend          站內寄信"},
-    {x_love, PERM_LOGINOK,      "PPaper         \033[1;32m情書產生器\033[m "},
-    {mail_list, PERM_BASIC,     "RMail List     群組寄信"},
-    {setforward, PERM_LOGINOK,"FForward       \033[32m設定信箱自動轉寄\033[m"},
-    {m_sysop, 0,                "YYes, sir!     諂媚站長"},
-    {m_internet, PERM_INTERNET, "RInternet      寄信到 Internet"},
-    {mail_mbox, PERM_INTERNET,  "RZip UserHome  把所有私人資料打包回去"},
-    {built_mail_index, PERM_LOGINOK, "SSavemail      重建信箱索引"},
-    {mail_all, PERM_SYSOP,      "RAll           寄信給所有使用者"},
-    {NULL, 0, NULL}
+    {m_new, PERM_READMAIL,      1410},
+    {m_read, PERM_READMAIL,     1411},
+    {m_send, PERM_BASIC,        1412},
+    {x_love, PERM_LOGINOK,      1413},
+    {mail_list, PERM_BASIC,     1414},
+    {setforward, PERM_LOGINOK,1415},
+    {m_sysop, 0,                1416},
+    {m_internet, PERM_INTERNET, 1417},
+    {mail_mbox, PERM_INTERNET,  1418},
+    {built_mail_index, PERM_LOGINOK, 1419},
+    {mail_all, PERM_SYSOP,      1420},
+    {NULL, 0, -1}
 };
 
 /* Talk menu */
 static commands_t talklist[] = {
-    {t_users, 0,            "UUsers         完全聊天手冊"},
-    {t_pager, PERM_BASIC,   "PPager         切換呼叫器"},
-    {t_idle, 0,             "IIdle          發呆"},
-    {t_query, 0,            "QQuery         查詢網友"},
-    {t_qchicken, 0,         "WWatch Pet     查詢寵物"},
-    {t_talk, PERM_PAGE,     "TTalk          找人聊聊"},
-    {t_chat, PERM_CHAT,     "CChat          找家茶坊喫茶去"},
-    {t_display, 0,          "DDisplay       顯示上幾次熱訊"},
-    {NULL, 0, NULL}
+    {t_users, 0,            1421},
+    {t_pager, PERM_BASIC,   1422},
+    {t_idle, 0,             1423},
+    {t_query, 0,            1424},
+    {t_qchicken, 0,         1425},
+    {t_talk, PERM_PAGE,     1426},
+    {t_chat, PERM_CHAT,     1427},
+    {t_display, 0,          1428},
+    {NULL, 0, -1}
 };
 
 /* name menu */
@@ -359,93 +358,92 @@ static int t_special() {
 }
 
 static commands_t namelist[] = {
-    {t_override, PERM_LOGINOK,"OOverRide      好友名單"},
-    {t_reject, PERM_LOGINOK,  "BBlack         壞人名單"},
-    {t_aloha,PERM_LOGINOK,    "AALOHA         上站通知名單"},
+    {t_override, PERM_LOGINOK,1429},
+    {t_reject, PERM_LOGINOK,  1430},
+    {t_aloha,PERM_LOGINOK,    1431},
 #ifdef POSTNOTIFY
-    {t_post,PERM_LOGINOK,     "NNewPost       新文章通知名單"},
+    {t_post,PERM_LOGINOK,     1432},
 #endif
-    {t_special,PERM_LOGINOK,  "SSpecial       其他特別名單"},
-    {NULL, 0, NULL}
+    {t_special,PERM_LOGINOK,  1433},
+    {NULL, 0, -1}
 };
 
 /* User menu */
 static commands_t userlist[] = {
-    {u_info, PERM_LOGINOK,          "IInfo          設定個人資料與密碼"},
-    {calendar, PERM_LOGINOK,          "CCalendar      個人行事曆"},
-    {u_editcalendar, PERM_LOGINOK,    "EEditCalendar  編輯個人行事曆"},
-    {u_loginview, PERM_LOGINOK,     "LLogin View    選擇進站畫面"},
-    {u_ansi, 0, "AANSI          切換 ANSI \033[36m彩\033[35m色\033[37m/"
-     "\033[30;47m黑\033[1;37m白\033[m模示"},
-    {u_movie, 0,                    "MMovie         切換動畫模示"},
+    {u_info, PERM_LOGINOK,          1434},
+    {calendar, PERM_LOGINOK,          1435},
+    {u_editcalendar, PERM_LOGINOK,    1436},
+    {u_loginview, PERM_LOGINOK,     1437},
+    {u_ansi, 0, 1438},
+    {u_movie, 0,                    1439},
 #ifdef  HAVE_SUICIDE
-    {u_kill, PERM_BASIC,            "IKill          自殺！！"},
+    {u_kill, PERM_BASIC,            1440},
 #endif
-    {u_editplan, PERM_LOGINOK,      "QQueryEdit     編輯名片檔"},
-    {u_editsig, PERM_LOGINOK,       "SSignature     編輯簽名檔"},
+    {u_editplan, PERM_LOGINOK,      1441},
+    {u_editsig, PERM_LOGINOK,       1442},
 #if HAVE_FREECLOAK
-    {u_cloak, PERM_LOGINOK,           "CCloak         隱身術"},
+    {u_cloak, PERM_LOGINOK,           1443},
 #else
-    {u_cloak, PERM_CLOAK,           "CCloak         隱身術"},
+    {u_cloak, PERM_CLOAK,           1444},
 #endif
-    {u_register, PERM_BASIC,        "RRegister      填寫《註冊申請單》"},
-    {u_list, PERM_SYSOP,            "UUsers         列出註冊名單"},
-    {NULL, 0, NULL}
+    {u_register, PERM_BASIC,        1445},
+    {u_list, PERM_SYSOP,            1446},
+    {NULL, 0, -1}
 };
 
 /* XYZ tool menu */
 static commands_t xyzlist[] = {
 #ifdef  HAVE_LICENSE
-    {x_gpl, 0,       "LLicense       GNU 使用執照"},
+    {x_gpl, 0,       1447},
 #endif
 #ifdef HAVE_INFO
-    {x_program, 0,   "PProgram       本程式之版本與版權宣告"},
+    {x_program, 0,   1448},
 #endif
-    {x_boardman,0,   "MMan Boards    《看板精華區排行榜》"},
-//  {x_boards,0,     "HHot Boards    《看板人氣排行榜》"},
-    {x_history, 0,   "HHistory       《我們的成長》"},
-    {x_note, 0,      "NNote          《酸甜苦辣流言板》"},
-    {x_login,0,      "SSystem        《系統重要公告》"},
-    {x_week, 0,      "WWeek          《本週五十大熱門話題》"},
-    {x_issue, 0,     "IIssue         《今日十大熱門話題》"},
-    {x_today, 0,     "TToday         《今日上線人次統計》"},
-    {x_yesterday, 0, "YYesterday     《昨日上線人次統計》"},
-    {x_user100 ,0,   "UUsers         《使用者百大排行榜》"},
-    {x_birth, 0,     "BBirthday      《今日壽星大觀》"},
-    {p_sysinfo, 0,   "XXinfo         《查看系統資訊》"},
-    {NULL, 0, NULL}
+    {x_boardman,0,   1449},
+//  {x_boards,0,     1450},
+    {x_history, 0,   1451},
+    {x_note, 0,      1452},
+    {x_login,0,      1453},
+    {x_week, 0,      1454},
+    {x_issue, 0,     1455},
+    {x_today, 0,     1456},
+    {x_yesterday, 0, 1457},
+    {x_user100 ,0,   1458},
+    {x_birth, 0,     1459},
+    {p_sysinfo, 0,   1460},
+    {NULL, 0, -1}
 };
 
 /* Ptt money menu */
 static commands_t moneylist[] = {
-    {p_give, 0,         "00Give        給其他人錢"},
-    {save_violatelaw, 0,"11ViolateLaw  繳罰單"},
+    {p_give, 0,         1461},
+    {save_violatelaw, 0,1462},
 #if !HAVE_FREECLOAK
-    {p_cloak, 0,        "22Cloak       切換 隱身/現身   $19  /次"},
+    {p_cloak, 0,        1463},
 #endif
-    {p_from, 0,         "33From        暫時修改故鄉     $49  /次"},
-    {ordersong,0,       "44OSong       歐桑動態點歌機   $200 /次"},
-    {p_exmail, 0,       "55Exmail      購買信箱         $1000/封"},
-    {NULL, 0, NULL}
+    {p_from, 0,         1464},
+    {ordersong,0,       1465},
+    {p_exmail, 0,       1466},
+    {NULL, 0, -1}
 };
 
 static int p_money() {
-    domenu(PSALE, "Ｐtt量販店", '0', moneylist);
+    domenu(PSALE, SHM->i18nstr[cuser.language][1467], '0', moneylist);
     return 0;
 };
 
 #if 0
 static commands_t jceelist[] = {
-    {x_90,PERM_LOGINOK,	     "0090 JCEE     【90學年度大學聯招查榜系統】"},
-    {x_89,PERM_LOGINOK,	     "1189 JCEE     【89學年度大學聯招查榜系統】"},
-    {x_88,PERM_LOGINOK,      "2288 JCEE     【88學年度大學聯招查榜系統】"},
-    {x_87,PERM_LOGINOK,      "3387 JCEE     【87學年度大學聯招查榜系統】"},
-    {x_86,PERM_LOGINOK,      "4486 JCEE     【86學年度大學聯招查榜系統】"},
-    {NULL, 0, NULL}
+    {x_90,PERM_LOGINOK,	     1468},
+    {x_89,PERM_LOGINOK,	     1469},
+    {x_88,PERM_LOGINOK,      1470},
+    {x_87,PERM_LOGINOK,      1471},
+    {x_86,PERM_LOGINOK,      1472},
+    {NULL, 0, -1}
 };
 
 static int m_jcee() {
-    domenu(JCEE, "Ｐtt查榜系統", '0', jceelist);
+    domenu(JCEE, SHM->i18nstr[cuser.language][1473], '0', jceelist);
     return 0;
 }
 #endif
@@ -458,32 +456,31 @@ static int chessroom();
 static commands_t playlist[] = {
 #if 0
 #if HAVE_JCEE
-    {m_jcee, PERM_LOGINOK,   "JJCEE        【 大學聯考查榜系統 】"},
+    {m_jcee, PERM_LOGINOK,   1474},
 #endif
 #endif
-    {note, PERM_LOGINOK,     "NNote        【 刻刻流言板 】"},
-    {x_weather,0 ,           "WWeather     【 氣象預報 】"},
+    {note, PERM_LOGINOK,     1475},
+    {x_weather,0 ,           1476},
 /* XXX 壞掉了 */
 /*    {x_stock,0 ,             "SStock       【 股市行情 】"},*/
-    {forsearch,PERM_LOGINOK, "SSearchEngine【\033[1;35m Ｐtt搜尋器 \033[m】"},
-    {topsong,PERM_LOGINOK,   "TTop Songs   【\033[1;32m歐桑點歌排行榜\033[m】"},
-    {p_money,PERM_LOGINOK,   "PPay         【\033[1;31m Ｐtt量販店 \033[m】"},
-    {chicken_main,PERM_LOGINOK, "CChicken     "
-     "【\033[1;34m Ｐtt養雞場 \033[m】"},
-    {playground,PERM_LOGINOK, "AAmusement   【\033[1;33m Ｐtt遊樂場 \033[m】"},
-    {chessroom, PERM_LOGINOK, "BChineseChess 【\033[1;34m Ｐtt棋院\033[m】"},
-    {NULL, 0, NULL}
+    {forsearch,PERM_LOGINOK, 1477},
+    {topsong,PERM_LOGINOK,   1478},
+    {p_money,PERM_LOGINOK,   1479},
+    {chicken_main,PERM_LOGINOK, 1480},
+    {playground,PERM_LOGINOK, 1481},
+    {chessroom, PERM_LOGINOK, 1482},
+    {NULL, 0, -1}
 };
 
 static commands_t chesslist[] = {
-    {chc_main, PERM_LOGINOK, "1ChessFight    【\033[1;33m  邀 局  \033[m】"},
-    {chc_personal, PERM_LOGINOK, "2SelfPlay      【\033[1;34m  打 譜  \033[m】"},
-    {chc_watch, PERM_LOGINOK, "3ChessWatch    【\033[1;35m  觀 棋  \033[m】"},
-    {NULL, 0, NULL}
+    {chc_main, PERM_LOGINOK, 1483},
+    {chc_personal, PERM_LOGINOK, 1484},
+    {chc_watch, PERM_LOGINOK, 1485},
+    {NULL, 0, -1}
 };
 
 static int chessroom() {
-    domenu(CHC, "Ｐtt棋院", '1', chesslist);
+    domenu(CHC, SHM->i18nstr[cuser.language][1486], '1', chesslist);
     return 0;
 }
 
@@ -492,34 +489,31 @@ static commands_t plist[] = {
 /*    {p_ticket_main, PERM_LOGINOK,"00Pre         【 總統機 】"},
       {alive, PERM_LOGINOK,        "00Alive       【  訂票雞  】"},
 */
-    {ticket_main, PERM_LOGINOK,  "11Gamble      【 Ｐtt賭場 】"},
-    {guess_main, PERM_LOGINOK,   "22Guess number【 猜數字   】"},
-    {othello_main, PERM_LOGINOK, "33Othello     【 黑白棋   】"},
-//    {dice_main, PERM_LOGINOK,    "44Dice        【 玩骰子   】"},
-    {vice_main, PERM_LOGINOK,    "44Vice        【 發票對獎 】"},
-    {g_card_jack, PERM_LOGINOK,  "55Jack        【 黑傑克 】"},
-    {g_ten_helf, PERM_LOGINOK,   "66Tenhalf     【 十點半 】"},
-    {card_99, PERM_LOGINOK,      "77Nine        【 九十九 】"},
-    {NULL, 0, NULL}
+    {ticket_main, PERM_LOGINOK,  1487},
+    {guess_main, PERM_LOGINOK,   1488},
+    {othello_main, PERM_LOGINOK, 1489},
+//    {dice_main, PERM_LOGINOK,    1490},
+    {vice_main, PERM_LOGINOK,    1491},
+    {g_card_jack, PERM_LOGINOK,  1492},
+    {g_ten_helf, PERM_LOGINOK,   1493},
+    {card_99, PERM_LOGINOK,      1494},
+    {NULL, 0, -1}
 };
 
 static int playground() {
-    domenu(AMUSE, "Ｐtt遊樂場",'1',plist);
+    domenu(AMUSE, SHM->i18nstr[cuser.language][1495],'1',plist);
     return 0;
 }
 
 static commands_t slist[] = {
-    {x_dict,0,                   "11Dictionary  "
-     "【\033[1;33m 趣味大字典 \033[m】"},
-    {x_mrtmap, 0,                "22MRTmap      "
-	 "【\033[1;34m  捷運地圖  \033[m】"},
-    {main_railway, PERM_LOGINOK,  "33Railway     "
-     "【\033[1;32m 火車表查詢 \033[m】"},
-    {NULL, 0, NULL}
+    {x_dict,0,                   1496},
+    {x_mrtmap, 0,                1497},
+    {main_railway, PERM_LOGINOK,  1498},
+    {NULL, 0, -1}
 };
 
 static int forsearch() {
-    domenu(SREG, "Ｐtt搜尋器", '1', slist);
+    domenu(SREG, SHM->i18nstr[cuser.language][1499], '1', slist);
     return 0;
 }
 
@@ -527,43 +521,43 @@ static int forsearch() {
 
 int admin()
 {
-    domenu(ADMIN, "系統維護", 'X', adminlist);
+    domenu(ADMIN, SHM->i18nstr[cuser.language][1500], 'X', adminlist);
     return 0;
 }
 
 int Mail()
 {
-    domenu(MAIL, "電子郵件", 'R', maillist);
+    domenu(MAIL, SHM->i18nstr[cuser.language][1501], 'R', maillist);
     return 0;
 }
 
 int Talk()
 {
-    domenu(TMENU, "聊天說話", 'U', talklist);
+    domenu(TMENU, SHM->i18nstr[cuser.language][1502], 'U', talklist);
     return 0;
 }
 
 int User()
 {
-    domenu(UMENU, "個人設定", 'A', userlist);
+    domenu(UMENU, SHM->i18nstr[cuser.language][1503], 'A', userlist);
     return 0;
 }
 
 int Xyz()
 {
-    domenu(XMENU, "工具程式", 'M', xyzlist);
+    domenu(XMENU, SHM->i18nstr[cuser.language][1504], 'M', xyzlist);
     return 0;
 }
 
 int Play_Play()
 {
-    domenu(PMENU, "網路遊樂場", 'A', playlist);
+    domenu(PMENU, SHM->i18nstr[cuser.language][1505], 'A', playlist);
     return 0;
 }
 
 int Name_Menu()
 {
-    domenu(NMENU, "白色恐怖", 'O', namelist);
+    domenu(NMENU, SHM->i18nstr[cuser.language][1506], 'O', namelist);
     return 0;
 }
  

@@ -86,9 +86,9 @@ modestring(userinfo_t * uentp, int simple)
     /* for debugging */
     if (mode >= MAX_MODES) {
 	syslog(LOG_WARNING, "what!? mode = %d", mode);
-	word = ModeTypeTable[mode % MAX_MODES];
+	word = SHM->i18nstr[cuser.language][ModeTypeTable[mode % MAX_MODES]];
     } else
-	word = ModeTypeTable[mode];
+	word = SHM->i18nstr[cuser.language][ModeTypeTable[mode]];
     fri_stat = friend_stat(currutmp, uentp);
     if (!(HAS_PERM(PERM_SYSOP) || HAS_PERM(PERM_SEECLOAK)) &&
 	((uentp->invisible || (fri_stat & HRM)) &&
@@ -96,8 +96,8 @@ modestring(userinfo_t * uentp, int simple)
 	return notonline;
     else if (mode == EDITING) {
 	snprintf(modestr, sizeof(modestr), "E:%s",
-		ModeTypeTable[uentp->destuid < EDITING ? uentp->destuid :
-			      EDITING]);
+		SHM->i18nstr[cuser.language][ModeTypeTable[uentp->destuid < EDITING ? uentp->destuid :
+			      EDITING]]);
 	word = modestr;
     } else if (!mode && *uentp->chatid == 1) {
 	if (!simple)

@@ -961,7 +961,7 @@ user_login()
 
     for (i = 0; i < NUMVIEWFILE; i++)
 	if ((cuser.loginview >> i) & 1)
-	    more(loginview_file[(int)i][0], YEA);
+	    more(loginview_file[(int)i].path, YEA);
 }
 
 static void

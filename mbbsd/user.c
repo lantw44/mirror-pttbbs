@@ -28,7 +28,9 @@ u_loginview()
     move(4, 0);
     for (i = 0; i < NUMVIEWFILE; i++)
 	prints("    %c. %-20s %-15s \n", 'A' + i,
-	       loginview_file[i][1], ((pbits >> i) & 1 ? SHM->i18nstr[cuser.language][2079] : SHM->i18nstr[cuser.language][2080]));
+	       SHM->i18nstr[cuser.language][loginview_file[i].string_index]
+	       , ((pbits >> i) & 1 ? SHM->i18nstr[cuser.language][2079] : 
+	       SHM->i18nstr[cuser.language][2080]));
 
     clrtobot();
     while ((i = getkey(SHM->i18nstr[cuser.language][2081]))!='\r') {

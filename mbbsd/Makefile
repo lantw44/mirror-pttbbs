@@ -32,7 +32,7 @@ test: $(PROG)
 	killall -9 testmbbsd || true
 	cp mbbsd testmbbsd
 	./testmbbsd 9000
-	rm -f testmbbsd
+#	rm -f testmbbsd
 
 install: $(PROG)
 	install -d $(BBSHOME)/bin/

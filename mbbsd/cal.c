@@ -32,11 +32,11 @@ lockutmpmode(int unmode, int state)
 	move(10, 20);
 	if (errorno == 1)
 	    prints(SHM->i18nstr[cuser.language][532],
-		   ModeTypeTable[currutmp->lockmode],
-		   ModeTypeTable[unmode]);
+		   SHM->i18nstr[cuser.language][ModeTypeTable[currutmp->lockmode]],
+		   SHM->i18nstr[cuser.language][ModeTypeTable[unmode]]);
 	else
 	    prints(SHM->i18nstr[cuser.language][533],
-		   ModeTypeTable[unmode]);
+		   SHM->i18nstr[cuser.language][ModeTypeTable[unmode]]);
 	pressanykey();
 	return errorno;
     }

@@ -212,7 +212,7 @@ bperm_msg(boardheader_t * board)
 }
 
 unsigned int
-setperms(unsigned int pbits, char *pstring[])
+setperms(unsigned int pbits, int *pstring)
 {
     register int    i;
     char            choice[4];
@@ -220,10 +220,10 @@ setperms(unsigned int pbits, char *pstring[])
     move(4, 0);
     for (i = 0; i < NUMPERMS / 2; i++) {
 	prints("%c. %-20s %-15s %c. %-20s %s\n",
-	       'A' + i, pstring[i],
+	       'A' + i, SHM->i18nstr[cuser.language][pstring[i]],
 	       ((pbits >> i) & 1 ? SHM->i18nstr[cuser.language][23] : SHM->i18nstr[cuser.language][24]),
 	       i < 10 ? 'Q' + i : '0' + i - 10,
-	       pstring[i + 16],
+	       SHM->i18nstr[cuser.language][pstring[i + 16]],
 	       ((pbits >> (i + 16)) & 1 ? SHM->i18nstr[cuser.language][25] : SHM->i18nstr[cuser.language][26]));
     }
     clrtobot();

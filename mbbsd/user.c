@@ -244,7 +244,7 @@ static void Customize(void)
 	       ((cuser.uflag2 & FAVNOHILIGHT) ? "否" : "是"));
 #ifdef PLAY_ANGEL
 	if( HAS_PERM(PERM_ANGEL) ){
-	    prints("%-30s%10s\n", "F. 接受小主人詢問", 
+	    prints("%-30s%10s\n", "F. 開放小主人詢問", 
 		    (REJECT_QUESTION ? "否" : "是"));
 	    prints("%-30s%10s\n", "G. 接受的小主人性別", am[ANGEL_STATUS()]);
 	    key = getkey("請按 [A-G] 切換設定，按 [Return] 結束：");

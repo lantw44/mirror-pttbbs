@@ -143,7 +143,7 @@ static char *get_item_class(fav_type_t *ft)
 	case FAVT_BOARD:
 	    return bcache[cast_board(ft)->bid - 1].title;
 	case FAVT_FOLDER:
-	    return "¥Ø¿ý";
+	    return SHM->i18nstr[cuser.language][1032];
 	case FAVT_LINE:
 	    return "----";
     }

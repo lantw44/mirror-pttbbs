@@ -73,12 +73,12 @@ m_fpg()
    clrtobot();
 #ifdef MERGEMONEY
     int price[10] = {74, 21, 29, 48, 67, 11, 9, 43, 57, 72};
-    unsigned int market[10], lmarket=0;
+    unsigned lmarket=0;
 
    reload_money(); 
 
    for(i=0; i<10; i++)
-     lmarket += market[i]/(674 / price[i]);
+     lmarket += man.market[i]/(674 / price[i]);
    sprintf(buf, 
            "您的花園幣有 %10d 換算成 Ptt 幣為 %9d (優惠匯率 155:1), \n"
            "    銀行有   %10d 換算為 Ptt 幣為 %9d (匯率為 674:1), \n"

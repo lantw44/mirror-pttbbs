@@ -8,7 +8,7 @@
 # stdarg.h patch for pttbbs by in2 03/05/05               #
 
 OS!=uname
-OSTYPE?=OS
+OSTYPE?=$(OS)
 ####################################################
 # this is a bbs <--> news gateway
 #####################################################

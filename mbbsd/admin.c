@@ -302,11 +302,12 @@ void merge_dir(char *dir1, char *dir2)
          if( strcmp(fh[i-1].filename, fh[i].filename))
 	 {
                 fh[i-1].recommend =0;
+		fh[i-1].filemode |= 1;
                 append_record(dir1, &fh[i-1], sizeof(fileheader_t));
 		strcpy(p1, fh[i].filename);
                 if(!dashd(file1))
 		      {
-			  strcpy(p2, fh[i].filename);
+			  strcpy(p2, fh[i-1].filename);
 			  Copy(file2, file1);
 		      } 
 	 }

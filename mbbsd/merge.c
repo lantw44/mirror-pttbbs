@@ -94,7 +94,7 @@ m_fpg()
    strcat(msg,buf);
    sprintf(buf, "¦¹±b¸¹µù¥U¤é´Á %s ±N¨ú ",Cdatedate(&(cuser.firstlogin)));
    strcat(msg,buf);
-   prints(buf, "%s", Cdatedate(&d) );
+   sprintf(buf, "±N¨ú %s\n", Cdatedate(&d) );
    strcat(msg,buf);
    cuser.firstlogin = d;
 
@@ -112,7 +112,7 @@ m_fpg()
                  man.numposts,cuser.numposts,i);
    strcat(msg,buf);
    cuser.numposts = i;
-   prints(buf);
+   outs(msg);
    while(search_ulistn(usernum,2)) 
         {vmsg("½Ð±N­«ÂÐ¤W¯¸¨ä¥L½uÃö³¬! ¦AÄ~Äò");}
    passwd_update(usernum, &cuser);
@@ -139,7 +139,7 @@ m_fpg()
 	      userid[0], userid,
 	      cuser.userid[0], cuser.userid);
         system(buf);
-        strcat(msg, "¶×¤J­Ó¤H«H½cºëµØµØØ°Ï\n");
+        strcat(msg, "¶×¤J­Ó¤H«H½cºëµØ°Ï\n");
    }
    if(getans("¬O§_¶×¤J¦n¤Í¦W³æ? (·|ÂÐ»\\²{¦³³]©w, ID¥i¯à¬O¤£¦P¤H)? (y/N)")=='y')
    {
@@ -148,15 +148,16 @@ m_fpg()
        Copy(buf, genbuf);
        strcat(buf, genbuf);
        friend_load(FRIEND_OVERRIDE);
-       strcat(msg, "¶×¤J¦n¦³¤Í¤ÍÍ¦W³ææ\n");
+       strcat(msg, "¶×¤J¦n¦³¤ÍÍ³ææ\n");
    }
-   sprintf(buf, "±b¸¹¸¹¹¶××¤J³øø§i %s -> %s ", userid, cuser.userid);
+   sprintf(buf, "±b¸¹¶×¤J³ø§i %s -> %s ", userid, cuser.userid);
    post_msg("Security", buf, msg, "[¨t²Î¦w¥þ§½]");
    sprintf(buf, "fpg/home/bbs/home/%c/%s/PttID", userid[0],userid);
    if((fp = fopen(buf, "w")))
      {
         fprintf(fp, "%s\n", cuser.userid);
         fprintf(fp, "%s", msg);
+	fclose(fp);
      }
 
    vmsg("®¥³ß±z§¹¦¨±b¸¹ÅÜ¨­..");

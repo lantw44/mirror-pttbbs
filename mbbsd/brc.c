@@ -167,7 +167,7 @@ brc_insert_record(brcbid_t bid, brcnbrd_t num, time_t* list)
 	num--; /* don't write the times before brc_expire_time */
 
     if (!ptr) {
-	brc_size -= tnum;
+	brc_size -= (int)tnum;
 
 	/* put on the beginning */
 	if (num){
@@ -313,8 +313,9 @@ brc_initialize(){
 int
 brc_read_record(int bid, int *num, time_t *list){
     char *ptr;
-    *num = 0;
-    ptr = brc_findrecord_in(brc_buf, brc_buf + brc_size, bid, (brcnbrd_t*)num);
+    brcnbrd_t tnum;
+    ptr = brc_findrecord_in(brc_buf, brc_buf + brc_size, bid, &tnum);
+    *num = tnum;
     if ( ptr ){
 	memcpy(list, ptr + sizeof(brcbid_t) + sizeof(brcnbrd_t),
 		*num * sizeof(time_t));

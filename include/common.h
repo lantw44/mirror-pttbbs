@@ -189,6 +189,19 @@
 #define NOTREPLYING     -1
 #define REPLYING        0
 #define RECVINREPLYING  1
+
+#define LOG_CREAT       1
+#define LOG_VF          2
+
+
+#if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 96)
+    #define __builtin_expect(exp,c) (exp)
+
 #endif
 
 #define I18N SHM->i18nstr[cuser.language]
+
+#define likely(x)       __builtin_expect(!!(x), 1)
+#define unlikely(x)     __builtin_expect(!!(x), 0)
+
+#endif

@@ -605,9 +605,7 @@ m_newbrd(int recover)
     setbpath(genbuf, newboard.brdname);
 
     if (recover) {
-	struct stat     sb;
-
-	if (stat(genbuf, &sb) == -1 || !(sb.st_mode & S_IFDIR)) {
+	if (dashd(genbuf)) {
 	    outs("此看板已經存在! 請取不同英文板名");
 	    pressanykey();
 	    return -1;
@@ -682,15 +680,19 @@ int make_symbolic_link(int gid, int bid)
     stand_title("建立看板連結");
     memset(&newboard, 0, sizeof(newboard));
 
+    strlcpy(newboard.brdname, "1SYMLINK", sizeof(newboard.brdname));
     newboard.gid = gid;
+    newboard.nuser = bid;
     newboard.brdattr = BRD_NOTRAN | BRD_SYMBOLIC;
-    if (append_record(fn_board, (fileheader_t *) & newboard, sizeof(newboard)) == -1) {
-	vmsg("看板連結建來失敗");
+    if ((bid = getbnum("")) > 0) {
+	substitute_record(fn_board, &newboard, sizeof(newboard), bid);
+	reset_board(bid);
+    } else if (append_record(fn_board, (fileheader_t *) & newboard, sizeof(newboard)) == -1) {
+	vmsg("看板連結建立失敗");
 	return -1;
     } else {
 	addbrd_touchcache();
     }
-    pressanykey();
     return 0;
 }
 

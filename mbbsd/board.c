@@ -609,11 +609,6 @@ load_boards(char *key)
 			(key[0] && !strcasestr(bptr->title, key)) ||
 			(class_bid == -1 && bptr->nuser < 5))
 		    continue;
-		if (bptr->brdattr & BRD_SYMBOLIC) {
-		    bptr = SYM2TAR_BH(bptr);
-		    n = SYM2TAR_UID(n + 1) - 1;
-		    // "state" is set since B_BH get the target stuff
-		}
 		addnewbrdstat(n, state);
 	    }
 #ifdef CRITICAL_MEMORY
@@ -636,6 +631,11 @@ load_boards(char *key)
 		|| (yank_flag == 0 && !(getbrdattr(n) & PBS_FAV)) ||
 		(key[0] && !strcasestr(bptr->title, key)))
 		continue;
+	    if (bptr->brdattr & BRD_SYMBOLIC) {
+		bptr = SYM2TAR_BH(bptr);
+		n = SYM2TAR_UID(n + 1) - 1;
+		// "state" is set since B_BH get the target stuff
+	    }
 	    addnewbrdstat(n, state);
 	}
 	byMALLOC = 0;
@@ -1143,8 +1143,8 @@ choose_board(int newflag)
 		brdnum = -1;
 	    }
 	    break;
-	case Ctrl('L'):
-	    if (HAS_PERM(PERM_SYSOP) && yank_flag) {
+	case 'L':
+	    if (HAS_PERM(PERM_SYSOP) && class_bid > 0) {
 		tmp = generalnamecomplete("請輸入看板英文名稱：",
                             buf, sizeof(buf),
                             SHM->Bnumber,
@@ -1156,9 +1156,7 @@ choose_board(int newflag)
 		brdnum = -1;
 		head = 9999;
 	    }
-	    break;
-	case 'L':
-	    if (HAS_PERM(PERM_BASIC) && yank_flag == 0) {
+	    else if (HAS_PERM(PERM_BASIC) && yank_flag == 0) {
 		if (fav_add_line() == NULL) {
 		    vmsg("新增失敗，分隔線/總最愛 數量達最大值。");
 		    break;

@@ -414,7 +414,7 @@ count_logins(int uid, int show)
 	    for (count = 0; (ulist[i + count] &&
 			     uid == ulist[i + count]->uid); count++) {
 		if (show)
-		    prints("(%d) 目前狀態為: %-17.16s(來自 %s)\n",
+		    prints(SHM->i18nstr[cuser.language][531],
 			   count + 1, modestring(ulist[i + count], 0),
 			   ulist[i + count]->from);
 	    }

@@ -8,16 +8,16 @@ show_table(char TABLE[], char ifcomputer)
     int             i;
 
     move(0, 35);
-    prints("\033[1;44;33m  【 猜數字 】  \033[m");
+    prints(SHM->i18nstr[cuser.language][1139]);
     move(8, 1);
-    prints("\033[1;44;36m目   前   倍   率\033[m\n");
+    prints(SHM->i18nstr[cuser.language][1140]);
     prints("\033[1;33m=================\033[m\n");
     if (ifcomputer) {
-	prints("贏電腦: 2 倍\n");
-	prints("輸電腦: 0 倍\n");
+	prints(SHM->i18nstr[cuser.language][1141]);
+	prints(SHM->i18nstr[cuser.language][1142]);
     } else {
 	for (i = 1; i <= 6; i++)
-	    prints("第%d次, %02d倍\n", i, TABLE[i]);
+	    prints(SHM->i18nstr[cuser.language][1143], i, TABLE[i]);
     }
     prints("\033[33m=================\033[m");
 }
@@ -29,9 +29,9 @@ get_money(void)
     char            data[20];
 
     move(1, 0);
-    prints("您目前有:%d Ptt$", cuser.money);
+    prints(SHM->i18nstr[cuser.language][1144], cuser.money);
     do {
-	getdata(2, 0, "要賭多少(5-10或按q離開): ", data, 9, LCECHO);
+	getdata(2, 0, SHM->i18nstr[cuser.language][1145], data, 9, LCECHO);
 	money = 0;
 	if (data[0] == 'q' || data[0] == 'Q') {
 	    unlockutmpmode();
@@ -53,7 +53,7 @@ get_money(void)
     move(1, 0);
     clrtoeol();
     reload_money();
-    prints("您目前有:%d Ptt$", cuser.money - money);
+    prints(SHM->i18nstr[cuser.language][1146], cuser.money - money);
     return money;
 }
 
@@ -78,7 +78,7 @@ static char    *
 get_data(char data[5], int count)
 {
     while (1) {
-	getdata(6, 0, "輸入四位數字(不重複): ", data, 5, LCECHO);
+	getdata(6, 0, SHM->i18nstr[cuser.language][1147], data, 5, LCECHO);
 	if (check_data(data) == 1)
 	    break;
     }
@@ -173,7 +173,7 @@ computer(int correct, int total, char flag[], int n[])
     if (k == 40) {
 	move(total + 8, 25);
 	snprintf(data, sizeof(data), "%04d", guess);
-	prints("%s => 猜中了!!", data);
+	prints(SHM->i18nstr[cuser.language][1148], data);
 	return 1;
     } else {
 	move(total + 8, 25);
@@ -227,28 +227,28 @@ guess_main()
     FILE           *file;
 
     clear();
-    showtitle("猜數字", BBSName);
+    showtitle(SHM->i18nstr[cuser.language][1149], BBSName);
     lockreturn0(GUESSNUM, LOCK_MULTI);
 
     reload_money();
     if (cuser.money < 5) {
 	clear();
 	move(12, 35);
-	prints("錢不夠啦 至少要 5 Ptt$");
+	prints(SHM->i18nstr[cuser.language][1150]);
 	unlockutmpmode();
 	pressanykey();
 	return 1;
     }
     if ((money = get_money()) == 0)
 	return 1;
-    vice(money, "猜數字");
+    vice(money, SHM->i18nstr[cuser.language][1151]);
 
     Diff_Random(answer);
     move(2, 0);
     clrtoeol();
-    prints("您下注 :%lu Ptt$", money);
+    prints(SHM->i18nstr[cuser.language][1152], money);
 
-    getdata_str(4, 0, "您要和電腦比賽嗎? <y/n>[y]:",
+    getdata_str(4, 0, SHM->i18nstr[cuser.language][1153],
 		ifcomputer, sizeof(ifcomputer), LCECHO, "y");
     if (ifcomputer[0] == 'y') {
 	ifcomputer[0] = 1;
@@ -259,17 +259,17 @@ guess_main()
     }
     if (ifcomputer[0]) {
 	do {
-	    getdata(5, 0, "請輸入您要讓電腦猜的數字: ",
+	    getdata(5, 0, SHM->i18nstr[cuser.language][1154],
 		    yournum, sizeof(yournum), LCECHO);
 	} while (!legal(atoi(yournum)));
 	move(8, 25);
-	prints("電腦猜");
+	prints(SHM->i18nstr[cuser.language][1155]);
 	flag = malloc(sizeof(char) * 10000);
 	n = malloc(sizeof(int) * 1500);
 	initcomputer(flag);
     }
     move(8, 55);
-    prints("你猜");
+    prints(SHM->i18nstr[cuser.language][1156]);
     while (((!computerwin || !youwin) && count < 10 && (ifcomputer[0])) ||
 	   (!ifcomputer[0] && count < 10 && !youwin)) {
 	if (!computerwin && ifcomputer[0]) {
@@ -278,7 +278,7 @@ guess_main()
 		computerwin = 1;
 	}
 	move(20, 55);
-	prints("第 %d 次機會 ", count + 1);
+	prints(SHM->i18nstr[cuser.language][1157], count + 1);
 	if (!youwin) {
 	    ++count;
 	    if (guess_play(get_data(data, count), answer, count))
@@ -290,34 +290,33 @@ guess_main()
     free(n);
     if (ifcomputer[0]) {
 	if (count > c_count) {
-	    prints("你輸給電腦了");
+	    prints(SHM->i18nstr[cuser.language][1158]);
 	    move(18, 35);
-	    prints("你賠了 %lu ", money);
+	    prints(SHM->i18nstr[cuser.language][1159], money);
 	    if ((file = fopen(LOGPASS, "a"))) {
-		fprintf(file, "電腦第%d次猜中, ", c_count);
+		fprintf(file, SHM->i18nstr[cuser.language][1160], c_count);
 		if (youwin)
-		    fprintf(file, "%s 第%d次猜中, ", cuser.userid, count);
+		    fprintf(file, SHM->i18nstr[cuser.language][1161], cuser.userid, count);
 		else
-		    fprintf(file, "%s 沒猜中, ", cuser.userid);
-		fprintf(file, "電腦賺走了%s %ld Ptt$\n", cuser.userid, money);
+		    fprintf(file, SHM->i18nstr[cuser.language][1162], cuser.userid);
+		fprintf(file, SHM->i18nstr[cuser.language][1163], cuser.userid, money);
 		fclose(file);
 	    }
 	} else if (count < c_count) {
-	    prints("真厲害, 讓你賺到囉");
+	    prints(SHM->i18nstr[cuser.language][1164]);
 	    move(18, 35);
-	    prints("你賺走了 %lu ", money * 2);
+	    prints(SHM->i18nstr[cuser.language][1165], money * 2);
 	    demoney(money * 2);
 	    if ((file = fopen(LOGPASS, "a"))) {
-		fprintf(file, "id: %s, 第%d次猜中, 電腦第%d次猜中, "
-			"贏了電腦 %ld Ptt$\n", cuser.userid, count,
+		fprintf(file, SHM->i18nstr[cuser.language][1166], cuser.userid, count,
 			c_count, money * 2);
 		fclose(file);
 	    }
 	} else {
-	    prints("真厲害, 和電腦打成平手了, 拿回本錢%lu\n", money);
+	    prints(SHM->i18nstr[cuser.language][1167], money);
 	    demoney(money);
 	    if ((file = fopen(LOGPASS, "a"))) {
-		fprintf(file, "id: %s 和電腦打成了平手\n", cuser.userid);
+		fprintf(file, SHM->i18nstr[cuser.language][1168], cuser.userid);
 		fclose(file);
 	    }
 	}
@@ -328,26 +327,26 @@ guess_main()
     if (youwin) {
 	demoney(TABLE[count] * money);
 	if (count < 5) {
-	    prints("真厲害, 錢被你賺走了");
+	    prints(SHM->i18nstr[cuser.language][1169]);
 	    if ((file = fopen(LOGPASS, "a"))) {
-		fprintf(file, "id: %s, 第%d次猜中, 贏了 %ld Ptt$\n",
+		fprintf(file, SHM->i18nstr[cuser.language][1170],
 			cuser.userid, count, TABLE[count] * money);
 		fclose(file);
 	    }
 	} else if (count > 5) {
-	    prints("唉, 太多次才猜出來了");
+	    prints(SHM->i18nstr[cuser.language][1171]);
 	    if ((file = fopen(LOGPASS, "a"))) {
-		fprintf(file, "id: %s, 第%d次才猜中, 賠了 %ld Ptt$\n",
+		fprintf(file, SHM->i18nstr[cuser.language][1172],
 			cuser.userid, count, money);
 		fclose(file);
 	    }
 	} else {
-	    prints("五次猜出來, 還你本錢吧");
+	    prints(SHM->i18nstr[cuser.language][1173]);
 	    move(18, 35);
 	    clrtoeol();
-	    prints("你拿回了%lu Ptt$\n", money);
+	    prints(SHM->i18nstr[cuser.language][1174], money);
 	    if ((file = fopen(LOGPASS, "a"))) {
-		fprintf(file, "id: %s, 第%d次猜中, 拿回了本錢 %lu Ptt$\n",
+		fprintf(file, SHM->i18nstr[cuser.language][1175],
 			cuser.userid, count, money);
 		fclose(file);
 	    }
@@ -357,11 +356,11 @@ guess_main()
 	return 1;
     }
     move(17, 35);
-    prints("嘿嘿 標準答案是 %s ", answer);
+    prints(SHM->i18nstr[cuser.language][1176], answer);
     move(18, 35);
-    prints("下次再來吧");
+    prints(SHM->i18nstr[cuser.language][1177]);
     if ((file = fopen(BBSHOME "/etc/loseguess.log", "a"))) {
-	fprintf(file, "id: %s 賭了 %ld Ptt$\n", cuser.userid, money);
+	fprintf(file, SHM->i18nstr[cuser.language][1178], cuser.userid, money);
 	fclose(file);
     }
     unlockutmpmode();

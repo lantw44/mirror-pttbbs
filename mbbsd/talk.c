@@ -3,12 +3,11 @@
 
 #define QCAST   int (*)(const void *, const void *)
 
-static char    *IdleTypeTable[] = {
-    "偶在花呆啦", "情人來電", "覓食中", "拜見周公", "假死狀態", "我在思考"
-};
-static char    *sig_des[] = {
-    "鬥雞", "聊天", "", "下棋", "象棋", "暗棋"
-};
+//#define sig_des [(a)] (SHM->i18nstr[cuser.language][1896 + (a)])
+#define sig_des(a) (SHM->i18nstr[cuser.language][1896 + (a)])
+/*static char    *sig_des[] = {
+    SHM->i18nstr[cuser.language][1896], SHM->i18nstr[cuser.language][1897], "", SHM->i18nstr[cuser.language][1898], SHM->i18nstr[cuser.language][1899], SHM->i18nstr[cuser.language][1900]
+};*/
 
 #define MAX_SHOW_MODE 4
 #define M_INT 15		/* monitor mode update interval */
@@ -58,7 +57,7 @@ iswritable_stat(userinfo_t * uentp, int fri_stat)
 int
 isvisible_stat(userinfo_t * me, userinfo_t * uentp, int fri_stat)
 {
-    if (!uentp || uentp->userid[0] == 0)
+    if (uentp->userid[0] == 0)
 	return 0;
 
     if (PERM_HIDE(uentp) && !(PERM_HIDE(me)))	/* 對方紫色隱形而你沒有 */
@@ -78,7 +77,7 @@ char           *
 modestring(userinfo_t * uentp, int simple)
 {
     static char     modestr[40];
-    char    *notonline = "不在站上";
+    char    *notonline = SHM->i18nstr[cuser.language][1901];
     register int    mode = uentp->mode;
     register char  *word;
     int             fri_stat;
@@ -102,12 +101,12 @@ modestring(userinfo_t * uentp, int simple)
     } else if (!mode && *uentp->chatid == 1) {
 	if (!simple)
 	    snprintf(modestr, sizeof(modestr),
-		     "回應 %s", getuserid(uentp->destuid));
+		     SHM->i18nstr[cuser.language][1902], getuserid(uentp->destuid));
 	else
-	    snprintf(modestr, sizeof(modestr), "回應呼叫");
+	    snprintf(modestr, sizeof(modestr), SHM->i18nstr[cuser.language][1903]);
     } 
     else if (!mode && *uentp->chatid == 3)
-	snprintf(modestr, sizeof(modestr), "水球準備中");
+	snprintf(modestr, sizeof(modestr), SHM->i18nstr[cuser.language][1904]);
     else if (
 #ifdef NOKILLWATERBALL
 	     uentp->msgcount > 0
@@ -117,40 +116,40 @@ modestring(userinfo_t * uentp, int simple)
 	     )
 	if (uentp->msgcount < 10) {
 	    char           *cnum[10] =
-	    {"", "一", "兩", "三", "四", "五", "六", "七",
-	    "八", "九"};
+	    {"", SHM->i18nstr[cuser.language][1905], SHM->i18nstr[cuser.language][1906], SHM->i18nstr[cuser.language][1907], SHM->i18nstr[cuser.language][1908], SHM->i18nstr[cuser.language][1909], SHM->i18nstr[cuser.language][1910], SHM->i18nstr[cuser.language][1911],
+	    SHM->i18nstr[cuser.language][1912], SHM->i18nstr[cuser.language][1913]};
 	    snprintf(modestr, sizeof(modestr),
-		     "中%s顆水球", cnum[(int)(uentp->msgcount)]);
+		     SHM->i18nstr[cuser.language][1914], cnum[(int)(uentp->msgcount)]);
 	} else
-	    snprintf(modestr, sizeof(modestr), "不行了 @_@");
+	    snprintf(modestr, sizeof(modestr), SHM->i18nstr[cuser.language][1915]);
     else if (!mode)
 	return (uentp->destuid == 6) ? uentp->chatid :
-	    IdleTypeTable[(0 <= uentp->destuid && uentp->destuid < 6) ?
-			  uentp->destuid : 0];
+	    SHM->i18nstr[cuser.language][1890 + ((0 <= uentp->destuid && uentp->destuid < 6) ?
+			  uentp->destuid : 0)];
     else if (simple)
 	return word;
     else if (uentp->in_chat && mode == CHATING)
 	snprintf(modestr, sizeof(modestr), "%s (%s)", word, uentp->chatid);
     else if (mode == TALK) {
 	if (!isvisible_uid(uentp->destuid))	/* Leeym 對方(紫色)隱形 */
-	    snprintf(modestr, sizeof(modestr), "%s", "交談 空氣");
+	    snprintf(modestr, sizeof(modestr), "%s", SHM->i18nstr[cuser.language][1916]);
 	/* Leeym * 大家自己發揮吧！ */
 	else
 	    snprintf(modestr, sizeof(modestr),
 		     "%s %s", word, getuserid(uentp->destuid));
     } else if (mode == M_FIVE) {
 	if (!isvisible_uid(uentp->destuid))
-	    snprintf(modestr, sizeof(modestr), "%s", "五子棋 空氣");
+	    snprintf(modestr, sizeof(modestr), "%s", SHM->i18nstr[cuser.language][1917]);
 	else
 	    snprintf(modestr, sizeof(modestr), "%s %s", word, getuserid(uentp->destuid));
     } else if (mode == CHESSWATCHING) {
-	snprintf(modestr, sizeof(modestr), "觀棋");
+	snprintf(modestr, sizeof(modestr), SHM->i18nstr[cuser.language][1918]);
     } else if (mode == CHC) {
 	if (isvisible_uid(uentp->destuid))
-	    snprintf(modestr, sizeof(modestr), "%s", "下象棋");
+	    snprintf(modestr, sizeof(modestr), "%s", SHM->i18nstr[cuser.language][1919]);
 	else
 	    snprintf(modestr, sizeof(modestr),
-		     "下象棋 %s", getuserid(uentp->destuid));
+		     SHM->i18nstr[cuser.language][1920], getuserid(uentp->destuid));
     } else if (mode != PAGE && mode != TQUERY)
 	return word;
     else
@@ -323,7 +322,7 @@ my_kick(userinfo_t * uentp)
 	log_usies("KICK ", genbuf);
 	if ((uentp->pid <= 0 || kill(uentp->pid, SIGHUP) == -1) && (errno == ESRCH))
 	    purge_utmp(uentp);
-	outs("踢出去囉");
+	outs(SHM->i18nstr[cuser.language][1921]);
     } else
 	outs(msg_cancel);
     pressanykey();
@@ -337,12 +336,12 @@ chicken_query(char *userid)
 	    time_diff(&(xuser.mychicken));
 	    if (!isdeadth(&(xuser.mychicken))) {
 		show_chicken_data(&(xuser.mychicken), NULL);
-		prints("\n\n以上是 %s 的寵物資料..", userid);
+		prints(SHM->i18nstr[cuser.language][1922], userid);
 	    }
 	} else {
 	    move(1, 0);
 	    clrtobot();
-	    prints("\n\n%s 並沒有養寵物..", userid);
+	    prints(SHM->i18nstr[cuser.language][1923], userid);
 	}
 	pressanykey();
     }
@@ -356,8 +355,8 @@ my_query(char *uident)
     unsigned long int j;
     userinfo_t     *uentp;
     const char *money[10] =
-    {"債台高築", "赤貧", "清寒", "普通", "小康",
-    "小富", "中富", "大富翁", "富可敵國", "比爾蓋\天"};
+    {SHM->i18nstr[cuser.language][1924], SHM->i18nstr[cuser.language][1925], SHM->i18nstr[cuser.language][1926], SHM->i18nstr[cuser.language][1927], SHM->i18nstr[cuser.language][1928],
+    SHM->i18nstr[cuser.language][1929], SHM->i18nstr[cuser.language][1930], SHM->i18nstr[cuser.language][1931], SHM->i18nstr[cuser.language][1932], SHM->i18nstr[cuser.language][1933]};
     const char *sex[8] =
     {MSG_BIG_BOY, MSG_BIG_GIRL,
 	MSG_LITTLE_BOY, MSG_LITTLE_GIRL,
@@ -377,7 +376,7 @@ my_query(char *uident)
 	j = muser.money;
 	for (i = 0; i < 10 && j > 10; i++)
 	    j /= 10;
-	prints("《ＩＤ暱稱》%s(%s)%*s《經濟狀況》%s",
+	prints(SHM->i18nstr[cuser.language][1934],
 	       muser.userid,
 	       muser.username,
 	       26 - strlen(muser.userid) - strlen(muser.username), "",
@@ -386,34 +385,33 @@ my_query(char *uident)
 	    prints(" ($%d)", muser.money);
 	prints("\n");
 
-	prints("《上站次數》%d次", muser.numlogins);
+	prints(SHM->i18nstr[cuser.language][1935], muser.numlogins);
 	move(2, 40);
 #ifdef ASSESS
-	prints("《文章篇數》%d篇 (優:%d/劣:%d)\n", muser.numposts, muser.goodpost, muser.badpost);
+	prints(SHM->i18nstr[cuser.language][1936], muser.numposts, muser.goodpost, muser.badpost);
 #else
-	prints("《文章篇數》%d篇\n", muser.numposts);
+	prints(SHM->i18nstr[cuser.language][1937], muser.numposts);
 #endif
 
-	prints("\033[1;33m《目前動態》%-28.28s\033[m",
+	prints(SHM->i18nstr[cuser.language][1938],
 	       (uentp && isvisible_stat(currutmp, uentp, fri_stat)) ?
-	       modestring(uentp, 0) : "不在站上");
+	       modestring(uentp, 0) : SHM->i18nstr[cuser.language][1939]);
 
 	outs(((uentp && uentp->mailalert) || load_mailalert(muser.userid))
-	     ? "《私人信箱》有新進信件還沒看\n" :
-	     "《私人信箱》所有信件都看過了\n");
-	prints("《上次上站》%-28.28s《上次故鄉》%s\n",
+	     ? SHM->i18nstr[cuser.language][1940] :
+	     SHM->i18nstr[cuser.language][1941]);
+	prints(SHM->i18nstr[cuser.language][1942],
 	       Cdate(&muser.lastlogin),
-	       (muser.lasthost[0] ? muser.lasthost : "(不詳)"));
-	prints("《五子棋戰績》%3d 勝 %3d 敗 %3d 和      "
-	       "《象棋戰績》%3d 勝 %3d 敗 %3d 和\n",
+	       (muser.lasthost[0] ? muser.lasthost : SHM->i18nstr[cuser.language][1943]));
+	prints(SHM->i18nstr[cuser.language][1944],
 	       muser.five_win, muser.five_lose, muser.five_tie,
 	       muser.chc_win, muser.chc_lose, muser.chc_tie);
 #ifdef ASSESS
-	prints("《競標評比》 優 %d / 劣 %d", muser.goodsale, muser.badsale);
+	prints(SHM->i18nstr[cuser.language][1945], muser.goodsale, muser.badsale);
 	move(6, 40);
 #endif
 	if ((uentp && ((fri_stat & HFM) || strcmp(muser.userid,cuser.userid) == 0) && !uentp->invisible))
-	    prints("《 性  別 》%-28.28s\n", sex[muser.sex % 8]);
+	    prints(SHM->i18nstr[cuser.language][1946], sex[muser.sex % 8]);
 
 	showplans(uident);
 	pressanykey();
@@ -441,11 +439,11 @@ water_scr(water_t * tw, int which, char type)
 	    prints(" ");
 	    move(16 + i, 4);
 	    if (tw->msg[(tw->top - i + 4) % 5].last_call_in[0] != 0)
-		prints("\033[0m   \033[1;%d;44m★%-64s\033[0m   \n",
+		prints(SHM->i18nstr[cuser.language][1947],
 		       colors[i],
 		       tw->msg[(tw->top - i + 4) % 5].last_call_in);
 	    else
-		prints("\033[0m　\n");
+		prints(SHM->i18nstr[cuser.language][1948]);
 	}
 
 	move(21, 4);
@@ -457,14 +455,14 @@ water_scr(water_t * tw, int which, char type)
 	move(0, 0);
 	prints(" ");
 	move(0, 0);
-	prints("\033[0m反擊 %s:", tw->userid);
+	prints(SHM->i18nstr[cuser.language][1949], tw->userid);
 	clrtoeol();
 	move(0, strlen(tw->userid) + 6);
     } else {
 	move(8 + which, 28);
 	prints("123456789012345678901234567890");
 	move(8 + which, 28);
-	prints("\033[1;37;44m  %c %-13s　\033[0m",
+	prints(SHM->i18nstr[cuser.language][1950],
 	       tw->uin ? ' ' : 'x',
 	       tw->userid);
     }
@@ -490,7 +488,7 @@ my_write2(void)
 
     //init screen
 	move(7, 28);
-    prints("\033[1;33;46m ↑ 水球反擊對象 ↓\033[0m");
+    prints(SHM->i18nstr[cuser.language][1951]);
     for (i = 0; i < 5; ++i)
 	if (swater[i] == NULL || swater[i]->pid == 0)
 	    break;
@@ -502,11 +500,9 @@ my_write2(void)
 	    water_scr(swater[i], i, 0);
 	}
     move(15, 4);
-    prints("\033[0m \033[1;35m◇\033[1;36m────────────────"
-	   "─────────────────\033[1;35m◇\033[0m ");
+    prints(SHM->i18nstr[cuser.language][1952]);
     move(22, 4);
-    prints(" \033[1;35m◇\033[1;36m────────────────"
-	   "─────────────────\033[1;35m◇\033[0m ");
+    prints(SHM->i18nstr[cuser.language][1953]);
     water_scr(swater[0], 0, 1);
     refresh();
 
@@ -551,7 +547,7 @@ my_write2(void)
 	    move(0, 0);
 	    prints("\033[m");
 	    clrtoeol();
-	    snprintf(genbuf, sizeof(genbuf), "攻擊 %s:", tw->userid);
+	    snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][1954], tw->userid);
 	    if (!oldgetdata(0, 0, genbuf, msg,
 			    80 - strlen(tw->userid) - 6, DOECHO))
 		break;
@@ -592,7 +588,7 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
     strlcpy(destid, id, sizeof(destid));
 
     if (!uin && !(flag == 0 && water_which->count > 0)) {
-	vmsg("糟糕! 對方已落跑了(不在站上)! ");
+	vmsg(SHM->i18nstr[cuser.language][1955]);
 	watermode = -1;
 	return 0;
     }
@@ -606,6 +602,9 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
 	/* 一般水球 */
 	watermode = 0;
 	if (!(len = getdata(0, 0, prompt, msg, 56, DOECHO))) {
+	    outmsg(SHM->i18nstr[cuser.language][1956]);
+	    clrtoeol();
+	    refresh();
 	    currutmp->chatid[0] = c0;
 	    currutmp->mode = mode0;
 	    currstat = currstat0;
@@ -627,7 +626,7 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
 
     strip_ansi(msg, msg, STRIP_ALL);
     if (uin && *uin->userid && (flag == 0 || flag == 4)) {
-	snprintf(buf, sizeof(buf), "丟給 %s : %s [Y/n]?", uin->userid, msg);
+	snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][1957], uin->userid, msg);
 	getdata(0, 0, buf, genbuf, 3, LCECHO);
 	if (genbuf[0] == 'n') {
 	    currutmp->chatid[0] = c0;
@@ -639,7 +638,7 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
     }
     watermode = -1;
     if (!uin || !*uin->userid || strcasecmp(destid, uin->userid)) {
-	vmsg("糟糕! 對方已落跑了(不在站上)! ");
+	vmsg(SHM->i18nstr[cuser.language][1959]);
 	currutmp->chatid[0] = c0;
 	currutmp->mode = mode0;
 	currstat = currstat0;
@@ -670,7 +669,7 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
 		uin->pager == 2 ||
 		(uin->pager == 4 &&
 		 !(fri_stat & HFM))))
-	outmsg("\033[1;33;41m糟糕! 對方防水了! \033[37m~>_<~\033[m");
+	outmsg(SHM->i18nstr[cuser.language][1960]);
     else {
 	int     write_pos = uin->msgcount; /* try to avoid race */
 	if ( write_pos < (MAX_MSGS - 1) ) { /* race here */
@@ -685,7 +684,7 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
 		    sizeof(uin->msgs[write_pos].last_call_in));
 	    uin->pager = pager0;
 	} else if (flag != 2)
-	    outmsg("\033[1;33;41m糟糕! 對方不行了! (收到太多水球) \033[37m@_@\033[m");
+	    outmsg(SHM->i18nstr[cuser.language][1961]);
 
 	if (uin->msgcount >= 1 &&
 #ifdef NOKILLWATERBALL
@@ -694,11 +693,11 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
 	    (uin->pid <= 0 || kill(uin->pid, SIGUSR2) == -1) 
 #endif
 	    && flag != 2)
-	    outmsg("\033[1;33;41m糟糕! 沒打中! \033[37m~>_<~\033[m");
+	    outmsg(SHM->i18nstr[cuser.language][1962]);
 	else if (uin->msgcount == 1 && flag != 2)
-	    outmsg("\033[1;33;44m水球砸過去了! \033[37m*^o^*\033[m");
+	    outmsg(SHM->i18nstr[cuser.language][1963]);
 	else if (uin->msgcount > 1 && uin->msgcount < MAX_MSGS && flag != 2)
-	    outmsg("\033[1;33;44m再補上一粒! \033[37m*^o^*\033[m");
+	    outmsg(SHM->i18nstr[cuser.language][1964]);
     }
 
     clrtoeol();
@@ -739,10 +738,10 @@ t_display_new(void)
 
     if (water[0].count && watermode > 0) {
 	move(1, 0);
-	outs("───────水─球─回─顧───");
+	outs(SHM->i18nstr[cuser.language][1965]);
 	outs(WATERMODE(WATER_ORIG) ?
-	     "──────用[Ctrl-R Ctrl-T]鍵切換─────" :
-	     "用[Ctrl-R Ctrl-T Ctrl-F Ctrl-G ]鍵切換────");
+	     SHM->i18nstr[cuser.language][1966] :
+	     SHM->i18nstr[cuser.language][1967]);
 	if (WATERMODE(WATER_NEW)) {
 	    move(2, 0);
 	    clrtoeol();
@@ -763,7 +762,7 @@ t_display_new(void)
 		    } else
 			prints("              ");
 		else
-		    prints("%s 全部  \033[m",
+		    prints(SHM->i18nstr[cuser.language][1968],
 			   water_which == &water[0] ? "\033[1;33;47m " :
 			   " "
 			);
@@ -783,8 +782,7 @@ t_display_new(void)
 		       water_which->msg[a].last_call_in, len,
 		       "");
 	    else
-		prints("\033[1;44m>\033[1;33;47m%s "
-		       "\033[37;45m %s \033[m%*s",
+		prints("\033[1;44m>\033[1;33;47m%s \033[37;45m %s \033[m%*s",
 		       water_which->msg[a].userid,
 		       water_which->msg[a].last_call_in,
 		       len, "");
@@ -797,8 +795,7 @@ t_display_new(void)
 	    i++;
 	}
 	move(i + off, 0);
-	outs("──────────────────────"
-	     "─────────────────");
+	outs(SHM->i18nstr[cuser.language][1969]);
 	if (WATERMODE(WATER_NEW))
 	    while (i++ <= water[0].count) {
 		move(i + off, 0);
@@ -819,10 +816,8 @@ t_display(void)
     setuserfile(genbuf, fn_writelog);
     if (more(genbuf, YEA) != -1) {
 	move(b_lines - 4, 0);
-	outs("\033[1;33;45m★現在 Ptt提供創新的水球整理程式★\033[m\n"
-	     "您將水球存至信箱後, 在【郵件選單】該信件前按 u,\n"
-	     "系統即會將您的水球紀錄重新整理後寄送給您唷! \n");
-	getdata(b_lines - 1, 0, "清除(C) 移至備忘錄(M) 保留(R) (C/M/R)?[R]",
+	outs(SHM->i18nstr[cuser.language][1970]);
+	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1971],
 		ans, sizeof(ans), LCECHO);
 	if (*ans == 'm') {
 	    fileheader_t    mymail;
@@ -832,8 +827,8 @@ t_display(void)
 	    stampfile(buf, &mymail);
 
 	    mymail.filemode = FILE_READ ;
-	    strlcpy(mymail.owner, "[備.忘.錄]", sizeof(mymail.owner));
-	    strlcpy(mymail.title, "熱線記錄", sizeof(mymail.title));
+	    strlcpy(mymail.owner, SHM->i18nstr[cuser.language][1972], sizeof(mymail.owner));
+	    strlcpy(mymail.title, SHM->i18nstr[cuser.language][1973], sizeof(mymail.title));
 	    sethomedir(title, cuser.userid);
 	    Rename(genbuf, buf);
 	    append_record(title, &mymail, sizeof(mymail));
@@ -1013,7 +1008,7 @@ do_talk(int fd)
     setutmpmode(TALK);
 
     ch = 58 - strlen(save_page_requestor);
-    snprintf(genbuf, sizeof(genbuf), "%s【%s", cuser.userid, cuser.username);
+    snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][1974], cuser.userid, cuser.username);
     i = ch - strlen(genbuf);
     if (i >= 0)
 	i = (i >> 1) + 1;
@@ -1025,8 +1020,7 @@ do_talk(int fd)
     data[i] = '\0';
 
     snprintf(mid_line, sizeof(mid_line),
-	     "\033[1;46;37m  談天說地  \033[45m%s%s】"
-	     " 與  %s%s\033[0m", data, genbuf, save_page_requestor, data);
+	     SHM->i18nstr[cuser.language][1975], data, genbuf, save_page_requestor, data);
 
     memset(&mywin, 0, sizeof(mywin));
     memset(&itswin, 0, sizeof(itswin));
@@ -1057,7 +1051,7 @@ do_talk(int fd)
 		    break;
 		move(b_lines, 0);
 		clrtoeol();
-		outs("再按一次 Ctrl-C 就正式中止談話囉！");
+		outs(SHM->i18nstr[cuser.language][1976]);
 		im_leaving = 1;
 		continue;
 	    }
@@ -1098,13 +1092,13 @@ do_talk(int fd)
 	char            ans[4];
 	int             i;
 
-	fprintf(flog, "\n\033[33;44m離別畫面 [%s] ...     \033[m\n",
+	fprintf(flog, SHM->i18nstr[cuser.language][1977],
 		Cdatelite(&now));
 	for (i = 0; i < scr_lns; i++)
 	    fprintf(flog, "%.*s\n", big_picture[i].len, big_picture[i].data);
 	fclose(flog);
 	more(fpath, NA);
-	getdata(b_lines - 1, 0, "清除(C) 移至備忘錄(M). (C/M)?[C]",
+	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1978],
 		ans, sizeof(ans), LCECHO);
 	if (*ans == 'm') {
 	    fileheader_t    mymail;
@@ -1113,9 +1107,9 @@ do_talk(int fd)
 	    sethomepath(genbuf, cuser.userid);
 	    stampfile(genbuf, &mymail);
 	    mymail.filemode = FILE_READ ;
-	    strlcpy(mymail.owner, "[備.忘.錄]", sizeof(mymail.owner));
+	    strlcpy(mymail.owner, SHM->i18nstr[cuser.language][1979], sizeof(mymail.owner));
 	    snprintf(mymail.title, sizeof(mymail.title),
-		     "對話記錄 \033[1;36m(%s)\033[m",
+		     SHM->i18nstr[cuser.language][1980],
 		     getuserid(currutmp->destuid));
 	    sethomedir(title, cuser.userid);
 	    Rename(fpath, genbuf);
@@ -1164,7 +1158,7 @@ int make_connection_to_somebody(userinfo_t *uin, int timeout){
     if (pid > 0)
 	kill(pid, SIGUSR1);
     clear();
-    prints("正呼叫 %s.....\n鍵入 Ctrl-D 中止....", uin->userid);
+    prints(SHM->i18nstr[cuser.language][1981], uin->userid);
 
     listen(sock, 1);
     add_io(sock, timeout);
@@ -1176,7 +1170,7 @@ int make_connection_to_somebody(userinfo_t *uin, int timeout){
 	    if (!ch && uin->chatid[0] == 1 &&
 		    uin->destuip == currutmp - &SHM->uinfo[0]) {
 		bell();
-		outmsg("對方回應中...");
+		outmsg(SHM->i18nstr[cuser.language][1982]);
 		refresh();
 	    } else if (ch == EDITING || ch == TALK || ch == CHATING ||
 		    ch == PAGE || ch == MAILALL || ch == MONITOR ||
@@ -1186,7 +1180,7 @@ int make_connection_to_somebody(userinfo_t *uin, int timeout){
 		add_io(0, 0);
 		close(sock);
 		currutmp->sockactive = currutmp->destuid = 0;
-		vmsg("人家在忙啦");
+		vmsg(SHM->i18nstr[cuser.language][1983]);
 		unlockutmpmode();
 		return -1;
 	    } else {
@@ -1194,7 +1188,7 @@ int make_connection_to_somebody(userinfo_t *uin, int timeout){
 		add_io(sock, 20);	/* added for linux... achen */
 #endif
 		move(0, 0);
-		outs("再");
+		outs(SHM->i18nstr[cuser.language][1984]);
 		bell();
 
 		uin->destuip = currutmp - &SHM->uinfo[0];
@@ -1245,31 +1239,30 @@ my_talk(userinfo_t * uin, int fri_stat, char defact)
 	    kill(uin->pid, SIGUSR1);
 	    sock = make_connection_to_somebody(uin, 20);
 	    if (sock < 0)
-		vmsg("無法建立連線");
+		vmsg(SHM->i18nstr[cuser.language][1985]);
 	    else {
 		strlcpy(currutmp->mateid, uin->userid, sizeof(currutmp->mateid));
 		chc(sock, CHC_WATCH);
 	    }
 	}
 	else
-	    outs("人家在忙啦");
+	    outs(SHM->i18nstr[cuser.language][1986]);
     } else if (!HAS_PERM(PERM_SYSOP) &&
 	       (((fri_stat & HRM) && !(fri_stat & HFM)) ||
 		((!uin->pager) && !(fri_stat & HFM)))) {
-	outs("對方關掉呼叫器了");
+	outs(SHM->i18nstr[cuser.language][1987]);
     } else if (!HAS_PERM(PERM_SYSOP) &&
 	     (((fri_stat & HRM) && !(fri_stat & HFM)) || uin->pager == 2)) {
-	outs("對方拔掉呼叫器了");
+	outs(SHM->i18nstr[cuser.language][1988]);
     } else if (!HAS_PERM(PERM_SYSOP) &&
 	       !(fri_stat & HFM) && uin->pager == 4) {
-	outs("對方只接受好友的呼叫");
+	outs(SHM->i18nstr[cuser.language][1989]);
     } else if (!(pid = uin->pid) /* || (kill(pid, 0) == -1) */ ) {
 	//resetutmpent();
 	outs(msg_usr_left);
     } else {
 	showplans(uin->userid);
-	getdata(2, 0, "要和他(她) (T)談天(F)下五子棋(P)鬥寵物"
-		"(C)下象棋(D)下暗棋(N)沒事找錯人了?[N] ", genbuf, 4, LCECHO);
+	getdata(2, 0, SHM->i18nstr[cuser.language][1990], genbuf, 4, LCECHO);
 	switch (*genbuf) {
 	case 'y':
 	case 't':
@@ -1294,8 +1287,8 @@ my_talk(userinfo_t * uin, int fri_stat, char defact)
 	    if (!cuser.mychicken.name[0] || !xuser.mychicken.name[0])
 		error = 2;
 	    if (error) {
-		vmsg(error == 2 ? "並非兩人都養寵物" :
-		       "有一方的寵物正在使用中");
+		vmsg(error == 2 ? SHM->i18nstr[cuser.language][1991] :
+		       SHM->i18nstr[cuser.language][1992]);
 		return;
 	    }
 	    uin->sig = SIG_PK;
@@ -1345,41 +1338,41 @@ my_talk(userinfo_t * uin, int fri_stat, char defact)
 	    }
 	} else {
 	    move(9, 9);
-	    outs("【回音】 ");
+	    outs(SHM->i18nstr[cuser.language][1993]);
 	    switch (c) {
 	    case 'a':
-		outs("我現在很忙，請等一會兒再 call 我，好嗎？");
+		outs(SHM->i18nstr[cuser.language][1994]);
 		break;
 	    case 'b':
-		prints("對不起，我有事情不能跟你 %s....", sig_des[uin->sig]);
+		prints(SHM->i18nstr[cuser.language][1995], sig_des(uin->sig));
 		break;
 	    case 'd':
-		outs("我要離站囉..下次再聊吧..........");
+		outs(SHM->i18nstr[cuser.language][1996]);
 		break;
 	    case 'c':
-		outs("請不要吵我好嗎？");
+		outs(SHM->i18nstr[cuser.language][1997]);
 		break;
 	    case 'e':
-		outs("找我有事嗎？請先來信唷....");
+		outs(SHM->i18nstr[cuser.language][1998]);
 		break;
 	    case 'f':
 		{
 		    char            msgbuf[60];
 
 		    read(msgsock, msgbuf, 60);
-		    prints("對不起，我現在不能跟你 %s，因為\n", sig_des[uin->sig]);
+		    prints(SHM->i18nstr[cuser.language][1999], sig_des(uin->sig));
 		    move(10, 18);
 		    outs(msgbuf);
 		}
 		break;
 	    case '1':
-		prints("%s？先拿100銀兩來..", sig_des[uin->sig]);
+		prints(SHM->i18nstr[cuser.language][2000], sig_des(uin->sig));
 		break;
 	    case '2':
-		prints("%s？先拿1000銀兩來..", sig_des[uin->sig]);
+		prints(SHM->i18nstr[cuser.language][2001], sig_des(uin->sig));
 		break;
 	    default:
-		prints("我現在不想 %s 啦.....:)", sig_des[uin->sig]);
+		prints(SHM->i18nstr[cuser.language][2002], sig_des(uin->sig));
 	    }
 	    close(msgsock);
 	}
@@ -1401,32 +1394,17 @@ t_showhelp()
 {
     clear();
 
-    outs("\033[36m【 休閒聊天使用說明 】\033[m\n\n"
-	 "(←)(e)         結束離開             (h)             看使用說明\n"
-	 "(↑)/(↓)(n)    上下移動             (TAB)           切換排序方式\n"
-	 "(PgUp)(^B)      上頁選單             ( )(PgDn)(^F)   下頁選單\n"
-	 "(Hm)/($)(Ed)    首/尾                (S)             來源/好友描述/戰績 切換\n"
-	 "(m)             寄信                 (q/c)           查詢網友/寵物\n"
-	 "(r)             閱\讀信件             (l/C)           看上次熱訊/切換隱身\n"
-	 "(f)             全部/好友列表        (數字)          跳至該使用者\n"
-	 "(p)             切換呼叫器           (g/i)           給錢/切換心情\n"
-	 "(a/d/o)         好友 增加/刪除/修改  (/)(s)          網友ID/暱稱搜尋\n"
-	 "(N)             修改暱稱");
+    outs(SHM->i18nstr[cuser.language][2003]);
 
     if (HAS_PERM(PERM_PAGE)) {
-	outs("\n\n\033[36m【 交談專用鍵 】\033[m\n"
-	     "(→)(t)(Enter)  跟他／她聊天\n"
-	     "(w)             熱線 Call in\n"
-	     "(^W)切換水球方式 一般 / 進階 / 未來\n"
-	     "(b)             對好友廣播 (一定要在好友列表中)\n"
-	     "(^R)            即時回應 (有人 Call in 你時)");
+	outs(SHM->i18nstr[cuser.language][2004]);
     }
     if (HAS_PERM(PERM_SYSOP)) {
-	outs("\n\n\033[36m【 站長專用鍵 】\033[m\n\n");
-	outs("(u)/(H)         設定使用者資料/切換隱形模式\n");
-	outs("(K)             把壞蛋踢出去\n");
+	outs(SHM->i18nstr[cuser.language][2005]);
+	outs(SHM->i18nstr[cuser.language][2006]);
+	outs(SHM->i18nstr[cuser.language][2007]);
 #if defined(SHOWBOARD) && defined(DEBUG)
-	outs("(Y)             顯示正在看什麼板\n");
+	outs(SHM->i18nstr[cuser.language][2008]);
 #endif
     }
     pressanykey();
@@ -1715,10 +1693,10 @@ draw_pickup(int drawall, pickup_t * pickup, int pickup_way,
 	    int show_pid, int myfriend, int friendme, int bfriend, int badfriend)
 {
     char           *msg_pickup_way[PICKUP_WAYS] = {
-	"嗨! 朋友", "網友代號", "網友動態", "發呆時間", "來自何方", " 五子棋 ", "  象棋  "
+	SHM->i18nstr[cuser.language][2009], SHM->i18nstr[cuser.language][2010], SHM->i18nstr[cuser.language][2011], SHM->i18nstr[cuser.language][2012], SHM->i18nstr[cuser.language][2013], SHM->i18nstr[cuser.language][2014], SHM->i18nstr[cuser.language][2015]
     };
     char           *MODE_STRING[MAX_SHOW_MODE] = {
-	"故鄉", "好友描述", "五子棋戰績", "象棋戰績"
+	SHM->i18nstr[cuser.language][2016], SHM->i18nstr[cuser.language][2017], SHM->i18nstr[cuser.language][2018], SHM->i18nstr[cuser.language][2019]
     };
     char            pagerchar[5] = "* -Wf";
 
@@ -1731,29 +1709,24 @@ draw_pickup(int drawall, pickup_t * pickup, int pickup_way,
 #endif
 
     if (drawall) {
-	showtitle((cuser.uflag & FRIEND_FLAG) ? "好友列表" : "休閒聊天",
+	showtitle((cuser.uflag & FRIEND_FLAG) ? SHM->i18nstr[cuser.language][2020] : SHM->i18nstr[cuser.language][2021],
 		  BBSName);
-	prints("\n"
-	       "\033[7m  %s P%c代號         %-17s%-17s%-13s%-10s\033[m\n",
+	prints(SHM->i18nstr[cuser.language][2022],
 	       show_uid ? "UID" : "No.",
 	       (HAS_PERM(PERM_SEECLOAK) || HAS_PERM(PERM_SYSOP)) ? 'C' : ' ',
-	       "暱稱",
+	       SHM->i18nstr[cuser.language][2023],
 	       MODE_STRING[show_mode],
-	       show_board ? "Board" : "動態",
-	       show_pid ? "       PID" : "心情  發呆"
+	       show_board ? "Board" : SHM->i18nstr[cuser.language][2024],
+	       show_pid ? "       PID" : SHM->i18nstr[cuser.language][2025]
 	    );
 	move(b_lines, 0);
-	outs("\033[31;47m(TAB/f)\033[30m排序/好友 \033[31m(t)\033[30m聊天 "
-	     "\033[31m(a/d/o)\033[30m交友 \033[31m(q)\033[30m查詢 "
-	     "\033[31m(w)\033[30m水球 \033[31m(m)\033[30m寄信 \033[31m(h)"
-	     "\033[30m線上輔助 \033[m");
+	outs(SHM->i18nstr[cuser.language][2026]);
     }
     move(1, 0);
-    prints("  排序：[%s] 上站人數：%-4d\033[1;32m我的朋友：%-3d"
-	   "\033[33m與我為友：%-3d\033[36m板友：%-4d\033[31m壞人："
-	   "%-2d\033[m\n",
+    prints(SHM->i18nstr[cuser.language][2027],
 	   msg_pickup_way[pickup_way], SHM->UTMPnumber,
 	   myfriend, friendme, currutmp->brc_id ? (bfriend + 1) : 0, badfriend);
+
     for (i = 0, ch = page * nPickups + 1; i < nPickups; ++i, ++ch) {
 	move(i + 3, 0);
 	prints("a");
@@ -1765,7 +1738,7 @@ draw_pickup(int drawall, pickup_t * pickup, int pickup_way,
 	    continue;
 	}
 	if (!uentp->pid) {
-	    prints("%5d   < 離站中..>\n", ch);
+	    prints(SHM->i18nstr[cuser.language][2028], ch);
 	    continue;
 	}
 	if (PERM_HIDE(uentp))
@@ -1792,14 +1765,13 @@ draw_pickup(int drawall, pickup_t * pickup, int pickup_way,
 #endif
 
 	if ((uentp->userlevel & PERM_VIOLATELAW))
-	    memcpy(mind, "通緝", 4);
+	    memcpy(mind, SHM->i18nstr[cuser.language][2029], 4);
 	else if (uentp->birth)
-	    memcpy(mind, "壽星", 4);
+	    memcpy(mind, SHM->i18nstr[cuser.language][2030], 4);
 	else
 	    memcpy(mind, uentp->mind, 4);
 	mind[4] = 0;
-	prints("%5d %c%c%s%-13s%-17.16s\033[m%-17.16s%-13.13s"
-	       "\33[33m%-4.4s\33[m%s\n",
+	prints("%5d %c%c%s%-13s%-17.16s\033[m%-17.16s%-13.13s\33[33m%-4.4s\33[m%s\n",
 
 	/* list number or uid */
 #ifdef SHOWUID
@@ -1842,7 +1814,6 @@ draw_pickup(int drawall, pickup_t * pickup, int pickup_way,
 #endif
 	    );
 
-	//refresh();
     }
 }
 
@@ -1851,7 +1822,7 @@ call_in(userinfo_t * uentp, int fri_stat)
 {
     if (iswritable_stat(uentp, fri_stat)) {
 	char            genbuf[60];
-	snprintf(genbuf, sizeof(genbuf), "Call-In %s ：", uentp->userid);
+	snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][2031], uentp->userid);
 	my_write(uentp->pid, genbuf, uentp->userid, 0, NULL);
 	return 1;
     }
@@ -1962,7 +1933,7 @@ userlist(void)
 		if (HAS_PERM(PERM_SYSOP)) {
 		    char            buf[100];
 		    snprintf(buf, sizeof(buf),
-			     "代號 [%s]：", currutmp->userid);
+			     SHM->i18nstr[cuser.language][2032], currutmp->userid);
 		    if (!getdata(1, 0, buf, currutmp->userid,
 				 sizeof(buf), DOECHO))
 			strlcpy(currutmp->userid, cuser.userid, sizeof(currutmp->userid));
@@ -1974,7 +1945,7 @@ userlist(void)
 		if (HAS_PERM(PERM_SYSOP)) {
 		    char            buf[100];
 
-		    snprintf(buf, sizeof(buf), "故鄉 [%s]：", currutmp->from);
+		    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][2033], currutmp->from);
 		    if (!getdata(1, 0, buf, currutmp->from,
 				 sizeof(currutmp->from), DOECHO))
 			strncpy(currutmp->from, buf, 23);
@@ -2153,14 +2124,14 @@ userlist(void)
 		    char            genbuf[60];
 		    char            ans[4];
 
-		    if (!getdata(0, 0, "廣播訊息:", genbuf, sizeof(genbuf), DOECHO))
+		    if (!getdata(0, 0, SHM->i18nstr[cuser.language][2034], genbuf, sizeof(genbuf), DOECHO))
 			break;
-		    if (getdata(0, 0, "確定廣播? [Y]",
+		    if (getdata(0, 0, SHM->i18nstr[cuser.language][2035],
 				ans, sizeof(ans), LCECHO) &&
 			*ans == 'n')
 			break;
 		    if (!(cuser.uflag & FRIEND_FLAG) && HAS_PERM(PERM_SYSOP)) {
-			getdata(1, 0, "再次確定站長廣播? [N]",
+			getdata(1, 0, SHM->i18nstr[cuser.language][2036],
 				ans, sizeof(ans), LCECHO);
 			if( *ans != 'y' && *ans != 'Y' ){
 			    vmsg("abort");
@@ -2209,7 +2180,7 @@ userlist(void)
 		    int             id;
 		    userec_t        muser;
 		    strlcpy(currauthor, uentp->userid, sizeof(currauthor));
-		    stand_title("使用者設定");
+		    stand_title(SHM->i18nstr[cuser.language][2037]);
 		    move(1, 0);
 		    if ((id = getuser(uentp->userid)) > 0) {
 			memcpy(&muser, &xuser, sizeof(muser));
@@ -2222,12 +2193,12 @@ userlist(void)
 
 	    case 'i':{
 		    char            mindbuf[5];
-		    getdata(b_lines - 1, 0, "現在的心情? ",
+		    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][2038],
 			    mindbuf, sizeof(mindbuf), DOECHO);
-		    if (strcmp(mindbuf, "通緝") == 0)
-			vmsg("不可以把自己設通緝啦!");
-		    else if (strcmp(mindbuf, "壽星") == 0)
-			vmsg("你不是今天生日欸!");
+		    if (strcmp(mindbuf, SHM->i18nstr[cuser.language][2039]) == 0)
+			vmsg(SHM->i18nstr[cuser.language][2040]);
+		    else if (strcmp(mindbuf, SHM->i18nstr[cuser.language][2041]) == 0)
+			vmsg(SHM->i18nstr[cuser.language][2042]);
 		    else
 			memcpy(currutmp->mind, mindbuf, 4);
 		}
@@ -2261,7 +2232,7 @@ userlist(void)
 		break;
 	    case 'a':
 		if (HAS_PERM(PERM_LOGINOK) && !(fri_stat & IFH)) {
-		    if (getans("確定要加入好友嗎 [N/y]") == 'y') {
+		    if (getans(SHM->i18nstr[cuser.language][2043]) == 'y') {
 			friend_add(uentp->userid, FRIEND_OVERRIDE,uentp->username);
 			friend_load(FRIEND_OVERRIDE);
 		    }
@@ -2271,7 +2242,7 @@ userlist(void)
 
 	    case 'd':
 		if (HAS_PERM(PERM_LOGINOK) && (fri_stat & IFH)) {
-		    if (getans("確定要刪除好友嗎 [N/y]") == 'y') {
+		    if (getans(SHM->i18nstr[cuser.language][2044]) == 'y') {
 			friend_delete(uentp->userid, FRIEND_OVERRIDE);
 			friend_load(FRIEND_OVERRIDE);
 		    }
@@ -2296,37 +2267,36 @@ userlist(void)
 	    case 'g':
 		if (HAS_PERM(PERM_LOGINOK) &&
 		    strcmp(uentp->userid, cuser.userid) != 0) {
-                    char genbuf[10];
+		    char genbuf[10];
 		    move(b_lines - 2, 0);
-		    prints("要給 %s 多少錢呢?  ", uentp->userid);
-		    if (getdata(b_lines - 1, 0, "[銀行轉帳]: ",
+		    prints(SHM->i18nstr[cuser.language][2045], uentp->userid);
+		    if (getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][2046],
 				genbuf, 7, LCECHO)) {
 			clrtoeol();
 			if ((ch = atoi(genbuf)) <= 0 || ch <= give_tax(ch)){
 			    redrawall = redraw = 1;
 			    break;
 			}
-			if (getans("確定要給 %s %d Ptt 幣嗎? [N/y]",
-                             uentp->userid, ch) != 'y'){
+			sprintf(genbuf, SHM->i18nstr[cuser.language][2047], uentp->userid, ch);
+			if (getans(genbuf) != 'y'){
 			    redrawall = redraw = 1;
 			    break;
 			}
 			reload_money();
 
 			if (ch > cuser.money) {
-			    outs("\033[41m 現金不足~~\033[m");
+			    outs(SHM->i18nstr[cuser.language][2048]);
 			} else {
 			    deumoney(uentp->uid, ch - give_tax(ch));
-			    log_file(FN_MONEY, 1,
-                                  "%s\t給%s\t%d\t%s\n", cuser.userid,
-                                  uentp->userid, ch, ctime(&currutmp->lastact));
+			    log_file(FN_MONEY, 1, SHM->i18nstr[cuser.language][2050],
+			    	cuser.userid,uentp->userid, ch,ctime(&currutmp->lastact));
 			    mail_redenvelop(cuser.userid, uentp->userid,
 					    ch - give_tax(ch), 'Y');
-			    vmsg(" 嗯..還剩下 %d 錢..", demoney(-ch));
+				vmsg(SHM->i18nstr[cuser.language][2049],demoney(-ch));
 			}
 		    } else {
 			clrtoeol();
-			vmsg(" 交易取消! ");
+			vmsg(SHM->i18nstr[cuser.language][2051]);
 		    }
 		    redrawall = redraw = 1;
 		}
@@ -2334,8 +2304,8 @@ userlist(void)
 
 	    case 'm':
 		if (HAS_PERM(PERM_BASIC)) {
-		    stand_title("寄  信");
-		    prints("[寄信] 收信人：%s", uentp->userid);
+		    stand_title(SHM->i18nstr[cuser.language][2052]);
+		    prints(SHM->i18nstr[cuser.language][2053], uentp->userid);
 		    my_send(uentp->userid);
 		    setutmpmode(LUSERS);
 		    redrawall = redraw = 1;
@@ -2378,14 +2348,12 @@ userlist(void)
 	    case Ctrl('W'):
 		if (HAS_PERM(PERM_LOGINOK)) {
 		    int             tmp;
-		    char           *wm[3] = {"一般", "進階", "未來"};
+		    char           *wm[3] = {SHM->i18nstr[cuser.language][2054], SHM->i18nstr[cuser.language][2055], SHM->i18nstr[cuser.language][2056]};
 		    tmp = cuser.uflag2 & WATER_MASK;
 		    cuser.uflag2 -= tmp;
 		    tmp = (tmp + 1) % 3;
 		    cuser.uflag2 |= tmp;
-		    vmsg("系統提供 一般 進階 未來 三種模式\n"
-			   "在切換後請正常下線再重新登入, 以確保結構正確\n"
-			   "目前切換到 %s 水球模式\n", wm[tmp]);
+		    vmsg(SHM->i18nstr[cuser.language][2057], wm[tmp]);
 		    redrawall = redraw = 1;
 		}
 		break;
@@ -2399,7 +2367,7 @@ userlist(void)
 		break;
 
 	    case 'N':
-		oldgetdata(1, 0, "新的暱稱: ",
+		oldgetdata(1, 0, SHM->i18nstr[cuser.language][2058],
 			cuser.username, sizeof(cuser.username), DOECHO);
 		strcpy(currutmp->username, cuser.username);
 		redrawall = redraw = 1;
@@ -2452,8 +2420,7 @@ t_idle(void)
     char            passbuf[PASSLEN];
 
     setutmpmode(IDLE);
-    getdata(b_lines - 1, 0, "理由：[0]發呆 (1)接電話 (2)覓食 (3)打瞌睡 "
-	    "(4)裝死 (5)羅丹 (6)其他 (Q)沒事？", genbuf, 3, DOECHO);
+    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][2059], genbuf, 3, DOECHO);
     if (genbuf[0] == 'q' || genbuf[0] == 'Q') {
 	currutmp->mode = mode0;
 	currstat = stat0;
@@ -2465,14 +2432,14 @@ t_idle(void)
 
     if (currutmp->destuid == 6)
 	if (!cuser.userlevel ||
-	    !getdata(b_lines - 1, 0, "發呆的理由：",
+	    !getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][2060],
 		     currutmp->chatid, sizeof(currutmp->chatid), DOECHO))
 	    currutmp->destuid = 0;
     do {
 	move(b_lines - 2, 0);
 	clrtoeol();
-	prints("(鎖定螢幕)發呆原因: %s", (currutmp->destuid != 6) ?
-		 IdleTypeTable[currutmp->destuid] : currutmp->chatid);
+	prints(SHM->i18nstr[cuser.language][2061], (currutmp->destuid != 6) ?
+		 SHM->i18nstr[cuser.language][1890 + currutmp->destuid] : currutmp->chatid);
 	refresh();
 	getdata(b_lines - 1, 0, MSG_PASSWD, passbuf, sizeof(passbuf), NOECHO);
 	passbuf[8] = '\0';
@@ -2492,7 +2459,7 @@ t_qchicken(void)
 {
     char            uident[STRLEN];
 
-    stand_title("查詢寵物");
+    stand_title(SHM->i18nstr[cuser.language][2062]);
     usercomplete(msg_uid, uident);
     if (uident[0])
 	chicken_query(uident);
@@ -2504,7 +2471,7 @@ t_query(void)
 {
     char            uident[STRLEN];
 
-    stand_title("查詢網友");
+    stand_title(SHM->i18nstr[cuser.language][2063]);
     usercomplete(msg_uid, uident);
     if (uident[0])
 	my_query(uident);
@@ -2522,7 +2489,7 @@ t_talk()
      * if (count_ulist() <= 1){ outs("目前線上只有您一人，快邀請朋友來光臨【"
      * BBSNAME "】吧！"); return XEASY; }
      */
-    stand_title("打開話匣子");
+    stand_title(SHM->i18nstr[cuser.language][2064]);
     generalnamecomplete(msg_uid, uident, sizeof(uident),
 			SHM->UTMPnumber,
 			completeutmp_compar,
@@ -2540,9 +2507,9 @@ t_talk()
     /* multi-login check */
     unum = 1;
     while ((ucount = count_logins(tuid, 0)) > 1) {
-	outs("(0) 不想 talk 了...\n");
+	outs(SHM->i18nstr[cuser.language][2065]);
 	count_logins(tuid, 1);
-	getdata(1, 33, "請選擇一個聊天對象 [0]：", genbuf, 4, DOECHO);
+	getdata(1, 33, SHM->i18nstr[cuser.language][2066], genbuf, 4, DOECHO);
 	unum = atoi(genbuf);
 	if (unum == 0)
 	    return 0;
@@ -2568,7 +2535,7 @@ reply_connection_request(userinfo_t *uip)
 
     if (uip->mode != PAGE) {
 	snprintf(genbuf, sizeof(genbuf),
-		 "%s已停止呼叫，按Enter繼續...", page_requestor);
+		 SHM->i18nstr[cuser.language][2067], page_requestor);
 	getdata(0, 0, genbuf, buf, sizeof(buf), LCECHO);
 	return -1;
     }
@@ -2608,31 +2575,26 @@ talkreply(void)
     clear();
 
     prints("\n\n");
-    prints("       (Y) 讓我們 %s 吧！"
-	    "     (A) 我現在很忙，請等一會兒再 call 我\n", sig_des[sig]);
-    prints("       (N) 我現在不想 %s"
-	    "      (B) 對不起，我有事情不能跟你 %s\n",
-	    sig_des[sig], sig_des[sig]);
-    prints("       (C) 請不要吵我好嗎？"
-	    "     (D) 我要離站囉..下次再聊吧.......\n");
-    prints("       (E) 有事嗎？請先來信"
-	    "     (F) \033[1;33m我自己輸入理由好了...\033[m\n");
-    prints("       (1) %s？先拿100銀兩來"
-	    "  (2) %s？先拿1000銀兩來..\n\n", sig_des[sig], sig_des[sig]);
+    prints(SHM->i18nstr[cuser.language][2068], sig_des(sig));
+    prints(SHM->i18nstr[cuser.language][2069],
+	    sig_des(sig), sig_des(sig));
+    prints(SHM->i18nstr[cuser.language][2070]);
+    prints(SHM->i18nstr[cuser.language][2071]);
+    prints(SHM->i18nstr[cuser.language][2072], sig_des(sig), sig_des(sig));
 
     getuser(uip->userid);
     currutmp->msgs[0].pid = uip->pid;
     strlcpy(currutmp->msgs[0].userid, uip->userid, sizeof(currutmp->msgs[0].userid));
-    strlcpy(currutmp->msgs[0].last_call_in, "呼叫、呼叫，聽到請回答 (Ctrl-R)",
+    strlcpy(currutmp->msgs[0].last_call_in, SHM->i18nstr[cuser.language][2073],
 	    sizeof(currutmp->msgs[0].last_call_in));
-    prints("對方來自 [%s]，共上站 %d 次，文章 %d 篇\n",
+    prints(SHM->i18nstr[cuser.language][2074],
 	    uip->from, xuser.numlogins, xuser.numposts);
     showplans(uip->userid);
     show_call_in(0, 0);
 
     snprintf(genbuf, sizeof(genbuf),
-	    "你想跟 %s %s啊？請選擇(Y/N/A/B/C/D/E/F/1/2)[N] ",
-	    page_requestor, sig_des[sig]);
+	    SHM->i18nstr[cuser.language][2075],
+	    page_requestor, sig_des(sig));
     getdata(0, 0, genbuf, buf, sizeof(buf), LCECHO);
     a = reply_connection_request(uip);
 
@@ -2640,8 +2602,8 @@ talkreply(void)
 	buf[0] = 'n';
     write(a, buf, 1);
     if (buf[0] == 'f' || buf[0] == 'F') {
-	if (!getdata(b_lines, 0, "不能的原因：", genbuf, 60, DOECHO))
-	    strlcpy(genbuf, "不告訴你咧 !! ^o^", sizeof(genbuf));
+	if (!getdata(b_lines, 0, SHM->i18nstr[cuser.language][2076], genbuf, 60, DOECHO))
+	    strlcpy(genbuf, SHM->i18nstr[cuser.language][2077], sizeof(genbuf));
 	write(a, genbuf, 60);
     }
 

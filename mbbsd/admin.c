@@ -10,16 +10,16 @@ m_loginmsg()
   clrtobot();
   if(SHM->loginmsg.pid && SHM->loginmsg.pid != currutmp->pid)
     {
-      prints(SHM->i18nstr[cuser.language][0]);
+      prints(I18N[0]);
       getmessage(SHM->loginmsg);
     }
   getdata(22, 0, 
-     SHM->i18nstr[cuser.language][1],
+     I18N[1],
           msg, 3, LCECHO);
 
   if(msg[0]=='y' &&
 
-     getdata_str(23, 0, SHM->i18nstr[cuser.language][2], msg, 56, DOECHO, SHM->loginmsg.last_call_in))
+     getdata_str(23, 0, I18N[2], msg, 56, DOECHO, SHM->loginmsg.last_call_in))
     {
           SHM->loginmsg.pid=currutmp->pid; /*站長不多 就不管race condition */
           strcpy(SHM->loginmsg.last_call_in, msg);
@@ -36,7 +36,7 @@ m_user()
     int             id;
     char            genbuf[200];
 
-    stand_title(SHM->i18nstr[cuser.language][3]);
+    stand_title(I18N[3]);
     usercomplete(msg_uid, genbuf);
     if (*genbuf) {
 	move(2, 0);
@@ -66,13 +66,13 @@ search_key_user(char *passwdfile, int mode)
 
     assert(fp1);
     clear();
-    getdata(0, 0, mode ? SHM->i18nstr[cuser.language][4] : SHM->i18nstr[cuser.language][5], key, sizeof(key), DOECHO);
+    getdata(0, 0, mode ? I18N[4] : SHM->i18nstr[cuser.language][5], key, sizeof(key), DOECHO);
     if(!key[0])
 	return 0;
     while ((fread(&user, sizeof(user), 1, fp1)) > 0 && coun < MAX_USERS) {
 	if (!(++coun & 15)) {
 	    move(1, 0);
-	    prints(SHM->i18nstr[cuser.language][6], coun);
+	    prints(I18N[6], coun);
 	    refresh();
 	}
         keymatch = NULL;
@@ -98,15 +98,15 @@ search_key_user(char *passwdfile, int mode)
 	}
         if(keymatch) {
 	    move(1, 0);
-	    prints(SHM->i18nstr[cuser.language][7], coun);
+	    prints(I18N[7], coun);
 	    refresh();
 
 	    user_display(&user, 1);
 	    uinfo_query(&user, 1, coun);
-	    outs(SHM->i18nstr[cuser.language][8]);
+	    outs(I18N[8]);
 	    outs(mode ? 
                  "      A: add to namelist \033[m " :
-		 SHM->i18nstr[cuser.language][9]);
+		 I18N[9]);
 	    while (1) {
 		while ((ch = igetch()) == 0);
                 if (ch == 'a' || ch=='A' )
@@ -134,24 +134,24 @@ search_key_user(char *passwdfile, int mode)
 		    } else {
 			move(b_lines - 1, 0);
 			getdata(0, 0,
-				SHM->i18nstr[cuser.language][10],
+				I18N[10],
 				genbuf, 3, LCECHO);
 			if (genbuf[0] != 'y') {
-			    outs(SHM->i18nstr[cuser.language][11]);
+			    outs(I18N[11]);
 			} else {
 			    int             allocid = getnewuserid();
 
 			    if (allocid > MAX_USERS || allocid <= 0) {
-				fprintf(stderr, SHM->i18nstr[cuser.language][12]);
+				fprintf(stderr, I18N[12]);
 				exit(1);
 			    }
 			    if (passwd_update(allocid, &user) == -1) {
-				fprintf(stderr, SHM->i18nstr[cuser.language][13]);
+				fprintf(stderr, I18N[13]);
 				exit(1);
 			    }
 			    setuserid(allocid, user.userid);
 			    if (!searchuser(user.userid)) {
-				fprintf(stderr, SHM->i18nstr[cuser.language][14]);
+				fprintf(stderr, I18N[14]);
 				exit(1);
 			    }
 			    fclose(fp1);
@@ -188,13 +188,13 @@ search_user_bybakpwd()
 
     clear();
     move(1, 1);
-    outs(SHM->i18nstr[cuser.language][15]);
-    outs(SHM->i18nstr[cuser.language][16]);
-    outs(SHM->i18nstr[cuser.language][17]);
-    outs(SHM->i18nstr[cuser.language][18]);
+    outs(I18N[15]);
+    outs(I18N[16]);
+    outs(I18N[17]);
+    outs(I18N[18]);
     do {
 	move(5, 1);
-	outs(SHM->i18nstr[cuser.language][19]);
+	outs(I18N[19]);
 	ch = igetch();
 	if (ch == 'q' || ch == 'Q')
 	    return 0;
@@ -207,8 +207,8 @@ search_user_bybakpwd()
 static void
 bperm_msg(boardheader_t * board)
 {
-    prints(SHM->i18nstr[cuser.language][20], board->brdname,
-	   board->brdattr & BRD_POSTMASK ? SHM->i18nstr[cuser.language][21] : SHM->i18nstr[cuser.language][22]);
+    prints(I18N[20], board->brdname,
+	   board->brdattr & BRD_POSTMASK ? I18N[21] : SHM->i18nstr[cuser.language][22]);
 }
 
 unsigned int
@@ -220,15 +220,15 @@ setperms(unsigned int pbits, int *pstring)
     move(4, 0);
     for (i = 0; i < NUMPERMS / 2; i++) {
 	prints("%c. %-20s %-15s %c. %-20s %s\n",
-	       'A' + i, SHM->i18nstr[cuser.language][pstring[i]],
-	       ((pbits >> i) & 1 ? SHM->i18nstr[cuser.language][23] : SHM->i18nstr[cuser.language][24]),
+	       'A' + i, I18N[pstring[i]],
+	       ((pbits >> i) & 1 ? I18N[23] : SHM->i18nstr[cuser.language][24]),
 	       i < 10 ? 'Q' + i : '0' + i - 10,
-	       SHM->i18nstr[cuser.language][pstring[i + 16]],
-	       ((pbits >> (i + 16)) & 1 ? SHM->i18nstr[cuser.language][25] : SHM->i18nstr[cuser.language][26]));
+	       I18N[pstring[i + 16]],
+	       ((pbits >> (i + 16)) & 1 ? I18N[25] : SHM->i18nstr[cuser.language][26]));
     }
     clrtobot();
     while(
-    	(i = getkey(SHM->i18nstr[cuser.language][27]))!='\r')
+    	(i = getkey(I18N[27]))!='\r')
     	{
     i = i - 'a';
 	if (i < 0)
@@ -238,7 +238,7 @@ setperms(unsigned int pbits, int *pstring)
 	else {
 	    pbits ^= (1 << i);
 	    move(i % 16 + 4, i <= 15 ? 24 : 64);
-	    prints((pbits >> i) & 1 ? SHM->i18nstr[cuser.language][28] : SHM->i18nstr[cuser.language][29]);
+	    prints((pbits >> i) & 1 ? I18N[28] : SHM->i18nstr[cuser.language][29]);
 	}
     }
     return pbits;
@@ -276,14 +276,14 @@ m_mod_board(char *bname)
 	pressanykey();
 	return -1;
     }
-    prints(SHM->i18nstr[cuser.language][30], bh.brdname, bh.title, bid, bh.gid, bh.BM);
+    prints(I18N[30], bh.brdname, bh.title, bid, bh.gid, bh.BM);
     bperm_msg(&bh);
 
     /* Ptt 這邊斷行會檔到下面 */
     move(9, 0);
-    snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][31],
-	    HAS_PERM(PERM_SYSOP) ? SHM->i18nstr[cuser.language][32] : "",
-	    HAS_PERM(PERM_SYSSUBOP) ? SHM->i18nstr[cuser.language][33] : "");
+    snprintf(genbuf, sizeof(genbuf), I18N[31],
+	    HAS_PERM(PERM_SYSOP) ? I18N[32] : "",
+	    HAS_PERM(PERM_SYSSUBOP) ? I18N[33] : "");
     getdata(10, 0, genbuf, ans, sizeof(ans), LCECHO);
 
     switch (*ans) {
@@ -310,8 +310,8 @@ m_mod_board(char *bname)
 	    memcpy(&newbh, &bh, sizeof(bh));
 	    snprintf(bvotebuf, sizeof(bvotebuf), "%d", newbh.bvote);
 	    move(20, 0);
-	    prints(SHM->i18nstr[cuser.language][34], bh.brdname, bh.bvote);
-	    getdata_str(21, 0, SHM->i18nstr[cuser.language][35], genbuf, 5, LCECHO, bvotebuf);
+	    prints(I18N[34], bh.brdname, bh.bvote);
+	    getdata_str(21, 0, I18N[35], genbuf, 5, LCECHO, bvotebuf);
 	    newbh.bvote = atoi(genbuf);
 	    substitute_record(fn_board, &newbh, sizeof(newbh), bid);
 	    reset_board(bid);
@@ -321,9 +321,9 @@ m_mod_board(char *bname)
 	    break;
     case 'v':
 	memcpy(&newbh, &bh, sizeof(bh));
-	outs(SHM->i18nstr[cuser.language][36]);
-	outs((bh.brdattr & BRD_BAD) ? SHM->i18nstr[cuser.language][37] : SHM->i18nstr[cuser.language][38]);
-	getdata(21, 0, SHM->i18nstr[cuser.language][39], genbuf, 5, LCECHO);
+	outs(I18N[36]);
+	outs((bh.brdattr & BRD_BAD) ? I18N[37] : SHM->i18nstr[cuser.language][38]);
+	getdata(21, 0, I18N[39], genbuf, 5, LCECHO);
 	if (genbuf[0] == 'y') {
 	    if (newbh.brdattr & BRD_BAD)
 		newbh.brdattr = newbh.brdattr & (!BRD_BAD);
@@ -352,24 +352,24 @@ m_mod_board(char *bname)
 	    system(genbuf);
 	    memset(&bh, 0, sizeof(bh));
 	    snprintf(bh.title, sizeof(bh.title),
-		     SHM->i18nstr[cuser.language][40], bname, cuser.userid);
-	    post_msg("Security", bh.title, SHM->i18nstr[cuser.language][41], SHM->i18nstr[cuser.language][42]);
+		     I18N[40], bname, cuser.userid);
+	    post_msg("Security", bh.title, I18N[41], SHM->i18nstr[cuser.language][42]);
 	    substitute_record(fn_board, &bh, sizeof(bh), bid);
 	    reset_board(bid);
 	    sort_bcache();
 	    log_usies("DelBoard", bh.title);
-	    outs(SHM->i18nstr[cuser.language][43]);
+	    outs(I18N[43]);
 	}
 	break;
     case 'e':
 	move(8, 0);
-	outs(SHM->i18nstr[cuser.language][44]);
+	outs(I18N[44]);
 	memcpy(&newbh, &bh, sizeof(bh));
 
-	while (getdata(9, 0, SHM->i18nstr[cuser.language][45], genbuf, IDLEN + 1, DOECHO)) {
+	while (getdata(9, 0, I18N[45], genbuf, IDLEN + 1, DOECHO)) {
 	    if (getbnum(genbuf)) {
 		move(3, 0);
-		outs(SHM->i18nstr[cuser.language][46]);
+		outs(I18N[46]);
 	    } else if ( !invalid_brdname(genbuf) ){
 		strlcpy(newbh.brdname, genbuf, sizeof(newbh.brdname));
 		break;
@@ -377,7 +377,7 @@ m_mod_board(char *bname)
 	}
 
 	do {
-	    getdata_str(12, 0, SHM->i18nstr[cuser.language][47], genbuf, 5, DOECHO, bh.title);
+	    getdata_str(12, 0, I18N[47], genbuf, 5, DOECHO, bh.title);
 	    if (strlen(genbuf) == 4)
 		break;
 	} while (1);
@@ -387,11 +387,11 @@ m_mod_board(char *bname)
 
 	newbh.title[4] = ' ';
 
-	getdata_str(14, 0, SHM->i18nstr[cuser.language][48], genbuf, BTLEN + 1, DOECHO,
+	getdata_str(14, 0, I18N[48], genbuf, BTLEN + 1, DOECHO,
 		    bh.title + 7);
 	if (genbuf[0])
 	    strlcpy(newbh.title + 7, genbuf, sizeof(newbh.title) - 7);
-	if (getdata_str(15, 0, SHM->i18nstr[cuser.language][49], genbuf, IDLEN * 3 + 3, DOECHO,
+	if (getdata_str(15, 0, I18N[49], genbuf, IDLEN * 3 + 3, DOECHO,
 			bh.BM)) {
 	    trim(genbuf);
 	    strlcpy(newbh.BM, genbuf, sizeof(newbh.BM));
@@ -404,16 +404,16 @@ m_mod_board(char *bname)
 	    clrtobot();
 	}
 	if (newbh.brdattr & BRD_GROUPBOARD)
-	    strncpy(newbh.title + 5, SHM->i18nstr[cuser.language][50], 2);
+	    strncpy(newbh.title + 5, I18N[50], 2);
 	else if (newbh.brdattr & BRD_NOTRAN)
-	    strncpy(newbh.title + 5, SHM->i18nstr[cuser.language][51], 2);
+	    strncpy(newbh.title + 5, I18N[51], 2);
 	else
-	    strncpy(newbh.title + 5, SHM->i18nstr[cuser.language][52], 2);
+	    strncpy(newbh.title + 5, I18N[52], 2);
 
 	if (HAS_PERM(PERM_SYSOP) && !(newbh.brdattr & BRD_HIDE)) {
-	    getdata_str(14, 0, SHM->i18nstr[cuser.language][53], ans, sizeof(ans), LCECHO, "N");
+	    getdata_str(14, 0, I18N[53], ans, sizeof(ans), LCECHO, "N");
 	    if (*ans == 'y') {
-		getdata_str(15, 0, SHM->i18nstr[cuser.language][54], ans, sizeof(ans), LCECHO,
+		getdata_str(15, 0, I18N[54], ans, sizeof(ans), LCECHO,
 			    "R");
 		if (*ans == 'p')
 		    newbh.brdattr |= BRD_POSTMASK;
@@ -427,7 +427,7 @@ m_mod_board(char *bname)
 		clear();
 	    }
 	}
-	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][55], genbuf, 4, LCECHO);
+	getdata(b_lines - 1, 0, I18N[55], genbuf, 4, LCECHO);
 
 	if ((*genbuf != 'n') && memcmp(&newbh, &bh, sizeof(bh))) {
 	    if (strcmp(bh.brdname, newbh.brdname)) {
@@ -457,7 +457,7 @@ m_board()
 {
     char            bname[32];
 
-    stand_title(SHM->i18nstr[cuser.language][56]);
+    stand_title(I18N[56]);
     generalnamecomplete(msg_bid, bname, sizeof(bname), SHM->Bnumber,
 			completeboard_compar,
 			completeboard_permission,
@@ -477,16 +477,16 @@ x_file()
 
     move(b_lines - 6, 0);
     /* Ptt */
-    outs(SHM->i18nstr[cuser.language][57]);
-    outs(SHM->i18nstr[cuser.language][58]);
-    outs(SHM->i18nstr[cuser.language][59]);
+    outs(I18N[57]);
+    outs(I18N[58]);
+    outs(I18N[59]);
 #ifdef MULTI_WELCOME_LOGIN
-	 outs(SHM->i18nstr[cuser.language][60]);
+	 outs(I18N[60]);
 #endif
 	outs("\n");
-    outs(SHM->i18nstr[cuser.language][61]);
-    outs(SHM->i18nstr[cuser.language][62]);
-    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][63], ans, sizeof(ans), LCECHO);
+    outs(I18N[61]);
+    outs(I18N[62]);
+    getdata(b_lines - 1, 0, I18N[63], ans, sizeof(ans), LCECHO);
 
     switch (ans[0]) {
     case '1':
@@ -527,7 +527,7 @@ x_file()
 	break;
     case 'g':
 #ifdef MULTI_WELCOME_LOGIN
-	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][64], ans, sizeof(ans), LCECHO);
+	getdata(b_lines - 1, 0, I18N[64], ans, sizeof(ans), LCECHO);
 	if (ans[0] == '1') {
 	    fpath = "etc/Welcome_login.1";
 	} else if (ans[0] == '2') {
@@ -546,7 +546,7 @@ x_file()
 
 #ifdef MULTI_WELCOME_LOGIN
     case 'x':
-	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][65], ans, sizeof(ans), LCECHO);
+	getdata(b_lines - 1, 0, I18N[65], ans, sizeof(ans), LCECHO);
 	if (ans[0] == '1') {
 	    unlink("etc/Welcome_login.1");
 	    outs("ok");
@@ -560,7 +560,7 @@ x_file()
 	    unlink("etc/Welcome_login.4");
 	    outs("ok");
 	} else {
-	    outs(SHM->i18nstr[cuser.language][66]);
+	    outs(I18N[66]);
 	}
 	pressanykey();
 	return FULLUPDATE;
@@ -592,8 +592,8 @@ x_file()
 	return FULLUPDATE;
     }
     aborted = vedit(fpath, NA, NULL);
-    prints(SHM->i18nstr[cuser.language][67], fpath,
-	   (aborted == -1) ? SHM->i18nstr[cuser.language][68] : SHM->i18nstr[cuser.language][69]);
+    prints(I18N[67], fpath,
+	   (aborted == -1) ? I18N[68] : SHM->i18nstr[cuser.language][69]);
     pressanykey();
     return FULLUPDATE;
 }
@@ -620,13 +620,13 @@ m_newbrd(int recover)
     char            ans[4];
     char            genbuf[200];
 
-    stand_title(SHM->i18nstr[cuser.language][70]);
+    stand_title(I18N[70]);
     memset(&newboard, 0, sizeof(newboard));
 
     newboard.gid = class_bid;
     if (newboard.gid == 0) {
 	move(6, 0);
-	outs(SHM->i18nstr[cuser.language][71]);
+	outs(I18N[71]);
 	pressanykey();
 	return -1;
     }
@@ -637,7 +637,7 @@ m_newbrd(int recover)
     } while (invalid_brdname(newboard.brdname));
 
     do {
-	getdata(6, 0, SHM->i18nstr[cuser.language][72], genbuf, 5, DOECHO);
+	getdata(6, 0, I18N[72], genbuf, 5, DOECHO);
 	if (strlen(genbuf) == 4)
 	    break;
     } while (1);
@@ -646,19 +646,19 @@ m_newbrd(int recover)
 
     newboard.title[4] = ' ';
 
-    getdata(8, 0, SHM->i18nstr[cuser.language][73], genbuf, BTLEN + 1, DOECHO);
+    getdata(8, 0, I18N[73], genbuf, BTLEN + 1, DOECHO);
     if (genbuf[0])
 	strlcpy(newboard.title + 7, genbuf, sizeof(newboard.title) - 7);
     setbpath(genbuf, newboard.brdname);
 
     if (recover) {
 	if (dashd(genbuf)) {
-	    outs(SHM->i18nstr[cuser.language][74]);
+	    outs(I18N[74]);
 	    pressanykey();
 	    return -1;
 	}
     } else if (getbnum(newboard.brdname) > 0 || mkdir(genbuf, 0755) == -1) {
-	outs(SHM->i18nstr[cuser.language][75]);
+	outs(I18N[75]);
 	pressanykey();
 	return -1;
     }
@@ -671,24 +671,24 @@ m_newbrd(int recover)
 	move(1, 0);
 	clrtobot();
     }
-    getdata(9, 0, SHM->i18nstr[cuser.language][76], genbuf, 3, LCECHO);
+    getdata(9, 0, I18N[76], genbuf, 3, LCECHO);
     if (genbuf[0] == 'n')
 	newboard.brdattr |= BRD_GROUPBOARD;
 
     if (newboard.brdattr & BRD_GROUPBOARD)
-	strncpy(newboard.title + 5, SHM->i18nstr[cuser.language][77], 2);
+	strncpy(newboard.title + 5, I18N[77], 2);
     else if (newboard.brdattr & BRD_NOTRAN)
-	strncpy(newboard.title + 5, SHM->i18nstr[cuser.language][78], 2);
+	strncpy(newboard.title + 5, I18N[78], 2);
     else
-	strncpy(newboard.title + 5, SHM->i18nstr[cuser.language][79], 2);
+	strncpy(newboard.title + 5, I18N[79], 2);
 
     newboard.level = 0;
-    getdata(11, 0, SHM->i18nstr[cuser.language][80], newboard.BM, sizeof(newboard.BM), DOECHO);
+    getdata(11, 0, I18N[80], newboard.BM, sizeof(newboard.BM), DOECHO);
 
     if (HAS_PERM(PERM_SYSOP) && !(newboard.brdattr & BRD_HIDE)) {
-	getdata_str(14, 0, SHM->i18nstr[cuser.language][81], ans, sizeof(ans), LCECHO, "N");
+	getdata_str(14, 0, I18N[81], ans, sizeof(ans), LCECHO, "N");
 	if (*ans == 'y') {
-	    getdata_str(15, 0, SHM->i18nstr[cuser.language][82], ans, sizeof(ans), LCECHO, "R");
+	    getdata_str(15, 0, I18N[82], ans, sizeof(ans), LCECHO, "R");
 	    if (*ans == 'p')
 		newboard.brdattr |= BRD_POSTMASK;
 	    else
@@ -707,7 +707,7 @@ m_newbrd(int recover)
     pressanykey();
     setup_man(&newboard);
 
-    outs(SHM->i18nstr[cuser.language][83]);
+    outs(I18N[83]);
     post_newboard(newboard.title, newboard.brdname, newboard.BM);
     log_usies("NewBoard", newboard.title);
     pressanykey();
@@ -738,7 +738,7 @@ int make_symbolic_link(char *bname, int gid)
     strlcpy(newboard.brdname, bname, sizeof(newboard.brdname));
     newboard.brdname[strlen(bname) - 1] = '~';
     strlcpy(newboard.title, bcache[bid - 1].title, sizeof(newboard.title));
-    strcpy(newboard.title + 5, SHM->i18nstr[cuser.language][84]);
+    strcpy(newboard.title + 5, I18N[84]);
 
     newboard.gid = gid;
     BRD_LINK_TARGET(&newboard) = bid;
@@ -760,10 +760,10 @@ int make_symbolic_link_interactively(int gid)
     if (!buf[0])
 	return -1;
 
-    stand_title(SHM->i18nstr[cuser.language][85]);
+    stand_title(I18N[85]);
 
     if (make_symbolic_link(buf, gid) < 0) {
-	vmsg(SHM->i18nstr[cuser.language][86]);
+	vmsg(I18N[86]);
 	return -1;
     }
     log_usies("NewSymbolic", buf);
@@ -778,8 +778,8 @@ auto_scan(char fdata[][STRLEN], char ans[])
     int             i;
     char            temp[10];
 
-    if (!strncmp(fdata[2], SHM->i18nstr[cuser.language][87], 2) || strstr(fdata[2], SHM->i18nstr[cuser.language][88])
-	|| strstr(fdata[2], SHM->i18nstr[cuser.language][89]) || strstr(fdata[2], SHM->i18nstr[cuser.language][90])) {
+    if (!strncmp(fdata[2], I18N[87], 2) || strstr(fdata[2], SHM->i18nstr[cuser.language][88])
+	|| strstr(fdata[2], I18N[89]) || strstr(fdata[2], SHM->i18nstr[cuser.language][90])) {
 	ans[0] = '0';
 	return 1;
     }
@@ -792,17 +792,17 @@ auto_scan(char fdata[][STRLEN], char ans[])
 	return 1;
     }
     if (strlen(fdata[2]) >= 6) {
-	if (strstr(fdata[2], SHM->i18nstr[cuser.language][91])) {
+	if (strstr(fdata[2], I18N[91])) {
 	    ans[0] = '0';
 	    return 1;
 	}
-	if (strstr(SHM->i18nstr[cuser.language][92], temp))
+	if (strstr(I18N[92], temp))
 	    good++;
-	else if (strstr(SHM->i18nstr[cuser.language][93], temp))
+	else if (strstr(I18N[93], temp))
 	    good++;
-	else if (strstr(SHM->i18nstr[cuser.language][94], temp))
+	else if (strstr(I18N[94], temp))
 	    good++;
-	else if (strstr(SHM->i18nstr[cuser.language][95], temp))
+	else if (strstr(I18N[95], temp))
 	    good++;
     }
     if (!good)
@@ -814,25 +814,25 @@ auto_scan(char fdata[][STRLEN], char ans[])
 	ans[0] = '4';
 	return 5;
     }
-    if (strstr(fdata[3], SHM->i18nstr[cuser.language][96])) {
-	if (strstr(fdata[3], SHM->i18nstr[cuser.language][97]) || strstr(fdata[3], SHM->i18nstr[cuser.language][98]) ||
-	    strstr(fdata[3], SHM->i18nstr[cuser.language][99]) || strstr(fdata[3], SHM->i18nstr[cuser.language][100]) ||
-	    strstr(fdata[3], SHM->i18nstr[cuser.language][101]) || strstr(fdata[3], SHM->i18nstr[cuser.language][102]) ||
-	    strstr(fdata[3], SHM->i18nstr[cuser.language][103]) || strstr(fdata[3], SHM->i18nstr[cuser.language][104]) ||
-	    strstr(fdata[3], SHM->i18nstr[cuser.language][105]) || strstr(fdata[3], SHM->i18nstr[cuser.language][106]) ||
-	    strstr(fdata[3], SHM->i18nstr[cuser.language][107]) || strstr(fdata[3], SHM->i18nstr[cuser.language][108]))
+    if (strstr(fdata[3], I18N[96])) {
+	if (strstr(fdata[3], I18N[97]) || strstr(fdata[3], SHM->i18nstr[cuser.language][98]) ||
+	    strstr(fdata[3], I18N[99]) || strstr(fdata[3], SHM->i18nstr[cuser.language][100]) ||
+	    strstr(fdata[3], I18N[101]) || strstr(fdata[3], SHM->i18nstr[cuser.language][102]) ||
+	    strstr(fdata[3], I18N[103]) || strstr(fdata[3], SHM->i18nstr[cuser.language][104]) ||
+	    strstr(fdata[3], I18N[105]) || strstr(fdata[3], SHM->i18nstr[cuser.language][106]) ||
+	    strstr(fdata[3], I18N[107]) || strstr(fdata[3], SHM->i18nstr[cuser.language][108]))
 	    good++;
-    } else if (strstr(fdata[3], SHM->i18nstr[cuser.language][109]))
+    } else if (strstr(fdata[3], I18N[109]))
 	good++;
 
-    if (strstr(fdata[4], SHM->i18nstr[cuser.language][110]) || strstr(fdata[4], SHM->i18nstr[cuser.language][111]) ||
-	strstr(fdata[4], SHM->i18nstr[cuser.language][112])) {
+    if (strstr(fdata[4], I18N[110]) || strstr(fdata[4], SHM->i18nstr[cuser.language][111]) ||
+	strstr(fdata[4], I18N[112])) {
 	ans[0] = '2';
 	return 3;
     }
-    if (strstr(fdata[4], SHM->i18nstr[cuser.language][113]) || strstr(fdata[4], SHM->i18nstr[cuser.language][114])) {
-	if (strstr(fdata[4], SHM->i18nstr[cuser.language][115]) || strstr(fdata[4], SHM->i18nstr[cuser.language][116])) {
-	    if (strstr(fdata[4], SHM->i18nstr[cuser.language][117]))
+    if (strstr(fdata[4], I18N[113]) || strstr(fdata[4], SHM->i18nstr[cuser.language][114])) {
+	if (strstr(fdata[4], I18N[115]) || strstr(fdata[4], SHM->i18nstr[cuser.language][116])) {
+	    if (strstr(fdata[4], I18N[117]))
 		good++;
 	}
     }
@@ -864,17 +864,17 @@ scan_register_form(char *regfile, int automode, int neednum)
 	"uid", "ident", "name", "career", "addr", "phone", "email", NULL
     };
     char    *finfo[] = {
-	SHM->i18nstr[cuser.language][118], SHM->i18nstr[cuser.language][119], SHM->i18nstr[cuser.language][120], SHM->i18nstr[cuser.language][121], SHM->i18nstr[cuser.language][122],
-	SHM->i18nstr[cuser.language][123], SHM->i18nstr[cuser.language][124], NULL
+	I18N[118], SHM->i18nstr[cuser.language][119], SHM->i18nstr[cuser.language][120], SHM->i18nstr[cuser.language][121], SHM->i18nstr[cuser.language][122],
+	I18N[123], SHM->i18nstr[cuser.language][124], NULL
     };
     char    *reason[] = {
-	SHM->i18nstr[cuser.language][125],
-	SHM->i18nstr[cuser.language][126],
-	SHM->i18nstr[cuser.language][127],
-	SHM->i18nstr[cuser.language][128],
-	SHM->i18nstr[cuser.language][129],
-	SHM->i18nstr[cuser.language][130],
-	SHM->i18nstr[cuser.language][131],
+	I18N[125],
+	I18N[126],
+	I18N[127],
+	I18N[128],
+	I18N[129],
+	I18N[130],
+	I18N[131],
 	NULL
     };
     char    *autoid = "AutoScan";
@@ -891,22 +891,22 @@ scan_register_form(char *regfile, int automode, int neednum)
     move(2, 0);
     if (dashf(fname)) {
 	if (neednum == 0) {	/* 自己進 Admin 來審的 */
-	    outs(SHM->i18nstr[cuser.language][132]);
+	    outs(I18N[132]);
 	    pressanykey();
 	}
 	return -1;
     }
     Rename(regfile, fname);
     if ((fn = fopen(fname, "r")) == NULL) {
-	prints(SHM->i18nstr[cuser.language][133], fname);
+	prints(I18N[133], fname);
 	pressanykey();
 	return -1;
     }
     if (neednum) {		/* 被強迫審的 */
 	move(1, 0);
 	clrtobot();
-	prints(SHM->i18nstr[cuser.language][134], neednum);
-	prints(SHM->i18nstr[cuser.language][135]);
+	prints(I18N[134], neednum);
+	prints(I18N[135]);
 	pressanykey();
     }
     memset(fdata, 0, sizeof(fdata));
@@ -923,7 +923,7 @@ scan_register_form(char *regfile, int automode, int neednum)
 	} else if ((unum = getuser(fdata[0])) == 0) {
 	    move(2, 0);
 	    clrtobot();
-	    outs(SHM->i18nstr[cuser.language][136]);
+	    outs(I18N[136]);
 	    for (n = 0; field[n]; n++)
 		prints("%s     : %s\n", finfo[n], fdata[n]);
 	    pressanykey();
@@ -938,27 +938,27 @@ scan_register_form(char *regfile, int automode, int neednum)
 		uid = cuser.userid;
 
 		move(1, 0);
-		prints(SHM->i18nstr[cuser.language][137], unum);
+		prints(I18N[137], unum);
 		user_display(&muser, 1);
 		move(14, 0);
-		prints(SHM->i18nstr[cuser.language][138], neednum);
-	    	prints(SHM->i18nstr[cuser.language][139], finfo[0], fdata[0]);
-		prints(SHM->i18nstr[cuser.language][140], finfo[1], fdata[1]);
+		prints(I18N[138], neednum);
+	    	prints(I18N[139], finfo[0], fdata[0]);
+		prints(I18N[140], finfo[1], fdata[1]);
 #ifdef FOREIGN_REG
-		prints(SHM->i18nstr[cuser.language][141], finfo[2], fdata[2], muser.uflag2 & FOREIGN ? SHM->i18nstr[cuser.language][142] : "");
+		prints(I18N[141], finfo[2], fdata[2], muser.uflag2 & FOREIGN ? SHM->i18nstr[cuser.language][142] : "");
 #else
-		prints(SHM->i18nstr[cuser.language][143], finfo[2], fdata[2]);
+		prints(I18N[143], finfo[2], fdata[2]);
 #endif
 		for (n = 3; field[n]; n++) {
-		    prints(SHM->i18nstr[cuser.language][144], n - 2, finfo[n], fdata[n]);
+		    prints(I18N[144], n - 2, finfo[n], fdata[n]);
 		}
 		if (muser.userlevel & PERM_LOGINOK) {
-		    ans[0] = getkey(SHM->i18nstr[cuser.language][145]);
+		    ans[0] = getkey(I18N[145]);
 		    if (ans[0] != 'y' && ans[0] != 's')
 			ans[0] = 'd';
 		} else {
 			if (search_ulist(unum) == NULL)
-				ans[0] = vmsg_lines(22, SHM->i18nstr[cuser.language][146]);
+				ans[0] = vmsg_lines(22, I18N[146]);
 			else
 			ans[0] = 's';
 		    if ('A' <= ans[0] && ans[0] <= 'Z')
@@ -974,7 +974,7 @@ scan_register_form(char *regfile, int automode, int neednum)
 	    if (neednum > 0 && ans[0] == 'q') {
 		move(2, 0);
 		clrtobot();
-		prints(SHM->i18nstr[cuser.language][147]);
+		prints(I18N[147]);
 		pressanykey();
 		ans[0] = 's';
 	    }
@@ -1000,13 +1000,13 @@ scan_register_form(char *regfile, int automode, int neednum)
 		    for (n = 0; field[n]; n++)
 			prints("%s: %s\n", finfo[n], fdata[n]);
 		    move(9, 0);
-		    prints(SHM->i18nstr[cuser.language][148]);
+		    prints(I18N[148]);
 		    for (n = 0; reason[n]; n++)
-			prints(SHM->i18nstr[cuser.language][149], n, reason[n]);
+			prints(I18N[149], n, reason[n]);
 		} else
 		    buf[0] = ans[0];
 		if (ans[0] != 'n' ||
-		    getdata(10 + n, 0, SHM->i18nstr[cuser.language][150], buf, 60, DOECHO))
+		    getdata(10 + n, 0, I18N[150], buf, 60, DOECHO))
 		    if ((buf[0] - '0') >= 0 && (buf[0] - '0') < n) {
 			int             i;
 			fileheader_t    mhdr;
@@ -1016,7 +1016,7 @@ scan_register_form(char *regfile, int automode, int neednum)
 			sethomepath(buf1, muser.userid);
 			stampfile(buf1, &mhdr);
 			strlcpy(mhdr.owner, cuser.userid, sizeof(mhdr.owner));
-			strlcpy(mhdr.title, SHM->i18nstr[cuser.language][151], TTLEN);
+			strlcpy(mhdr.title, I18N[151], TTLEN);
 			mhdr.filemode = 0;
 			sethomedir(title, muser.userid);
 			if (append_record(title, &mhdr, sizeof(mhdr)) != -1) {
@@ -1026,7 +1026,7 @@ scan_register_form(char *regfile, int automode, int neednum)
 				if (!isdigit(buf[i]))
 				    continue;
 				snprintf(genbuf, sizeof(genbuf),
-				    SHM->i18nstr[cuser.language][152], reason[buf[i] - '0']);
+				    I18N[152], reason[buf[i] - '0']);
 				fprintf(fp, "%s\n", genbuf);
 			    }
 
@@ -1044,7 +1044,7 @@ scan_register_form(char *regfile, int automode, int neednum)
 		    }
 		move(10, 0);
 		clrtobot();
-		prints(SHM->i18nstr[cuser.language][153]);
+		prints(I18N[153]);
 	    case 's':
 		if ((freg = fopen(regfile, "a"))) {
 		    for (n = 0; field[n]; n++)
@@ -1054,10 +1054,10 @@ scan_register_form(char *regfile, int automode, int neednum)
 		}
 		break;
 	    default:
-		prints(SHM->i18nstr[cuser.language][154]);
-		mail_muser(muser, SHM->i18nstr[cuser.language][155], "etc/registered");
+		prints(I18N[154]);
+		mail_muser(muser, I18N[155], "etc/registered");
 		if(muser.uflag2 & FOREIGN)
-		    mail_muser(muser, SHM->i18nstr[cuser.language][156], "etc/foreign_welcome");
+		    mail_muser(muser, I18N[156], "etc/foreign_welcome");
 		muser.userlevel |= (PERM_LOGINOK | PERM_POST);
 		strlcpy(muser.realname, fdata[2], sizeof(muser.realname));
 		strlcpy(muser.address, fdata[4], sizeof(muser.address));
@@ -1088,7 +1088,7 @@ scan_register_form(char *regfile, int automode, int neednum)
     clrtobot();
 
     move(5, 0);
-    prints(SHM->i18nstr[cuser.language][157], nSelf, nAuto);
+    prints(I18N[157], nSelf, nAuto);
 
     /**	DickG: 將審了幾份的相關資料 post 到 Security 板上	***********/
     /*
@@ -1118,10 +1118,10 @@ m_register()
     char            genbuf[200];
 
     if ((fn = fopen(fn_register, "r")) == NULL) {
-	outs(SHM->i18nstr[cuser.language][158]);
+	outs(I18N[158]);
 	return XEASY;
     }
-    stand_title(SHM->i18nstr[cuser.language][159]);
+    stand_title(I18N[159]);
     y = 2;
     x = wid = 0;
 
@@ -1139,7 +1139,7 @@ m_register()
 	}
     }
     fclose(fn);
-    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][160], ans, sizeof(ans), LCECHO);
+    getdata(b_lines - 1, 0, I18N[160], ans, sizeof(ans), LCECHO);
     if (ans[0] == 'a')
 	scan_register_form(fn_register, 1, 0);
     else if (ans[0] == 'y')
@@ -1153,9 +1153,9 @@ cat_register()
 {
     if (system("cat register.new.tmp >> register.new") == 0 &&
 	system("rm -f register.new.tmp") == 0)
-	vmsg(SHM->i18nstr[cuser.language][161]);
+	vmsg(I18N[161]);
     else
-	vmsg(SHM->i18nstr[cuser.language][162]);
+	vmsg(I18N[162]);
     return 0;
 }
 
@@ -1167,12 +1167,12 @@ give_id_money(char *user_id, int money, FILE * log_fp, char *mail_title, time_t 
     if (deumoney(searchuser(user_id), money) < 0) {
 	move(12, 0);
 	clrtoeol();
-	prints(SHM->i18nstr[cuser.language][163], user_id, money);
+	prints(I18N[163], user_id, money);
 	pressanykey();
     } else {
 	fprintf(log_fp, "%d %s %d", (int)t, user_id, money);
-	snprintf(tt, sizeof(tt), SHM->i18nstr[cuser.language][164], mail_title, money);
-	mail_id(user_id, tt, "etc/givemoney.why", SHM->i18nstr[cuser.language][165]);
+	snprintf(tt, sizeof(tt), I18N[164], mail_title, money);
+	mail_id(user_id, tt, "etc/givemoney.why", I18N[165]);
     }
 }
 
@@ -1185,16 +1185,16 @@ give_money()
     struct tm      *pt = localtime(&now);
     int             to_all = 0, money = 0;
 
-    getdata(0, 0, SHM->i18nstr[cuser.language][166], buf, sizeof(buf), LCECHO);
+    getdata(0, 0, I18N[166], buf, sizeof(buf), LCECHO);
     if (buf[0] == 'q')
 	return 1;
     else if (buf[0] == 'a') {
 	to_all = 1;
-	getdata(1, 0, SHM->i18nstr[cuser.language][167], buf, 20, DOECHO);
+	getdata(1, 0, I18N[167], buf, 20, DOECHO);
 	money = atoi(buf);
 	if (money <= 0) {
 	    move(2, 0);
-	    prints(SHM->i18nstr[cuser.language][168]);
+	    prints(I18N[168]);
 	    pressanykey();
 	    return 1;
 	}
@@ -1204,7 +1204,7 @@ give_money()
     }
 
     clear();
-    getdata(0, 0, SHM->i18nstr[cuser.language][169], buf, 3, LCECHO);
+    getdata(0, 0, I18N[169], buf, 3, LCECHO);
     if (buf[0] != 'y')
 	return 1;
 
@@ -1214,17 +1214,17 @@ give_money()
     fprintf(fp2, "%s\n", buf);
 
 
-    getdata(1, 0, SHM->i18nstr[cuser.language][170], tt, TTLEN, DOECHO);
+    getdata(1, 0, I18N[170], tt, TTLEN, DOECHO);
     move(2, 0);
 
-    prints(SHM->i18nstr[cuser.language][171]);
+    prints(I18N[171]);
     pressanykey();
     if (vedit("etc/givemoney.why", NA, NULL) < 0) {
         fclose(fp2);
 	return 1;
     }
 
-    stand_title(SHM->i18nstr[cuser.language][172]);
+    stand_title(I18N[172]);
     if (to_all) {
 	int             i, unum;
 	for (unum = SHM->number, i = 0; i < unum; i++) {
@@ -1234,7 +1234,7 @@ give_money()
 	    give_id_money(id, money, fp2, tt, now);
 	}
 	//something wrong @ _ @
-	    //give_money_post(SHM->i18nstr[cuser.language][173], atoi(money));
+	    //give_money_post(I18N[173], atoi(money));
     } else {
 	if (!(fp = fopen("etc/givemoney.txt", "r+"))) {
 	    fclose(fp2);

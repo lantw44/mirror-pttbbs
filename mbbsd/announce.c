@@ -17,7 +17,7 @@ a_copyitem(char *fpath, char *title, char *owner, int mode)
     else
 	*copyowner = 0;
     if (mode) {
-	vmsg(SHM->i18nstr[cuser.language][174]);
+	vmsg(I18N[174]);
     }
 }
 
@@ -52,9 +52,9 @@ a_showmenu(menu_t * pm)
     char            buf[PATHLEN];
     time_t          dtime;
 
-    showtitle(SHM->i18nstr[cuser.language][175], pm->mtitle);
-    prints(SHM->i18nstr[cuser.language][176],
-	   SHM->i18nstr[cuser.language][177]);
+    showtitle(I18N[175], pm->mtitle);
+    prints(I18N[176],
+	   I18N[177]);
 
     if (pm->num) {
 	setadir(buf, pm->path);
@@ -76,12 +76,12 @@ a_showmenu(menu_t * pm)
 		   buf);
 	}
     } else
-	outs(SHM->i18nstr[cuser.language][178]);
+	outs(I18N[178]);
 
     move(b_lines, 1);
     outs(pm->level ?
-	 SHM->i18nstr[cuser.language][179] :
-	 SHM->i18nstr[cuser.language][180]);
+	 I18N[179] :
+	 I18N[180]);
 }
 
 static int
@@ -90,7 +90,7 @@ a_searchtitle(menu_t * pm, int rev)
     static char     search_str[40] = "";
     int             pos;
 
-    getdata(b_lines - 1, 1, SHM->i18nstr[cuser.language][181], search_str, sizeof(search_str), DOECHO);
+    getdata(b_lines - 1, 1, I18N[181], search_str, sizeof(search_str), DOECHO);
 
     if (!*search_str)
 	return pm->now;
@@ -123,14 +123,14 @@ static void
 a_showhelp(int level)
 {
     clear();
-    outs(SHM->i18nstr[cuser.language][182]);
+    outs(I18N[182]);
     outs(BBSNAME);
-    outs(SHM->i18nstr[cuser.language][183]);
+    outs(I18N[183]);
     if (level >= MANAGER) {
-	outs(SHM->i18nstr[cuser.language][184]);
+	outs(I18N[184]);
     }
     if (level >= SYSOP) {
-	outs(SHM->i18nstr[cuser.language][185]);
+	outs(I18N[185]);
     }
     pressanykey();
 }
@@ -183,9 +183,9 @@ static void
 a_newitem(menu_t * pm, int mode)
 {
     char    *mesg[3] = {
-	SHM->i18nstr[cuser.language][186],	/* ADDITEM */
-	SHM->i18nstr[cuser.language][187],	/* ADDGROUP */
-	SHM->i18nstr[cuser.language][188]		/* ADDLINK */
+	I18N[186],	/* ADDITEM */
+	I18N[187],	/* ADDGROUP */
+	I18N[188]		/* ADDLINK */
     };
 
     char            fpath[PATHLEN], buf[PATHLEN], lpath[PATHLEN];
@@ -197,20 +197,20 @@ a_newitem(menu_t * pm, int mode)
     switch (mode) {
     case ADDITEM:
 	stampfile(fpath, &item);
-	strlcpy(item.title, SHM->i18nstr[cuser.language][189], sizeof(item.title));	/* A1BA */
+	strlcpy(item.title, I18N[189], sizeof(item.title));	/* A1BA */
 	break;
 
     case ADDGROUP:
 	stampdir(fpath, &item);
-	strlcpy(item.title, SHM->i18nstr[cuser.language][190], sizeof(item.title));	/* A1BB */
+	strlcpy(item.title, I18N[190], sizeof(item.title));	/* A1BB */
 	break;
     case ADDLINK:
 	stamplink(fpath, &item);
-	if (!getdata(b_lines - 2, 1, SHM->i18nstr[cuser.language][191], buf, 61, DOECHO))
+	if (!getdata(b_lines - 2, 1, I18N[191], buf, 61, DOECHO))
 	    return;
 	if (invalid_pname(buf)) {
 	    unlink(fpath);
-	    outs(SHM->i18nstr[cuser.language][192]);
+	    outs(I18N[192]);
 	    igetch();
 	    return;
 	}
@@ -237,10 +237,10 @@ a_newitem(menu_t * pm, int mode)
 		break;
 	    }
 	    if (dashf(lpath)) {
-		strlcpy(item.title, SHM->i18nstr[cuser.language][193], sizeof(item.title));	/* A1B3 */
+		strlcpy(item.title, I18N[193], sizeof(item.title));	/* A1B3 */
 		break;
 	    } else if (dashd(lpath)) {
-		strlcpy(item.title, SHM->i18nstr[cuser.language][194], sizeof(item.title));	/* A1B4 */
+		strlcpy(item.title, I18N[194], sizeof(item.title));	/* A1B4 */
 		break;
 	    }
 	    if (!HAS_PERM(PERM_BBSADM) && d == 1)
@@ -249,7 +249,7 @@ a_newitem(menu_t * pm, int mode)
 
 	if (!item.title[0]) {
 	    unlink(fpath);
-	    outs(SHM->i18nstr[cuser.language][195]);
+	    outs(I18N[195]);
 	    igetch();
 	    return;
 	}
@@ -273,7 +273,7 @@ a_newitem(menu_t * pm, int mode)
     case ADDLINK:
 	unlink(fpath);
 	if (symlink(lpath, fpath) == -1) {
-	    outs(SHM->i18nstr[cuser.language][196]);
+	    outs(I18N[196]);
 	    igetch();
 	    return;
 	}
@@ -298,13 +298,13 @@ a_pasteitem(menu_t * pm, int mode)
 	if (dashd(copyfile)) {
 	    for (i = 0; copyfile[i] && copyfile[i] == pm->path[i]; i++);
 	    if (!copyfile[i]) {
-			vmsg(SHM->i18nstr[cuser.language][197]);
+			vmsg(I18N[197]);
 			return;
 	    }
 	}
 	if (mode) {
 	    snprintf(buf, sizeof(buf),
-		     SHM->i18nstr[cuser.language][198], copytitle);
+		     I18N[198], copytitle);
 	    getdata(b_lines - 1, 1, buf, ans, sizeof(ans), LCECHO);
 	} else
 	    ans[0] = 'y';
@@ -322,7 +322,7 @@ a_pasteitem(menu_t * pm, int mode)
 		    mkdir(pm->path, 0755);
 		memset(&item, 0, sizeof(fileheader_t));
 		strlcpy(item.filename, fname + 1, sizeof(item.filename));
-		memcpy(copytitle, SHM->i18nstr[cuser.language][199], 2);
+		memcpy(copytitle, I18N[199], 2);
 		if (HAS_PERM(PERM_BBSADM))
 		    Link(copyfile, newpath);
 		else {
@@ -330,17 +330,17 @@ a_pasteitem(menu_t * pm, int mode)
 		}
 	    } else if (dashf(copyfile)) {
 		stampfile(newpath, &item);
-		memcpy(copytitle, SHM->i18nstr[cuser.language][200], 2);
+		memcpy(copytitle, I18N[200], 2);
                 Copy(copyfile, newpath);
 	    } else if (dashd(copyfile)) {
 		stampdir(newpath, &item);
-		memcpy(copytitle, SHM->i18nstr[cuser.language][201], 2);
+		memcpy(copytitle, I18N[201], 2);
 		snprintf(buf, sizeof(buf),
 			 "/bin/cp -r %s/* %s/.D* %s", copyfile, copyfile,
 			 newpath);
 		system(buf);
 	    } else {
-		outs(SHM->i18nstr[cuser.language][202]);
+		outs(I18N[202]);
 		igetch();
 		return;
 	    }
@@ -351,7 +351,7 @@ a_pasteitem(menu_t * pm, int mode)
 	    copyfile[0] = '\0';
 	}
     } else {
-	outs(SHM->i18nstr[cuser.language][203]);
+	outs(I18N[203]);
 	igetch();
     }
 }
@@ -372,7 +372,7 @@ a_appenditem(menu_t * pm, int isask)
 	    if (dashf(fname)) {
 		if (isask) {
 		    snprintf(buf, sizeof(buf),
-			     SHM->i18nstr[cuser.language][204], copytitle);
+			     I18N[204], copytitle);
 		    getdata(b_lines - 2, 1, buf, ans, sizeof(ans), LCECHO);
 		}
 		if (ans[0] == 'y') {
@@ -383,7 +383,7 @@ a_appenditem(menu_t * pm, int isask)
 			    fprintf(fp, "\n> %s <\n\n", buf);
 			    if (isask)
 				getdata(b_lines - 1, 1,
-					SHM->i18nstr[cuser.language][205],
+					I18N[205],
 					ans, sizeof(ans), LCECHO);
 			    while (fgets(buf, sizeof(buf), fin)) {
 				if ((ans[0] == 'n') &&
@@ -398,15 +398,15 @@ a_appenditem(menu_t * pm, int isask)
 		    }
 		}
 	    } else {
-		outs(SHM->i18nstr[cuser.language][206]);
+		outs(I18N[206]);
 		igetch();
 	    }
 	} else {
-	    outs(SHM->i18nstr[cuser.language][207]);
+	    outs(I18N[207]);
 	    igetch();
 	}
     } else {
-	outs(SHM->i18nstr[cuser.language][208]);
+	outs(I18N[208]);
 	igetch();
     }
 }
@@ -440,7 +440,7 @@ a_pastetagpost(menu_t * pm, int mode)
 	    setbfile(buf, bh->brdname, fhdr.filename);
 
 	if (dashf(buf)) {
-		strcpy(title, SHM->i18nstr[cuser.language][209]);
+		strcpy(title, I18N[209]);
 	    strncpy(title + 3, fhdr.title, TTLEN - 3);
 	    title[TTLEN] = '\0';
 	    a_copyitem(buf, title, 0, 0);
@@ -466,7 +466,7 @@ a_moveitem(menu_t * pm)
     char            buf[PATHLEN];
     int             fail;
 
-    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][210], pm->now + 1);
+    snprintf(buf, sizeof(buf), I18N[210], pm->now + 1);
     if (!getdata(b_lines - 1, 1, buf, newnum, sizeof(newnum), DOECHO))
 	return;
     num = (newnum[0] == '$') ? 9999 : atoi(newnum) - 1;
@@ -522,14 +522,14 @@ a_delete(menu_t * pm)
 
     if (pm->header[pm->now - pm->page].filename[0] == 'H' &&
 	pm->header[pm->now - pm->page].filename[1] == '.') {
-	getdata(b_lines - 1, 1, SHM->i18nstr[cuser.language][211],
+	getdata(b_lines - 1, 1, I18N[211],
 		ans, sizeof(ans), LCECHO);
 	if (ans[0] != 'y')
 	    return;
 	if (delete_record(buf, FHSZ, pm->now + 1) == -1)
 	    return;
     } else if (dashl(fpath)) {
-	getdata(b_lines - 1, 1, SHM->i18nstr[cuser.language][212],
+	getdata(b_lines - 1, 1, I18N[212],
 		ans, sizeof(ans), LCECHO);
 	if (ans[0] != 'y')
 	    return;
@@ -537,7 +537,7 @@ a_delete(menu_t * pm)
 	    return;
 	unlink(fpath);
     } else if (dashf(fpath)) {
-	getdata(b_lines - 1, 1, SHM->i18nstr[cuser.language][213], ans,
+	getdata(b_lines - 1, 1, I18N[213], ans,
 		sizeof(ans), LCECHO);
 	if (ans[0] != 'y')
 	    return;
@@ -557,7 +557,7 @@ a_delete(menu_t * pm)
 	setbdir(buf, "deleted");
 	append_record(buf, &backup, sizeof(backup));
     } else if (dashd(fpath)) {
-	getdata(b_lines - 1, 1, SHM->i18nstr[cuser.language][214], ans,
+	getdata(b_lines - 1, 1, I18N[214], ans,
 		sizeof(ans), LCECHO);
 	if (ans[0] != 'y')
 	    return;
@@ -579,7 +579,7 @@ a_delete(menu_t * pm)
 	setadir(buf, buf);
 	append_record(buf, &backup, sizeof(backup));
     } else {			/* Ptt 損毀的項目 */
-	getdata(b_lines - 1, 1, SHM->i18nstr[cuser.language][215],
+	getdata(b_lines - 1, 1, I18N[215],
 		ans, sizeof(ans), LCECHO);
 	if (ans[0] != 'y')
 	    return;
@@ -597,7 +597,7 @@ a_newtitle(menu_t * pm)
 
     memcpy(&item, &pm->header[pm->now - pm->page], FHSZ);
     strlcpy(buf, item.title + 3, sizeof(buf));
-    if (getdata_buf(b_lines - 1, 1, SHM->i18nstr[cuser.language][216], buf, 60, DOECHO)) {
+    if (getdata_buf(b_lines - 1, 1, I18N[216], buf, 60, DOECHO)) {
 	strlcpy(item.title + 3, buf, sizeof(item.title) - 3);
 	setadir(buf, pm->path);
 	substitute_record(buf, &item, FHSZ, pm->now + 1);
@@ -626,7 +626,7 @@ a_editsign(menu_t * pm)
 
     memcpy(&item, &pm->header[pm->now - pm->page], FHSZ);
     snprintf(buf, sizeof(buf), "%c%c", item.title[0], item.title[1]);
-    if (getdata_buf(b_lines - 1, 1, SHM->i18nstr[cuser.language][217], buf, 5, DOECHO)) {
+    if (getdata_buf(b_lines - 1, 1, I18N[217], buf, 5, DOECHO)) {
 	item.title[0] = buf[0] ? buf[0] : ' ';
 	item.title[1] = buf[1] ? buf[1] : ' ';
 	item.title[2] = buf[2] ? buf[2] : ' ';
@@ -647,7 +647,7 @@ a_showname(menu_t * pm)
     snprintf(buf, sizeof(buf),
 	     "%s/%s", pm->path, pm->header[pm->now - pm->page].filename);
     if (dashl(buf)) {
-	prints(SHM->i18nstr[cuser.language][218],
+	prints(I18N[218],
 	       pm->header[pm->now - pm->page].filename);
 	if ((len = readlink(buf, buf, PATHLEN - 1)) >= 0) {
 	    buf[len] = '\0';
@@ -663,16 +663,16 @@ a_showname(menu_t * pm)
 			sym = 1;
 		}
 		if (sym) {
-		    vmsg(SHM->i18nstr[cuser.language][219], &buf[i + 1]);
+		    vmsg(I18N[219], &buf[i + 1]);
 		}
 	    }
 	}
     } else if (dashf(buf))
-	prints(SHM->i18nstr[cuser.language][220], pm->header[pm->now - pm->page].filename);
+	prints(I18N[220], pm->header[pm->now - pm->page].filename);
     else if (dashd(buf))
-	prints(SHM->i18nstr[cuser.language][221], pm->header[pm->now - pm->page].filename);
+	prints(I18N[221], pm->header[pm->now - pm->page].filename);
     else
-	outs(SHM->i18nstr[cuser.language][222]);
+	outs(I18N[222]);
     pressanykey();
 }
 
@@ -682,8 +682,8 @@ static char    *a_title;
 static void
 atitle()
 {
-    showtitle(SHM->i18nstr[cuser.language][223], a_title);
-    outs(SHM->i18nstr[cuser.language][224]);
+    showtitle(I18N[223], a_title);
+    outs(I18N[224]);
 }
 #endif
 
@@ -849,7 +849,7 @@ a_menu(char *maintitle, char *path, int lastlevel)
 		 */
 		if( !lastlevel && !HAS_PERM(PERM_SYSOP) &&
 		    !is_BM_cache(currbid) && dashd(fname) )
-		    vmsg(SHM->i18nstr[cuser.language][225]);
+		    vmsg(I18N[225]);
 		else
 		    a_copyitem(fname, me.header[me.now - me.page].title, 0, 1);
 		me.page = 9999;
@@ -868,7 +868,7 @@ a_menu(char *maintitle, char *path, int lastlevel)
 #endif
 		snprintf(fname, sizeof(fname), "%s/%s", path, fhdr->filename);
 		if (*fhdr->filename == 'H' && fhdr->filename[1] == '.') {
-		  vmsg(SHM->i18nstr[cuser.language][226]);
+		  vmsg(I18N[226]);
 		  vmsg("gopher://%s/1/",fhdr->filename+2);
 		} else if (dashf(fname)) {
 		    int             more_result;
@@ -882,8 +882,8 @@ a_menu(char *maintitle, char *path, int lastlevel)
 			    clrtoeol();
 			    getdata(22, 1,
 				    currstat == EDITEXP ?
-				    SHM->i18nstr[cuser.language][227] :
-				    SHM->i18nstr[cuser.language][228],
+				    I18N[227] :
+				    I18N[228],
 				    ans, sizeof(ans), LCECHO);
 			    if (ans[0] == 'y') {
 				strlcpy(trans_buffer,
@@ -937,7 +937,7 @@ a_menu(char *maintitle, char *path, int lastlevel)
 		a_forward(path, &me.header[me.now - me.page], ch /* == 'U' */ );
 		/* By CharlieL */
 	    } else
-		vmsg(SHM->i18nstr[cuser.language][229]);
+		vmsg(I18N[229]);
 
 	    me.page = 9999;
 	    break;
@@ -945,20 +945,20 @@ a_menu(char *maintitle, char *path, int lastlevel)
 #ifdef BLOG
 	case 'b':
 	    if( !HAS_PERM(PERM_SYSOP) && !is_BM_cache(currbid) )
-		vmsg(SHM->i18nstr[cuser.language][230]);
+		vmsg(I18N[230]);
 	    else{
 		char    genbuf[128];
 		snprintf(genbuf, sizeof(genbuf),
 			 "bin/builddb.pl -f -n %d %s", me.now, currboard);
 		system(genbuf);
-		vmsg(SHM->i18nstr[cuser.language][231]);
+		vmsg(I18N[231]);
 	    }
 	    me.page = 9999;
 	    break;
 
 	case 'B':
 	    if( !HAS_PERM(SYSOP) && !is_BM_cache(currbid) )
-		vmsg(SHM->i18nstr[cuser.language][232]);
+		vmsg(I18N[232]);
 	    else
 		BlogMain(me.now);
 	    me.page = 9999;
@@ -1054,7 +1054,7 @@ Announce()
 {
     setutmpmode(ANNOUNCE);
     char mytitle[256];
-    sprintf(mytitle, "%s%s", BBSNAME, SHM->i18nstr[cuser.language][233]);
+    sprintf(mytitle, "%s%s", BBSNAME, I18N[233]);
     a_menu(mytitle, "man",
 	   ((HAS_PERM(PERM_SYSOP) || HAS_PERM(PERM_ANNOUNCE)) ? SYSOP :
 	    NOBODY));
@@ -1069,13 +1069,13 @@ void BlogMain(int num)
     char    genbuf[128], exit = 0;
 
     //setutmpmode(BLOGGING); /* will crash someone using old program  */
-    sprintf(genbuf, SHM->i18nstr[cuser.language][234], currboard);
-    showtitle(SHM->i18nstr[cuser.language][235], genbuf);
+    sprintf(genbuf, I18N[234], currboard);
+    showtitle(I18N[235], genbuf);
     while( !exit ){
 	move(1, 0);
-	prints(SHM->i18nstr[cuser.language][236]
+	prints(I18N[236]
 	       );
-	switch( getans(SHM->i18nstr[cuser.language][237]) ){
+	switch( getans(I18N[237]) ){
 	case '1':
 	    snprintf(genbuf, sizeof(genbuf),
 		     "bin/builddb.pl -c %s", currboard);
@@ -1094,17 +1094,17 @@ void BlogMain(int num)
 	case '4':{
 	    char    hash[35];
 	    int     i;
-	    getdata(16, 0, SHM->i18nstr[cuser.language][238],
+	    getdata(16, 0, I18N[238],
 		    hash, sizeof(hash), DOECHO);
 	    for( i = 0 ; hash[i] != 0 ; ++i ) /* 前面用 getdata() 保證有 \0 */
 		if( !islower(hash[i]) && !isnumber(hash[i]) )
 		    break;
 	    if( i != 32 ){
-		vmsg(SHM->i18nstr[cuser.language][239]);
+		vmsg(I18N[239]);
 		break;
 	    }
 	    if( hash[0] != 0 && 
-		getans(SHM->i18nstr[cuser.language][240]) == 'y' ){
+		getans(I18N[240]) == 'y' ){
 		MYSQL   mysql;
 		char    cmd[256];
 		
@@ -1117,7 +1117,7 @@ void BlogMain(int num)
 					  BLOGDB_PASSWD, BLOGDB_DB, 
 					  BLOGDB_PORT, BLOGDB_SOCK, 0) ||
 		      mysql_query(&mysql, cmd)) )
-		    vmsg(SHM->i18nstr[cuser.language][241]);
+		    vmsg(I18N[241]);
 		else
 		    vmsg(
 #ifdef DEBUG
@@ -1133,7 +1133,7 @@ void BlogMain(int num)
 	    
 	case '5': {
 	    char    date[9];
-	    getdata(16, 0, SHM->i18nstr[cuser.language][242],
+	    getdata(16, 0, I18N[242],
 		    date, sizeof(date), DOECHO);
 	    snprintf(genbuf, sizeof(genbuf),
 		     "bin/builddb.pl -D %s %s", date, currboard);
@@ -1146,7 +1146,7 @@ void BlogMain(int num)
 	    char    fpath[PATHLEN], adir[PATHLEN], buf[256];
 	    sprintf(fpath, "man/boards/%c/%s", currboard[0], currboard);
 	    stampdir(fpath, &item);
-	    strlcpy(item.title, SHM->i18nstr[cuser.language][243], sizeof(item.title));
+	    strlcpy(item.title, I18N[243], sizeof(item.title));
 	    strlcpy(item.owner, cuser.userid, sizeof(item.owner));
 
 	    sprintf(adir, "man/boards/%c/%s/.DIR", currboard[0], currboard);
@@ -1166,7 +1166,7 @@ void BlogMain(int num)
 	    break;
 	}
 	if( !exit )
-	    vmsg(SHM->i18nstr[cuser.language][244]);
+	    vmsg(I18N[244]);
     }
     currutmp->mode = oldmode;
     pressanykey();

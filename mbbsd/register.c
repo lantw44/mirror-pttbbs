@@ -1,5 +1,6 @@
 /* $Id$ */
 #define _XOPEN_SOURCE
+#define _ISOC99_SOURCE
 
 #include "bbs.h"
 
@@ -107,7 +108,6 @@ compute_user_value(userec_t * urec, time_t clock)
 int
 check_and_expire_account(int uid, userec_t * urec)
 {
-    userec_t        zerorec;
     char            genbuf[200], genbuf2[200];
     int             val;
     if ((val = compute_user_value(urec, now)) < 0) {
@@ -115,7 +115,6 @@ check_and_expire_account(int uid, userec_t * urec)
 		uid, urec->userid, ctime(&(urec->lastlogin)) + 4,
 		urec->numlogins, urec->numposts, val);
 	if (val > -1 * 60 * 24 * 365) {
-	    memset(&zerorec, 0, sizeof(zerorec));
 	    log_usies("CLEAN", genbuf);
 	    snprintf(genbuf, sizeof(genbuf), "home/%c/%s", urec->userid[0],
 		    urec->userid);
@@ -126,9 +125,7 @@ check_and_expire_account(int uid, userec_t * urec)
 			 urec->userid[0], urec->userid);
 		system(genbuf);
 	    }
-	    passwd_update(uid, &zerorec);
-	    remove_from_uhash(uid - 1);
-	    add_to_uhash(uid - 1, "");
+            kill_user(uid);
 	} else {
 	    val = 0;
 	    log_usies("DATED", genbuf);
@@ -143,12 +140,11 @@ getnewuserid()
 {
     char            genbuf[50];
     char    *fn_fresh = ".fresh";
-    userec_t        utmp, zerorec;
+    userec_t        utmp;
     time_t          clock;
     struct stat     st;
     int             fd, i;
 
-    memset(&zerorec, 0, sizeof(zerorec));
     clock = now;
 
     /* Lazy method : 先找尋已經清除的過期帳號 */
@@ -185,10 +181,7 @@ getnewuserid()
     snprintf(genbuf, sizeof(genbuf), "uid %d", i);
     log_usies("APPLY", genbuf);
 
-    strlcpy(zerorec.userid, str_new, sizeof(zerorec.userid));
-    zerorec.lastlogin = clock;
-    passwd_update(i, &zerorec);
-    setuserid(i, zerorec.userid);
+    kill_user(i);
     passwd_unlock();
     return i;
 }
@@ -281,12 +274,12 @@ new_register()
 	fprintf(stderr, "本站人口已達飽和！\n");
 	exit(1);
     }
-    if (passwd_update(allocid, &newuser) == -1) {
+    if (passwd_index_update(allocid, &newuser) == -1) {
 	fprintf(stderr, "客滿了，再見！\n");
 	exit(1);
     }
     setuserid(allocid, newuser.userid);
-    if( (uid = dosearchuser(newuser.userid)) )
+    if( (uid = initcuser(newuser.userid)) )
 	setumoney(uid, 0);
     else{
 	fprintf(stderr, "無法建立帳號\n");
@@ -312,33 +305,33 @@ check_register()
 
     stand_title("請詳細填寫個人資料");
 
-    while (strlen(cuser.username) < 2)
-	getdata(2, 0, "綽號暱稱：", cuser.username,
-		sizeof(cuser.username), DOECHO);
+    while (strlen(cuser->username) < 2)
+	getdata(2, 0, "綽號暱稱：", cuser->username,
+		sizeof(cuser->username), DOECHO);
 
-    for (ptr = cuser.username; *ptr; ptr++) {
+    for (ptr = cuser->username; *ptr; ptr++) {
 	if (*ptr == 9)		/* TAB convert */
 	    *ptr = ' ';
     }
-    while (strlen(cuser.realname) < 4)
-	getdata(4, 0, "真實姓名：", cuser.realname,
-		sizeof(cuser.realname), DOECHO);
+    while (strlen(cuser->realname) < 4)
+	getdata(4, 0, "真實姓名：", cuser->realname,
+		sizeof(cuser->realname), DOECHO);
 
-    while (strlen(cuser.address) < 8)
-	getdata(6, 0, "聯絡地址：", cuser.address,
-		sizeof(cuser.address), DOECHO);
+    while (strlen(cuser->address) < 8)
+	getdata(6, 0, "聯絡地址：", cuser->address,
+		sizeof(cuser->address), DOECHO);
 
 
     /*
-     * if(!strchr(cuser.email, '@')) { bell(); move(t_lines - 4, 0); prints("
+     * if(!strchr(cuser->email, '@')) { bell(); move(t_lines - 4, 0); prints("
      * 您的權益，請填寫真實的 E-mail address，" "以資確認閣下身份，\n" "
      * 033[44muser@domain_name\033[0m 或 \033[44muser"
      * "@\\[ip_number\\]\033[0m。\n\n" "※ 如果您真的沒有 E-mail， turn]
      * 即可。");
      * 
-     * do { getdata(8, 0, "電子信箱：", cuser.email, sizeof(cuser.email),
-     * DOECHO); if(!cuser.email[0]) sprintf(cuser.email, "%s%s",
-     * cuser.userid, str_mail_address); } while(!strchr(cuser.email, '@'));
+     * do { getdata(8, 0, "電子信箱：", cuser->email, sizeof(cuser->email),
+     * DOECHO); if(!cuser->email[0]) sprintf(cuser->email, "%s%s",
+     * cuser->userid, str_mail_address); } while(!strchr(cuser->email, '@'));
      * 
      * } */
     if (!HAS_PERM(PERM_SYSOP)) {
@@ -350,8 +343,8 @@ check_register()
 	u_register();
 
 #ifdef NEWUSER_LIMIT
-	if (cuser.lastlogin - cuser.firstlogin < 3 * 86400)
-	    cuser.userlevel &= ~PERM_POST;
+	if (cuser->lastlogin - cuser->firstlogin < 3 * 86400)
+	    cuser->userlevel &= ~PERM_POST;
 	more("etc/newuser", YEA);
 #endif
     }

@@ -2,7 +2,6 @@
 #include "bbs.h"
 
 /* 進站水球宣傳 */
-
 int
 m_loginmsg()
 {
@@ -24,7 +23,7 @@ m_loginmsg()
     {
           SHM->loginmsg.pid=currutmp->pid; /*站長不多 就不管race condition */
           strcpy(SHM->loginmsg.last_call_in, msg);
-          strcpy(SHM->loginmsg.userid, cuser.userid);
+          strcpy(SHM->loginmsg.userid, cuser->userid);
     }
   return 0;
 }
@@ -131,7 +130,7 @@ search_key_user(char *passwdfile, int mode)
 		if (ch == 's' && !mode) {
 		    if ((ch = searchuser(user.userid))) {
 			setumoney(ch, user.money);
-			passwd_update(ch, &user);
+			passwd_index_update(ch, &user);
 			fclose(fp1);
 			return 0;
 		    } else {
@@ -149,7 +148,7 @@ search_key_user(char *passwdfile, int mode)
 				fprintf(stderr, "本站人口已達飽和！\n");
 				exit(1);
 			    }
-			    if (passwd_update(allocid, &user) == -1) {
+			    if (passwd_index_update(allocid, &user) == -1) {
 				fprintf(stderr, "客滿了，再見！\n");
 				exit(1);
 			    }
@@ -259,7 +258,6 @@ setup_man(boardheader_t * board)
     mkdir(genbuf, 0755);
 }
 
-
 int
 m_mod_board(char *bname)
 {
@@ -354,7 +352,7 @@ m_mod_board(char *bname)
 	    system(genbuf);
 	    memset(&bh, 0, sizeof(bh));
 	    snprintf(bh.title, sizeof(bh.title),
-		     "%s 看板 %s 刪除", bname, cuser.userid);
+		     "%s 看板 %s 刪除", bname, cuser->userid);
 	    post_msg("Security", bh.title, "請注意刪除的合法性", "[系統安全局]");
 	    substitute_record(fn_board, &bh, sizeof(bh), bid);
 	    reset_board(bid);
@@ -371,7 +369,7 @@ m_mod_board(char *bname)
 	    if (getbnum(genbuf)) {
 		move(3, 0);
 		outs("錯誤! 板名雷同");
-	    } else if (!invalid_brdname(genbuf)) {
+	    } else if ( !invalid_brdname(genbuf) ){
 		strlcpy(newbh.brdname, genbuf, sizeof(newbh.brdname));
 		break;
 	    }
@@ -428,7 +426,7 @@ m_mod_board(char *bname)
 		clear();
 	    }
 	}
-	getdata_str(b_lines - 1, 0, msg_sure_ny, genbuf, 4, LCECHO, "Y");
+	getdata_str(b_lines - 1, 0, msg_sure_ny, genbuf, 4, LCECHO, "N");
 
 	if ((*genbuf == 'y') && memcmp(&newbh, &bh, sizeof(bh))) {
 	    if (strcmp(bh.brdname, newbh.brdname)) {
@@ -884,7 +882,7 @@ scan_register_form(char *regfile, int automode, int neednum)
     int             n = 0, unum = 0;
     int             nSelf = 0, nAuto = 0;
 
-    uid = cuser.userid;
+    uid = cuser->userid;
     snprintf(fname, sizeof(fname), "%s.tmp", regfile);
     move(2, 0);
     if (dashf(fname)) {
@@ -933,7 +931,7 @@ scan_register_form(char *regfile, int automode, int neednum)
 		uid = autoid;
 
 	    if ((!automode || !auto_scan(fdata, ans))) {
-		uid = cuser.userid;
+		uid = cuser->userid;
 
 		move(1, 0);
 		prints("帳號位置    ：%d\n", unum);
@@ -1016,7 +1014,7 @@ scan_register_form(char *regfile, int automode, int neednum)
 
 			sethomepath(buf1, muser.userid);
 			stampfile(buf1, &mhdr);
-			strlcpy(mhdr.owner, cuser.userid, sizeof(mhdr.owner));
+			strlcpy(mhdr.owner, cuser->userid, sizeof(mhdr.owner));
 			strlcpy(mhdr.title, "[註冊失敗]", TTLEN);
 			mhdr.filemode = 0;
 			sethomedir(title, muser.userid);
@@ -1070,6 +1068,7 @@ scan_register_form(char *regfile, int automode, int neednum)
 		strncat(genbuf, "\n", sizeof(genbuf));
 		log_file(buf, genbuf, 1);
 		passwd_update(unum, &muser);
+		passwd_index_update(unum, &muser);
 
 		if ((fout = fopen(logfile, "a"))) {
 		    for (n = 0; field[n]; n++)
@@ -1103,10 +1102,10 @@ scan_register_form(char *regfile, int automode, int neednum)
      * &xfile); strcpy(xfile.owner, "系統"); strcpy(xfile.title, "[報告]
      * 審核記錄"); xptr = fopen(xfpath, "w"); fprintf(xptr, "\n時間：%s %s
      * 審了 %d 份註冊單\n AutoScan 審了 %d 份註冊單\n 共計 %d 份。", buf,
-     * cuser.userid, nSelf, nAuto, nSelf+nAuto); fclose(xptr); setbdir(fname,
+     * cuser->userid, nSelf, nAuto, nSelf+nAuto); fclose(xptr); setbdir(fname,
      * xboard); append_record(fname, &xfile, sizeof(xfile));
      * outgo_post(&xfile, xboard); touchbtotal(getbnum(xboard));
-     * cuser.numposts++;
+     * cuser->numposts++;
      */
     /*********************************************/
     pressanykey();

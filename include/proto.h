@@ -54,6 +54,7 @@ int del_range(int ent, fileheader_t *fhdr, char *direct);
 int cmpfowner(fileheader_t *fhdr);
 int b_note_edit_bname(int bid);
 int Read();
+int CheckPostPerm(void);
 void anticrosspost();
 int Select();
 void do_reply_title(int row, char *title);
@@ -152,7 +153,7 @@ int give_tax(int money);
 int vice(int money, char* item);
 int inumoney(char *tuser, int money);
 int cal();
-#define reload_money()  cuser.money=moneyof(usernum)
+#define reload_money()  cuser->money=moneyof(usernum)
 int demoney(int money);
 int deumoney(int uid, int money);
 int lockutmpmode(int unmode, int state);
@@ -350,7 +351,6 @@ void abort_bbs(int sig);
 void del_distinct(char *fname, char *line);
 void add_distinct(char *fname, char *line);
 void show_last_call_in(int save);
-int dosearchuser(char *userid);
 void u_exit(char *mode);
 void talk_request(int sig);
 int reply_connection_request(userinfo_t *uip);
@@ -584,6 +584,7 @@ void sortsong();
 int topsong();
 
 /* user */
+int kill_user(int num);
 int u_editcalendar();
 void user_display(userec_t *u, int real);
 void uinfo_query(userec_t *u, int real, int unum);
@@ -644,11 +645,16 @@ unsigned StringHash(unsigned char *s);
 /* passwd */
 int passwd_init();
 int passwd_update(int num, userec_t *buf);
+int passwd_index_update(int num, userec_t *buf);
 int passwd_query(int num, userec_t *buf);
-int passwd_apply(int (*fptr)(userec_t *));
+int passwd_index_query(int num, userec_t *buf);
+int passwd_apply(int (*fptr)(int, userec_t *));
 void passwd_lock();
 void passwd_unlock();
 int passwd_update_money(int num);
+int initcuser(char *userid);
+int freecuser();
+
 
 /* calendar */
 int calendar();

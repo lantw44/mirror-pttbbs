@@ -18,7 +18,7 @@ printchatline(char *str)
     }
     outs(str);
     outc('\n');
-    outs("→");
+    outs(SHM->i18nstr[cuser.language][658]);
 
     if (flog)
 	fprintf(flog, "%s\n", str);
@@ -34,7 +34,7 @@ chat_clear()
     move(b_lines, 0);
     clrtoeol();
     move(chatline = 2, 0);
-    outs("→");
+    outs(SHM->i18nstr[cuser.language][659]);
 }
 
 static void
@@ -92,7 +92,7 @@ chat_recv(int fd, char chatroom[IDLEN], char *chatid)
 	    case 't':
 		move(0, 0);
 		clrtoeol();
-		prints("\033[1;37;46m 談天室 [%-12s] \033[45m 話題：%-48s\033[m",
+		prints(SHM->i18nstr[cuser.language][660],
 		       chatroom, bptr + 2);
 	    }
 	} else
@@ -131,7 +131,7 @@ printuserent(userinfo_t * uentp)
 	     uentp->invisible ? '#' : ' ',
 	     modestring(uentp, 1));
     if (cnt < 2)
-	strcat(pline, "│");
+	strcat(pline, SHM->i18nstr[cuser.language][661]);
     strcat(uline, pline);
     if (++cnt == 3) {
 	printchatline(uline);
@@ -154,30 +154,30 @@ static void
 chat_help(char *arg)
 {
     if (strstr(arg, " op")) {
-	printchatline("談天室管理員專用指令");
-	chathelp("[/f]lag [+-][ls]", "設定鎖定、秘密狀態");
-	chathelp("[/i]nvite <id>", "邀請 <id> 加入談天室");
-	chathelp("[/k]ick <id>", "將 <id> 踢出談天室");
-	chathelp("[/o]p <id>", "將 Op 的權力轉移給 <id>");
-	chathelp("[/t]opic <text>", "換個話題");
-	chathelp("[/w]all", "廣播 (站長專用)");
+	printchatline(SHM->i18nstr[cuser.language][662]);
+	chathelp("[/f]lag [+-][ls]", SHM->i18nstr[cuser.language][663]);
+	chathelp("[/i]nvite <id>", SHM->i18nstr[cuser.language][664]);
+	chathelp("[/k]ick <id>", SHM->i18nstr[cuser.language][665]);
+	chathelp("[/o]p <id>", SHM->i18nstr[cuser.language][666]);
+	chathelp("[/t]opic <text>", SHM->i18nstr[cuser.language][667]);
+	chathelp("[/w]all", SHM->i18nstr[cuser.language][668]);
     } else {
-	chathelp("[//]help", "MUD-like 社交動詞");
-	chathelp("[/.]help", "chicken 鬥雞用指令");
-	chathelp("[/h]elp op", "談天室管理員專用指令");
-	chathelp("[/a]ct <msg>", "做一個動作");
-	chathelp("[/b]ye [msg]", "道別");
-	chathelp("[/c]lear", "清除螢幕");
-	chathelp("[/j]oin <room>", "建立或加入談天室");
-	chathelp("[/l]ist [room]", "列出談天室使用者");
-	chathelp("[/m]sg <id> <msg>", "跟 <id> 說悄悄話");
-	chathelp("[/n]ick <id>", "將談天代號換成 <id>");
-	chathelp("[/p]ager", "切換呼叫器");
-	chathelp("[/q]uery", "查詢網友");
-	chathelp("[/r]oom", "列出一般談天室");
-	chathelp("[/u]sers", "列出站上使用者");
-	chathelp("[/w]ho", "列出本談天室使用者");
-	chathelp("[/w]hoin <room>", "列出談天室<room> 的使用者");
+	chathelp("[//]help", SHM->i18nstr[cuser.language][669]);
+	chathelp("[/.]help", SHM->i18nstr[cuser.language][670]);
+	chathelp("[/h]elp op", SHM->i18nstr[cuser.language][671]);
+	chathelp("[/a]ct <msg>", SHM->i18nstr[cuser.language][672]);
+	chathelp("[/b]ye [msg]", SHM->i18nstr[cuser.language][673]);
+	chathelp("[/c]lear", SHM->i18nstr[cuser.language][674]);
+	chathelp("[/j]oin <room>", SHM->i18nstr[cuser.language][675]);
+	chathelp("[/l]ist [room]", SHM->i18nstr[cuser.language][676]);
+	chathelp("[/m]sg <id> <msg>", SHM->i18nstr[cuser.language][677]);
+	chathelp("[/n]ick <id>", SHM->i18nstr[cuser.language][678]);
+	chathelp("[/p]ager", SHM->i18nstr[cuser.language][679]);
+	chathelp("[/q]uery", SHM->i18nstr[cuser.language][680]);
+	chathelp("[/r]oom", SHM->i18nstr[cuser.language][681]);
+	chathelp("[/u]sers", SHM->i18nstr[cuser.language][682]);
+	chathelp("[/w]ho", SHM->i18nstr[cuser.language][683]);
+	chathelp("[/w]hoin <room>", SHM->i18nstr[cuser.language][684]);
     }
 }
 
@@ -187,7 +187,7 @@ chat_date()
     char            genbuf[200];
 
     snprintf(genbuf, sizeof(genbuf),
-	     "◆ " BBSNAME "標準時間: %s", Cdate(&now));
+	     SHM->i18nstr[cuser.language][686], BBSNAME, Cdate(&now));
     printchatline(genbuf);
 }
 
@@ -196,8 +196,8 @@ chat_pager()
 {
     char            genbuf[200];
 
-    char           *msgs[] = {"關閉", "打開", "拔掉", "防水", "好友"};
-    snprintf(genbuf, sizeof(genbuf), "◆ 您的呼叫器:[%s]",
+    char           *msgs[] = {SHM->i18nstr[cuser.language][687], SHM->i18nstr[cuser.language][688], SHM->i18nstr[cuser.language][689], SHM->i18nstr[cuser.language][690], SHM->i18nstr[cuser.language][691]};
+    snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][692],
 	     msgs[currutmp->pager = (currutmp->pager + 1) % 5]);
     printchatline(genbuf);
 }
@@ -214,14 +214,14 @@ chat_query(char *arg)
 	char            buf[128], *ptr;
 	FILE           *fp;
 
-	snprintf(buf, sizeof(buf), "%s(%s) 共上站 %d 次，發表過 %d 篇文章",
+	snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][693],
 		 xuser.userid, xuser.username,
 		 xuser.numlogins, xuser.numposts);
 	printchatline(buf);
 
 	snprintf(buf, sizeof(buf),
-		 "最近(%s)從[%s]上站", Cdate(&xuser.lastlogin),
-		(xuser.lasthost[0] ? xuser.lasthost : "(不詳)"));
+		 SHM->i18nstr[cuser.language][694], Cdate(&xuser.lastlogin),
+		(xuser.lasthost[0] ? xuser.lasthost : SHM->i18nstr[cuser.language][695]));
 	printchatline(buf);
 
 	sethomefile(buf, xuser.userid, fn_plans);
@@ -241,12 +241,14 @@ chat_query(char *arg)
 static void
 chat_users()
 {
+	char buf[256];
+	snprintf(buf, sizeof(buf), "%s%s%s", SHM->i18nstr[cuser.language][696], BBSNAME, SHM->i18nstr[cuser.language][697]);
     printchatline("");
-    printchatline("【 " BBSNAME "的遊客列表 】");
+    printchatline(buf);
     printchatline(msg_shortulist);
 
     if (apply_ulist(printuserent) == -1)
-	printchatline("空無一人");
+	printchatline(SHM->i18nstr[cuser.language][698]);
     printuserent(NULL);
 }
 
@@ -307,7 +309,7 @@ t_chat()
     int             chatting = YEA;
     char            fpath[80];
 
-    outs("                     驅車前往 請梢候........         ");
+    outs(SHM->i18nstr[cuser.language][699]);
     if (!(h = gethostbyname("localhost"))) {
 	perror("gethostbyname");
 	return -1;
@@ -321,8 +323,7 @@ t_chat()
     sin.sin_port = htons(NEW_CHATPORT);
     cfd = socket(sin.sin_family, SOCK_STREAM, 0);
     if (connect(cfd, (struct sockaddr *) & sin, sizeof sin) != 0) {
-	outs("\n              "
-		"哇! 沒人在那邊耶...要有那地方的人先去開門啦!...");
+	outs(SHM->i18nstr[cuser.language][700]);
 	system("bin/xchatd");
 	pressanykey();
 	close(cfd);
@@ -330,7 +331,7 @@ t_chat()
     }
 
     while (1) {
-	getdata(b_lines - 1, 0, "請輸入聊天代號：", chatid, 9, DOECHO);
+	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][701], chatid, 9, DOECHO);
 	if(!chatid[0])
 	    strlcpy(chatid, cuser.userid, sizeof(chatid));
 	chatid[8] = '\0';
@@ -347,11 +348,11 @@ t_chat()
 	if (!strcmp(inbuf, CHAT_LOGIN_OK))
 	    break;
 	else if (!strcmp(inbuf, CHAT_LOGIN_EXISTS))
-	    ptr = "這個代號已經有人用了";
+	    ptr = SHM->i18nstr[cuser.language][702];
 	else if (!strcmp(inbuf, CHAT_LOGIN_INVALID))
-	    ptr = "這個代號是錯誤的";
+	    ptr = SHM->i18nstr[cuser.language][703];
 	else if (!strcmp(inbuf, CHAT_LOGIN_BOGUS))
-	    ptr = "請勿派遣分身進入聊天室 !!";
+	    ptr = SHM->i18nstr[cuser.language][704];
 
 	move(b_lines - 2, 0);
 	outs(ptr);
@@ -375,7 +376,7 @@ t_chat()
     move(STOP_LINE, 0);
     outs(msg_seperator);
     move(STOP_LINE, 60);
-    outs(" /help 查詢指令 ");
+    outs(SHM->i18nstr[cuser.language][705]);
     move(1, 0);
     outs(msg_seperator);
     print_chatid(chatid);
@@ -412,7 +413,7 @@ t_chat()
 
 	if (!newmail && currutmp->mailalert) {
 	    newmail = 1;
-	    printchatline("◆ 噹！郵差又來了...");
+	    printchatline(SHM->i18nstr[cuser.language][706]);
 	}
 	if (ch == I_OTHERDATA) {/* incoming */
 	    if (chat_recv(cfd, chatroom, chatid) == -1) {
@@ -513,7 +514,7 @@ t_chat()
 
 	fclose(flog);
 	more(fpath, NA);
-	getdata(b_lines - 1, 0, "清除(C) 移至備忘錄(M) (C/M)?[C]",
+	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][707],
 		ans, sizeof(ans), LCECHO);
 	if (*ans == 'm') {
 	    fileheader_t    mymail;
@@ -523,8 +524,8 @@ t_chat()
 	    sethomepath(genbuf, cuser.userid);
 	    stampfile(genbuf, &mymail);
 	    mymail.filemode = FILE_READ ;
-	    strlcpy(mymail.owner, "[備.忘.錄]", sizeof(mymail.owner));
-	    strlcpy(mymail.title, "會議\033[1;33m記錄\033[m", sizeof(mymail.title));
+	    strlcpy(mymail.owner, SHM->i18nstr[cuser.language][708], sizeof(mymail.owner));
+	    strlcpy(mymail.title, SHM->i18nstr[cuser.language][709], sizeof(mymail.title));
 	    sethomedir(title, cuser.userid);
 	    append_record(title, &mymail, sizeof(mymail));
 	    Rename(fpath, genbuf);

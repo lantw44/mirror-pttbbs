@@ -384,6 +384,7 @@ char            real_name[IDLEN + 1];
 int             local_article;
 
 /* mbbsd.c */
+int             use_shell_login_mode = 0;
 char            fromhost[STRLEN] = "\0";
 char            water_usies = 0;
 FILE           *fp_writelog = NULL;

@@ -227,16 +227,18 @@ igetch()
         else                                       //  here is switch for default keys
 	switch (ch) {
         case IAC:
+	    if (use_shell_login_mode)
+		return IAC;
 #ifndef SKIP_TELNET_CONTROL_SIGNAL
-	    {
+	    else {
 		unsigned char cmd[16];
-		ch = dogetch();
-		switch (ch) {
+		cmd[0] = IAC;
+		cmd[1] = ch = dogetch();
+		switch (ch) { /* switch first char after IAC */
 		    case IAC:
 			return IAC; /* escaped IAC */
 
 		    case DO:
-			cmd[0] = IAC;
 			cmd[1] = WONT; /* this always work according to rfc 854 */
 			cmd[2] = dogetch();
 			if(cmd[1] != TELOPT_TTYPE && cmd[1] != TELOPT_NAWS &&
@@ -245,10 +247,12 @@ igetch()
 			break;
 
 		    case DONT:
-			cmd[0] = IAC;
 			cmd[1] = WONT;
 			cmd[2] = dogetch();
-			write(1, cmd, 3);
+			if(cmd[1] == TELOPT_TTYPE || cmd[1] == TELOPT_NAWS ||
+				cmd[1] == TELOPT_ECHO || cmd[1] == TELOPT_SGA)
+			    /* we don't like this, but rfc have us swallow */
+			    write(1, cmd, 3);
 			break;
 
 		    case WILL: case WONT:
@@ -266,7 +270,7 @@ igetch()
 				else if (ch && cmd[i] == SE)
 				    break;
 				else
-				    mode = 0;
+				    ch = 0;
 			    }
 			}
 			if (cmd[2] == TELOPT_NAWS)

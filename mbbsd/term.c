@@ -54,21 +54,23 @@ outcf(int ch)
 
 static inline void
 term_resize(int row, int col){
-    screenline_t   *new_picture;
 
     /* make sure reasonable size */
     row = MAX(24, MIN(100, row));
     col = MAX(80, MIN(200, col));
 
     if (big_picture != NULL && row > t_lines) {
-	new_picture = (screenline_t *) calloc(row, sizeof(screenline_t));
-	if (new_picture == NULL) {
+	screenline_t* buf = alloca(t_lines * sizeof(screenline_t));
+	memcpy(buf, big_picture, t_lines * sizeof(screenline_t));
+	free(big_picture);
+	big_picture = (screenline_t *) calloc(row, sizeof(screenline_t));
+	if (big_picture == NULL) {
 	    syslog(LOG_ERR, "calloc(): %m");
+	    big_picture = (screenline_t*) calloc(t_lines, sizeof(screenline_t));
+	    memcpy(big_picture, buf, t_lines * sizeof(screenline_t));
 	    return;
 	}
-	memcpy(new_picture, big_picture, t_lines * sizeof(screenline_t));
-	free(big_picture);
-	big_picture = new_picture;
+	memcpy(big_picture, buf, t_lines * sizeof(screenline_t));
     }
     t_lines = row;
     t_columns = col;
@@ -120,11 +122,11 @@ char            term_buf[32];
 void
 do_move(int destcol, int destline)
 {
-    char            buf[16], *p;
+    char            buf[16];
 
-    snprintf(buf, sizeof(buf), "\33[%d;%dH", destline + 1, destcol + 1);
-    for (p = buf; *p; p++)
-	ochar(*p);
+    output(buf, 
+	    snprintf(buf, sizeof(buf), "\33[%d;%dH", destline + 1,
+		destcol + 1));
 }
 
 void
@@ -144,11 +146,10 @@ restore_cursor()
 void
 change_scroll_range(int top, int bottom)
 {
-    char            buf[16], *p;
+    char            buf[16];
 
-    snprintf(buf, sizeof(buf), "\33[%d;%dr", top + 1, bottom + 1);
-    for (p = buf; *p; p++)
-	ochar(*p);
+    output(buf,
+	    snprintf(buf, sizeof(buf), "\33[%d;%dr", top + 1, bottom + 1));
 }
 
 void

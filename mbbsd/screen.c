@@ -22,7 +22,7 @@ initscr()
 {
     if (!big_picture) {
 #ifdef Try_to_remove_these_code
-	scr_lns = scr_lns;
+	scr_lns = t_lines;
 	scr_cols = ANSILINELEN;
 	/* scr_cols = MIN(t_columns, ANSILINELEN); */
 #endif
@@ -77,8 +77,6 @@ rel_move(int was_col, int was_ln, int new_col, int new_ln)
     do_move(new_col, new_ln);
 }
 
-/*
- */
 static void
 standoutput(char *buf, int ds, int de, int sso, int eso)
 {
@@ -126,8 +124,9 @@ redoscr()
 	bp = &big_picture[j];
 	if ((len = bp->len)) {
 	    rel_move(tc_col, tc_line, 0, i);
-	    if (bp->mode & STANDOUT)
+	    if (bp->mode & STANDOUT) {
 		standoutput((char *)bp->data, 0, len, bp->sso, bp->eso);
+	    }
 	    else
 		output((char *)bp->data, len);
 	    tc_col += len;
@@ -193,7 +192,7 @@ refresh()
 
 	    if (bp->mode & STANDOUT)
 		standoutput((char *)bp->data, bp->smod, bp->emod + 1,
-			    bp->sso, bp->eso);
+			bp->sso, bp->eso);
 	    else
 		output((char *)&bp->data[bp->smod], bp->emod - bp->smod + 1);
 	    tc_col = bp->emod + 1;
@@ -352,11 +351,19 @@ parsecolor(char *buf)
 
     while (val) {
 	if (atoi(val) < 30) {
+#if 0
 	    if (data[0]) {
 		data[len++] = ';';
 		data[len] = 0;
 	    }
 	    strcpy(&data[len], val);
+#else
+	    if (data[0]) {
+		data[len++] = ';';
+		data[len] = 0;
+	    }
+	    strcpy(&data[len], val);
+#endif
 	}
 	val = (char *)strtok(NULL, ";");
     }
@@ -521,7 +528,7 @@ region_scroll_up(int top, int bottom)
     refresh();
 }
 
-/* 開始反白 - 瑩幕上之後的訊息開始反白輸出 */
+/* 開始反白 - 瑩幕上之後的訊息開始反白輸出，會寫在 screenline_t 上。 */
 void
 standout()
 {
@@ -533,6 +540,7 @@ standout()
 	slp->sso = slp->eso = cur_col;
 	slp->mode |= STANDOUT;
     }
+//    outs(strtstandout);
 }
 
 /* 結束反白 */
@@ -546,4 +554,5 @@ standend()
 	standing = NA;
 	slp->eso = MAX(slp->eso, cur_col);
     }
+//    outs(endstandout);
 }

@@ -404,9 +404,10 @@ screenline_t   *big_picture = NULL;
 #ifdef Try_to_remove_these_code
 unsigned char   scr_lns;
 unsigned short  scr_cols;
-#endif
+#else
 #define scr_lns		t_lines
-#define scr_cols	t_columns
+#define scr_cols	ANSILINELEN
+#endif
 char            roll;
 
 /* gomo.c */

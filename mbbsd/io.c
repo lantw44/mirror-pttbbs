@@ -1,6 +1,8 @@
 /* $Id$ */
 #include "bbs.h"
 
+#define MAXLASTCMD 12
+
 /*
  * Mechanism
  * =========
@@ -500,7 +502,6 @@ oldgetdata(int line, int col, char *prompt, char *buf, int len, int echo)
     register int    ch, i;
     int             clen;
     int             x = col, y = line;
-#define MAXLASTCMD 12
     static char     lastcmd[MAXLASTCMD][80];
 
     strip_ansi(buf, buf, STRIP_ALL);

@@ -25,36 +25,3 @@ int main(int argc, char **argv)
 	}
     return 0;
 }
-
-/* utils */
-int towrite(int fd, void *buf, int len)
-{
-    int     l;
-    for( l = 0 ; len > 0 ; )
-	if( (l = write(fd, buf, len)) <= 0 )
-	    return -1;
-	else{
-	    buf += l;
-	    len -= l;
-	}
-    return l;
-}
-
-int toconnect(char *host, int port)
-{
-    int    sock;
-    struct sockaddr_in serv_name;
-    if( (sock = socket(AF_INET, SOCK_STREAM, 0)) < 0 ){
-        perror("socket");
-        return -1;
-    }
-
-    serv_name.sin_family = AF_INET;
-    serv_name.sin_addr.s_addr = inet_addr(host);
-    serv_name.sin_port = htons(port);
-    if( connect(sock, (struct sockaddr*)&serv_name, sizeof(serv_name)) < 0 ){
-        close(sock);
-        return -1;
-    }
-    return sock;
-}

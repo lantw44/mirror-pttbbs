@@ -2,9 +2,6 @@
 #include "bbs.h"
 #include <err.h>
 
-int tobind(int);
-int toread(int fd, void *buf, int len);
-
 struct {
     int     uid;
     short   nFriends, nRejects;
@@ -12,11 +9,18 @@ struct {
     int     reject[MAX_REJECT];
 } utmp[MAX_ACTIVE];
 
+inline void countarray(int *s, int max)
+{
+    int     i;
+    for( i = 0 ; i < max && s[i] ; ++i )
+	;
+    return i;
+}
+
 int main(int argc, char **argv)
 {
     struct  sockaddr_in     clientaddr;
-    int     ch, port = 5120, sfd, cfd, len, index, i;
-    //char    buf[2048];
+    int     ch, port = 5120, sfd, cfd, len, index, i, uid;
 
     while( (ch = getopt(argc, argv, "p:h")) != -1 )
 	switch( ch ){
@@ -55,41 +59,17 @@ int main(int argc, char **argv)
 	    fprintf(stderr, "%d users synced\n", nSynced);
 	    continue;
 	}
+
+	if( toread(cfd, &uid, sizeof(uid)) > 0                              &&
+	    toread(cfd, utmp[index].friend, sizeof(utmp[index].friend)) > 0 &&
+	    toread(cfd, utmp[index].reject, sizeof(utmp[index].reject)) > 0 ){
+	    int     nFriends = 0, frarray[MAX_FRIEND];
+	    utmp[index].uid = uid;
+	    utmp[index].nFriends = countarray(utmp[index].friend, MAX_FRIEND);
+	    utmp[index].nRejects = countarray(utmp[index].reject, MAX_REJECT);
+
+	}
+	close(cfd);
     }
     return 0;
-}
-
-/* utils */
-int tobind(int port)
-{
-    int     sockfd, val;
-    struct  sockaddr_in     servaddr;
-
-    if( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0 )
-	err(1, NULL);
-    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR,
-	       (char *)&val, sizeof(val));
-    bzero(&servaddr, sizeof(servaddr));
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(port);
-    if( bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0 )
-	err(1, NULL);
-    if( listen(sockfd, 5) < 0 )
-	err(1, NULL);
-
-    return sockfd;
-}
-
-int toread(int fd, void *buf, int len)
-{
-    int     l;
-    for( l = 0 ; len > 0 ; )
-	if( (l = read(fd, buf, len)) <= 0 )
-	    return -1;
-	else{
-	    buf += l;
-	    len -= l;
-	}
-    return l;
 }

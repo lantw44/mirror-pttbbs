@@ -216,6 +216,18 @@ login_friend_online(void)
     userinfo_t     *uentp;
     int             i, stat, stat1;
     int             offset = (int)(currutmp - &SHM->uinfo[0]);
+#ifdef OUTTACACHE
+    int             sfd;
+
+    if( (sfd = toconnect(OUTTACACHEHOST, OUTTACACHEPOST)) > 0 ){
+	if( towrite(sfd, &offset, sizeof(offset)) > 0                    &&
+	    towrite(sfd, &currutmp->uid, sizeof(currutmp->uid)) > 0      &&
+	    towrite(sfd, currutmp->friend, sizeof(currutmp->friend)) > 0 &&
+	    towrite(sfd, currutmp->reject, sizeof(currutmp->reject)) > 0 ){
+	}
+	close(sfd);
+    }
+#endif
     for (i = 0; i < SHM->UTMPnumber && currutmp->friendtotal < MAX_FRIEND; i++) {
 	uentp = (SHM->sorted[SHM->currsorted][0][i]);
 	if (uentp && uentp->uid && (stat = set_friend_bit(currutmp, uentp))) {

@@ -3,7 +3,6 @@
 #include <avltree.h>
 #include <err.h>
 
-int tobind(int);
 AVL_IX_DESC        avl;
 
 typedef struct {
@@ -104,26 +103,4 @@ int main(int argc, char **argv)
 
     service(sfd);
     return 0;
-}
-
-/* utils */
-int tobind(int port)
-{
-    int     sockfd, val;
-    struct  sockaddr_in     servaddr;
-
-    if( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0 )
-	err(1, NULL);
-    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR,
-	       (char *)&val, sizeof(val));
-    bzero(&servaddr, sizeof(servaddr));
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(port);
-    if( bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0 )
-	err(1, NULL);
-    if( listen(sockfd, 5) < 0 )
-	err(1, NULL);
-
-    return sockfd;
 }

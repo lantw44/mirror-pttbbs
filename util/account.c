@@ -1,6 +1,7 @@
 /* $Id$ */
 #include "bbs.h"
 
+
 #define ACCOUNT_MAX_LINE        16
 #define ADJUST_M        6	/* adjust back 5 minutes */
 

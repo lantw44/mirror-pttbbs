@@ -159,7 +159,7 @@ getnewuserid()
 	    close(fd);
 	    log_usies("CLEAN", "dated users");
 
-	    fprintf(stdout, "尋找新帳號中, 請稍待片刻...\n\r");
+	    fprintf(stdout, SHM->i18nstr[cuser.language][1856]);
 
 	    if ((fd = open(fn_passwd, O_RDWR | O_CREAT, 0600)) == -1)
 		return -1;
@@ -175,7 +175,8 @@ getnewuserid()
     i = searchnewuser(1);
     if ((i <= 0) || (i > MAX_USERS)) {
 	passwd_unlock();
-	vmsg("抱歉，使用者帳號已經滿了，無法註冊新的帳號");
+	vmsg(SHM->i18nstr[cuser.language][1857]);
+	safe_sleep(2);
 	exit(1);
     }
     snprintf(genbuf, sizeof(genbuf), "uid %d", i);
@@ -196,15 +197,15 @@ new_register()
 #ifdef HAVE_USERAGREEMENT
     more(HAVE_USERAGREEMENT, YEA);
     while( 1 ){
-	getdata(b_lines - 1, 0, "請問您接受這份使用者條款嗎? (yes/no) ",
+	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1858],
 		passbuf, 4, LCECHO);
 	if( passbuf[0] == 'y' )
 	    break;
 	if( passbuf[0] == 'n' ){
-	    vmsg("\n抱歉, 您須要接受使用者條款才能註冊帳號享受我們的服務唷!");
+	    vmsg(SHM->i18nstr[cuser.language][1859]);
 	    exit(1);
 	}
-	vmsg("請輸入 y表示接受, n表示不接受");
+	vmsg(SHM->i18nstr[cuser.language][1860]);
     }
 #endif
     memset(&newuser, 0, sizeof(newuser));
@@ -212,20 +213,20 @@ new_register()
     try = 0;
     while (1) {
 	if (++try >= 6) {
-	    vmsg("\n您嘗試錯誤的輸入太多，請下次再來吧\n");
+	    vmsg(SHM->i18nstr[cuser.language][1861]);
 	    exit(1);
 	}
 	getdata(17, 0, msg_uid, newuser.userid,
 		sizeof(newuser.userid), DOECHO);
 
 	if (bad_user_id(newuser.userid))
-	    outs("無法接受這個代號，請使用英文字母，並且不要包含空格\n");
+	    outs(SHM->i18nstr[cuser.language][1862]);
 	else if ((id = getuser(newuser.userid)) &&
 		 (id = check_and_expire_account(id, &xuser)) >= 0) {
 	    if (id == 999999)
-		outs("此代號已經有人使用 是不死之身");
+		outs(SHM->i18nstr[cuser.language][1863]);
 	    else {
-		prints("此代號已經有人使用 還有%d天才過期 \n", id / (60 * 24));
+		prints(SHM->i18nstr[cuser.language][1864], id / (60 * 24));
 	    }
 	} else
 	    break;
@@ -234,19 +235,19 @@ new_register()
     try = 0;
     while (1) {
 	if (++try >= 6) {
-	    vmsg("\n您嘗試錯誤的輸入太多，請下次再來吧\n");
+	    vmsg(SHM->i18nstr[cuser.language][1865]);
 	    exit(1);
 	}
-	if ((getdata(19, 0, "請設定密碼：", passbuf,
+	if ((getdata(19, 0, SHM->i18nstr[cuser.language][1866], passbuf,
 		     sizeof(passbuf), NOECHO) < 3) ||
 	    !strcmp(passbuf, newuser.userid)) {
-	    outs("密碼太簡單，易遭入侵，至少要 4 個字，請重新輸入\n");
+	    outs(SHM->i18nstr[cuser.language][1867]);
 	    continue;
 	}
 	strncpy(newuser.passwd, passbuf, PASSLEN);
-	getdata(20, 0, "請檢查密碼：", passbuf, sizeof(passbuf), NOECHO);
+	getdata(20, 0, SHM->i18nstr[cuser.language][1868], passbuf, sizeof(passbuf), NOECHO);
 	if (strncmp(passbuf, newuser.passwd, PASSLEN)) {
-	    outs("密碼輸入錯誤, 請重新輸入密碼.\n");
+	    outs(SHM->i18nstr[cuser.language][1869]);
 	    continue;
 	}
 	passbuf[8] = '\0';
@@ -261,18 +262,18 @@ new_register()
     newuser.pager = 1;
     allocid = getnewuserid();
     if (allocid > MAX_USERS || allocid <= 0) {
-	fprintf(stderr, "本站人口已達飽和！\n");
+	fprintf(stderr, SHM->i18nstr[cuser.language][1870]);
 	exit(1);
     }
     if (passwd_update(allocid, &newuser) == -1) {
-	fprintf(stderr, "客滿了，再見！\n");
+	fprintf(stderr, SHM->i18nstr[cuser.language][1871]);
 	exit(1);
     }
     setuserid(allocid, newuser.userid);
     if( (uid = initcuser(newuser.userid)) )
 	setumoney(uid, 0);
     else{
-	fprintf(stderr, "無法建立帳號\n");
+	fprintf(stderr, SHM->i18nstr[cuser.language][1872]);
 	exit(1);
     }
 }
@@ -293,10 +294,10 @@ check_register()
     if (currutmp->mailalert)
 	m_read();
 
-    stand_title("請詳細填寫個人資料");
+    stand_title(SHM->i18nstr[cuser.language][1873]);
 
     while (strlen(cuser.username) < 2)
-	getdata(2, 0, "綽號暱稱：", cuser.username,
+	getdata(2, 0, SHM->i18nstr[cuser.language][1874], cuser.username,
 		sizeof(cuser.username), DOECHO);
 
     for (ptr = cuser.username; *ptr; ptr++) {
@@ -304,11 +305,11 @@ check_register()
 	    *ptr = ' ';
     }
     while (strlen(cuser.realname) < 4)
-	getdata(4, 0, "真實姓名：", cuser.realname,
+	getdata(4, 0, SHM->i18nstr[cuser.language][1875], cuser.realname,
 		sizeof(cuser.realname), DOECHO);
 
     while (strlen(cuser.address) < 8)
-	getdata(6, 0, "聯絡地址：", cuser.address,
+	getdata(6, 0, SHM->i18nstr[cuser.language][1876], cuser.address,
 		sizeof(cuser.address), DOECHO);
 
 
@@ -328,8 +329,7 @@ check_register()
 	/* 回覆過身份認證信函，或曾經 E-mail post 過 */
 	clear();
 	move(9, 3);
-	prints("請詳填寫\033[32m註冊申請單\033[m，"
-	       "通告站長以獲得進階使用權力。\n\n\n\n");
+	prints(SHM->i18nstr[cuser.language][1877]);
 	u_register();
 
 #ifdef NEWUSER_LIMIT

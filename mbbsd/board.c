@@ -264,12 +264,17 @@ brc_unread(const char *fname, int bnum, const int *blist)
 /* personal board state
  * 相對於看板的 attr (BRD_* in ../include/pttstruct.h),
  * 這些是因人而異的 flag */
-#define PBS_FAV    	1
-#define PBS_BOARD	2
-#define PBS_LINE   	4
-#define PBS_FOLDER	8
-#define PBS_TAG	       16
-#define PBS_UNREAD     32
+#define NBRD_FAV    	1
+#define NBRD_BOARD	2
+#define NBRD_LINE   	4
+#define NBRD_FOLDER	8
+#define NBRD_TAG	       16
+#define NBRD_UNREAD     32
+#define NBRD_SYMBOLIC   64
+
+#define BRD_LINK_TARGET(x)	((x)->nuser)
+#define TITLE_MATCH(bptr, key)	((key)[0] && !strcasestr((bptr)->title, (key)))
+#define GROUPOP()		(currmode & MODE_GROUPOP)
 
 
 #define FAVNB      ".favnb"
@@ -287,10 +292,10 @@ static char	choose_board_depth = 0;
 static short    brdnum;
 static char     yank_flag = 1;
 
-
-#define SYM2TAR_UID(_uid)		bcache[_uid - 1].nuser
-#define SYM2TAR_BH(_bcache)		&bcache[_bcache->nuser - 1]
-
+inline int getbid(boardheader_t *fh)
+{
+    return (fh - bcache);
+}
 
 #define BRD_OLD 0
 #define BRD_NEW 1
@@ -315,7 +320,7 @@ void updatenewfav(int mode)
 	
 	for(i = 0; i < numboards + 1 && brd[i] != BRD_END; i++){
 	    if(brd[i] == BRD_NEW){
-		if(bcache[i].brdname[0] && Ben_Perm(&bcache[i])){ // check the permission if the board exsits
+		if(bcache[i].brdname[0] && HasPerm(&bcache[i])){ // check the permission if the board exsits
 		    if(mode)
 			fav_add_board(i + 1);
 		    brd[i] = BRD_OLD;
@@ -328,7 +333,7 @@ void updatenewfav(int mode)
 	}
 	if( i < numboards) // the board number may change
 	    for(i-- ; i < numboards; i++){
-		if(bcache[i].brdname[0] && Ben_Perm(&bcache[i])){
+		if(bcache[i].brdname[0] && HasPerm(&bcache[i])){
 		    if(mode)
 			fav_add_board(i + 1);
 		    brd[i] = BRD_OLD;
@@ -389,7 +394,7 @@ save_brdbuf(void)
 }
 
 int
-Ben_Perm(boardheader_t * bptr)
+HasPerm(boardheader_t * bptr)
 {
     register int    level, brdattr;
 
@@ -447,7 +452,7 @@ check_newpost(boardstat_t * ptr)
     int             tbrc_list[BRC_MAXNUM], tbrc_num;
     time_t          ftime;
 
-    ptr->myattr &= ~PBS_UNREAD;
+    ptr->myattr &= ~NBRD_UNREAD;
     if (B_BH(ptr)->brdattr & BRD_GROUPBOARD)
 	return 0;
 
@@ -461,7 +466,7 @@ check_newpost(boardstat_t * ptr)
 
     if ( brc_read_record(B_BH(ptr)->brdname, &tbrc_num, tbrc_list) == 0 ||
 	 brc_unread_time(ftime, tbrc_num, tbrc_list) )
-	ptr->myattr |= PBS_UNREAD;
+	ptr->myattr |= NBRD_UNREAD;
     
     return 1;
 }
@@ -506,10 +511,10 @@ addnewbrdstat(int n, int state)
     
     ptr->bid = n + 1;
     ptr->myattr = state;
-    if ((B_BH(ptr)->brdattr & BRD_HIDE) && state == PBS_BOARD)
+    if ((B_BH(ptr)->brdattr & BRD_HIDE) && state == NBRD_BOARD)
 	B_BH(ptr)->brdattr |= BRD_POSTMASK;
     if (yank_flag != 0)
-	ptr->myattr &= ~PBS_FAV;
+	ptr->myattr &= ~NBRD_FAV;
     check_newpost(ptr);
     return ptr;
 }
@@ -552,17 +557,17 @@ load_boards(char *key)
 
 		if ( !key[0] ){
 		    if (get_item_type(&fav->favh[i]) == FAVT_LINE )
-			state = PBS_LINE;
+			state = NBRD_LINE;
 		    else if (get_item_type(&fav->favh[i]) == FAVT_FOLDER )
-			state = PBS_FOLDER;
+			state = NBRD_FOLDER;
 		    else {
 			bptr = &bcache[ fav_getid(&fav->favh[i]) - 1];
 			if( yank_flag == 0 )
-			    state = PBS_BOARD;
+			    state = NBRD_BOARD;
 			else
 			    continue;
 			if (is_set_attr(&fav->favh[i], FAVH_UNREAD))
-			    state |= PBS_UNREAD;
+			    state |= NBRD_UNREAD;
 		    }
 		} else {
 		    if (get_item_type(&fav->favh[i]) == FAVT_LINE )
@@ -572,25 +577,25 @@ load_boards(char *key)
 			    get_folder_title(fav_getid(&fav->favh[i])),
 			    key)
 			)
-			    state = PBS_FOLDER;
+			    state = NBRD_FOLDER;
 			else
 			    continue;
 		    }else{
 			bptr = &bcache[ fav_getid(&fav->favh[i]) - 1];
-			if( Ben_Perm(bptr) && strcasestr(bptr->title, key))
-			    state = PBS_BOARD;
+			if( HasPerm(bptr) && strcasestr(bptr->title, key))
+			    state = NBRD_BOARD;
 			else
 			    continue;
 			if (is_set_attr(&fav->favh[i], FAVH_UNREAD))
-			    state |= PBS_UNREAD;
+			    state |= NBRD_UNREAD;
 		    }
 		}
 
 		if (is_set_attr(&fav->favh[i], FAVH_TAG))
-		    state |= PBS_TAG;
+		    state |= NBRD_TAG;
 		if (is_set_attr(&fav->favh[i], FAVH_ADM_TAG))
-		    state |= PBS_TAG;
-		addnewbrdstat(fav_getid(&fav->favh[i]) - 1, PBS_FAV | state);
+		    state |= NBRD_TAG;
+		addnewbrdstat(fav_getid(&fav->favh[i]) - 1, NBRD_FAV | state);
 	    }
 	    if (brdnum == 0)
 		addnewbrdstat(0, 0);
@@ -602,12 +607,15 @@ load_boards(char *key)
 	    for (i = 0; i < numboards; i++) {
 		if ((bptr = SHM->bsorted[type][i]) == NULL)
 		    continue;
-		n = (int)(bptr - bcache);
+		n = getbid(bptr);
 		if (!bptr->brdname[0] ||
-			(bptr->brdattr & BRD_GROUPBOARD) ||
-			!((state = Ben_Perm(bptr)) || (currmode & MODE_MENU)) ||
-			(key[0] && !strcasestr(bptr->title, key)) ||
-			(class_bid == -1 && bptr->nuser < 5))
+		    !((state = HasPerm(bptr)) || GROUPOP()) ||
+		    (bptr->brdattr & (BRD_GROUPBOARD | BRD_SYMBOLIC)) ||
+		    TITLE_MATCH(bptr, key) ||
+		    // XXX:
+		    // class_bid == -1 should be remove
+		    //   if symbolic link work fine
+		    (class_bid == -1 && bptr->nuser < 5))
 		    continue;
 		addnewbrdstat(n, state);
 	    }
@@ -626,15 +634,14 @@ load_boards(char *key)
 	nbrd = (boardstat_t *) malloc(childcount * sizeof(boardstat_t));
 	for (bptr = bptr->firstchild[type]; bptr != NULL;
 	     bptr = bptr->next[type]) {
-	    n = (int)(bptr - bcache);
-	    if (!((state = Ben_Perm(bptr)) || (currmode & MODE_MENU))
-		|| (yank_flag == 0 && !(getbrdattr(n) & PBS_FAV)) ||
-		(key[0] && !strcasestr(bptr->title, key)))
+	    n = getbid(bptr);
+	    state = HasPerm(bptr);
+	    if ( !(state || GROUPOP()) || TITLE_MATCH(bptr, key) )
 		continue;
 	    if (bptr->brdattr & BRD_SYMBOLIC) {
-		bptr = SYM2TAR_BH(bptr);
-		n = SYM2TAR_UID(n + 1) - 1;
-		// "state" is set since B_BH get the target stuff
+		n = BRD_LINK_TARGET(bptr);
+		bptr = &bcache[n];
+		state |= NBRD_SYMBOLIC;
 	    }
 	    addnewbrdstat(n, state);
 	}
@@ -666,7 +673,7 @@ search_board()
     CreateNameList();
     for (num = 0; num < brdnum; num++)
 	if (yank_flag != 0 ||
-	    (nbrd[num].myattr & PBS_BOARD && Ben_Perm(B_BH(&nbrd[num]))) )
+	    (nbrd[num].myattr & NBRD_BOARD && HasPerm(B_BH(&nbrd[num]))) )
 	    AddNameList(B_BH(&nbrd[num])->brdname);
     namecomplete(MSG_SELECT_BOARD, genbuf);
     FreeNameList();
@@ -687,7 +694,7 @@ unread_position(char *dirfile, boardstat_t * ptr)
 
     total = B_TOTAL(ptr);
     num = total + 1;
-    if ((ptr->myattr & PBS_UNREAD) && (fd = open(dirfile, O_RDWR)) > 0) {
+    if ((ptr->myattr & NBRD_UNREAD) && (fd = open(dirfile, O_RDWR)) > 0) {
 	if (!brc_initial(B_BH(ptr)->brdname)) {
 	    num = 1;
 	} else {
@@ -722,11 +729,11 @@ unread_position(char *dirfile, boardstat_t * ptr)
 static char
 get_fav_type(boardstat_t *ptr)
 {
-    if (ptr->myattr & PBS_FOLDER)
+    if (ptr->myattr & NBRD_FOLDER)
 	return FAVT_FOLDER;
-    else if (ptr->myattr & PBS_BOARD)
+    else if (ptr->myattr & NBRD_BOARD)
 	return FAVT_BOARD;
-    else if (ptr->myattr & PBS_LINE)
+    else if (ptr->myattr & NBRD_LINE)
 	return FAVT_LINE;
     return 0;
 }
@@ -791,22 +798,22 @@ show_brdlist(int head, int clsflag, int newflag)
 	    clrtoeol();
 	    if (head < brdnum) {
 		ptr = &nbrd[head++];
-		if (ptr->myattr & PBS_LINE){
+		if (ptr->myattr & NBRD_LINE){
 		    if( !newflag )
 			prints("%5d %c %s------------      ------------------------------------------\033[m",
 				head,
-				ptr->myattr & PBS_TAG ? 'D' : ' ',
-				ptr->myattr & PBS_FAV ? "" : "\033[1;30m");
+				ptr->myattr & NBRD_TAG ? 'D' : ' ',
+				ptr->myattr & NBRD_FAV ? "" : "\033[1;30m");
 		    else
-			prints("        %s------------      ------------------------------------------\033[m", ptr->myattr & PBS_FAV ? "" : "\033[1;30m");
+			prints("        %s------------      ------------------------------------------\033[m", ptr->myattr & NBRD_FAV ? "" : "\033[1;30m");
 		    continue;
 		}
-		else if (ptr->myattr & PBS_FOLDER){
+		else if (ptr->myattr & NBRD_FOLDER){
 		    char *title = get_folder_title(ptr->bid);
 		    if( !newflag )
 			prints("%5d %c %sMyFavFolder\033[m  目錄 □%-34s\033[m",
 				head,
-				ptr->myattr & PBS_TAG ? 'D' : ' ',
+				ptr->myattr & NBRD_TAG ? 'D' : ' ',
 				!(cuser.uflag2 & FAVNOHILIGHT) ? "\033[1;36m" : "",
 				title);
 		    else
@@ -823,18 +830,18 @@ show_brdlist(int head, int clsflag, int newflag)
 		    prints("%5d%c%s", head,
 			   !(B_BH(ptr)->brdattr & BRD_HIDE) ? ' ' :
 			   (B_BH(ptr)->brdattr & BRD_POSTMASK) ? ')' : '-',
-			   (ptr->myattr & PBS_TAG) ? "D " :
+			   (ptr->myattr & NBRD_TAG) ? "D " :
 			   (B_BH(ptr)->brdattr & BRD_GROUPBOARD) ? "  " :
-			   unread[ptr->myattr & PBS_UNREAD ? 1 : 0]);
+			   unread[ptr->myattr & NBRD_UNREAD ? 1 : 0]);
 		} else {
 		    if (B_BH(ptr)->brdattr & BRD_GROUPBOARD)
 			prints("        ");
 		    else
 			prints("%6d%s", (int)(B_TOTAL(ptr)),
-				unread[ptr->myattr & PBS_UNREAD ? 1 : 0]);
+				unread[ptr->myattr & NBRD_UNREAD ? 1 : 0]);
 		}
 		if (class_bid != 1) {
-		    if (!(currmode & MODE_MENU) && !Ben_Perm(B_BH(ptr))) {
+		    if (!GROUPOP() && !HasPerm(B_BH(ptr))) {
 			prints("Unknown??    隱板 ？這個板是隱板");
 		    }
 		    else {
@@ -907,7 +914,7 @@ static void
 set_menu_BM(char *BM)
 {
     if (HAS_PERM(PERM_ALLBOARD) || is_BM(BM)) {
-	currmode |= MODE_MENU;
+	currmode |= MODE_GROUPOP;
 	cuser.userlevel |= PERM_SYSSUBOP;
     }
 }
@@ -947,7 +954,7 @@ choose_board(int newflag)
 		    yank_flag++;
 		    continue;
 		}
-		if (HAS_PERM(PERM_SYSOP) || (currmode & MODE_MENU)) {
+		if (HAS_PERM(PERM_SYSOP) || GROUPOP()) {
 		    if (m_newbrd(0) == -1)
 			break;
 		    brdnum = -1;
@@ -969,7 +976,7 @@ choose_board(int newflag)
 		tmp = num;
 		while (num < brdnum) {
 		    ptr = &nbrd[num];
-		    if (ptr->myattr & PBS_UNREAD)
+		    if (ptr->myattr & NBRD_UNREAD)
 			break;
 		    num++;
 		}
@@ -1044,12 +1051,12 @@ choose_board(int newflag)
 	    }
 	    else if (yank_flag != 0) {
 		/* 站長管理用的 tag */
-		if (ptr->myattr & PBS_TAG)
+		if (ptr->myattr & NBRD_TAG)
 		    set_attr(getadmtag(ptr->bid), FAVH_ADM_TAG, 0);
 		else
 		    fav_add_admtag(ptr->bid);
 	    }
-	    ptr->myattr ^= PBS_TAG;
+	    ptr->myattr ^= NBRD_TAG;
 	    head = 9999;
 	case KEY_DOWN:
 	case 'n':
@@ -1124,7 +1131,7 @@ choose_board(int newflag)
 	    break;
 	case Ctrl('P'):
 	    if (class_bid != 0 &&
-		(HAS_PERM(PERM_SYSOP) || (currmode & MODE_MENU))) {
+		(HAS_PERM(PERM_SYSOP) || GROUPOP())) {
 		fav_t *fav = get_current_fav();
 		for (tmp = 0; tmp < fav->DataTail; tmp++) {
 		    short   bid = fav_getid(&fav->favh[tmp]);
@@ -1172,23 +1179,23 @@ choose_board(int newflag)
 	    if (HAS_PERM(PERM_BASIC)) {
 		ptr = &nbrd[num];
 		if (yank_flag == 0) {
-		    if (ptr->myattr & PBS_FAV) {
+		    if (ptr->myattr & NBRD_FAV) {
 			if (getans("你確定刪除嗎? [N/y]") != 'y')
 			    break;
 			fav_remove_item(ptr->bid, get_fav_type(ptr));
-			ptr->myattr &= ~PBS_FAV;
+			ptr->myattr &= ~NBRD_FAV;
 		    }
 		}
 		else {
 		    if (getboard(ptr->bid) != NULL) {
 			fav_remove_item(ptr->bid, FAVT_BOARD);
-			ptr->myattr &= ~PBS_FAV;
+			ptr->myattr &= ~NBRD_FAV;
 		    }
 		    else {
 			if (fav_add_board(ptr->bid) == NULL)
 			    vmsg("你的最愛太多了啦 真花心");
 			else
-			    ptr->myattr |= PBS_FAV;
+			    ptr->myattr |= NBRD_FAV;
 		    }
 		}
 		brdnum = -1;
@@ -1224,7 +1231,7 @@ choose_board(int newflag)
 	    }
 	    break;
 	case 'T':
-	    if (HAS_PERM(PERM_BASIC) && nbrd[num].myattr & PBS_FOLDER) {
+	    if (HAS_PERM(PERM_BASIC) && nbrd[num].myattr & NBRD_FOLDER) {
 		fav_type_t *ft = getfolder(nbrd[num].bid);
 		strlcpy(buf, get_item_title(ft), sizeof(buf));
 		getdata_buf(b_lines - 1, 0, "請輸入板名:", buf, 65, DOECHO);
@@ -1294,16 +1301,16 @@ choose_board(int newflag)
 	case 'v':
 	case 'V':
 	    ptr = &nbrd[num];
-	    if(nbrd[num].bid < 0 || !Ben_Perm(B_BH(ptr)))
+	    if(nbrd[num].bid < 0 || !HasPerm(B_BH(ptr)))
 		break;
 	    if (ch == 'v') {
-		ptr->myattr &= ~PBS_UNREAD;
+		ptr->myattr &= ~NBRD_UNREAD;
 		brc_trunc(B_BH(ptr)->brdname, now);
 		setbrdtime(ptr->bid, now);
 	    } else {
 		brc_trunc(B_BH(ptr)->brdname, 1);
 		setbrdtime(ptr->bid, 1);
-		ptr->myattr |= PBS_UNREAD;
+		ptr->myattr |= NBRD_UNREAD;
 	    }
 	    show_brdlist(head, 0, newflag);
 	    break;
@@ -1315,7 +1322,7 @@ choose_board(int newflag)
 	    num = tmp;
 	    break;
 	case 'E':
-	    if (HAS_PERM(PERM_SYSOP) || (currmode & MODE_MENU)) {
+	    if (HAS_PERM(PERM_SYSOP) || GROUP_OP()) {
 		ptr = &nbrd[num];
 		move(1, 1);
 		clrtobot();
@@ -1324,20 +1331,20 @@ choose_board(int newflag)
 	    }
 	    break;
 	case 'R':
-	    if (HAS_PERM(PERM_SYSOP) || (currmode & MODE_MENU)) {
+	    if (HAS_PERM(PERM_SYSOP) || GROUP_OP()) {
 		m_newbrd(1);
 		brdnum = -1;
 	    }
 	    break;
 	case 'B':
-	    if (HAS_PERM(PERM_SYSOP) || (currmode & MODE_MENU)) {
+	    if (HAS_PERM(PERM_SYSOP) || GROUP_OP()) {
 		m_newbrd(0);
 		brdnum = -1;
 	    }
 	    break;
 	case 'W':
 	    if (class_bid > 0 &&
-		(HAS_PERM(PERM_SYSOP) || (currmode & MODE_MENU))) {
+		(HAS_PERM(PERM_SYSOP) || GROUP_OP())) {
 		setbpath(buf, bcache[class_bid - 1].brdname);
 		mkdir(buf, 0755);	/* Ptt:開群組目錄 */
 		b_note_edit_bname(class_bid);
@@ -1359,9 +1366,9 @@ choose_board(int newflag)
 		ptr = &nbrd[num];
 		if (yank_flag == 0 && get_fav_type(&nbrd[0]) == 0)
 		    break;
-		else if (ptr->myattr & PBS_LINE)
+		else if (ptr->myattr & NBRD_LINE)
 		    break;
-		else if (ptr->myattr & PBS_FOLDER){
+		else if (ptr->myattr & NBRD_FOLDER){
 		    int t = num;
 		    num = 0;
 		    fav_folder_in(ptr->bid);
@@ -1374,7 +1381,7 @@ choose_board(int newflag)
 		}
 
 		if (!(B_BH(ptr)->brdattr & BRD_GROUPBOARD)) {	/* 非sub class */
-		    if (Ben_Perm(B_BH(ptr))) {
+		    if (HasPerm(B_BH(ptr))) {
 			brc_initial(B_BH(ptr)->brdname);
 
 			if (newflag) {
@@ -1400,7 +1407,7 @@ choose_board(int newflag)
 		    else
 			class_bid = -1;	/* 熱門群組用 */
 
-		    if (!(currmode & MODE_MENU))	/* 如果還沒有小組長權限 */
+		    if (!GROUP_OP())	/* 如果還沒有小組長權限 */
 			set_menu_BM(B_BH(ptr)->BM);
 
 		    if (now < B_BH(ptr)->bupdate) {

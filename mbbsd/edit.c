@@ -63,7 +63,7 @@ static char     fp_bak[] = "bak";
 static void
 indigestion(int i)
 {
-    fprintf(stderr, "嚴重內傷 %d\n", i);
+    fprintf(stderr, SHM->i18nstr[cuser.language][978], i);
 }
 
 /* Thor: ansi 座標轉換  for color 編輯模式 */
@@ -121,7 +121,7 @@ n2ansi(int nx, textline_t * line)
 static void
 edit_msg()
 {
-    char    *edit_mode[2] = {"取代", "插入"};
+    char    *edit_mode[2] = {SHM->i18nstr[cuser.language][979], SHM->i18nstr[cuser.language][980]};
     register int    n = currpnt;
 
     if (my_ansimode)		/* Thor: 作 ansi 編輯 */
@@ -129,9 +129,7 @@ edit_msg()
     n++;
     move(b_lines, 0);
     clrtoeol();
-    prints("\033[%sm 編輯文章 \033[31;47m (Ctrl-Z)\033[30m輔助說明 "
-	   "\033[31;47m(^G)\033[30m插入圖文庫 \033[31m(^X,^Q)"
-	   "\033[30m離開║%s│%c%c%c%c║ %3d:%3d  \033[m",
+    prints(SHM->i18nstr[cuser.language][981],
 	   "37;44",
 	   edit_mode[insert_character],
 	   my_ansimode ? 'A' : 'a', indent_mode ? 'I' : 'i',
@@ -527,8 +525,9 @@ char           *
 ask_tmpbuf(int y)
 {
     static char     fp_buf[10] = "buf.0";
-    static char     msg[] = "請選擇暫存檔 (0-9)[0]: ";
-
+    char     msg[36];
+    
+    strlcpy(msg, SHM->i18nstr[cuser.language][982], sizeof(msg));
     msg[19] = fp_buf[4];
     do {
 	if (!getdata(y, 0, msg, fp_buf + 4, 4, DOECHO))
@@ -556,7 +555,7 @@ read_tmpbuf(int n)
 
     setuserfile(fp_tmpbuf, tmpf);
     if (n != 0 && n != 5 && more(fp_tmpbuf, NA) != -1)
-	getdata(b_lines - 1, 0, "確定讀入嗎(Y/N)?[Y]", ans, sizeof(ans), LCECHO);
+	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][983], ans, sizeof(ans), LCECHO);
     if (*ans != 'n' && (fp = fopen(fp_tmpbuf, "r"))) {
 	load_file(fp);
 	while (curr_window_line >= b_lines) {
@@ -576,7 +575,7 @@ write_tmpbuf()
     setuserfile(fp_tmpbuf, ask_tmpbuf(3));
     if (dashf(fp_tmpbuf)) {
 	more(fp_tmpbuf, NA);
-	getdata(b_lines - 1, 0, "暫存檔已有資料 (A)附加 (W)覆寫 (Q)取消？[A] ",
+	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][984],
 		ans, sizeof(ans), LCECHO);
 
 	if (ans[0] == 'q')
@@ -599,7 +598,7 @@ erase_tmpbuf()
 
     setuserfile(fp_tmpbuf, ask_tmpbuf(3));
     if (more(fp_tmpbuf, NA) != -1)
-	getdata(b_lines - 1, 0, "確定刪除嗎(Y/N)?[N]",
+	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][985],
 		ans, sizeof(ans), LCECHO);
     if (*ans == 'y')
 	unlink(fp_tmpbuf);
@@ -635,8 +634,8 @@ restore_backup()
 
     setuserfile(bakfile, fp_bak);
     if (dashf(bakfile)) {
-	stand_title("編輯器自動復原");
-	getdata(1, 0, "您有一篇文章尚未完成，(S)寫入暫存檔 (Q)算了？[S] ",
+	stand_title(SHM->i18nstr[cuser.language][986]);
+	getdata(1, 0, SHM->i18nstr[cuser.language][987],
 		buf, 4, LCECHO);
 	if (buf[0] != 'q') {
 	    setuserfile(buf, ask_tmpbuf(3));
@@ -661,8 +660,8 @@ garbage_line(char *str)
     while (*str == ' ' || *str == '\t')
 	str++;
     if (qlevel >= 1) {
-	if (!strncmp(str, "※ ", 3) || !strncmp(str, "==>", 3) ||
-	    strstr(str, ") 提到:\n"))
+	if (!strncmp(str, SHM->i18nstr[cuser.language][988], 3) || !strncmp(str, "==>", 3) ||
+	    strstr(str, SHM->i18nstr[cuser.language][989]))
 	    return 1;
     }
     return (*str == '\n');
@@ -674,7 +673,7 @@ do_quote()
     int             op;
     char            buf[256];
 
-    getdata(b_lines - 1, 0, "請問要引用原文嗎(Y/N/All/Repost)？[Y] ",
+    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][990],
 	    buf, 3, LCECHO);
     op = buf[0];
 
@@ -707,9 +706,9 @@ do_quote()
 		ptr = quote_user;
 
 	    indent_mode = 0;
-	    insert_string("※ 引述《");
+	    insert_string(SHM->i18nstr[cuser.language][991]);
 	    insert_string(ptr);
-	    insert_string("》之銘言：\n");
+	    insert_string(SHM->i18nstr[cuser.language][992]);
 
 	    if (op != 'a')	/* 去掉 header */
 		while (fgets(buf, 256, inf) && buf[0] != '\n');
@@ -725,7 +724,7 @@ do_quote()
 		    insert_string(Ptt_prints(buf, NO_RELOAD));
 	    else {
 		if (curredit & EDIT_LIST)	/* 去掉 mail list 之 header */
-		    while (fgets(buf, 256, inf) && (!strncmp(buf, "※ ", 3)));
+		    while (fgets(buf, 256, inf) && (!strncmp(buf, SHM->i18nstr[cuser.language][993], 3)));
 		while (fgets(buf, 256, inf)) {
 		    if (!strcmp(buf, "--\n"))
 			break;
@@ -768,12 +767,11 @@ check_quote()
 
     if ((included_line >> 2) > post_line) {
 	move(4, 0);
-	outs("本篇文章的引言比例超過 80%，請您做些微的修正：\n\n"
-	     "\033[1;33m1) 增加一些文章 或  2) 刪除不必要之引言\033[m");
+	outs(SHM->i18nstr[cuser.language][994]);
 	{
 	    char            ans[4];
 
-	    getdata(12, 12, "(E)繼續編輯 (W)強制寫入？[E] ",
+	    getdata(12, 12, SHM->i18nstr[cuser.language][995],
 		    ans, sizeof(ans), LCECHO);
 	    if (ans[0] == 'w')
 		return 0;
@@ -825,10 +823,9 @@ write_header(FILE * fp)
 	if (currbrdattr & BRD_ANONYMOUS) {
 	    int             defanony = (currbrdattr & BRD_DEFAULTANONYMOUS);
 	    if (defanony)
-		getdata(3, 0, "請輸入你想用的ID，也可直接按[Enter]，"
-		 "或是按[r]用真名：", real_name, sizeof(real_name), DOECHO);
+		getdata(3, 0, SHM->i18nstr[cuser.language][996], real_name, sizeof(real_name), DOECHO);
 	    else
-		getdata(3, 0, "請輸入你想用的ID，也可直接按[Enter]使用原ID：",
+		getdata(3, 0, SHM->i18nstr[cuser.language][997],
 			real_name, sizeof(real_name), DOECHO);
 	    if (!real_name[0] && defanony) {
 		strlcpy(real_name, "Anonymous", sizeof(real_name));
@@ -861,7 +858,7 @@ write_header(FILE * fp)
 	    fprintf(fp, "%s %s (%s) %s %s\n", str_author1, postlog.author,
 		    (((!strcmp(real_name, "r") && defanony) ||
 		      (!real_name[0] && (!defanony))) ? cuser.username :
-		     "猜猜我是誰 ? ^o^"),
+		     SHM->i18nstr[cuser.language][998]),
 		    local_article ? str_post2 : str_post1, currboard);
 	} else {
 	    fprintf(fp, "%s %s (%s) %s %s\n", str_author1, cuser.userid,
@@ -876,7 +873,7 @@ write_header(FILE * fp)
 
     }
     save_title[72] = '\0';
-    fprintf(fp, "標題: %s\n時間: %s\n", save_title, ctime(&now));
+    fprintf(fp, SHM->i18nstr[cuser.language][999], save_title, ctime(&now));
 }
 
 void
@@ -887,12 +884,13 @@ addsignature(FILE * fp, int ifuseanony)
     char            buf[WRAPMARGIN + 1];
     char            fpath[STRLEN];
 
-    static char     msg[] = "請選擇簽名檔 (1-9, 0=不加 X=隨機)[X]: ";
+    static char     msg[64];
     char            ch;
 
+	strlcpy(msg, SHM->i18nstr[cuser.language][1000], sizeof(msg));
     if (!strcmp(cuser.userid, STR_GUEST)) {
-	fprintf(fp, "\n--\n※ 發信站 :" BBSNAME "(" MYHOSTNAME
-		") \n◆ From: %s\n", fromhost);
+	fprintf(fp, "%s" BBSNAME "(" MYHOSTNAME "%s%s\n", SHM->i18nstr[cuser.language][1001],
+		SHM->i18nstr[cuser.language][1002], fromhost);
 	return;
     }
     if (!ifuseanony) {
@@ -925,20 +923,20 @@ addsignature(FILE * fp, int ifuseanony)
 #ifdef HAVE_ORIGIN
 #ifdef HAVE_ANONYMOUS
     if (ifuseanony)
-	fprintf(fp, "\n--\n※ 發信站: " BBSNAME "(" MYHOSTNAME
-		") \n◆ From: %s\n", "暱名天使的家");
+	fprintf(fp, "%s"BBSNAME"("MYHOSTNAME"%s%s\n", SHM->i18nstr[cuser.language][1003],
+		SHM->i18nstr[cuser.language][1004], SHM->i18nstr[cuser.language][1005]);
     else {
 	char            temp[33];
 
 	strncpy(temp, fromhost, 31);
 	temp[32] = '\0';
-	fprintf(fp, "\n--\n※ 發信站: " BBSNAME "(" MYHOSTNAME
-		") \n◆ From: %s\n", temp);
+	fprintf(fp, "%s"BBSNAME"("MYHOSTNAME"%s%s\n", SHM->i18nstr[cuser.language][1006],
+		SHM->i18nstr[cuser.language][1007], temp);
     }
 #else
     strncpy(temp, fromhost, 15);
-    fprintf(fp, "\n--\n※ 發信站: " BBSNAME "(" MYHOSTNAME
-	    ") \n◆ From: %s\n", temp);
+    fprintf(fp, "%s"BBSNAME"("MYHOSTNAME"%s%s\n", SHM->i18nstr[cuser.language][1008],
+	    SHM->i18nstr[cuser.language][1009], temp);
 #endif
 #endif
 }
@@ -952,20 +950,18 @@ write_file(char *fpath, int saveheader, int *islocal)
     char            ans[TTLEN], *msg;
     int             aborted = 0, line = 0, checksum[3], sum = 0, po = 1;
 
-    stand_title("檔案處理");
+    stand_title(SHM->i18nstr[cuser.language][1010]);
     if (currstat == SMAIL)
-	msg = "[S]儲存 (A)放棄 (T)改標題 (E)繼續 (R/W/D)讀寫刪暫存檔？";
+	msg = SHM->i18nstr[cuser.language][1011];
     else if (local_article)
-	msg = "[L]站內信件 (S)儲存 (A)放棄 (T)改標題 (E)繼續 "
-	    "(R/W/D)讀寫刪暫存檔？";
+	msg = SHM->i18nstr[cuser.language][1012];
     else
-	msg = "[S]儲存 (L)站內信件 (A)放棄 (T)改標題 (E)繼續 "
-	    "(R/W/D)讀寫刪暫存檔？";
+	msg = SHM->i18nstr[cuser.language][1013];
     getdata(1, 0, msg, ans, 2, LCECHO);
 
     switch (ans[0]) {
     case 'a':
-	outs("文章\033[1m 沒有 \033[m存入");
+	outs(SHM->i18nstr[cuser.language][1014]);
 	aborted = -1;
 	break;
     case 'r':
@@ -980,16 +976,16 @@ write_file(char *fpath, int saveheader, int *islocal)
 	return KEEP_EDITING;
     case 't':
 	move(3, 0);
-	prints("舊標題：%s", save_title);
+	prints(SHM->i18nstr[cuser.language][1015], save_title);
 	strlcpy(ans, save_title, sizeof(ans));
-	if (getdata_buf(4, 0, "新標題：", ans, sizeof(ans), DOECHO))
+	if (getdata_buf(4, 0, SHM->i18nstr[cuser.language][1016], ans, sizeof(ans), DOECHO))
 	    strlcpy(save_title, ans, sizeof(save_title));
 	return KEEP_EDITING;
     case 's':
 	if (!HAS_PERM(PERM_LOGINOK)) {
 	    local_article = 1;
 	    move(2, 0);
-	    prints("您尚未通過身份確認，只能 Local Save。\n");
+	    prints(SHM->i18nstr[cuser.language][1017]);
 	    pressanykey();
 	} else
 	    local_article = 0;
@@ -1050,7 +1046,7 @@ write_file(char *fpath, int saveheader, int *islocal)
     }
     currline = NULL;
 
-    if (postrecord.times > MAX_CROSSNUM-1 && hbflcheck(currbid, currutmp->uid))
+    if (postrecord.times > MAX_CROSSNUM - 1)
 	anticrosspost();
 
     if (po && sum == 3) {
@@ -1069,7 +1065,7 @@ write_file(char *fpath, int saveheader, int *islocal)
 	    ) {
 	    ptime = localtime(&now);
 	    fprintf(fp,
-		    "※ 編輯: %-15s 來自: %-20s (%02d/%02d %02d:%02d)\n",
+		    SHM->i18nstr[cuser.language][1018],
 		    cuser.userid, fromhost,
 		    ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
 	}
@@ -1155,7 +1151,7 @@ goto_line(int lino)
     char            buf[10];
 
     if (lino > 0 ||
-	(getdata(b_lines - 1, 0, "跳至第幾行:", buf, sizeof(buf), DOECHO) &&
+	(getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1019], buf, sizeof(buf), DOECHO) &&
 	 sscanf(buf, "%d", &lino) && lino > 0)) {
 	textline_t     *p;
 
@@ -1214,10 +1210,10 @@ search_str(int mode)
     char            ans[4] = "n";
 
     if (!mode) {
-	if (getdata_buf(b_lines - 1, 0, "[搜尋]關鍵字:",
+	if (getdata_buf(b_lines - 1, 0, SHM->i18nstr[cuser.language][1020],
 			str, sizeof(str), DOECHO))
 	    if (*str) {
-		if (getdata(b_lines - 1, 0, "區分大小寫(Y/N/Q)? [N] ",
+		if (getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1021],
 			    ans, sizeof(ans), LCECHO) && *ans == 'y')
 		    fptr = strstr;
 		else
@@ -1405,8 +1401,7 @@ block_del(int hide)
 	clrtoeol();
 	if (hide == 1)
 	    tmpfname[4] = 'q';
-	else if (!hide && !getdata(b_lines - 1, 0, "把區塊移至暫存檔 "
-				   "(0:Cut, 5:Copy, 6-9, q: Cancel)[0] ",
+	else if (!hide && !getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1022],
 				   tmpfname + 4, 4, LCECHO))
 	    tmpfname[4] = '0';
 	if (tmpfname[4] < '0' || tmpfname[4] > '9')
@@ -1415,15 +1410,14 @@ block_del(int hide)
 	    setuserfile(fp_tmpbuf, tmpfname);
 	    if (tmpfname[4] != '5' && dashf(fp_tmpbuf)) {
 		more(fp_tmpbuf, NA);
-		getdata(b_lines - 1, 0, "暫存檔已有資料 (A)附加 (W)覆寫 "
-			"(Q)取消？[W] ", ans, 2, LCECHO);
+		getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1023], ans, 2, LCECHO);
 		if (*ans == 'q')
 		    tmpfname[4] = 'q';
 		else if (*ans != 'a')
 		    *ans = 'w';
 	    }
 	    if (tmpfname[4] != '5') {
-		getdata(b_lines - 1, 0, "刪除區塊(Y/N)?[N] ",
+		getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1024],
 			ans + 2, 4, LCECHO);
 		if (ans[2] != 'y')
 		    ans[2] = 'n';
@@ -1781,7 +1775,7 @@ vedit(char *fpath, int saveheader, int *islocal)
 		line_dirty = 1;
 		break;
 	    case Ctrl('Q'):	/* Quit without saving */
-		ch = ask("結束但不儲存 (Y/N)? [N]: ");
+		ch = ask(SHM->i18nstr[cuser.language][1025]);
 		if (ch == 'y' || ch == 'Y') {
 		    currutmp->mode = mode0;
 		    currutmp->destuid = destuid0;
@@ -1812,10 +1806,9 @@ vedit(char *fpath, int saveheader, int *islocal)
 		else {
 		    char            ans[4];
 		    move(b_lines - 2, 55);
-		    outs("\033[1;33;40mB\033[41mR\033[42mG\033[43mY\033[44mL"
-			 "\033[45mP\033[46mC\033[47mW\033[m");
+		    outs("\033[1;33;40mB\033[41mR\033[42mG\033[43mY\033[44mL\033[45mP\033[46mC\033[47mW\033[m");
 		    if (getdata(b_lines - 1, 0,
-			      "請輸入  亮度/前景/背景[正常白字黑底][0wb]：",
+			      SHM->i18nstr[cuser.language][1026],
 				ans, sizeof(ans), LCECHO)) {
 			char            t[] = "BRGYLPCW";
 			char            color[15];
@@ -1824,7 +1817,7 @@ vedit(char *fpath, int saveheader, int *islocal)
 
 			strcpy(color, "\033[");
 			if (isdigit(*apos)) {
-			    sprintf(color,"%s%c", color, *(apos++)); 
+				sprintf(color,"%s%c", color, *(apos++));
 			    if (*apos)
 				strcat(color, ";");
 			}
@@ -2020,7 +2013,7 @@ vedit(char *fpath, int saveheader, int *islocal)
 		{
 		    unsigned int    currstat0 = currstat;
 		    setutmpmode(EDITEXP);
-		    a_menu("編輯輔助器", "etc/editexp",
+		    a_menu(SHM->i18nstr[cuser.language][1027], "etc/editexp",
 			   (HAS_PERM(PERM_SYSOP) ? SYSOP : NOBODY));
 		    currstat = currstat0;
 		}
@@ -2030,9 +2023,9 @@ vedit(char *fpath, int saveheader, int *islocal)
 
 			indent_mode = 0;
 			while (fgets(line, WRAPMARGIN + 2, fp1)) {
-			    if (!strncmp(line, "作者:", 5) ||
-				!strncmp(line, "標題:", 5) ||
-				!strncmp(line, "時間:", 5))
+			    if (!strncmp(line, SHM->i18nstr[cuser.language][1028], 5) ||
+				!strncmp(line, SHM->i18nstr[cuser.language][1029], 5) ||
+				!strncmp(line, SHM->i18nstr[cuser.language][1030], 5))
 				continue;
 			    insert_string(line);
 			}
@@ -2176,7 +2169,7 @@ vedit(char *fpath, int saveheader, int *islocal)
 		    char            ans[4];
 
 		    getdata(b_lines - 1, 0,
-			    "區塊微調右移插入字元(預設為空白字元)",
+			    SHM->i18nstr[cuser.language][1031],
 			    ans, sizeof(ans), LCECHO);
 		    insert_c = (*ans) ? *ans : ' ';
 		}

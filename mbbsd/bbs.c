@@ -551,7 +551,7 @@ do_general(int isbid)
          move(21,0);
          prints(SHM->i18nstr[cuser.language][310]);
          for(i=0; i<8 ; i++)
-         	strlcpy(ctype[i], SHM->i18nstr[cuser.language][297 + i], 4);
+         	strlcpy(ctype[i], SHM->i18nstr[cuser.language][297 + i], sizeof(ctype[0]));
          for(i=0; i<8 && bp->posttype[i*4]; i++)
             strncpy(ctype[i],bp->posttype+4*i,4);
          if(i==0) i=8;

@@ -3,7 +3,6 @@
 
 #define QCAST   int (*)(const void *, const void *)
 
-static char    *chess[] = {"●", "○"};
 static int      tick, lastcount, mylasttick, hislasttick;
 
 typedef struct {
@@ -165,7 +164,7 @@ HO_add(Horder_t * mv)
 static void
 HO_undo(Horder_t * mv)
 {
-    char           *str = "┌┬┐├┼┤└┴┘";
+    char           *str = SHM->i18nstr[cuser.language][1099];
     int             n1, n2, loc;
 
     *mv = *(--v);
@@ -198,7 +197,7 @@ HO_log(Horder_t *pool, char *user)
 
     i = 0;
     do {
-	fprintf(log, "[%2d]%s ==> %c%d%c", i + 1, chess[i % 2],
+	fprintf(log, "[%2d]%s ==> %c%d%c", i + 1, SHM->i18nstr[cuser.language][1097 + i % 2],
 		'A' + ptr->x, ptr->y + 1, (i % 2) ? '\n' : '\t');
 	i++;
     } while (++ptr < v);
@@ -208,9 +207,9 @@ HO_log(Horder_t *pool, char *user)
     stampfile(buf1, &mymail);
 
     mymail.filemode = FILE_READ ;
-    strlcpy(mymail.owner, "[備.忘.錄]", sizeof(mymail.owner));
+    strlcpy(mymail.owner, SHM->i18nstr[cuser.language][1100], sizeof(mymail.owner));
     snprintf(mymail.title, sizeof(mymail.title),
-	     "\033[37;41m棋譜\033[m %s VS %s", cuser.userid, user);
+	     SHM->i18nstr[cuser.language][1101], cuser.userid, user);
     sethomedir(title, cuser.userid);
     Rename(buf, buf1);
     append_record(title, &mymail, sizeof(mymail));
@@ -227,12 +226,12 @@ countgomo(Horder_t *pool)
 static int
 chkmv(Horder_t * mv, int color, int limit)
 {
-    char           *xtype[] = {"\033[1;31m跳三\033[m", "\033[1;31m活三\033[m",
-	"\033[1;31m死四\033[m", "\033[1;31m跳四\033[m",
-	"\033[1;31m活四\033[m", "\033[1;31m四三\033[m",
-	"\033[1;31m雙三\033[m", "\033[1;31m雙四\033[m",
-	"\033[1;31m雙四\033[m", "\033[1;31m連六\033[m",
-    "\033[1;31m連五\033[m"};
+    char           *xtype[] = {SHM->i18nstr[cuser.language][1102], SHM->i18nstr[cuser.language][1103],
+	SHM->i18nstr[cuser.language][1104], SHM->i18nstr[cuser.language][1105],
+	SHM->i18nstr[cuser.language][1106], SHM->i18nstr[cuser.language][1107],
+	SHM->i18nstr[cuser.language][1108], SHM->i18nstr[cuser.language][1109],
+	SHM->i18nstr[cuser.language][1110], SHM->i18nstr[cuser.language][1111],
+    SHM->i18nstr[cuser.language][1112]};
     int             rule = getstyle(mv->x, mv->y, color, limit);
     if (rule > 1 && rule < 13) {
 	move(15, 40);
@@ -251,7 +250,7 @@ gomo_key(int fd, int ch, Horder_t * mv)
 	pbuf[0] = ch;
 	if (fd)
 	    add_io(0, 0);
-	oldgetdata(17, 0, "直接指定位置 :", pbuf, sizeof(pbuf), DOECHO);
+	oldgetdata(17, 0, SHM->i18nstr[cuser.language][1113], pbuf, sizeof(pbuf), DOECHO);
 	if (fd)
 	    add_io(fd, 0);
 	vx = pbuf[0] - 'a';
@@ -306,24 +305,22 @@ gomoku(int fd)
     setutmpmode(M_FIVE);
     clear();
 
-    prints("\033[1;46m  五子棋對戰  \033[45m%30s VS %-30s\033[m",
+    prints(SHM->i18nstr[cuser.language][1114],
 	   cuser.userid, my->mateid);
     show_file("etc/@five", 1, -1, ONLY_COLOR);
     move(11, 40);
-    prints("我是 %s", me == BBLACK ? "先手 ●, 有禁手" : "後手 ○");
+    prints(SHM->i18nstr[cuser.language][1115], me == BBLACK ? SHM->i18nstr[cuser.language][1116] : SHM->i18nstr[cuser.language][1117]);
     move(16, 40);
     prints("\033[1;33m%s", cuser.userid);
     move(17, 40);
     prints("\033[1;33m%s", my->mateid);
 
     move(16, 60);
-    prints("\033[1;31m%d\033[37m勝 \033[34m%d\033[37m敗 \033[36m%d\033[37m和"
-	   "\033[m", cuser.five_win, cuser.five_lose, cuser.five_tie);
+    prints(SHM->i18nstr[cuser.language][1118], cuser.five_win, cuser.five_lose, cuser.five_tie);
 
     getuser(my->mateid);
     move(17, 60);
-    prints("\033[1;31m%d\033[37m勝 \033[34m%d\033[37m敗 \033[36m%d\033[37m"
-	   "和\033[m", xuser.five_win, xuser.five_lose, xuser.five_tie);
+    prints(SHM->i18nstr[cuser.language][1119], xuser.five_win, xuser.five_lose, xuser.five_tie);
 
     cuser.five_lose++;
     /* 一進來先加一場敗場, 贏了後再扣回去, 避免快輸了惡意斷線 */
@@ -334,26 +331,26 @@ gomoku(int fd)
     hewantpass = iwantpass = 0;
     mv.x = mv.y = 7;
     move(18, 40);
-    prints("%s時間還剩%d:%02d\n", my->turn ? "你的" : "對方",
+    prints(SHM->i18nstr[cuser.language][1120], my->turn ? SHM->i18nstr[cuser.language][1121] : SHM->i18nstr[cuser.language][1122],
 	   MAX_TIME / 60, MAX_TIME % 60);
     for (;;) {
 	move(13, 40);
-	outs(my->turn ? "輪到自己下了!" : "等待對方下子..");
+	outs(my->turn ? SHM->i18nstr[cuser.language][1123] : SHM->i18nstr[cuser.language][1124]);
 	if (lastcount != tick - now) {
 	    lastcount = tick - now;
 	    move(18, 40);
-	    prints("%s時間還剩%d:%02d\n", my->turn ? "你的" : "對方",
+	    prints(SHM->i18nstr[cuser.language][1125], my->turn ? SHM->i18nstr[cuser.language][1126] : SHM->i18nstr[cuser.language][1127],
 		   lastcount / 60, lastcount % 60);
 	    if (lastcount <= 0 && my->turn) {
 		move(19, 40);
-		outs("時間已到, 你輸了");
+		outs(SHM->i18nstr[cuser.language][1128]);
 		my->five_lose++;
 		send(fd, '\0', 1, 0);
 		break;
 	    }
 	    if (lastcount <= -5 && !my->turn) {
 		move(19, 40);
-		outs("對手太久沒下, 你贏了!");
+		outs(SHM->i18nstr[cuser.language][1129]);
 		cuser.five_lose--;
 		cuser.five_win++;
 		my->five_win++;
@@ -366,7 +363,7 @@ gomoku(int fd)
 	}
 	move(14, 40);
 	if (hewantpass) {
-	    outs("\033[1;32m和棋要求!\033[m");
+	    outs(SHM->i18nstr[cuser.language][1130]);
 	    bell();
 	} else
 	    clrtoeol();
@@ -423,10 +420,10 @@ gomoku(int fd)
 			my->five_win++;
 		    }
 		    passwd_update(usernum, &cuser);
-		    outmsg("對方認輸了!!");
+		    outmsg(SHM->i18nstr[cuser.language][1131]);
 		    break;
 		} else {
-		    outmsg("你超過時間未下子, 輸了!");
+		    outmsg(SHM->i18nstr[cuser.language][1132]);
 		    my->five_lose++;
 		    break;
 		}
@@ -444,7 +441,7 @@ gomoku(int fd)
 		}
 	    }
 	    if (my->turn && mv.x == -1 && mv.y == -1) {
-		outmsg("對方悔棋");
+		outmsg(SHM->i18nstr[cuser.language][1133]);
 		tick = hislasttick;
 		HO_undo(&mv);
 		my->turn = 0;
@@ -459,10 +456,10 @@ gomoku(int fd)
 		ku[(int)mv.x][(int)mv.y] = he;
 		bell();
 		BGOTO(mv.x, mv.y);
-		outs(chess[he - 1]);
+		outs(SHM->i18nstr[cuser.language][1097 + he - 1]);
 
 		if (win) {
-		    outmsg(win == 1 ? "對方贏了!" : "對方禁手");
+		    outmsg(win == 1 ? SHM->i18nstr[cuser.language][1134] : SHM->i18nstr[cuser.language][1135]);
 		    if (win != 1) {
 			cuser.five_lose--;
 			cuser.five_win++;
@@ -486,7 +483,7 @@ gomoku(int fd)
 		int win;
 		HO_add(&mv);
 		BGOTO(mv.x, mv.y);
-		outs(chess[me - 1]);
+		outs(SHM->i18nstr[cuser.language][1097 + me - 1]);
 		win = chkmv(&mv, me, me == BBLACK);
 		ku[(int)mv.x][(int)mv.y] = me;
 		mylasttick = tick;
@@ -495,7 +492,7 @@ gomoku(int fd)
 		if (send(fd, &mv, sizeof(Horder_t), 0) != sizeof(Horder_t))
 		    break;
 		if (win) {
-		    outmsg(win == 1 ? "我贏囉~~" : "禁手輸了");
+		    outmsg(win == 1 ? SHM->i18nstr[cuser.language][1136] : SHM->i18nstr[cuser.language][1137]);
 		    if (win == 1) {
 			cuser.five_lose--;
 			cuser.five_win++;
@@ -517,7 +514,7 @@ gomoku(int fd)
     if (v > pool) {
 	char            ans[4];
 
-	getdata(19, 0, "要保留本局成棋譜嗎?(y/N)", ans, sizeof(ans), LCECHO);
+	getdata(19, 0, SHM->i18nstr[cuser.language][1138], ans, sizeof(ans), LCECHO);
 	if (*ans == 'y')
 	    HO_log(pool, my->mateid);
     }

@@ -32,20 +32,20 @@ show_ticket_data(char betname[MAX_ITEM][MAX_ITEM_LEN],char *direct, int *price, 
 
     clear();
     if (bh) {
-	snprintf(genbuf, sizeof(genbuf), "%s 賭盤", bh->brdname);
+	snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][1061], bh->brdname);
 	if (bh->endgamble && now < bh->endgamble &&
 	    bh->endgamble - now < 3600) {
 	    snprintf(t, sizeof(t),
-		     "封盤倒數 %d 秒", (int)(bh->endgamble - now));
+		     SHM->i18nstr[cuser.language][1062], (int)(bh->endgamble - now));
 	    showtitle(genbuf, t);
 	} else
 	    showtitle(genbuf, BBSNAME);
     } else
-	showtitle("Ptt賭盤", BBSNAME);
+	showtitle(SHM->i18nstr[cuser.language][1063], BBSNAME);
     move(2, 0);
     snprintf(genbuf, sizeof(genbuf), "%s/" FN_TICKET_ITEMS, direct);
     if (!(fp = fopen(genbuf, "r"))) {
-	prints("\n目前並沒有舉辦賭盤\n");
+	prints(SHM->i18nstr[cuser.language][1064]);
 	snprintf(genbuf, sizeof(genbuf), "%s/" FN_TICKET_OUTCOME, direct);
 	more(genbuf, NA);
 	return 0;
@@ -56,15 +56,11 @@ show_ticket_data(char betname[MAX_ITEM][MAX_ITEM_LEN],char *direct, int *price, 
 	strtok(betname[count], "\r\n");
     fclose(fp);
 
-    prints("\033[32m站規:\033[m 1.可購買以下不同類型的彩票。每張要花 \033[32m%d\033[m 元。\n"
-	   "      2.%s\n"
-	   "      3.開獎時只有一種彩票中獎, 有購買該彩票者, 則可依購買的張數均分總賭金。\n"
-	   "      4.每筆獎金由系統抽取 5%% 之稅金%s。\n\n"
-	   "\033[32m%s:\033[m", *price,
-	   bh ? "此賭盤由板主負責舉辦並且決定開獎時間結果, 站長不管, 願賭服輸。" :
-	        "系統每天 2:00 11:00 16:00 21:00 開獎。",
-	   bh ? ", 其中 2% 分給開獎板主" : "",
-	   bh ? "板主自訂規則及說明" : "前幾次開獎結果");
+    prints(SHM->i18nstr[cuser.language][1065], *price,
+	   bh ? SHM->i18nstr[cuser.language][1066] :
+	        SHM->i18nstr[cuser.language][1067],
+	   bh ? SHM->i18nstr[cuser.language][1068] : "",
+	   bh ? SHM->i18nstr[cuser.language][1069] : SHM->i18nstr[cuser.language][1070]);
 
 
     snprintf(genbuf, sizeof(genbuf), "%s/" FN_TICKET, direct);
@@ -74,7 +70,7 @@ show_ticket_data(char betname[MAX_ITEM][MAX_ITEM_LEN],char *direct, int *price, 
     }
     show_file(genbuf, 8, -1, NO_RELOAD);
     move(15, 0);
-    prints("\033[1;32m目前下注狀況:\033[m\n");
+    prints(SHM->i18nstr[cuser.language][1071]);
 
     total = load_ticket_record(direct, ticket);
 
@@ -84,9 +80,9 @@ show_ticket_data(char betname[MAX_ITEM][MAX_ITEM_LEN],char *direct, int *price, 
 	if (i == 3)
 	    prints("\n");
     }
-    prints("\033[m\n\033[42m 下注總金額:\033[31m %d 元 \033[m", total * (*price));
+    prints(SHM->i18nstr[cuser.language][1072], total * (*price));
     if (end) {
-	prints("\n賭盤已經停止下注\n");
+	prints(SHM->i18nstr[cuser.language][1073]);
 	return -count;
     }
     return count;
@@ -140,8 +136,7 @@ ticket(int bid)
 	}
 	move(20, 0);
 	reload_money();
-	prints("\033[44m錢: %-10d  \033[m\n\033[1m請選擇要購買的種類(1~%d)"
-	       "[Q:離開]\033[m:", cuser.money, count);
+	prints(SHM->i18nstr[cuser.language][1074], cuser.money, count);
 	ch = igetch();
 	/*--
 	  Tim011127
@@ -159,7 +154,7 @@ ticket(int bid)
 	ch_buyitem(price, "etc/buyticket", &n, 0);
 
 	if (bid && !dashf(fn_ticket)) {
-	    vmsg("哇!! 耐ㄚ捏...板主已經停止下注了 不能賭嚕");
+	    vmsg(SHM->i18nstr[cuser.language][1075]);
 	    break;
 	}
 
@@ -191,7 +186,7 @@ openticket(int bid)
     do {
 	do {
 	    getdata(20, 0,
-		    "\033[1m選擇中獎的號碼(0:不開獎 99:取消退錢)\033[m:", buf, 3, LCECHO);
+		    SHM->i18nstr[cuser.language][1076], buf, 3, LCECHO);
 	    bet = atoi(buf);
 	    move(0, 0);
 	    clrtoeol();
@@ -200,13 +195,13 @@ openticket(int bid)
 	    unlockutmpmode();
 	    return 0;
 	}
-	getdata(21, 0, "\033[1m再次確認輸入號碼\033[m:", buf, 3, LCECHO);
+	getdata(21, 0, SHM->i18nstr[cuser.language][1077], buf, 3, LCECHO);
     } while (bet != atoi(buf));
 
     if (fork()) {
 	/* Ptt: 用 fork() 防止不正常斷線洗錢 */
 	move(22, 0);
-	prints("系統將於稍後自動把中獎結果公佈於看板 若參加者多會需要幾分鐘時間..");
+	prints(SHM->i18nstr[cuser.language][1078]);
 	pressanykey();
 	unlockutmpmode();
 	return 0;
@@ -235,20 +230,20 @@ openticket(int bid)
     if (bet != 98) {
 	money = total * price;
 	demoney(money * 0.02);
-	mail_redenvelop("[賭場抽頭]", cuser.userid, money * 0.02, 'n');
+	mail_redenvelop(SHM->i18nstr[cuser.language][1079], cuser.userid, money * 0.02, 'n');
 	money = ticket[bet] ? money * 0.95 / ticket[bet] : 9999999;
     } else {
-	vice(price * 10, "賭盤退錢手續費");
+	vice(price * 10, SHM->i18nstr[cuser.language][1080]);
 	money = price;
     }
     setbfile(outcome, bh->brdname, FN_TICKET_OUTCOME);
     if ((fp = fopen(outcome, "w"))) {
-	fprintf(fp, "賭盤說明\n");
+	fprintf(fp, SHM->i18nstr[cuser.language][1081]);
 	while (fgets(buf, sizeof(buf), fp1)) {
 	    buf[sizeof(buf)-1] = 0;
 	    fprintf(fp, "%s", buf);
 	}
-	fprintf(fp, "下注情況\n");
+	fprintf(fp, SHM->i18nstr[cuser.language][1082]);
 
 	fprintf(fp, "\033[33m");
 	for (i = 0; i < count; i++) {
@@ -259,19 +254,15 @@ openticket(int bid)
 	fprintf(fp, "\033[m\n");
 
 	if (bet != 98) {
-	    fprintf(fp, "\n\n開獎時間： %s \n\n"
-		    "開獎結果： %s \n\n"
-		    "所有金額： %d 元 \n"
-		    "中獎比例： %d張/%d張  (%f)\n"
-		    "每張中獎彩票可得 %d 枚Ｐ幣 \n\n",
+	    fprintf(fp, SHM->i18nstr[cuser.language][1083],
 	    Cdatelite(&now), betname[bet], total * price, ticket[bet], total,
 		    (float)ticket[bet] / total, money);
 
-	    fprintf(fp, "%s 賭盤開出:%s 所有金額:%d 元 獎金/張:%d 元 機率:%1.2f\n\n",
+	    fprintf(fp, SHM->i18nstr[cuser.language][1084],
 		    Cdatelite(&now), betname[bet], total * price, money,
 		    total ? (float)ticket[bet] / total : 0);
 	} else
-	    fprintf(fp, "\n\n賭盤取消退錢： %s \n\n", Cdatelite(&now));
+	    fprintf(fp, SHM->i18nstr[cuser.language][1085], Cdatelite(&now));
 
     } // XXX somebody may use fp even fp==NULL
     fclose(fp1);
@@ -290,37 +281,37 @@ openticket(int bid)
 	while (fscanf(fp1, "%s %d %d\n", userid, &mybet, &i) != EOF) {
 	    if (bet == 98 && mybet >= 0 && mybet < count) {
 		if (fp)
-		    fprintf(fp, "%s 買了 %d 張 %s, 退回 %d 枚Ｐ幣\n"
+		    fprintf(fp, SHM->i18nstr[cuser.language][1086]
 			    ,userid, i, betname[mybet], money * i);
 		snprintf(buf, sizeof(buf),
-			 "%s 賭場退錢! $ %d", bh->brdname, money * i);
+			 SHM->i18nstr[cuser.language][1087], bh->brdname, money * i);
 	    } else if (mybet == bet) {
 		if (fp)
-		    fprintf(fp, "恭喜 %s 買了%d 張 %s, 獲得 %d 枚Ｐ幣\n"
+		    fprintf(fp, SHM->i18nstr[cuser.language][1088]
 			    ,userid, i, betname[mybet], money * i);
-		snprintf(buf, sizeof(buf), "%s 中獎咧! $ %d", bh->brdname, money * i);
+		snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][1089], bh->brdname, money * i);
 	    } else
 		continue;
 	    if ((uid = searchuser(userid)) == 0)
 		continue;
 	    deumoney(uid, money * i);
-	    mail_id(userid, buf, "etc/ticket.win", "Ptt賭場");
+	    mail_id(userid, buf, "etc/ticket.win", SHM->i18nstr[cuser.language][1090]);
 	}
 	fclose(fp1);
     }
     if (fp)
       {
-        fprintf(fp, "\n--\n※ 開獎站 :" BBSNAME "(" MYHOSTNAME
-                ") \n◆ From: %s\n", fromhost);
+        fprintf(fp, "%s"BBSNAME"("MYHOSTNAME"%s%s\n", SHM->i18nstr[cuser.language][1091],
+                SHM->i18nstr[cuser.language][1092], fromhost);
 	fclose(fp);
       }
 
     if (bet != 98)
-	snprintf(buf, sizeof(buf), "[公告] %s 賭盤開獎", bh->brdname);
+	snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][1093], bh->brdname);
     else
-	snprintf(buf, sizeof(buf), "[公告] %s 賭盤取消", bh->brdname);
-    post_file(bh->brdname, buf, outcome, "[賭神]");
-    post_file("Record", buf + 7, outcome, "[馬路探子]");
+	snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][1094], bh->brdname);
+    post_file(bh->brdname, buf, outcome, SHM->i18nstr[cuser.language][1095]);
+    post_file("Record", buf + 7, outcome, SHM->i18nstr[cuser.language][1096]);
 
     setbfile(buf, bh->brdname, FN_TICKET_RECORD);
     unlink(buf);

@@ -427,10 +427,10 @@ typedef struct {
 
 #ifdef I18N    
     /* i18n(internationlization) */
-    char	*i18nstrptr[MAX_LANG][MAX_STRING];
-    char	i18nstrbody[16 * MAX_LANG * MAX_STRING]; 
+    const char	*i18nstr[MAX_LANG][MAX_STRING];
+    char	i18nstrbody[20 * MAX_LANG * MAX_STRING]; 
     	/* Based on the statistis, we found the lengh of one string
-    	   is 16 bytes approximately.
+    	   is 20 bytes approximately.
     	*/
 #endif    
 } SHM_t;

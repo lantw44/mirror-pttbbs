@@ -16,9 +16,6 @@ typedef struct cur {
 static item     brd[4][8];
 static cur      curr;		/* 6 ­Ó bytes */
 
-static char    *rname[] = {"§L", "¬¶", "ØX", "¨®", "¬Û", "¥K", "«Ó"};
-static char    *bname[] = {"¨ò", "¥]", "°¨", "¨®", "¶H", "¤h", "±N"};
-
 static sint     cury[] = {3, 5, 7, 9}, curx[] = {5, 9, 13, 17, 21, 25, 29, 33};
 static sint     rcount, bcount, cont, fix;	/* cont:¬O§_¥i³s¦Y */
 static sint     my = 0, mx = 0, mly = -1, mlx = -1;	/* ²¾°Êªº®y¼Ð ¼Ð */
@@ -124,17 +121,7 @@ brd_prints()
 {
     clear();
     move(1, 0);
-    outs("\n"
-	 "   [43;30m¢~¢w¢s¢w¢s¢w¢s¢w¢s¢w¢s¢w¢s¢w¢s¢w¢¡[m\n"
-	 "   [43;30m¢x¡´¢x¡´¢x¡´¢x¡´¢x¡´¢x¡´¢x¡´¢x¡´¢x[m\n"
-	 "   [43;30m¢u¢w¢q¢w¢q¢w¢q¢w¢q¢w¢q¢w¢q¢w¢q¢w¢t[m\n"
-	 "   [43;30m¢x¡´¢x¡´¢x¡´¢x¡´¢x¡´¢x¡´¢x¡´¢x¡´¢x[m\n"
-	 "   [43;30m¢u¢w¢q¢w¢q¢w¢q¢w¢q¢w¢q¢w¢q¢w¢q¢w¢t[m\n"
-	 "   [43;30m¢x¡´¢x¡´¢x¡´¢x¡´¢x¡´¢x¡´¢x¡´¢x¡´¢x[m\n"
-	 "   [43;30m¢u¢w¢q¢w¢q¢w¢q¢w¢q¢w¢q¢w¢q¢w¢q¢w¢t[m\n"
-	 "   [43;30m¢x¡´¢x¡´¢x¡´¢x¡´¢x¡´¢x¡´¢x¡´¢x¡´¢x[m\n"
-	 "   [43;30m¢¢¢w¢r¢w¢r¢w¢r¢w¢r¢w¢r¢w¢r¢w¢r¢w¢£[m\n"
-	 "   ");
+    outs(SHM->i18nstr[cuser.language][950]);
 }
 
 static void
@@ -148,18 +135,18 @@ draw_line(sint y, sint f)
     strlcpy(buf, "\033[43;30m", sizeof(buf));
     for (i = 0; i < 8; i++) {
 	if (brd[y][i].die == 1)
-	    snprintf(tmp, sizeof(tmp), "¢x  ");
+	    snprintf(tmp, sizeof(tmp), SHM->i18nstr[cuser.language][951]);
 	else if (brd[y][i].out == 0)
-	    snprintf(tmp, sizeof(tmp), "¢x¡´");
+	    snprintf(tmp, sizeof(tmp), SHM->i18nstr[cuser.language][952]);
 	else {
-	    snprintf(tmp, sizeof(tmp), "¢x\033[%s1;%dm%s\033[m\033[43;30m",
+	    snprintf(tmp, sizeof(tmp), SHM->i18nstr[cuser.language][953],
 		     (f == i) ? "1;47;" : "", (brd[y][i].color) ? 31 : 34,
-		     (brd[y][i].color) ? rname[brd[y][i].value] :
-		     bname[brd[y][i].value]);
+		     (brd[y][i].color) ? SHM->i18nstr[cuser.language][936 + brd[y][i].value] :
+		     SHM->i18nstr[cuser.language][943 + brd[y][i].value]);
 	}
 	strcat(buf, tmp);
     }
-    strcat(buf, "¢x\033[m");
+    strcat(buf, SHM->i18nstr[cuser.language][954]);
 
     move(cury[y], 3);
     clrtoeol();
@@ -285,7 +272,7 @@ playing(sint fd, sint color, sint ch, sint * b, userinfo_t * uin)
     case 'u':
 	move(0, 0);
 	clrtoeol();
-	prints("%s¦â%s cont=%d", (brd[my][mx].color == RED) ? "¬õ" : "¶Â", rname[brd[my][mx].value], cont);
+	prints(SHM->i18nstr[cuser.language][955], (brd[my][mx].color == RED) ? SHM->i18nstr[cuser.language][956] : SHM->i18nstr[cuser.language][957], SHM->i18nstr[cuser.language][936 + brd[my][mx].value], cont);
 	*b = -1;
 	break;
     case '\r':			/* ¦Y or ²¾°Ê  ly¸òlx¥²¶·¤j©ó0 */
@@ -307,7 +294,7 @@ playing(sint fd, sint color, sint ch, sint * b, userinfo_t * uin)
 		else
 		    rcount--;
 		move(cur_eaty, cur_eatx);
-		prints("%s", (color) ? bname[brd[my][mx].value] : rname[brd[my][mx].value]);
+		prints("%s", (color) ? SHM->i18nstr[cuser.language][943 + brd[my][mx].value] : SHM->i18nstr[cuser.language][brd[my][mx].value]);
 		if (cur_eatx >= 26) {
 		    cur_eatx = 5;
 		    cur_eaty++;
@@ -362,22 +349,15 @@ main_dark(int fd, userinfo_t * uin)
     if (currutmp->turn) {
 	brd_rand();
 	send(fd, &brd, sizeof(brd), 0);
-	mouts(21, 0, "   [1;37m[1;33m¡»[1;37m§A¬O¥ý¤â[m");
-	mouts(22, 0, "   [1;33m¡»[5;35m½ü¨ì§A¤U¤F[m");
+	mouts(21, 0, SHM->i18nstr[cuser.language][958]);
+	mouts(22, 0, SHM->i18nstr[cuser.language][959]);
     } else {
 	recv(fd, &brd, sizeof(brd), 0);
-	mouts(21, 0, "   [1;33m¡»[1;37m§A¬O«á¤â[m");
+	mouts(21, 0, SHM->i18nstr[cuser.language][960]);
     }
     move(12, 3);
-    prints("%s[0³Ó0±Ñ][5;31m¢þ¢û[1;37m.[m%s[0³Ó0±Ñ]", currutmp->userid, currutmp->mateid);
-    outs("\n"
-	 "                                                [1;36m¢®¢¬[1;31m¥\\¯àªí[1;36m¢­¢®¢­¢¬¢®¢­[m\n"
-	 "                                                [1;36m¢¬[1;33m ¡ô¡ö¡õ¡÷[1;37m: [1;35m²¾°Ê[m\n"
-	 "                                                [1;36m¢®[1;33m ¢û[1;37m: [1;35m      ¿ï¤l,Â½¤l[m\n"
-	 "                                                [1;36m¢¬[1;33m enter[1;37m: [1;35m   ¦Y´Ñ,©ñ´Ñ[m\n"
-	 "¡@[1;33m¤w¸g¸Ñ¨Mªº[1;37m:[1;36m¡@¡@                               ¢®[1;33m ¢ø[1;37m: [1;35m      ¦X´Ñ[m\n"
-	 "                                       ¡@¡@     [1;36m¢¬[1;33m ¢ù[1;37m: [1;35m      »{¿é[m\n"
-	 "                                                [1;36m¢®[1;33m ¢ë[1;37m: [1;35m      ´«Ãä[m");
+    prints(SHM->i18nstr[cuser.language][961], currutmp->userid, currutmp->mateid);
+    outs(SHM->i18nstr[cuser.language][962]);
 
     if (currutmp->turn)
 	move(cury[0], curx[0]);
@@ -404,11 +384,11 @@ main_dark(int fd, userinfo_t * uin)
 		break;
 	    }
 	    if (curr.end == -3)
-		mouts(23, 30, "\033[33m­n¨D¦X´Ñ\033[m");
+		mouts(23, 30, SHM->i18nstr[cuser.language][963]);
 	    else if (curr.end == -4)
-		mouts(23, 30, "\033[33m­n¨D´«Ãä\033[m");
+		mouts(23, 30, SHM->i18nstr[cuser.language][964]);
 	    else if (curr.end == -5)
-		mouts(23, 30, "\033[33m­n¨D³s¦Y\033[m");
+		mouts(23, 30, SHM->i18nstr[cuser.language][965]);
 	    else
 		mouts(23, 30, "");
 
@@ -417,7 +397,7 @@ main_dark(int fd, userinfo_t * uin)
 	    mx = curr.x;
 	    redraw();
 	    if (curr.end)
-		mouts(22, 0, "   [1;33m¡»[5;35m½ü¨ì§A¤U¤F[m");
+		mouts(22, 0, SHM->i18nstr[cuser.language][966]);
 	    move(cury[my], curx[mx]);
 	} else {
 	    if (currutmp->turn == 'p') {
@@ -434,7 +414,7 @@ main_dark(int fd, userinfo_t * uin)
 		if (ch == 'y') {
 		    currutmp->color = (currutmp->color == '1') ? '0' : '1';
 		    uin->color = (uin->color == '1') ? '0' : '1';
-		    mouts(21, 0, (currutmp->color == '1') ? "   \033[1;33m¡»[1;31m§A«ù¬õ¦â´Ñ\033[m" : "   \033[1;33m¡»[1;36m§A«ù¶Â¦â´Ñ\033[m");
+		    mouts(21, 0, (currutmp->color == '1') ? SHM->i18nstr[cuser.language][967] : SHM->i18nstr[cuser.language][968]);
 		} else {
 		    mouts(23, 30, "");
 		    currutmp->turn = (uin->turn) ? 0 : 1;
@@ -442,7 +422,7 @@ main_dark(int fd, userinfo_t * uin)
 	    } else if (currutmp->turn == 'g') {
 		if (ch == 'y') {
 		    cont = 1;
-		    mouts(21, 0, "   \033[1;33m¡»[1;31m§A«ù¬õ¦â´Ñ\033[m ¥i³s¦Y");
+		    mouts(21, 0, SHM->i18nstr[cuser.language][969]);
 		} else {
 		    mouts(23, 30, "");
 		    currutmp->turn = (uin->turn) ? 0 : 1;
@@ -452,7 +432,7 @@ main_dark(int fd, userinfo_t * uin)
 		if (uin->turn == 'g') {
 		    cont = 1;
 		    uin->turn = (currutmp->turn) ? 0 : 1;
-		    mouts(21, 10, "¥i³s¦Y");
+		    mouts(21, 10, SHM->i18nstr[cuser.language][970]);
 		}
 		end = playing(fd, currutmp->color - '0', ch, &go_on, uin);
 
@@ -485,12 +465,12 @@ main_dark(int fd, userinfo_t * uin)
 		    continue;
 		}
 		if (!i && currutmp->color == '1') {
-		    mouts(21, 0, "   \033[1;33m¡»[1;31m§A«ù¬õ¦â´Ñ\033[m");
+		    mouts(21, 0, SHM->i18nstr[cuser.language][971]);
 		    i++;
 		    move(cury[my], curx[mx]);
 		}
 		if (!i && currutmp->color == '0') {
-		    mouts(21, 0, "   \033[1;33m¡»[1;36m§A«ù¶Â¦â´Ñ\033[m");
+		    mouts(21, 0, SHM->i18nstr[cuser.language][972]);
 		    i++;
 		    move(cury[my], curx[mx]);
 		}
@@ -503,7 +483,7 @@ main_dark(int fd, userinfo_t * uin)
 
 		move(22, 0);
 		clrtoeol();
-		prints("   [1;33m¡»[1;37m½ü¨ì%s¤U §O©È§O©È ¥LºâÔ£¦Ì[m", currutmp->mateid);
+		prints(SHM->i18nstr[cuser.language][973], currutmp->mateid);
 		currutmp->turn = 0;
 		uin->turn = 1;
 	    } else {
@@ -513,7 +493,7 @@ main_dark(int fd, userinfo_t * uin)
 		}
 		move(22, 0);
 		clrtoeol();
-		prints("   [1;33m¡»[1;37m½ü¨ì%s¤U §O©È§O©È ¥LºâÔ£¦Ì[m", currutmp->mateid);
+		prints(SHM->i18nstr[cuser.language][974], currutmp->mateid);
 	    }
 	}
     }
@@ -524,15 +504,15 @@ main_dark(int fd, userinfo_t * uin)
 	if (currutmp->turn == 'w') {
 	    move(22, 0);
 	    clrtoeol();
-	    prints("[1;31m§AÄ¹¤F.. ¯u¬O®¥³ß~~[m");
+	    prints(SHM->i18nstr[cuser.language][975]);
 	} else {
 	    move(22, 0);
 	    clrtoeol();
-	    prints("[1;31m¿é±¼¤F°Õ.....¤U¦¸Åý¥L¦n¬Ý!![m");
+	    prints(SHM->i18nstr[cuser.language][976]);
 	}
 	break;
     case -3:
-	mouts(22, 0, "[1;31m¦X´Ñ­ò!! ¤U¦¸¦b¤À°ª¤U§a ^_^[m");
+	mouts(22, 0, SHM->i18nstr[cuser.language][977]);
 	break;
     default:
 	add_io(0, 0);

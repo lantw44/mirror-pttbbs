@@ -1,7 +1,8 @@
 # $Id$
 .include "../pttbbs.mk"
 
-PROGRAMS=	utmpserver utmpsync
+AUTO_PROGRAMS=	utmpserver
+PROGRAMS=	${AUTO_PROGRAMS}	utmpsync
 
 all:	${PROGRAMS}
 
@@ -12,7 +13,7 @@ utmpsync: utmpsync.c
 	${CC} ${CFLAGS} ${LDFLAGS} -DPTTBBS_UTIL -o utmpsync utmpsync.c \
 	../util/util_*.o
 
-.for fn in utmpsync utmpserver
+.for fn in ${AUTO_PROGRAMS}
 ${fn}: ${fn}.c
 	${CC} ${CFLAGS} ${LDFLAGS} -o ${fn} ${fn}.c
 .endfor

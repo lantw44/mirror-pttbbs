@@ -16,9 +16,11 @@ int main(int argc, char **argv)
     index = -1;
     towrite(sfd, &index, sizeof(index));
     for( i = 0 ; i < MAX_ACTIVE ; ++i )
-	if( !towrite(sfd, &SHM->uinfo[i].uid, sizeof(SHM->uinfo[i].uid)) ||
-	    !towrite(sfd, SHM->uinfo[i].friend, sizeof(SHM->uinfo[i].friend))||
-	    !towrite(sfd, SHM->uinfo[i].reject, sizeof(SHM->uinfo[i].reject))){
+	if( towrite(sfd, &SHM->uinfo[i].uid, sizeof(SHM->uinfo[i].uid)) < 0 ||
+	    towrite(sfd, SHM->uinfo[i].friend,
+		    sizeof(SHM->uinfo[i].friend)) < 0                       ||
+	    towrite(sfd, SHM->uinfo[i].reject,
+		    sizeof(SHM->uinfo[i].reject)) < 0                       ){
 	    fprintf(stderr, "sync error %d\n", i);
 	}
     return 0;
@@ -29,13 +31,13 @@ int towrite(int fd, void *buf, int len)
 {
     int     l;
     for( l = 0 ; len > 0 ; )
-	if( (l = write(fd, buf, len)) < 0 )
+	if( (l = write(fd, buf, len)) <= 0 )
 	    return -1;
 	else{
 	    buf += l;
 	    len -= l;
 	}
-    return len;
+    return l;
 }
 
 int toconnect(char *host, int port)

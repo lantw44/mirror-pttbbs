@@ -34,6 +34,7 @@ int main(int argc, char **argv)
 	return 1;
 
     while( 1 ){
+	len = sizeof(clientaddr);
 	if( (cfd = accept(sfd, (struct sockaddr *)&clientaddr, &len)) < 0 ){
 	    if( errno != EINTR )
 		sleep(1);
@@ -41,15 +42,17 @@ int main(int argc, char **argv)
 	}
 	toread(cfd, &index, sizeof(index));
 	if( index == -1 ){
-	    for( i = 0 ; i < MAX_ACTIVE ; ++i )
-		if( toread(cfd, &utmp[i].uid, sizeof(utmp[i].uid)) &&
-		    toread(cfd, utmp[i].friend, sizeof(utmp[i].friend)) &&
-		    toread(cfd, utmp[i].reject, sizeof(utmp[i].reject)) )
+	    int     nSynced = 0;
+	    for( i = 0 ; i < MAX_ACTIVE ; ++i, ++nSynced )
+		if( toread(cfd, &utmp[i].uid, sizeof(utmp[i].uid)) > 0      &&
+		    toread(cfd, utmp[i].friend, sizeof(utmp[i].friend)) > 0 &&
+		    toread(cfd, utmp[i].reject, sizeof(utmp[i].reject)) > 0 )
 		    ;
 		else
 		    for( ; i < MAX_ACTIVE ; ++i )
 			utmp[i].uid = 0;
 	    close(cfd);
+	    fprintf(stderr, "%d users synced\n", nSynced);
 	    continue;
 	}
     }
@@ -82,11 +85,11 @@ int toread(int fd, void *buf, int len)
 {
     int     l;
     for( l = 0 ; len > 0 ; )
-	if( (l = read(fd, buf, len)) < 0 )
+	if( (l = read(fd, buf, len)) <= 0 )
 	    return -1;
 	else{
 	    buf += l;
 	    len -= l;
 	}
-    return len;
+    return l;
 }

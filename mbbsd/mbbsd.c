@@ -102,7 +102,7 @@ log_usies(char *mode, char *mesg)
 {
 
     if (!mesg)
-        log_file(FN_USIES, 1, 
+        log_file(FN_USIES, 1,
                  "%s %s %-12s Stay:%d (%s)\n",
                  Cdate(&now), mode, cuser.userid ,
                  (int)(now - login_start_time) / 60, cuser.username);
@@ -156,7 +156,7 @@ u_exit(char *mode)
     setutmpbid(0);
     if (!(HAS_PERM(PERM_SYSOP) && HAS_PERM(PERM_SYSOPHIDE)) &&
 	!currutmp->invisible)
-	do_aloha("<<下站通知>> -- 我走囉！");
+	do_aloha(SHM->i18nstr[cuser.language][1319]);
 
     purge_utmp(currutmp);
     if ((cuser.uflag != enter_uflag) || (currmode & MODE_DIRTY) || diff) {
@@ -215,10 +215,10 @@ talk_request(int sig)
 
 	move(0, 0);
 	clrtoeol();
-	prints("\033[33;41m★%s\033[34;47m [%s] %s \033[0m",
+	prints(SHM->i18nstr[cuser.language][1321],
 		 SHM->uinfo[currutmp->destuip].userid, my_ctime(&now,timebuf,sizeof(timebuf)),
-		 (currutmp->sig == 2) ? "重要消息廣播！(請Ctrl-U,l查看熱訊記錄)"
-		 : "呼叫、呼叫，聽到請回答");
+		 (currutmp->sig == 2) ? SHM->i18nstr[cuser.language][1322]
+		 : SHM->i18nstr[cuser.language][1323]);
 	refresh();
     } else {
 	unsigned char   mode0 = currutmp->mode;
@@ -241,7 +241,7 @@ void
 show_call_in(int save, int which)
 {
     char            buf[200];
-    snprintf(buf, sizeof(buf), "\033[1;33;46m★%s\033[37;45m %s \033[m",
+    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][1324],
 	     currutmp->msgs[which].userid, currutmp->msgs[which].last_call_in);
     move(b_lines, 0);
     clrtoeol();
@@ -438,7 +438,7 @@ multi_user_check()
 	if (!pid /* || (kill(pid, 0) == -1) */ )
 	    return;		/* stale entry in utmp file */
 
-	getdata(b_lines - 1, 0, "您想刪除其他重複的 login (Y/N)嗎？[Y] ",
+	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1325],
 		genbuf, 3, LCECHO);
 
 	if (genbuf[0] != 'n') {
@@ -452,7 +452,7 @@ multi_user_check()
     } else {
 	/* allow multiple guest user */
 	if (search_ulistn(usernum, 100) != NULL) {
-	    vmsg("\n抱歉，目前已有太多 guest 在站上, 請用new註冊。\n");
+	    vmsg(SHM->i18nstr[cuser.language][1326]);
 	    exit(1);
 	}
     }
@@ -530,7 +530,7 @@ login_query()
 	move(19, 0);
 	prints("current pid: %d ", getpid());
 #endif
-	getdata(20, 0, "請輸入代號，或以[guest]參觀，以[new]註冊：",
+	getdata(20, 0, SHM->i18nstr[cuser.language][1327],
 		uid, sizeof(uid), DOECHO);
 #ifdef CONVERT
 	/* switch to gb mode if uid end with '.' */
@@ -553,7 +553,7 @@ login_query()
 	    mkuserdir(cuser.userid);
 	    break;
 #else
-	    outs("本系統目前無法以 new 註冊, 請用 guest 進入\n");
+	    outs(SHM->i18nstr[cuser.language][1328]);
 	    continue;
 #endif
 	} else if (uid[0] == '\0'){
@@ -777,9 +777,7 @@ setup_utmp(int mode)
 }
 
 inline static void welcome_msg(void) {
-    prints("\033[m      歡迎您第 \033[1;33m%d\033[0;37m 度拜訪本站，"
-	    "上次您是從 \033[1;33m%s\033[0;37m 連往本站，\n"
-	    "     我記得那天是 \033[1;33m%s\033[0;37m。\n",
+    prints(SHM->i18nstr[cuser.language][1329],
 	    ++cuser.numlogins, cuser.lasthost, Cdate(&(cuser.lastlogin)));
     pressanykey();
 }
@@ -789,10 +787,8 @@ inline static void check_bad_login(void) {
     setuserfile(genbuf, str_badlogin);
     if (more(genbuf, NA) != -1) {
 	move(b_lines - 3, 0);
-	prints("通常並沒有辦法知道該ip是誰所有, "
-		"以及其意圖(是不小心按錯或有意測您密碼)\n"
-		"若您有帳號被盜用疑慮, 請經常更改您的密碼或使用加密連線");
-	if (getans("您要刪除以上錯誤嘗試的記錄嗎(Y/N)?[Y]") != 'n')
+	prints(SHM->i18nstr[cuser.language][1330]);
+	if (getans(SHM->i18nstr[cuser.language][1331]) != 'n')
 	    unlink(genbuf);
     }
 }
@@ -820,23 +816,23 @@ static void init_guest_info(void)
 {
     int i;
     char           *nick[13] = {
-	"椰子", "貝殼", "內衣", "寶特瓶", "翻車魚",
-	"樹葉", "浮萍", "鞋子", "潛水艇", "魔王",
-	"鐵罐", "考卷", "大美女"
+	SHM->i18nstr[cuser.language][1332], SHM->i18nstr[cuser.language][1333], SHM->i18nstr[cuser.language][1334], SHM->i18nstr[cuser.language][1335], SHM->i18nstr[cuser.language][1336],
+	SHM->i18nstr[cuser.language][1337], SHM->i18nstr[cuser.language][1338], SHM->i18nstr[cuser.language][1339], SHM->i18nstr[cuser.language][1340], SHM->i18nstr[cuser.language][1341],
+	SHM->i18nstr[cuser.language][1342], SHM->i18nstr[cuser.language][1343], SHM->i18nstr[cuser.language][1344]
     };
     char           *name[13] = {
-	"大王椰子", "鸚鵡螺", "比基尼", "可口可樂", "仰泳的魚",
-	"憶", "高岡屋", "AIR Jordon", "紅色十月號", "批踢踢",
-	"SASAYA椰奶", "鴨蛋", "布魯克鱈魚香絲"
+	SHM->i18nstr[cuser.language][1345], SHM->i18nstr[cuser.language][1346], SHM->i18nstr[cuser.language][1347], SHM->i18nstr[cuser.language][1348], SHM->i18nstr[cuser.language][1349],
+	SHM->i18nstr[cuser.language][1350], SHM->i18nstr[cuser.language][1351], "AIR Jordon", SHM->i18nstr[cuser.language][1352], SHM->i18nstr[cuser.language][1353],
+	SHM->i18nstr[cuser.language][1354], SHM->i18nstr[cuser.language][1355], SHM->i18nstr[cuser.language][1356]
     };
     char           *addr[13] = {
-	"天堂樂園", "大海", "綠島小夜曲", "美國", "綠色珊瑚礁",
-	"遠方", "原本海", "NIKE", "蘇聯", "男八618室",
-	"愛之味", "天上", "藍色珊瑚礁"
+	SHM->i18nstr[cuser.language][1357], SHM->i18nstr[cuser.language][1358], SHM->i18nstr[cuser.language][1359], SHM->i18nstr[cuser.language][1360], SHM->i18nstr[cuser.language][1361],
+	SHM->i18nstr[cuser.language][1362], SHM->i18nstr[cuser.language][1363], "NIKE", SHM->i18nstr[cuser.language][1364], SHM->i18nstr[cuser.language][1365],
+	SHM->i18nstr[cuser.language][1366], SHM->i18nstr[cuser.language][1367], SHM->i18nstr[cuser.language][1368]
     };
     i = login_start_time % 13;
     snprintf(cuser.username, sizeof(cuser.username),
-	    "海邊漂來的%s", nick[(int)i]);
+	    SHM->i18nstr[cuser.language][1369], nick[(int)i]);
     strlcpy(currutmp->username, cuser.username,
 	    sizeof(currutmp->username));
     strlcpy(cuser.realname, name[(int)i], sizeof(cuser.realname));
@@ -849,11 +845,11 @@ static void init_guest_info(void)
 inline static void foreign_warning(void){
     if ((cuser.uflag2 & FOREIGN) && !(cuser.uflag2 & LIVERIGHT)){
 	if (login_start_time - cuser.firstlogin > (FOREIGN_REG_DAY - 5) * 24 * 3600){
-	    mail_muser(cuser, "[出入境管理局]", "etc/foreign_expired_warn");
+	    mail_muser(cuser, SHM->i18nstr[cuser.language][1370], "etc/foreign_expired_warn");
 	}
 	else if (login_start_time - cuser.firstlogin > FOREIGN_REG_DAY * 24 * 3600){
 	    cuser.userlevel &= ~(PERM_LOGINOK | PERM_POST);
-	    vmsg("警告：請至出入境管理局申請永久居留");
+	    vmsg(SHM->i18nstr[cuser.language][1371]);
 	}
     }
 }
@@ -898,7 +894,7 @@ user_login()
     resolve_fcache();
     resolve_boards();
     memset(&water[0], 0, sizeof(water_t) * 6);
-    strlcpy(water[0].userid, " 全部 ", sizeof(water[0].userid));
+    strlcpy(water[0].userid, SHM->i18nstr[cuser.language][1372], sizeof(water[0].userid));
 
     if(getenv("SSH_CLIENT") != NULL){
 	char frombuf[50];
@@ -923,7 +919,7 @@ user_login()
 
     if (!(HAS_PERM(PERM_SYSOP) && HAS_PERM(PERM_SYSOPHIDE)) &&
 	!currutmp->invisible)
-	do_aloha("<<上站通知>> -- 我來啦！");
+	do_aloha(SHM->i18nstr[cuser.language][1373]);
 
     if(SHM->loginmsg.pid)
       {
@@ -1052,7 +1048,7 @@ start_client()
 	showansi = 0;
     signal(SIGALRM, SIG_IGN);
 
-    domenu(MMENU, "主功\能表", (currutmp->mailalert ? 'M' : 'C'), cmdlist);
+    domenu(MMENU, SHM->i18nstr[cuser.language][1374], (currutmp->mailalert ? 'M' : 'C'), cmdlist);
 }
 
 /* FSA (finite state automata) for telnet protocol */
@@ -1442,7 +1438,7 @@ check_ban_and_load(int fd)
     write(fd, INSCREEN, sizeof(INSCREEN));
 #else
 #define BANNER \
-"【" BBSNAME "】◎ 台大流行網 ◎(" MYHOSTNAME ") 調幅(" MYIP ") \r\n"
+SHM->i18nstr[cuser.language][1375] BBSNAME SHM->i18nstr[cuser.language][1376] MYHOSTNAME SHM->i18nstr[cuser.language][1377] MYIP ") \r\n"
     write(fd, BANNER, sizeof(BANNER));
 #endif
 
@@ -1467,9 +1463,9 @@ check_ban_and_load(int fd)
     }
 
     if(overload == 1)
-	write(fd, "系統過載, 請稍後再來\r\n", 22);
+	write(fd, SHM->i18nstr[cuser.language][1378], 22);
     else if(overload == 2)
-	write(fd, "由於人數過多，請您稍後再來。", 28);
+	write(fd, SHM->i18nstr[cuser.language][1379], 28);
     else if (banned && (fp = fopen(BBSHOME "/" BAN_FILE, "r"))) {
 	char     buf[256];
 	while (fgets(buf, sizeof(buf), fp))

@@ -13,7 +13,8 @@
 #define READ_REDRAW     9
 #define PART_REDRAW     10
 #define TITLE_REDRAW    11
-#define POS_NEXT        101     /* cursor_pos(locmem, locmem->crs_ln + 1, 1);*/
+#define READ_SKIP       12      
+#define HEADERS_RELOAD  13      
 
 /* user 操作狀態與模式 */
 #define IDLE            0
@@ -110,7 +111,6 @@
 #define MODE_BOARD       0x0008    /* 是否可以在 currboard 刪除、mark文章 */
 #define MODE_GROUPOP     0x0010    /* 是否為小組長 (可以在 MENU 開板) */
 #define MODE_DIGEST      0x0020    /* 是否為 digest mode */
-#define MODE_ETC         0x0040    /* 是否為 etc mode */
 #define MODE_SELECT      0x0080    /* 搜尋使用者標題 */
 #define MODE_DIRTY       0x0100    /* 是否更動過 userflag */
 
@@ -128,21 +128,24 @@
 
 #define RS_FORWARD      0x01    /* backward */
 #define RS_TITLE        0x02    /* author/title */
-#define RS_RELATED      0x04
+#define RS_KEYWORD      0x04
 #define RS_FIRST        0x08    /* find first article */
 #define RS_CURRENT      0x10    /* match current read article */
-#define RS_THREAD       0x20    /* search the first article */
+#define RS_MARK         0x20    /* search the first article */
 #define RS_AUTHOR       0x40    /* search author's article */
 #define RS_NEWPOST	0x80	/* search new posts */
 
-#define CURSOR_FIRST    (RS_RELATED | RS_TITLE | RS_FIRST)
-#define CURSOR_NEXT     (RS_RELATED | RS_TITLE | RS_FORWARD)
-#define CURSOR_PREV     (RS_RELATED | RS_TITLE)
-#define RELATE_FIRST    (RS_RELATED | RS_TITLE | RS_FIRST | RS_CURRENT)
-#define RELATE_NEXT     (RS_RELATED | RS_TITLE | RS_FORWARD | RS_CURRENT)
-#define RELATE_PREV     (RS_RELATED | RS_TITLE | RS_CURRENT)
-#define THREAD_NEXT     (RS_THREAD | RS_FORWARD)
-#define THREAD_PREV     (RS_THREAD)
+#define CURSOR_FIRST    (RS_TITLE | RS_FIRST)
+#define CURSOR_NEXT     (RS_TITLE | RS_FORWARD)
+#define CURSOR_PREV     (RS_TITLE)
+#define RELATE_FIRST    (RS_TITLE | RS_FIRST | RS_CURRENT)
+#define RELATE_NEXT     (RS_TITLE | RS_FORWARD | RS_CURRENT)
+#define RELATE_PREV     (RS_TITLE | RS_CURRENT)
+#define NEWPOST_NEXT    (RS_NEWPOST | RS_FORWARD)
+#define NEWPOST_PREV    (RS_NEWPOST)
+#define AUTHOR_NEXT     (RS_AUTHOR | RS_FORWARD)
+#define AUTHOR_PREV     (RS_AUTHOR)
+
 
 enum {STRIP_ALL = 0, ONLY_COLOR, NO_RELOAD};
 

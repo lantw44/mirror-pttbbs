@@ -102,8 +102,7 @@ static int
 new_chicken()
 {
     chicken_t *mychicken = &cuser.mychicken;
-    char            buf[150];
-    int             price;
+    int             price, i;
 
     clear();
     move(2, 0);
@@ -116,19 +115,18 @@ new_chicken()
 	 "(k)忍者 $85  (l)阿扁   $200 (m)馬英九  $200 (n)就可人$100 "
 	 "[o]羅莉 $77\n"
 	 "[0]自己 $0\n");
-    getdata_str(7, 0, "請選擇你要養的動物：", buf, 3, LCECHO, "0");
+    i = getans("請選擇你要養的動物：");
 
-    buf[0] -= 'a';
-    if (buf[0] < 0 || buf[0] > NUM_KINDS - 1)
+    i -= 'a';
+    if (i < 0 || i > NUM_KINDS - 1)
 	return 0;
 
-    mychicken->type = buf[0];
+    mychicken->type = i;
 
     reload_money();
     price = egg_price[(int)mychicken->type];
     if (cuser.money < price) {
-	prints("\n 錢不夠買蛋蛋,蛋蛋要 %d 元", price);
-	refresh();
+	vmsg("\n 錢不夠買蛋蛋,蛋蛋要 %d 元", price);
 	return 0;
     }
     vice(price, "寵物蛋");
@@ -136,11 +134,10 @@ new_chicken()
 	getdata(8, 0, "幫牠取個好名字：", mychicken->name,
 		sizeof(mychicken->name), DOECHO);
 
-    snprintf(buf, sizeof(buf),
-	     "\033[31m%s \033[m養了一隻叫\033[33m %s \033[m的 "
-	     "\033[32m%s\033[m  於 %s\n", cuser.userid,
-	     mychicken->name, chicken_type[(int)mychicken->type], ctime(&now));
-    log_file(CHICKENLOG, buf, 1);
+    log_file(CHICKENLOG, LOG_CREAT | LOG_VF,
+              "\033[31m%s \033[m養了一隻叫\033[33m %s \033[m的 "
+              "\033[32m%s\033[m  於 %s\n", cuser.userid,
+              mychicken->name, chicken_type[(int)mychicken->type], ctime(&now));
     mychicken->lastvisit = mychicken->birthday = mychicken->cbirth = now;
     mychicken->food = 0;
     mychicken->weight = time_change[(int)mychicken->type][WEIGHT] / 3;
@@ -400,12 +397,10 @@ ch_buyitem(int money, char *picture, int *item, int haveticket)
 	else
 	    demoney(-money * num);
 	show_file(picture, 5, 14, NO_RELOAD);
+        pressanykey();
     } else {
-	move(b_lines - 1, 0);
-	clrtoeol();
-	outs("現金不夠 !!!");
+	vmsg("現金不夠 !!!");
     }
-    pressanykey();
 }
 
 static void
@@ -443,20 +438,17 @@ static void
 ch_kill()
 {
     chicken_t *mychicken = &cuser.mychicken;
-    char            buf[150], ans[4];
+    int        ans;
 
-    snprintf(buf, sizeof(buf), "棄養這%s要被罰 100 元, 是否要棄養?(y/N)",
-	    chicken_type[(int)mychicken->type]);
-    getdata_str(23, 0, buf, ans, sizeof(ans), DOECHO, "N");
-    if (ans[0] == 'y') {
+    ans = getans("棄養要被罰 100 元, 是否要棄養?(y/N)");
+    if (ans == 'y') {
 
 	vice(100, "棄養寵物費");
 	more(CHICKEN_PIC "/deadth", YEA);
-	snprintf(buf, sizeof(buf),
+	log_file(CHICKENLOG, LOG_CREAT | LOG_VF,
 		 "\033[31m%s \033[m把 \033[33m%s\033[m\033[32m %s "
 		 "\033[m宰了 於 %s\n", cuser.userid, mychicken->name,
 		 chicken_type[(int)mychicken->type], ctime(&now));
-	log_file(CHICKENLOG, buf, 1);
 	mychicken->name[0] = 0;
     }
 }
@@ -485,8 +477,7 @@ ch_sell()
     int             money = (age * food_price[(int)mychicken->type] * 3
 			     + (mychicken->hp_max * 10 + mychicken->weight) /
 			time_change[(int)mychicken->type][HP_MAX]) * 3 / 2 -
-    mychicken->sick;
-    char            buf[150], ans[4];
+    mychicken->sick, ans;
 
     if (money < 0)
 	money = 0;
@@ -508,15 +499,14 @@ ch_sell()
 	pressanykey();
 	return 0;
     }
-    snprintf(buf, sizeof(buf), "這隻%d歲%s可以賣 %d 元, 是否要賣?(y/N)", age,
-	     chicken_type[(int)mychicken->type], money);
-    getdata_str(23, 0, buf, ans, sizeof(ans), DOECHO, "N");
-    if (ans[0] == 'y') {
-	snprintf(buf, sizeof(buf), "\033[31m%s\033[m 把 \033[33m%s\033[m "
-		"\033[32m%s\033[m 用 \033[36m%d\033[m 賣了 於 %s\n",
-		cuser.userid, mychicken->name,
-		chicken_type[(int)mychicken->type], money, ctime(&now));
-	log_file(CHICKENLOG, buf, 1);
+    ans = getans("這隻%d歲%s可以賣 %d 元, 是否要賣?(y/N)", age, 
+                 chicken_type[(int)mychicken->type], money);
+    if (ans == 'y') {
+	log_file(CHICKENLOG, LOG_CREAT | LOG_VF,
+		 "\033[31m%s\033[m 把 \033[33m%s\033[m "
+                 "\033[32m%s\033[m 用 \033[36m%d\033[m 賣了 於 %s\n",
+                 cuser.userid, mychicken->name, 
+                 chicken_type[(int)mychicken->type], money, ctime(&now));
 	mychicken->lastvisit = mychicken->name[0] = 0;
 	passwd_update(usernum, &cuser);
 	more(CHICKEN_PIC "/sell", YEA);
@@ -653,7 +643,6 @@ deadtype(chicken_t * thechicken)
 {
     chicken_t *mychicken = &cuser.mychicken;
     int             i;
-    char            buf[150];
 
     if (thechicken->hp <= 0)	/* hp用盡 */
 	i = 1;
@@ -670,13 +659,10 @@ deadtype(chicken_t * thechicken)
 	return 0;
 
     if (thechicken == mychicken) {
-	snprintf(buf, sizeof(buf),
-		 "\033[31m%s\033[m 所疼愛的\033[33m %s\033[32m %s "
-		 "\033[m掛了 於 %s\n",
-		 cuser.userid, thechicken->name,
-		 chicken_type[(int)thechicken->type],
-		 ctime(&now));
-	log_file(CHICKENLOG, buf, 1);
+	log_file(CHICKENLOG, LOG_CREAT | LOG_VF,
+                 "\033[31m%s\033[m 所疼愛的\033[33m %s\033[32m %s "
+                 "\033[m掛了 於 %s\n", cuser.userid, thechicken->name,
+                 chicken_type[(int)thechicken->type], ctime(&now));
 	mychicken->name[0] = 0;
 	passwd_update(usernum, &cuser);
     }
@@ -723,20 +709,18 @@ static void
 ch_changename()
 {
     chicken_t *mychicken = &cuser.mychicken;
-    char            buf[150], newname[20] = "";
+    char      newname[20] = "";
 
     getdata_str(b_lines - 1, 0, "嗯..改個好名字吧:", newname, 18, DOECHO,
 		mychicken->name);
 
     if (strlen(newname) >= 3 && strcmp(newname, mychicken->name)) {
-	snprintf(buf, sizeof(buf),
-		 "\033[31m%s\033[m 把疼愛的\033[33m %s\033[32m %s "
-		 "\033[m改名為\033[33m %s\033[m 於 %s\n",
-		 cuser.userid, mychicken->name,
-		 chicken_type[(int)mychicken->type],
-		 newname, ctime(&now));
 	strlcpy(mychicken->name, newname, sizeof(mychicken->name));
-	log_file(CHICKENLOG, buf, 1);
+	log_file(CHICKENLOG, LOG_CREAT | LOG_VF, 
+                "\033[31m%s\033[m 把疼愛的\033[33m %s\033[32m %s "
+                "\033[m改名為\033[33m %s\033[m 於 %s\n",
+                 cuser.userid, mychicken->name,
+                 chicken_type[(int)mychicken->type], newname, ctime(&now));
     }
 }
 
@@ -928,20 +912,18 @@ chickenpk(int fd)
     memcpy(&ouser, &xuser, sizeof(userec_t));
     reload_chicken();
     if (!ochicken->name[0] || !mychicken->name[0]) {
-	outmsg("有一方沒有寵物");	/* Ptt:妨止page時把寵物賣掉 */
 	bell();
-	refresh();
+	vmsg("有一方沒有寵物");	/* Ptt:妨止page時把寵物賣掉 */
 	add_io(0, 0);
 	close(fd);
 	unlockutmpmode();
-	sleep(1);
 	return 0;
     }
     show_chicken_data(ochicken, mychicken);
     add_io(fd, 3);		/* 把fd加到igetch監視 */
     while (1) {
 	r = rand();
-	ch = igetkey();
+	ch = igetch();
 	getuser(mateid);
 	memcpy(&ouser, &xuser, sizeof(userec_t));
 	reload_chicken();

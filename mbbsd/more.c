@@ -26,7 +26,6 @@ static char    *more_help[] = {
     "(a/A)                 跳至同一作者下/上篇",
     "([/])                 主題式閱\讀 上/下",
     "(t)                   主題式循序閱\讀",
-    "(Ctrl-C)              小計算機",
     "(q)(←)               結束",
     "(h)(H)(?)             輔助說明畫面",
     NULL
@@ -329,7 +328,7 @@ more(char *fpath, int promptend)
 
 
 	    while (line == b_lines || (line > 0 && viewed == fsize)) {
-		switch ((ch = egetch())) {
+		switch ((ch = igetch())) {
 		case ':':
 		    {
 			char            buf[10];
@@ -382,47 +381,42 @@ more(char *fpath, int promptend)
 			lino = line = 0;
 		    }
 		    break;
-		case 'r':
+		case 'r': // Ptt: put all reply/recommend function here
 		case 'R':
 		case 'Y':
-		    close(fd);
-		    return 7;
 		case 'y':
 		    close(fd);
-		    return 8;
+		    return 999;
+		case 'X':
+		    close(fd);
+		    return 998;
 		case 'A':
 		    close(fd);
-		    return 9;
+		    return AUTHOR_PREV;
 		case 'a':
 		    close(fd);
-		    return 10;
+		    return AUTHOR_NEXT;
 		case 'F':
-		    close(fd);
-		    return 11;
-		case 'B':
-		    close(fd);
-		    return 12;
-		case KEY_LEFT:
-		    close(fd);
-		    return 6;
-		case 'q':
-		    close(fd);
-		    return 0;
-		case 'b':
-		    close(fd);
-		    return 1;
 		case 'f':
 		    close(fd);
-		    return 3;
+		    return READ_NEXT;
+		case 'B':
+		case 'b':
+		    close(fd);
+		    return READ_PREV;
+		case KEY_LEFT:
+		case 'q':
+		    close(fd);
+		    return FULLUPDATE;
 		case ']':	/* Kaede 為了主題閱讀方便 */
 		    close(fd);
-		    return 4;
+		    return RELATE_NEXT;
 		case '[':	/* Kaede 為了主題閱讀方便 */
 		    close(fd);
-		    return 2;
+		    return RELATE_PREV;
 		case '=':	/* Kaede 為了主題閱讀方便 */
 		    close(fd);
-		    return 5;
+		    return RELATE_FIRST;
 		case Ctrl('F'):
 		case KEY_PGDN:
 		    line = 1;
@@ -430,14 +424,14 @@ more(char *fpath, int promptend)
 		case 't':
 		    if (viewed == fsize) {
 			close(fd);
-			return 4;
+			return RELATE_NEXT;
 		    }
 		    line = 1;
 		    break;
 		case ' ':
 		    if (viewed == fsize) {
 			close(fd);
-			return 3;
+			return READ_NEXT;
 		    }
 		    line = 1;
 		    break;
@@ -454,7 +448,7 @@ more(char *fpath, int promptend)
 		    if (viewed == fsize ||
 			(promptend == 2 && (ch == '\r' || ch == '\n'))) {
 			close(fd);
-			return 3;
+			return READ_NEXT;
 		    }
 		    line = t_lines - 2;
 		    break;
@@ -489,12 +483,8 @@ more(char *fpath, int promptend)
 		    getdata(b_lines - 2, 0, "把這篇文章收入到暫存檔？[y/N] ",
 			    buf, 4, LCECHO);
 		    if (buf[0] == 'y') {
-			char            tmpbuf[128];
-
-			setuserfile(tmpbuf, ask_tmpbuf(b_lines - 1));
-			snprintf(buf, sizeof(buf),
-				 "cp -f %s %s", fpath, tmpbuf);
-			system(buf);
+			setuserfile(buf, ask_tmpbuf(b_lines - 1));
+                        Copy(fpath, buf);
 		    }
 		    if (pageno)
 			pageno--;
@@ -525,7 +515,7 @@ more(char *fpath, int promptend)
 			pageno = line = 0;
 		    else {
 			close(fd);
-			return 1;
+			return READ_PREV;
 		    }
 		}
 	    }
@@ -538,7 +528,7 @@ more(char *fpath, int promptend)
 		if (pageno <= 1) {
 		    if (lino == 1 || !pageno) {
 			close(fd);
-			return 1;
+			return READ_PREV;
 		    }
 		    if (header && lino <= 5) {
 			more_goto(fd, viewed = pagebreak[scrollup = lino =

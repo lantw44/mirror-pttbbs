@@ -25,6 +25,14 @@
 #define MAX_CPULOAD       (70)           /* CPU 最高load */
 #endif
 
+#ifndef MAX_LANG
+#define MAX_LANG          (1)			 /* 最多使用語言 */
+#endif
+
+#ifndef MAX_STRING
+#define MAX_STRING        (8000)         /* 系統最多使用字串 */
+#endif
+
 #ifndef MAX_POST_MONEY                      /* 發表文章稿費的上限 */
 #define MAX_POST_MONEY     100
 #endif
@@ -99,6 +107,10 @@
 
 #ifndef HOTBOARDCACHE
 #define HOTBOARDCACHE     (0)            /* 熱門看板快取 */
+#endif
+
+#ifndef INNTIMEZONE
+#define INNTIMEZONE       "+0800 (CST)"
 #endif
 
 /* 以下還未整理 */

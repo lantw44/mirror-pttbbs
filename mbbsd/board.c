@@ -131,8 +131,7 @@ load_uidofgid(const int gid, const int type)
     int             n, childcount = 0;
     currbptr = &bcache[gid - 1];
     for (n = 0; n < numboards; ++n) {
-	bptr = SHM->bsorted[type][n];
-	if (bptr->brdname[0] == '\0')
+	if( !(bptr = SHM->bsorted[type][n]) || bptr->brdname[0] == '\0' )
 	    continue;
 	if (bptr->gid == gid) {
 	    if (currbptr == &bcache[gid - 1])
@@ -300,8 +299,9 @@ load_boards(char *key)
 	    }
 	    addnewbrdstat(n, state);
 	}
-        if(childcount != brdnum) //fix soon
-                getbcache(class_bid)->childcount = brdnum;
+        if(childcount < brdnum) //Ptt: dirty fix fix soon 
+                getbcache(class_bid)->childcount = 0;
+           
                  
     }
 }
@@ -390,11 +390,26 @@ brdlist_foot()
 	   yank_flag == 0 ? "最愛" : yank_flag == 1 ? "部份" : "全部");
 }
 
+
+static inline char * 
+make_class_color(char *name)
+{
+    char    *colorset[8] = {"", "\033[32m",
+	"\033[33m", "\033[36m", "\033[34m", "\033[1m",
+	"\033[1;32m", "\033[1;33m"};
+
+    return colorset[(unsigned int)
+	(name[0] + name[1] +
+	 name[2] + name[3]) & 07];
+}
+
+#define HILIGHT_COLOR	"\033[1;36m"
+
 static void
 show_brdlist(int head, int clsflag, int newflag)
 {
     int             myrow = 2;
-    if (class_bid == 1) {
+    if (unlikely(class_bid == 1)) {
 	currstat = CLASS;
 	myrow = 6;
 	showtitle("分類看板", BBSName);
@@ -428,11 +443,12 @@ show_brdlist(int head, int clsflag, int newflag)
 	char    *color[8] = {"", "\033[32m",
 	    "\033[33m", "\033[36m", "\033[34m", "\033[1m",
 	"\033[1;32m", "\033[1;33m"};
-	char    *unread[2] = {"\33[37m  \033[m", "\033[1;31mˇ\033[m"};
-
-	if (yank_flag == 0 && get_fav_type(&nbrd[0]) == 0){
+ 	char    *unread[2] = {"\33[37m  \033[m", "\033[1;31mˇ\033[m"};
+ 
+	if (yank_flag == 0 && get_data_number(get_current_fav()) == 0){
+	    // brdnum > 0 ???
 	    move(3, 0);
-	    prints("        --- 空目錄 ---");
+	    outs("        --- 空目錄 ---");
 	    return;
 	}
 
@@ -577,8 +593,9 @@ paste_taged_brds(int gid)
         getans("貼上標記的看板?(y/N)")=='n') return 0;
     fav = get_current_fav();
     for (tmp = 0; tmp < fav->DataTail; tmp++) {
-            bid = fav_getid(&fav->favh[tmp]);
-	    boardheader_t  *bh = getbcache(bid);
+	    boardheader_t  *bh;
+	    bid = fav_getid(&fav->favh[tmp]);
+	    bh = getbcache(bid);
 	    if( !is_set_attr(&fav->favh[tmp], FAVH_ADM_TAG))
 		continue;
 	    set_attr(&fav->favh[tmp], FAVH_ADM_TAG, 0);
@@ -590,6 +607,7 @@ paste_taged_brds(int gid)
 		log_usies("SetBoardGID", bh->brdname);
 	    }
 	}
+    sort_bcache();
     return 1;
 }
 
@@ -614,9 +632,8 @@ choose_board(int newflag)
 	    load_boards(keyword);
 	    if (brdnum <= 0 && yank_flag > 0) {
 		if (keyword[0] != 0) {
-		    mprints(b_lines - 1, 0, "沒有任何看板標題有此關鍵字 "
+		    vmsg("沒有任何看板標題有此關鍵字 "
 			    "(板主應注意看板標題命名)");
-		    pressanykey();
 		    keyword[0] = 0;
 		    brdnum = -1;
 		    continue;

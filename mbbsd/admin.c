@@ -134,7 +134,6 @@ search_key_user(char *passwdfile, int mode)
 			fclose(fp1);
 			return 0;
 		    } else {
-			move(b_lines - 1, 0);
 			getdata(0, 0,
 				"目前的 PASSWD 檔沒有此 ID，新增嗎？[y/N]",
 				genbuf, 3, LCECHO);
@@ -232,9 +231,10 @@ setperms(unsigned int pbits, char *pstring[])
 	       ((pbits >> (i + 16)) & 1 ? "ˇ" : "Ｘ"));
     }
     clrtobot();
-    while (getdata(b_lines - 1, 0, "請按 [A-5] 切換設定，按 [Return] 結束：",
-		   choice, sizeof(choice), LCECHO)) {
-	i = choice[0] - 'a';
+    while (
+       (i = getkey("請按 [A-5] 切換設定，按 [Return] 結束："))!='\r')
+         {
+	i = i - 'a';
 	if (i < 0)
 	    i = choice[0] - '0' + 26;
 	if (i >= NUMPERMS)
@@ -263,6 +263,7 @@ void delete_symbolic_link(boardheader_t *bh, int bid)
     memset(bh, 0, sizeof(boardheader_t));
     substitute_record(fn_board, bh, sizeof(boardheader_t), bid);
     reset_board(bid);
+    sort_bcache(); 
     log_usies("DelLink", bh->brdname);
 }
 
@@ -361,6 +362,7 @@ m_mod_board(char *bname)
 	    post_msg("Security", bh.title, "請注意刪除的合法性", "[系統安全局]");
 	    substitute_record(fn_board, &bh, sizeof(bh), bid);
 	    reset_board(bid);
+            sort_bcache(); 
 	    log_usies("DelBoard", bh.title);
 	    outs("刪板完畢");
 	}
@@ -448,6 +450,7 @@ m_mod_board(char *bname)
 	    setup_man(&newbh);
 	    substitute_record(fn_board, &newbh, sizeof(newbh), bid);
 	    reset_board(bid);
+            sort_bcache(); 
 	    log_usies("SetBoard", newbh.brdname);
 	}
     }
@@ -607,6 +610,7 @@ static int add_board_record(boardheader_t *board)
     if ((bid = getbnum("")) > 0) {
 	substitute_record(fn_board, board, sizeof(boardheader_t), bid);
 	reset_board(bid);
+        sort_bcache(); 
     } else if (append_record(fn_board, (fileheader_t *)board, sizeof(boardheader_t)) == -1) {
 	return -1;
     } else {
@@ -955,15 +959,13 @@ scan_register_form(char *regfile, int automode, int neednum)
 		    prints("%d.%-12s：%s\n", n - 2, finfo[n], fdata[n]);
 		}
 		if (muser.userlevel & PERM_LOGINOK) {
-		    getdata(b_lines - 1, 0, "\033[1;32m此帳號已經完成註冊, "
-		    "更新(Y/N/Skip)？\033[m[N] ", ans, sizeof(ans), LCECHO);
+		    ans[0] = getkey("此帳號已經完成註冊, "
+				    "更新(Y/N/Skip)？[N] ");
 		    if (ans[0] != 'y' && ans[0] != 's')
 			ans[0] = 'd';
 		} else {
-		    move(b_lines - 1, 0);
-		    prints("是否接受此資料(Y/N/Q/Del/Skip)？[S] ");
 		    if (search_ulist(unum) == NULL)
-			ans[0] = igetch();
+		        ans[0] = vmsg_lines(22, "是否接受此資料(Y/N/Q/Del/Skip)？[S])");
 		    else
 			ans[0] = 's';
 		    if ('A' <= ans[0] && ans[0] <= 'Z')
@@ -1067,13 +1069,13 @@ scan_register_form(char *regfile, int automode, int neednum)
 		strlcpy(muser.realname, fdata[2], sizeof(muser.realname));
 		strlcpy(muser.address, fdata[4], sizeof(muser.address));
 		strlcpy(muser.email, fdata[6], sizeof(muser.email));
-		snprintf(genbuf, sizeof(genbuf),
-			 "%s:%s:%s", fdata[5], fdata[3], uid);
-		strncpy(muser.justify, genbuf, REGLEN);
-		sethomefile(buf, muser.userid, "justify");
-		strncat(genbuf, "\n", sizeof(genbuf));
-		log_file(buf, genbuf, 1);
+		snprintf(genbuf, sizeof(genbuf), "%s:%s:%s",
+			 fdata[5], fdata[3], uid);
+		strlcpy(muser.justify, genbuf, sizeof(muser.justify));
 		passwd_update(unum, &muser);
+
+		sethomefile(buf, muser.userid, "justify");
+		log_file(buf, LOG_CREAT, genbuf);
 
 		if ((fout = fopen(logfile, "a"))) {
 		    for (n = 0; field[n]; n++)
@@ -1161,10 +1163,9 @@ cat_register()
 {
     if (system("cat register.new.tmp >> register.new") == 0 &&
 	system("rm -f register.new.tmp") == 0)
-	mprints(22, 0, "OK 嚕~~ 繼續去奮鬥吧!!");
+	vmsg("OK 嚕~~ 繼續去奮鬥吧!!");
     else
-	mprints(22, 0, "沒辦法CAT過去呢 去檢查一下系統吧!!");
-    pressanykey();
+	vmsg("沒辦法CAT過去呢 去檢查一下系統吧!!");
     return 0;
 }
 

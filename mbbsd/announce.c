@@ -317,8 +317,7 @@ a_pasteitem(menu_t * pm, int mode)
 	if (dashd(copyfile)) {
 	    for (i = 0; copyfile[i] && copyfile[i] == pm->path[i]; i++);
 	    if (!copyfile[i]) {
-		outs("將目錄拷進自己的子目錄中，會造成無窮迴圈！");
-		igetch();
+		vmsg("將目錄拷進自己的子目錄中，會造成無窮迴圈！");
 		return;
 	    }
 	}
@@ -682,9 +681,7 @@ a_showname(menu_t * pm)
 			sym = 1;
 		}
 		if (sym) {
-		    pressanykey();
-		    move(b_lines - 1, 1);
-		    prints("此 symbolic link 指向 %s\n", &buf[i + 1]);
+		    vmsg("此 symbolic link 指向 %s\n", &buf[i + 1]);
 		}
 	    }
 	}
@@ -914,21 +911,19 @@ a_menu(char *maintitle, char *path, int lastlevel)
 				Fexit = 1;
 				if (currstat == OSONG) {
 				    /* XXX: 只選歌未點歌可灌排行榜 */
-				    char    buf[128];
-				    snprintf(buf, sizeof(buf),
+				    log_file(FN_USSONG, LOG_CREAT | LOG_VF,
 					     "%s\n", fhdr->title);
-				    log_file(FN_USSONG, buf, 1);
 				}
 				free(me.header);
 				return FULLUPDATE;
 			    }
 			}
-			if (more_result == 1) {
+			if (more_result == READ_PREV) {
 			    if (--me.now < 0) {
 				me.now = 0;
 				break;
 			    }
-			} else if (more_result == 3) {
+			} else if (more_result == READ_NEXT) {
 			    if (++me.now >= me.num) {
 				me.now = me.num - 1;
 				break;

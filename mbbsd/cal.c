@@ -59,13 +59,12 @@ unlockutmpmode()
 int
 vice(int money, char *item)
 {
-   char            buf[128], vice[12];
+   char            buf[128];
    unsigned int viceserial = (currutmp->lastact % 1000000) * 100 + rand() % 100;
 
     demoney(-money);
     setuserfile(buf, VICE_NEW);
-    sprintf(vice,"%8.8d\n", viceserial);
-    log_file(buf, vice, 1);
+    log_file(buf, LOG_CREAT | LOG_VF, "%8.8d\n", viceserial);
     snprintf(buf, sizeof(buf),
 	     "%s 花了%d$ 編號[%08d]", item, money, viceserial);
     mail_id(cuser.userid, buf, "etc/vice.txt", "Ptt經濟部");
@@ -96,18 +95,13 @@ osong(char *defaultid)
     /* Jaky 一人一天點一首 */
     if (!strcmp(buf, Cdatedate(&cuser.lastsong)) && !HAS_PERM(PERM_SYSOP)) {
 	move(22, 0);
-	outs("你今天已經點過囉，明天再點吧....");
-	refresh();
-	pressanykey();
-
+	vmsg("你今天已經點過囉，明天再點吧....");
 	unlockutmpmode();
 	return 0;
     }
     if (cuser.money < 200) {
 	move(22, 0);
-	outs("點歌要200銀唷!....");
-	refresh();
-	pressanykey();
+	vmsg("點歌要200銀唷!....");
 	unlockutmpmode();
 	return 0;
     }
@@ -262,18 +256,12 @@ inmailbox(int m)
 int
 p_cloak()
 {
-    char            buf[4];
-    getdata(b_lines - 1, 0,
-	    currutmp->invisible ? "確定要現身?[y/N]" : "確定要隱身?[y/N]",
-	    buf, sizeof(buf), LCECHO);
-    if (buf[0] != 'y')
+    if (getans(currutmp->invisible ? "確定要現身?[y/N]" : "確定要隱身?[y/N]") != 'y')
 	return 0;
     if (cuser.money >= 19) {
 	vice(19, "付費隱身");
 	currutmp->invisible %= 2;
-	outs((currutmp->invisible ^= 1) ? MSG_CLOAKED : MSG_UNCLOAK);
-	refresh();
-	safe_sleep(1);
+	vmsg((currutmp->invisible ^= 1) ? MSG_CLOAKED : MSG_UNCLOAK);
     }
     return 0;
 }
@@ -282,10 +270,7 @@ p_cloak()
 int
 p_from()
 {
-    char            ans[4];
-
-    getdata(b_lines - 2, 0, "確定要改故鄉?[y/N]", ans, sizeof(ans), LCECHO);
-    if (ans[0] != 'y')
+    if (getans("確定要改故鄉?[y/N]") != 'y')
 	return 0;
     reload_money();
     if (cuser.money < 49)
@@ -305,8 +290,7 @@ p_exmail()
     int             n;
 
     if (cuser.exmailbox >= MAX_EXKEEPMAIL) {
-	prints("容量最多增加 %d 封，不能再買了。", MAX_EXKEEPMAIL);
-	refresh();
+	vmsg("容量最多增加 %d 封，不能再買了。", MAX_EXKEEPMAIL);
 	return 0;
     }
     snprintf(buf, sizeof(buf),
@@ -375,14 +359,14 @@ int
 p_give()
 {
     int             money, tax;
-    char            id[IDLEN + 1], genbuf[90];
+    char            id[IDLEN + 1], money_buf[20];
 
     move(1, 0);
     usercomplete("這位幸運兒的id:", id);
     if (!id[0] || !strcmp(cuser.userid, id) ||
-	!getdata(2, 0, "要給多少錢:", genbuf, 7, LCECHO))
+	!getdata(2, 0, "要給多少錢:", money_buf, 7, LCECHO))
 	return 0;
-    money = atoi(genbuf);
+    money = atoi(money_buf);
     reload_money();
     if (money > 0 && cuser.money >= money) {
 	tax = give_tax(money);
@@ -390,12 +374,9 @@ p_give()
 	    return 0;		/* 繳完稅就沒錢給了 */
 	deumoney(searchuser(id), money - tax);
 	demoney(-money);
-	snprintf(genbuf, sizeof(genbuf), "%s\t給%s\t%d\t%s",
-		 cuser.userid, id, money - tax, ctime(&now));
-	log_file(FN_MONEY, genbuf, 1);
-	genbuf[0] = 'n';
-	getdata(3, 0, "要自行書寫紅包袋嗎？[y/N]", genbuf, 2, LCECHO);
-	mail_redenvelop(cuser.userid, id, money - tax, genbuf[0]);
+	log_file(FN_MONEY, LOG_CREAT | LOG_VF, "%s\t給%s\t%d\t%s",
+                 cuser.userid, id, money - tax, ctime(&now));
+	mail_redenvelop(cuser.userid, id, money - tax, getans("要自行書寫紅包袋嗎？[y/N]"));
     }
     return 0;
 }
@@ -444,26 +425,3 @@ p_sysinfo(void)
     return 0;
 }
 
-/* 小計算機 */
-#if 0
-static void
-ccount(float *a, float b, int cmode)
-{
-    switch (cmode) {
-	case 0:
-	case 1:
-	case 2:
-	*a += b;
-	break;
-    case 3:
-	*a -= b;
-	break;
-    case 4:
-	*a *= b;
-	break;
-    case 5:
-	*a /= b;
-	break;
-    }
-}
-#endif

@@ -23,7 +23,6 @@ u_loginview()
 {
     int             i;
     unsigned int    pbits = cuser.loginview;
-    char            choice[5];
 
     clear();
     move(4, 0);
@@ -32,9 +31,9 @@ u_loginview()
 	       loginview_file[i][1], ((pbits >> i) & 1 ? "ˇ" : "Ｘ"));
 
     clrtobot();
-    while (getdata(b_lines - 1, 0, "請按 [A-N] 切換設定，按 [Return] 結束：",
-		   choice, 3, LCECHO)) {
-	i = choice[0] - 'a';
+    while ((i = getkey("請按 [A-N] 切換設定，按 [Return] 結束："))!='\r')
+       {
+	i = i - 'a';
 	if (i >= NUMVIEWFILE || i < 0)
 	    bell();
 	else {
@@ -219,8 +218,9 @@ violate_law(userec_t * u, int unum)
 
 static void Customize(void)
 {
-    char    ans[4], done = 0, mindbuf[5];
+    char    done = 0, mindbuf[5];
     char    *wm[3] = {"一般", "進階", "未來"};
+    int     key;
 
     showtitle("個人化設定", "個人化設定");
     memcpy(mindbuf, &currutmp->mind, 4);
@@ -241,15 +241,12 @@ static void Customize(void)
 	if( HAS_PERM(PERM_ANGEL) ){
 	    prints("%-30s%10s\n", "F. 接受小主人詢問", 
 		    ((cuser.uflag2 & BEING_ANGEL) ? "是" : "否"));
-	    getdata(b_lines - 1, 0, "請按 [A-F] 切換設定，按 [Return] 結束：",
-		    ans, 3, DOECHO);
+	    key = getkey("請按 [A-F] 切換設定，按 [Return] 結束：");
 	}else
 #endif
-	    getdata(b_lines - 1, 0, "請按 [A-E] 切換設定，按 [Return] 結束：",
-		    ans, 3, DOECHO);
+	    key = getkey("請按 [A-E] 切換設定，按 [Return] 結束：");
 
-	switch( ans[0] ){
-	case 'A':
+	switch( key ){
 	case 'a':{
 	    int     currentset = cuser.uflag2 & WATER_MASK;
 	    currentset = (currentset + 1) % 3;
@@ -258,18 +255,14 @@ static void Customize(void)
 	    vmsg("修正水球模式後請正常離線再重新上線");
 	}
 	    break;
-	case 'B':
 	case 'b':
 	    cuser.uflag2 ^= REJ_OUTTAMAIL;
 	    break;
-
-	case 'C':
 	case 'c':
 	    cuser.uflag2 ^= FAVNEW_FLAG;
 	    if (cuser.uflag2 & FAVNEW_FLAG)
 		subscribe_newfav();
 	    break;
-	case 'D':
 	case 'd':{
 	    getdata(b_lines - 1, 0, "現在的心情? ",
 		    mindbuf, sizeof(mindbuf), DOECHO);
@@ -281,13 +274,11 @@ static void Customize(void)
 		memcpy(currutmp->mind, mindbuf, 4);
 	}
 	    break;
-	case 'E':
 	case 'e':
 	    cuser.uflag2 ^= FAVNOHILIGHT;
 	    break;
 
 #ifdef PLAY_ANGEL
-	case 'F':
 	case 'f':
 	    if( HAS_PERM(PERM_ANGEL) ){
 		t_switchangel();
@@ -300,7 +291,7 @@ static void Customize(void)
 	}
 	passwd_update(usernum, &cuser);
     }
-    pressanykey();
+    vmsg("設定完成");
 }
 
 void
@@ -308,8 +299,8 @@ uinfo_query(userec_t * u, int real, int unum)
 {
     userec_t        x;
     register int    i = 0, fail, mail_changed;
-    int             uid;
-    char            ans[4], buf[STRLEN], *p;
+    int             uid, ans;
+    char            buf[STRLEN], *p;
     char            genbuf[200], reason[50];
     int money = 0;
     fileheader_t    fhdr;
@@ -320,23 +311,22 @@ uinfo_query(userec_t * u, int real, int unum)
     fail = mail_changed = 0;
 
     memcpy(&x, u, sizeof(userec_t));
-    getdata(b_lines - 1, 0, real ?
+    ans = getans(real ?
 	    "(1)改資料(2)設密碼(3)設權限(4)砍帳號(5)改ID"
 	    "(6)殺/復活寵物(7)審判 [0]結束 " :
-	    "請選擇 (1)修改資料 (2)設定密碼 (C) 個人化設定 ==> [0]結束 ",
-	    ans, sizeof(ans), DOECHO);
+	    "請選擇 (1)修改資料 (2)設定密碼 (C) 個人化設定 ==> [0]結束 ");
 
-    if (ans[0] > '2' && ans[0] != 'C' && ans[0] != 'c' && !real)
-	ans[0] = '0';
+    if (ans > '2' && ans != 'C' && ans != 'c' && !real)
+	ans = '0';
 
-    if (ans[0] == '1' || ans[0] == '3') {
+    if (ans == '1' || ans == '3') {
 	clear();
 	i = 1;
 	move(i++, 0);
 	outs(msg_uid);
 	outs(x.userid);
     }
-    switch (ans[0]) {
+    switch (ans) {
     case 'C':
     case 'c':
 	Customize();
@@ -608,8 +598,7 @@ uinfo_query(userec_t * u, int real, int unum)
 	pressanykey();
 	return;
     }
-    getdata(b_lines - 1, 0, msg_sure_ny, ans, 3, LCECHO);
-    if (*ans == 'y') {
+    if (getans(msg_sure_ny) == 'y') {
 	if (flag)
 	    post_change_perm(temp, i, cuser.userid, x.userid);
 	if (strcmp(u->userid, x.userid)) {
@@ -841,7 +830,6 @@ u_editcalendar()
     getdata(b_lines - 1, 0, "行事曆 (D)刪除 (E)編輯 [Q]取消？[Q] ",
 	    genbuf, 3, LCECHO);
 
-    sethomefile(genbuf, cuser.userid, "calendar");
     if (genbuf[0] == 'e') {
 	int             aborted;
 
@@ -852,6 +840,7 @@ u_editcalendar()
 	    vmsg("行事曆更新完畢");
 	return 0;
     } else if (genbuf[0] == 'd') {
+	sethomefile(genbuf, cuser.userid, "calendar");
 	unlink(genbuf);
 	vmsg("行事曆刪除完畢");
     }
@@ -1146,13 +1135,15 @@ static char *isvalidcareer(char *career)
 	return "麻煩請加學校系所";
     if (strcmp(career, "學生高中") == 0)
 	return "麻煩輸入學校名稱";
+#else
+    if( strlen(career) < 6 )
+	return "您的輸入不正確";
 #endif
     return NULL;
 }
 
 static char *isvalidaddr(char *addr)
 {
-#ifndef FOREIGN_REG
     char    *rejectstr[] =
 	{"地球", "銀河", "火星", NULL};
 
@@ -1171,7 +1162,6 @@ static char *isvalidaddr(char *addr)
 	strcmp(&addr[strlen(addr) - 2], "市") == 0 ||
 	strcmp(&addr[strlen(addr) - 2], "街") == 0    )
 	return "這個地址並不合法";
-#endif
     return NULL;
 }
 
@@ -1291,6 +1281,10 @@ u_register(void)
 		   "請按下任一鍵跳離後重新上站~ :)");
 	    sethomefile(genbuf, cuser.userid, "justify.wait");
 	    unlink(genbuf);
+	    snprintf(cuser.justify, sizeof(cuser.justify),
+		     "%s:%s:auto", phone, career);
+	    sethomefile(genbuf, cuser.userid, "justify");
+	    log_file(genbuf, LOG_CREAT, cuser.justify);
 	    pressanykey();
 	    u_exit("registed");
 	    exit(0);
@@ -1388,11 +1382,11 @@ u_register(void)
 	    getfield(11, "含\033[1;33m縣市\033[m及門寢號碼"
 		     "(台北請加\033[1;33m行政區\033[m)",
 		     "目前住址", addr, 50);
-	    if( (errcode = isvalidaddr(addr) 
+	    if( (errcode = isvalidaddr(addr)) == NULL
 #ifdef FOREIGN_REG
-                && fore[0] ==0 
+                || fore[0] 
 #endif
-                ) == NULL )
+		)
 		break;
 	    else
 		vmsg(errcode);
@@ -1571,6 +1565,6 @@ u_list()
     clrtoeol();
     prints("\033[34;46m  已顯示 %d/%d 的使用者(系統容量無上限)  "
 	   "\033[31;47m  (請按任意鍵繼續)  \033[m", usercounter, totalusers);
-    egetch();
+    igetch();
     return 0;
 }

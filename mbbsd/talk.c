@@ -512,7 +512,7 @@ my_write2(void)
 
     which = 0;
     do {
-	switch ((ch = igetkey())) {
+	switch ((ch = igetch())) {
 	case Ctrl('T'):
 	case KEY_UP:
 	    if (water_usies != 1) {
@@ -622,9 +622,7 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
     */
 
     if (!uin && !(flag == WATERBALL_GENERAL && water_which->count > 0)) {
-	outmsg("\033[1;33;41m糟糕! 對方已落跑了(不在站上)! \033[37m~>_<~\033[m");
-	clrtoeol();
-	refresh();
+	vmsg("糟糕! 對方已落跑了(不在站上)! ");
 	watermode = -1;
 	return 0;
     }
@@ -642,9 +640,6 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
 	/* 一般水球 */
 	watermode = 0;
 	if (!(len = getdata(0, 0, prompt, msg, 56, DOECHO))) {
-	    outmsg("\033[1;33;42m算了! 放你一馬...\033[m");
-	    clrtoeol();
-	    refresh();
 	    currutmp->chatid[0] = c0;
 	    currutmp->mode = mode0;
 	    currstat = currstat0;
@@ -674,9 +669,6 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
 	snprintf(buf, sizeof(buf), "丟給 %s : %s [Y/n]?", destid, msg);
 	getdata(0, 0, buf, genbuf, 3, LCECHO);
 	if (genbuf[0] == 'n') {
-	    outmsg("\033[1;33;42m算了! 放你一馬...\033[m");
-	    clrtoeol();
-	    refresh();
 	    currutmp->chatid[0] = c0;
 	    currutmp->mode = mode0;
 	    currstat = currstat0;
@@ -690,9 +682,7 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
 	    && flag != WATERBALL_ANSWER
 #endif
 	    )) {
-	outmsg("\033[1;33;41m糟糕! 對方已落跑了(不在站上)! \033[37m~>_<~\033[m");
-	clrtoeol();
-	refresh();
+	vmsg("糟糕! 對方已落跑了(不在站上)! ");
 	currutmp->chatid[0] = c0;
 	currutmp->mode = mode0;
 	currstat = currstat0;
@@ -785,7 +775,6 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
     }
 
     clrtoeol();
-    refresh();
 
     currutmp->chatid[0] = c0;
     currutmp->mode = mode0;
@@ -1128,7 +1117,7 @@ do_talk(int fd)
     add_io(fd, 0);
 
     while (1) {
-	ch = igetkey();
+	ch = igetch();
 	if (ch == I_OTHERDATA) {
 	    datac = recv(fd, data, sizeof(data), 0);
 	    if (datac <= 0)
@@ -1926,7 +1915,7 @@ draw_pickup(int drawall, pickup_t * pickup, int pickup_way,
 #endif
 	    );
 
-	refresh();
+	//refresh();
     }
 }
 
@@ -2240,11 +2229,12 @@ userlist(void)
 
 	    case 'b':		/* broadcast */
 		if (cuser.uflag & FRIEND_FLAG || HAS_PERM(PERM_SYSOP)) {
-		    char            genbuf[60];
+		    char            genbuf[60]="[廣播]";
 		    char            ans[4];
 
-		    if (!getdata(0, 0, "廣播訊息:", genbuf, sizeof(genbuf), DOECHO))
+		    if (!getdata(0, 0, "廣播訊息:", genbuf+6, 54, DOECHO))
 			break;
+                    
 		    if (getdata(0, 0, "確定廣播? [Y]",
 				ans, sizeof(ans), LCECHO) &&
 			*ans == 'n')
@@ -2386,7 +2376,7 @@ userlist(void)
 	    case 'g':
 		if (HAS_PERM(PERM_LOGINOK) &&
 		    strcmp(uentp->userid, cuser.userid) != 0) {
-		    char genbuf[128];
+                    char genbuf[10];
 		    move(b_lines - 2, 0);
 		    prints("要給 %s 多少錢呢?  ", uentp->userid);
 		    if (getdata(b_lines - 1, 0, "[銀行轉帳]: ",
@@ -2396,8 +2386,8 @@ userlist(void)
 			    redrawall = redraw = 1;
 			    break;
 			}
-			sprintf(genbuf, "確定要給 %s %d Ptt 幣嗎? [N/y]", uentp->userid, ch);
-			if (getans(genbuf) != 'y'){
+			if (getans("確定要給 %s %d Ptt 幣嗎? [N/y]",
+                             uentp->userid, ch) != 'y'){
 			    redrawall = redraw = 1;
 			    break;
 			}
@@ -2407,19 +2397,16 @@ userlist(void)
 			    outs("\033[41m 現金不足~~\033[m");
 			} else {
 			    deumoney(uentp->uid, ch - give_tax(ch));
-			    prints("\033[44m 嗯..還剩下 %d 錢.."
-				     "\033[m", demoney(-ch));
-			    snprintf(genbuf, sizeof(genbuf),
-				     "%s\t給%s\t%d\t%s\n", cuser.userid,
-				     uentp->userid, ch,
-				     ctime(&currutmp->lastact));
-			    log_file(FN_MONEY, genbuf, 1);
+			    log_file(FN_MONEY, LOG_CREAT | LOG_VF,
+                                  "%s\t給%s\t%d\t%s\n", cuser.userid,
+                                  uentp->userid, ch, ctime(&currutmp->lastact));
 			    mail_redenvelop(cuser.userid, uentp->userid,
 					    ch - give_tax(ch), 'Y');
+			    vmsg(" 嗯..還剩下 %d 錢..", demoney(-ch));
 			}
 		    } else {
 			clrtoeol();
-			outs("\033[41m 交易取消! \033[m");
+			vmsg(" 交易取消! ");
 		    }
 		    redrawall = redraw = 1;
 		}
@@ -2476,12 +2463,9 @@ userlist(void)
 		    cuser.uflag2 -= tmp;
 		    tmp = (tmp + 1) % 3;
 		    cuser.uflag2 |= tmp;
-		    move(4, 0);
-		    prints("系統提供 一般 進階 未來 三種模式\n"
+		    vmsg("系統提供 一般 進階 未來 三種模式\n"
 			   "在切換後請正常下線再重新登入, 以確保結構正確\n"
 			   "目前切換到 %s 水球模式\n", wm[tmp]);
-		    refresh();
-		    sleep(2);
 		    redrawall = redraw = 1;
 		}
 		break;
@@ -2695,7 +2679,6 @@ talkreply(void)
     char            genbuf[200];
     int             a, sig = currutmp->sig;
 
-    talkrequest = NA;
     uip = &SHM->uinfo[currutmp->destuip];
     snprintf(page_requestor, sizeof(page_requestor),
 	    "%s (%s)", uip->userid, uip->username);

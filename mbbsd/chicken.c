@@ -85,8 +85,8 @@ new_chicken()
 
     clear();
     move(2, 0);
-    outs(SHM->i18nstr[cuser.language][867]);
-    i = getans(SHM->i18nstr[cuser.language][868]);
+    outs(I18N[867]);
+    i = getans(I18N[868]);
 
     i -= 'a';
     if (i < 0 || i > NUM_KINDS - 1)
@@ -97,15 +97,15 @@ new_chicken()
     reload_money();
     price = egg_price[(int)mychicken->type];
     if (cuser.money < price) {
-	vmsg(SHM->i18nstr[cuser.language][869], price);
+	vmsg(I18N[869], price);
 	return 0;
     }
-    vice(price, SHM->i18nstr[cuser.language][870]);
+    vice(price, I18N[870]);
     while (strlen(mychicken->name) < 3)
-	getdata(8, 0, SHM->i18nstr[cuser.language][871], mychicken->name,
+	getdata(8, 0, I18N[871], mychicken->name,
 		sizeof(mychicken->name), DOECHO);
 
-    log_file(CHICKENLOG, 1, SHM->i18nstr[cuser.language][872],
+    log_file(CHICKENLOG, 1, I18N[872],
               cuser.userid,
               mychicken->name, chicken_type[(int)mychicken->type], ctime(&now));
     mychicken->lastvisit = mychicken->birthday = mychicken->cbirth = now;
@@ -151,11 +151,11 @@ show_chicken_stat(chicken_t * thechicken)
     struct tm      *ptime;
 
     ptime = localtime(&thechicken->birthday);
-    prints(SHM->i18nstr[cuser.language][873],
+    prints(I18N[873],
 	   thechicken->name, chicken_type[(int)thechicken->type],
 	   15 - strlen(thechicken->name), "",
 	   ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday,
-	   SHM->i18nstr[cuser.language][age > 16 ? 789 : age + 789],
+	   I18N[age > 16 ? 789 : age + 789],
 	   age, thechicken->hp, thechicken->hp_max,
 	   thechicken->mm, thechicken->mm_max,
 	   thechicken->attack, thechicken->run, thechicken->book,
@@ -180,7 +180,7 @@ show_chicken_data(chicken_t * thechicken, chicken_t * pkchicken)
     /* Ptt:debug */
     thechicken->type %= NUM_KINDS;
     clear();
-    showtitle(pkchicken ? SHM->i18nstr[cuser.language][874] : SHM->i18nstr[cuser.language][875], BBSName);
+    showtitle(pkchicken ? I18N[874] : I18N[875], BBSName);
     move(1, 0);
 
     show_chicken_stat(thechicken);
@@ -192,48 +192,48 @@ show_chicken_data(chicken_t * thechicken, chicken_t * pkchicken)
     move(18, 0);
 
     if (thechicken->sick)
-	outs(SHM->i18nstr[cuser.language][876]);
+	outs(I18N[876]);
     if (thechicken->sick > thechicken->hp / 5)
-	outs(SHM->i18nstr[cuser.language][877]);
+	outs(I18N[877]);
 
     if (thechicken->clean > 150)
-	outs(SHM->i18nstr[cuser.language][878]);
+	outs(I18N[878]);
     else if (thechicken->clean > 80)
-	outs(SHM->i18nstr[cuser.language][879]);
+	outs(I18N[879]);
     else if (thechicken->clean < 20)
-	outs(SHM->i18nstr[cuser.language][880]);
+	outs(I18N[880]);
 
     if (thechicken->weight > thechicken->hp_max * 4)
-	outs(SHM->i18nstr[cuser.language][881]);
+	outs(I18N[881]);
     else if (thechicken->weight > thechicken->hp_max * 3)
-	outs(SHM->i18nstr[cuser.language][882]);
+	outs(I18N[882]);
     else if (thechicken->weight < (thechicken->hp_max / 4))
-	outs(SHM->i18nstr[cuser.language][883]);
+	outs(I18N[883]);
     else if (thechicken->weight < (thechicken->hp_max / 2))
-	outs(SHM->i18nstr[cuser.language][884]);
+	outs(I18N[884]);
 
     if (thechicken->tiredstrong > thechicken->hp * 1.7)
-	outs(SHM->i18nstr[cuser.language][885]);
+	outs(I18N[885]);
     else if (thechicken->tiredstrong > thechicken->hp)
-	outs(SHM->i18nstr[cuser.language][886]);
+	outs(I18N[886]);
     else if (thechicken->tiredstrong < thechicken->hp / 4)
-	outs(SHM->i18nstr[cuser.language][887]);
+	outs(I18N[887]);
 
     if (thechicken->hp < thechicken->hp_max / 4)
-	outs(SHM->i18nstr[cuser.language][888]);
+	outs(I18N[888]);
     if (thechicken->happy > 500)
-	outs(SHM->i18nstr[cuser.language][889]);
+	outs(I18N[889]);
     else if (thechicken->happy < 100)
-	outs(SHM->i18nstr[cuser.language][890]);
+	outs(I18N[890]);
     if (thechicken->satis > 500)
-	outs(SHM->i18nstr[cuser.language][891]);
+	outs(I18N[891]);
     else if (thechicken->satis < 50)
-	outs(SHM->i18nstr[cuser.language][892]);
+	outs(I18N[892]);
 
     if (pkchicken) {
 	outs("\n");
 	show_chicken_stat(pkchicken);
-	outs(SHM->i18nstr[cuser.language][893]);
+	outs(I18N[893]);
     }
 }
 
@@ -271,7 +271,7 @@ ch_clean()
 static void
 ch_guess()
 {
-    char           *guess[3] = {SHM->i18nstr[cuser.language][894], SHM->i18nstr[cuser.language][895], SHM->i18nstr[cuser.language][896]}, me, ch, win;
+    char           *guess[3] = {I18N[894], I18N[895], I18N[896]}, me, ch, win;
 
     chicken_t *mychicken = &cuser.mychicken;
     mychicken->happy += time_change[(int)mychicken->type][HAPPY] * 1.5;
@@ -280,7 +280,7 @@ ch_guess()
     mychicken->attack += time_change[(int)mychicken->type][ATTACK] / 4;
     move(20, 0);
     clrtobot();
-    outs(SHM->i18nstr[cuser.language][897]);
+    outs(I18N[897]);
     me = igetch();
     me -= '1';
     if (me > 2 || me < 0)
@@ -289,7 +289,7 @@ ch_guess()
     ch = (me + win + 3) % 3;
     prints("%s:%s !      %s:%s !.....%s",
 	   cuser.userid, guess[(int)me], mychicken->name, guess[(int)ch],
-	   win == 0 ? SHM->i18nstr[cuser.language][898] : win < 0 ? SHM->i18nstr[cuser.language][899] : SHM->i18nstr[cuser.language][900]);
+	   win == 0 ? I18N[898] : win < 0 ? I18N[899] : I18N[900]);
     pressanykey();
 }
 
@@ -343,7 +343,7 @@ ch_buyitem(int money, char *picture, int *item, int haveticket)
     int             num = 0;
     char            buf[5];
 
-    getdata_str(b_lines - 1, 0, SHM->i18nstr[cuser.language][901],
+    getdata_str(b_lines - 1, 0, I18N[901],
 		buf, sizeof(buf), DOECHO, "1");
     num = atoi(buf);
     if (num < 1)
@@ -352,13 +352,13 @@ ch_buyitem(int money, char *picture, int *item, int haveticket)
     if (cuser.money > money * num) {
 	*item += num;
 	if( haveticket )
-	    vice(money * num, SHM->i18nstr[cuser.language][902]);
+	    vice(money * num, I18N[902]);
 	else
 	    demoney(-money * num);
 	show_file(picture, 5, 14, NO_RELOAD);
         pressanykey();
     } else {
-	vmsg(SHM->i18nstr[cuser.language][903]);
+	vmsg(I18N[903]);
     }
 }
 
@@ -399,13 +399,13 @@ ch_kill()
     chicken_t *mychicken = &cuser.mychicken;
     int        ans;
 
-    ans = getans(SHM->i18nstr[cuser.language][904]);
+    ans = getans(I18N[904]);
     if (ans == 'y') {
 
-	vice(100, SHM->i18nstr[cuser.language][905]);
+	vice(100, I18N[905]);
 	more(CHICKEN_PIC "/deadth", YEA);
 	log_file(CHICKENLOG, 1,
-		 SHM->i18nstr[cuser.language][906], cuser.userid, mychicken->name,
+		 I18N[906], cuser.userid, mychicken->name,
 		 chicken_type[(int)mychicken->type], ctime(&now));
 	mychicken->name[0] = 0;
     }
@@ -443,24 +443,24 @@ ch_sell()
 	money = MAX_CHICKEN_MONEY;
     //¨¾¤î©ÇÂû
     if (mychicken->type == 1 || mychicken->type == 7) {
-	outs(SHM->i18nstr[cuser.language][907]);
+	outs(I18N[907]);
 	pressanykey();
 	return 0;
     }
     if (age < 5) {
-	outs(SHM->i18nstr[cuser.language][908]);
+	outs(I18N[908]);
 	pressanykey();
 	return 0;
     }
     if (age > 30) {
-	outs(SHM->i18nstr[cuser.language][909]);
+	outs(I18N[909]);
 	pressanykey();
 	return 0;
     }
-    ans = getans(SHM->i18nstr[cuser.language][910], age, 
+    ans = getans(I18N[910], age, 
                  chicken_type[(int)mychicken->type], money);
     if (ans == 'y') {
-	log_file(CHICKENLOG, 1, SHM->i18nstr[cuser.language][911],
+	log_file(CHICKENLOG, 1, I18N[911],
                  cuser.userid, mychicken->name, 
                  chicken_type[(int)mychicken->type], money, ctime(&now));
 	mychicken->lastvisit = mychicken->name[0] = 0;
@@ -616,7 +616,7 @@ deadtype(chicken_t * thechicken)
 
     if (thechicken == mychicken) {
 	log_file(CHICKENLOG, 1,
-				SHM->i18nstr[cuser.language][912],
+				I18N[912],
                  cuser.userid, thechicken->name,
                  chicken_type[(int)thechicken->type], ctime(&now));
 	mychicken->name[0] = 0;
@@ -667,12 +667,12 @@ ch_changename()
     chicken_t *mychicken = &cuser.mychicken;
     char      newname[20] = "";
 
-    getdata_str(b_lines - 1, 0, SHM->i18nstr[cuser.language][913], newname, 18, DOECHO,
+    getdata_str(b_lines - 1, 0, I18N[913], newname, 18, DOECHO,
 		mychicken->name);
 
     if (strlen(newname) >= 3 && strcmp(newname, mychicken->name)) {
 	strlcpy(mychicken->name, newname, sizeof(mychicken->name));
-	log_file(CHICKENLOG, 1, SHM->i18nstr[cuser.language][914],
+	log_file(CHICKENLOG, 1, I18N[914],
                  cuser.userid, mychicken->name,
                  chicken_type[(int)mychicken->type], newname, ctime(&now));
     }
@@ -686,7 +686,7 @@ select_menu()
 
     reload_money();
     move(19, 0);
-    prints(SHM->i18nstr[cuser.language][915],
+    prints(I18N[915],
 	   cuser.money,
     /*
      * chicken_food[(int)mychicken->type],
@@ -766,38 +766,38 @@ recover_chicken(chicken_t * thechicken)
 
     if (now - thechicken->lastvisit > (60 * 60 * 24 * 7))
 	return 0;
-    outmsg(SHM->i18nstr[cuser.language][916]);
+    outmsg(I18N[916]);
     bell();
     igetch();
-    outmsg(SHM->i18nstr[cuser.language][917]);
+    outmsg(I18N[917]);
     bell();
     igetch();
-    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][918],
+    snprintf(buf, sizeof(buf), I18N[918],
 	     chicken_type[(int)thechicken->type], price * 2);
     outmsg(buf);
     bell();
-    getdata_str(21, 0, SHM->i18nstr[cuser.language][919], buf, 3, LCECHO, "N");
+    getdata_str(21, 0, I18N[919], buf, 3, LCECHO, "N");
     if (buf[0] == 'y' || buf[0] == 'Y') {
 	reload_money();
 	if (cuser.money < price * 2) {
-	    outmsg(SHM->i18nstr[cuser.language][920]);
+	    outmsg(I18N[920]);
 	    bell();
 	    igetch();
 	    return 0;
 	}
-	strlcpy(thechicken->name, SHM->i18nstr[cuser.language][921], sizeof(thechicken->name));
+	strlcpy(thechicken->name, I18N[921], sizeof(thechicken->name));
 	thechicken->hp = thechicken->hp_max;
 	thechicken->sick = 0;
 	thechicken->satis = 2;
-	vice(money, SHM->i18nstr[cuser.language][922]);
+	vice(money, I18N[922]);
 	snprintf(buf, sizeof(buf),
-		 SHM->i18nstr[cuser.language][923], money);
+		 I18N[923], money);
 	outmsg(buf);
 	bell();
 	igetch();
 	return 1;
     }
-    outmsg(SHM->i18nstr[cuser.language][924]);
+    outmsg(I18N[924]);
     bell();
     igetch();
     thechicken->lastvisit = 0;
@@ -810,12 +810,12 @@ recover_chicken(chicken_t * thechicken)
 void copy_i18nstring() {
 	int i;
 	for (i = 0; i < NUM_KINDS; i++) {
-		chicken_type[i] = SHM->i18nstr[cuser.language][806 + i];
-		chicken_food[i] = SHM->i18nstr[cuser.language][821 + i];
-		attack_type[i] = SHM->i18nstr[cuser.language][836 + i];
+		chicken_type[i] = I18N[806 + i];
+		chicken_food[i] = I18N[821 + i];
+		attack_type[i] = I18N[836 + i];
 	}
 	for (i = 0; i < 16; i++)
-		damage_degree[i] = SHM->i18nstr[cuser.language][851 + i];
+		damage_degree[i] = I18N[851 + i];
 }
 int
 chicken_main()
@@ -864,7 +864,7 @@ chickenpk(int fd)
     reload_chicken();
     if (!ochicken->name[0] || !mychicken->name[0]) {
 	bell();
-	vmsg(SHM->i18nstr[cuser.language][925]);	/* Ptt:§«¤îpage®É§âÃdª«½æ±¼ */
+	vmsg(I18N[925]);	/* Ptt:§«¤îpage®É§âÃdª«½æ±¼ */
 	add_io(0, 0);
 	close(fd);
 	unlockutmpmode();
@@ -895,11 +895,11 @@ chickenpk(int fd)
 	    case 'c':
 		catched = 1;
 		move(16, 0);
-		outs(SHM->i18nstr[cuser.language][926]);
+		outs(I18N[926]);
 		break;
 	    case 'd':
 		move(16, 0);
-		outs(SHM->i18nstr[cuser.language][927]);
+		outs(I18N[927]);
 		break;
 	    }
 	    if (data[0] == 'd' || data[0] == 'q' || data[0] == 'l')
@@ -914,7 +914,7 @@ chickenpk(int fd)
 	    case 'y':
 		if (catched == 1) {
 		    snprintf(data, sizeof(data),
-			     SHM->i18nstr[cuser.language][928], ochicken->name);
+			     I18N[928], ochicken->name);
 		}
 		break;
 	    case 'n':
@@ -924,14 +924,14 @@ chickenpk(int fd)
 		r = r % (attmax + 2);
 		if (r) {
 		    snprintf(data, sizeof(data),
-			     SHM->i18nstr[cuser.language][929], mychicken->name,
+			     I18N[929], mychicken->name,
 			     damage_degree[r / 3 > 15 ? 15 : r / 3],
 			     attack_type[(int)mychicken->type],
 			     ochicken->name, r);
 		    ochicken->hp -= r;
 		} else
 		    snprintf(data, sizeof(data),
-			     SHM->i18nstr[cuser.language][930], mychicken->name);
+			     I18N[930], mychicken->name);
 		break;
 	    case 'o':
 		if (mychicken->oo > 0) {
@@ -940,27 +940,27 @@ chickenpk(int fd)
 		    if (mychicken->hp > mychicken->hp_max)
 			mychicken->hp = mychicken->hp_max;
 		    mychicken->tiredstrong = 0;
-		    snprintf(data, sizeof(data), SHM->i18nstr[cuser.language][931],
+		    snprintf(data, sizeof(data), I18N[931],
 			     mychicken->name);
 		} else
 		    snprintf(data, sizeof(data),
-			    SHM->i18nstr[cuser.language][932],
+			    I18N[932],
 			    mychicken->name);
 		break;
 	    case 'q':
 		if (r % (mychicken->run + 1) > r % (ochicken->run + 1))
-		    snprintf(data, sizeof(data), SHM->i18nstr[cuser.language][933],
+		    snprintf(data, sizeof(data), I18N[933],
 			     mychicken->name);
 		else
 		    snprintf(data, sizeof(data),
-			     SHM->i18nstr[cuser.language][934],
+			     I18N[934],
 			     mychicken->name, ochicken->name);
 		break;
 	    }
 	    if (deadtype(ochicken)) {
 		strtok(data, "\n");
 		strlcpy(buf, data, sizeof(buf));
-		snprintf(data, sizeof(data), SHM->i18nstr[cuser.language][935],
+		snprintf(data, sizeof(data), I18N[935],
 			 buf + 1, ochicken->name, mychicken->name);
 	    }
 	    move(17, 0);

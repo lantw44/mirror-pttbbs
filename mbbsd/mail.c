@@ -17,20 +17,20 @@ setforward()
 	fscanf(fp, "%s", ip); // XXX check buffer size
 	fclose(fp);
     }
-    getdata_buf(b_lines - 1, 0, SHM->i18nstr[cuser.language][1202],
+    getdata_buf(b_lines - 1, 0, I18N[1202],
 		ip, sizeof(ip), DOECHO);
     if (ip[0] && ip[0] != ' ') {
-	getdata(b_lines, 0, SHM->i18nstr[cuser.language][1203], yn, sizeof(yn),
+	getdata(b_lines, 0, I18N[1203], yn, sizeof(yn),
 		LCECHO);
 	if (yn[0] != 'n' && (fp = fopen(buf, "w"))) {
 	    fprintf(fp, "%s", ip);
 	    fclose(fp);
-	    vmsg(SHM->i18nstr[cuser.language][1204]);
+	    vmsg(I18N[1204]);
 	    return 0;
 	}
     }
     unlink(buf);
-    vmsg(SHM->i18nstr[cuser.language][1205]);
+    vmsg(I18N[1205]);
     return 0;
 }
 
@@ -40,9 +40,9 @@ built_mail_index()
     char            genbuf[128];
 
     move(b_lines - 4, 0);
-    outs(SHM->i18nstr[cuser.language][1206]);
+    outs(I18N[1206]);
     getdata(b_lines - 1, 0,
-	    SHM->i18nstr[cuser.language][1207], genbuf, 3,
+	    I18N[1207], genbuf, 3,
 	    LCECHO);
     if (genbuf[0] != 'y')
 	return 0;
@@ -51,7 +51,7 @@ built_mail_index()
 	     BBSHOME "/bin/buildir " BBSHOME "/home/%c/%s",
 	     cuser.userid[0], cuser.userid);
     move(22, 0);
-    prints(SHM->i18nstr[cuser.language][1208]);
+    prints(I18N[1208]);
     pressanykey();
     system(genbuf);
     return 0;
@@ -116,13 +116,13 @@ m_internet()
 {
     char            receiver[60];
 
-    getdata(20, 0, SHM->i18nstr[cuser.language][1209], receiver, sizeof(receiver), DOECHO);
+    getdata(20, 0, I18N[1209], receiver, sizeof(receiver), DOECHO);
     if (strchr(receiver, '@') && !invalidaddr(receiver) &&
-	getdata(21, 0, SHM->i18nstr[cuser.language][1210], save_title, STRLEN, DOECHO))
+	getdata(21, 0, I18N[1210], save_title, STRLEN, DOECHO))
 	do_send(receiver, save_title);
     else {
 	move(22, 0);
-	outs(SHM->i18nstr[cuser.language][1211]);
+	outs(I18N[1211]);
 	pressanykey();
     }
     return 0;
@@ -159,7 +159,7 @@ chkmailbox()
 			mailsumlimit) {
 	    bell();
 	    bell();
-	    vmsg(SHM->i18nstr[cuser.language][1212], mailkeep, mailmaxkeep);
+	    vmsg(I18N[1212], mailkeep, mailmaxkeep);
 	    return mailkeep;
 	}
     }
@@ -177,7 +177,7 @@ do_hold_mail(char *fpath, char *receiver, char *holder)
     stampfile(buf, &mymail);
 
     mymail.filemode = FILE_READ ;
-    strlcpy(mymail.owner, SHM->i18nstr[cuser.language][1214], sizeof(mymail.owner));
+    strlcpy(mymail.owner, I18N[1214], sizeof(mymail.owner));
     if (receiver) {
 	snprintf(title, sizeof(title), "(%s) %s", receiver, save_title);
 	strncpy(mymail.title, title, TTLEN);
@@ -196,7 +196,7 @@ hold_mail(char *fpath, char *receiver)
 {
     char            buf[4];
 
-    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1215],
+    getdata(b_lines - 1, 0, I18N[1215],
 	    buf, sizeof(buf), LCECHO);
 
     if (buf[0] == 'y')
@@ -222,7 +222,7 @@ do_send(char *userid, char *title)
 	    return -3;
 
 	if (!title)
-	    getdata(2, 0, SHM->i18nstr[cuser.language][1216], save_title, STRLEN - 20, DOECHO);
+	    getdata(2, 0, I18N[1216], save_title, STRLEN - 20, DOECHO);
 	curredit |= EDIT_MAIL;
 	curredit &= ~EDIT_ITEM;
     }
@@ -240,17 +240,17 @@ do_send(char *userid, char *title)
 	    return -2;
 	}
 	clear();
-	prints(SHM->i18nstr[cuser.language][1217],
+	prints(I18N[1217],
 	       userid, title);
 	ch = igetch();
 	switch (ch) {
 	case 'N':
 	case 'n':
-	    outs(SHM->i18nstr[cuser.language][1218]);
+	    outs(I18N[1218]);
 	    res = -2;
 	    break;
 	default:
-	    outs(SHM->i18nstr[cuser.language][1219]);
+	    outs(I18N[1219]);
 	    res =
 #ifndef USE_BSMTP
 		bbs_sendmail(fpath, title, userid);
@@ -299,7 +299,7 @@ my_send(char *uident)
 	outs(msg_cancel);
 	break;
     case -3:
-	prints(SHM->i18nstr[cuser.language][1220], uident);
+	prints(I18N[1220], uident);
 	break;
     }
     pressanykey();
@@ -310,7 +310,7 @@ m_send()
 {
     char            uident[40];
 
-    stand_title(SHM->i18nstr[cuser.language][1221]);
+    stand_title(I18N[1221]);
     usercomplete(msg_uid, uident);
     showplans(uident);
     if (uident[0])
@@ -326,18 +326,18 @@ multi_list(int *reciper)
     char            genbuf[200];
 
     while (1) {
-	stand_title(SHM->i18nstr[cuser.language][1222]);
-	ShowNameList(3, 0, SHM->i18nstr[cuser.language][1201]);
+	stand_title(I18N[1222]);
+	ShowNameList(3, 0, I18N[1201]);
 	move(1, 0);
-	prints(SHM->i18nstr[cuser.language][1223]);
+	prints(I18N[1223]);
 	getdata(2, 0,
-	       SHM->i18nstr[cuser.language][1224],
+	       I18N[1224],
 		genbuf, 4, LCECHO);
 	switch (genbuf[0]) {
 	case 'a':
 	    while (1) {
 		move(1, 0);
-		usercomplete(SHM->i18nstr[cuser.language][1225], uid);
+		usercomplete(I18N[1225], uid);
 		if (uid[0] == '\0')
 		    break;
 
@@ -350,18 +350,18 @@ multi_list(int *reciper)
 		    AddNameList(uid);
 		    (*reciper)++;
 		}
-		ShowNameList(3, 0, SHM->i18nstr[cuser.language][1201]);
+		ShowNameList(3, 0, I18N[1201]);
 	    }
 	    break;
 	case 'd':
 	    while (*reciper) {
 		move(1, 0);
-		namecomplete(SHM->i18nstr[cuser.language][1226], uid);
+		namecomplete(I18N[1226], uid);
 		if (uid[0] == '\0')
 		    break;
 		if (RemoveNameList(uid))
 		    (*reciper)--;
-		ShowNameList(3, 0, SHM->i18nstr[cuser.language][1201]);
+		ShowNameList(3, 0, I18N[1201]);
 	    }
 	    break;
 	case '0':
@@ -378,15 +378,15 @@ multi_list(int *reciper)
 	    genbuf[0] = '1';
 	case 'i':
 	    setuserfile(genbuf, genbuf[0] == '1' ? listfile : fn_overrides);
-	    ToggleNameList(reciper, genbuf, SHM->i18nstr[cuser.language][1201]);
+	    ToggleNameList(reciper, genbuf, I18N[1201]);
 	    break;
 	case 'o':
 	    setuserfile(genbuf, "alohaed");
-	    ToggleNameList(reciper, genbuf, SHM->i18nstr[cuser.language][1201]);
+	    ToggleNameList(reciper, genbuf, I18N[1201]);
 	    break;
 	case 'n':
 	    setuserfile(genbuf, "postlist");
-	    ToggleNameList(reciper, genbuf, SHM->i18nstr[cuser.language][1201]);
+	    ToggleNameList(reciper, genbuf, I18N[1201]);
 	    break;
 	case 'q':
 	    *reciper = 0;
@@ -415,7 +415,7 @@ multi_send(char *title)
 	fp = fopen(quote_file, "r");
 	assert(fp);
 	while (fgets(genbuf, 256, fp)) {
-	    if (strncmp(genbuf, SHM->i18nstr[cuser.language][1227], 3)) {
+	    if (strncmp(genbuf, I18N[1227], 3)) {
 		if (listing)
 		    break;
 	    } else {
@@ -428,12 +428,12 @@ multi_send(char *title)
 			    reciper++;
 			}
 		    } while ((ptr = (char *)strtok(NULL, " \n\r")));
-		} else if (!strncmp(genbuf + 3, SHM->i18nstr[cuser.language][1228], 6))
+		} else if (!strncmp(genbuf + 3, I18N[1228], 6))
 		    listing = 1;
 	    }
 	}
 	fclose(fp);
-	ShowNameList(3, 0, SHM->i18nstr[cuser.language][1201]);
+	ShowNameList(3, 0, I18N[1201]);
     }
     multi_list(&reciper);
     move(1, 0);
@@ -444,21 +444,21 @@ multi_send(char *title)
 	if (title)
 	    do_reply_title(2, title);
 	else {
-	    getdata(2, 0, SHM->i18nstr[cuser.language][1229], fpath, sizeof(fpath), DOECHO);
-	    snprintf(save_title, sizeof(save_title), SHM->i18nstr[cuser.language][1230], fpath);
+	    getdata(2, 0, I18N[1229], fpath, sizeof(fpath), DOECHO);
+	    snprintf(save_title, sizeof(save_title), I18N[1230], fpath);
 	}
 
 	setuserfile(fpath, fn_notes);
 
 	if ((fp = fopen(fpath, "w"))) {
-	    fprintf(fp, SHM->i18nstr[cuser.language][1231], reciper);
+	    fprintf(fp, I18N[1231], reciper);
 	    listing = 80;
 
 	    for (p = toplev; p; p = p->next) {
 		reciper = strlen(p->word) + 1;
 		if (listing + reciper > 75) {
 		    listing = reciper;
-		    fprintf(fp, SHM->i18nstr[cuser.language][1232]);
+		    fprintf(fp, I18N[1232]);
 		} else
 		    listing += reciper;
 
@@ -518,7 +518,7 @@ multi_reply(int ent, fileheader_t * fhdr, char *direct)
     if (!(fhdr->filemode & FILE_MULTI))
 	return mail_reply(ent, fhdr, direct);
 
-    stand_title(SHM->i18nstr[cuser.language][1234]);
+    stand_title(I18N[1234]);
     strlcpy(quote_user, fhdr->owner, sizeof(quote_user));
     setuserfile(quote_file, fhdr->filename);
     multi_send(fhdr->title);
@@ -528,7 +528,7 @@ multi_reply(int ent, fileheader_t * fhdr, char *direct)
 int
 mail_list()
 {
-    stand_title(SHM->i18nstr[cuser.language][1235]);
+    stand_title(I18N[1235]);
     multi_send(NULL);
     return 0;
 }
@@ -543,16 +543,16 @@ mail_all()
     int             i, unum;
     char           *userid;
 
-    stand_title(SHM->i18nstr[cuser.language][1236]);
+    stand_title(I18N[1236]);
     setutmpmode(SMAIL);
-    getdata(2, 0, SHM->i18nstr[cuser.language][1237], fpath, sizeof(fpath), DOECHO);
+    getdata(2, 0, I18N[1237], fpath, sizeof(fpath), DOECHO);
     snprintf(save_title, sizeof(save_title),
-	     SHM->i18nstr[cuser.language][1238], fpath);
+	     I18N[1238], fpath);
 
     setuserfile(fpath, fn_notes);
 
     if ((fp = fopen(fpath, "w"))) {
-	fprintf(fp, SHM->i18nstr[cuser.language][1239]);
+	fprintf(fp, I18N[1239]);
 	fprintf(fp, "---------------------------------------------------------------------------\n");
 	fclose(fp);
     }
@@ -570,7 +570,7 @@ mail_all()
     curredit = 0;
 
     setutmpmode(MAILALL);
-    stand_title(SHM->i18nstr[cuser.language][1240]);
+    stand_title(I18N[1240]);
 
     sethomepath(genbuf, cuser.userid);
     stampfile(genbuf, &mymail);
@@ -619,7 +619,7 @@ mail_mbox()
     fileheader_t    fhdr;
 
     snprintf(cmd, sizeof(cmd), "/tmp/%s.uu", cuser.userid);
-    snprintf(fhdr.title, sizeof(fhdr.title), SHM->i18nstr[cuser.language][1241], cuser.userid);
+    snprintf(fhdr.title, sizeof(fhdr.title), I18N[1241], cuser.userid);
     doforward(cmd, &fhdr, 'Z');
     return 0;
 }
@@ -629,7 +629,7 @@ m_forward(int ent, fileheader_t * fhdr, char *direct)
 {
     char            uid[STRLEN];
 
-    stand_title(SHM->i18nstr[cuser.language][1242]);
+    stand_title(I18N[1242]);
     usercomplete(msg_uid, uid);
     if (uid[0] == '\0')
 	return FULLUPDATE;
@@ -639,7 +639,7 @@ m_forward(int ent, fileheader_t * fhdr, char *direct)
     snprintf(save_title, sizeof(save_title), "%.64s (fwd)", fhdr->title);
     move(1, 0);
     clrtobot();
-    prints(SHM->i18nstr[cuser.language][1243], uid, save_title);
+    prints(I18N[1243], uid, save_title);
 
     switch (do_send(uid, save_title)) {
     case -1:
@@ -649,7 +649,7 @@ m_forward(int ent, fileheader_t * fhdr, char *direct)
 	outs(msg_cancel);
 	break;
     case -3:
-	prints(SHM->i18nstr[cuser.language][1244], uid);
+	prints(I18N[1244], uid);
 	break;
     }
     pressanykey();
@@ -678,8 +678,8 @@ read_new_mail(fileheader_t * fptr)
 	return 0;
     clear();
     move(10, 0);
-    prints(SHM->i18nstr[cuser.language][1245], fptr->owner, fptr->title);
-    getdata(11, 0, SHM->i18nstr[cuser.language][1246], genbuf, 3, DOECHO);
+    prints(I18N[1245], fptr->owner, fptr->title);
+    getdata(11, 0, I18N[1246], genbuf, 3, DOECHO);
     if (genbuf[0] == 'q')
 	return QUIT;
     if (genbuf[0] == 'n')
@@ -728,7 +728,7 @@ read_new_mail(fileheader_t * fptr)
     }
     if (delete_it) {
 	clear();
-	prints(SHM->i18nstr[cuser.language][1247], fptr->title);
+	prints(I18N[1247], fptr->title);
 	getdata(1, 0, msg_sure_ny, genbuf, 2, LCECHO);
 	if (genbuf[0] == 'y') {
 	    unlink(fname);
@@ -750,7 +750,7 @@ m_new()
     curredit |= EDIT_MAIL;
     curredit &= ~EDIT_ITEM;
     if (apply_record(currmaildir, read_new_mail, sizeof(fileheader_t)) == -1) {
-	outs(SHM->i18nstr[cuser.language][1248]);
+	outs(I18N[1248]);
 	pressanykey();
 	return -1;
     }
@@ -759,7 +759,7 @@ m_new()
 	while (delcnt--)
 	    delete_record(currmaildir, sizeof(fileheader_t), delmsgs[delcnt]);
     }
-    outs(mrd ? SHM->i18nstr[cuser.language][1249] : SHM->i18nstr[cuser.language][1250]);
+    outs(mrd ? I18N[1249] : I18N[1250]);
     pressanykey();
     return -1;
 }
@@ -769,13 +769,13 @@ mailtitle()
 {
     char            buf[256];
 
-    showtitle(SHM->i18nstr[cuser.language][1251], BBSName);
-    prints(SHM->i18nstr[cuser.language][1252],
-	     HAS_PERM(PERM_NOOUTMAIL) ? SHM->i18nstr[cuser.language][1253] : SHM->i18nstr[cuser.language][1254]);
+    showtitle(I18N[1251], BBSName);
+    prints(I18N[1252],
+	     HAS_PERM(PERM_NOOUTMAIL) ? I18N[1253] : I18N[1254]);
     buf[0] = 0;
     if (mailsumlimit) {
 	snprintf(buf, sizeof(buf),
-		 SHM->i18nstr[cuser.language][1255], mailsum, mailsumlimit,
+		 I18N[1255], mailsum, mailsumlimit,
 		 mailkeep, mailmaxkeep);
     }
     prints("%-29s\033[m", buf);
@@ -792,7 +792,7 @@ maildoent(int num, fileheader_t * ent)
     title = subject(mark = ent->title);
     if (title == mark) {
 	color = '1';
-	mark = SHM->i18nstr[cuser.language][1256];
+	mark = I18N[1256];
     } else {
 	color = '3';
 	mark = "R:";
@@ -896,7 +896,7 @@ mail_reply(int ent, fileheader_t * fhdr, char *direct)
     FILE           *fp;
     char            genbuf[512];
 
-    stand_title(SHM->i18nstr[cuser.language][1257]);
+    stand_title(I18N[1257]);
 
     /* §PÂ_¬O boards ©Î mail */
     if (curredit & EDIT_MAIL)
@@ -916,7 +916,7 @@ mail_reply(int ent, fileheader_t * fhdr, char *direct)
 	if (!strcmp(t, str_author1) || !strcmp(t, str_author2))
 	    strlcpy(uid, strtok(NULL, str_space), sizeof(uid));
 	else {
-	    outs(SHM->i18nstr[cuser.language][1258]);
+	    outs(I18N[1258]);
 	    pressanykey();
 	    return FULLUPDATE;
 	}
@@ -925,7 +925,7 @@ mail_reply(int ent, fileheader_t * fhdr, char *direct)
 
     /* make the title */
     do_reply_title(3, fhdr->title);
-    prints(SHM->i18nstr[cuser.language][1259], uid, save_title);
+    prints(I18N[1259], uid, save_title);
 
     /* edit, then send the mail */
     ent = curredit;
@@ -937,7 +937,7 @@ mail_reply(int ent, fileheader_t * fhdr, char *direct)
 	outs(msg_cancel);
 	break;
     case -3:
-	prints(SHM->i18nstr[cuser.language][1260], uid);
+	prints(I18N[1260], uid);
 	break;
     }
     curredit = ent;
@@ -952,7 +952,7 @@ mail_edit(int ent, fileheader_t * fhdr, char *direct)
 
     if (!HAS_PERM(PERM_SYSOP) &&
 	strcmp(cuser.userid, fhdr->owner) &&
-	strcmp(SHM->i18nstr[cuser.language][1261], fhdr->owner))
+	strcmp(I18N[1261], fhdr->owner))
 	return DONOTHING;
 
     setdirpath(genbuf, direct, fhdr->filename);
@@ -1003,7 +1003,7 @@ mail_cross_post(int ent, fileheader_t * fhdr, char *direct)
     move(2, 0);
     clrtoeol();
     move(1, 0);
-    generalnamecomplete(SHM->i18nstr[cuser.language][1283], xboard, sizeof(xboard),
+    generalnamecomplete(I18N[1283], xboard, sizeof(xboard),
 			SHM->Bnumber,
 			completeboard_compar,
 			completeboard_permission,
@@ -1013,27 +1013,27 @@ mail_cross_post(int ent, fileheader_t * fhdr, char *direct)
 
     ent = 1;
     if (HAS_PERM(PERM_SYSOP) || !strcmp(fhdr->owner, cuser.userid)) {
-	getdata(2, 0, SHM->i18nstr[cuser.language][1284],
+	getdata(2, 0, I18N[1284],
 		genbuf, 3, DOECHO);
 	if (genbuf[0] != '2') {
 	    ent = 0;
-	    getdata(2, 0, SHM->i18nstr[cuser.language][1285], inputbuf, 3, DOECHO);
+	    getdata(2, 0, I18N[1285], inputbuf, 3, DOECHO);
 	    if (inputbuf[0] != 'n' && inputbuf[0] != 'N')
 		author = 1;
 	}
     }
     if (ent)
-	snprintf(xtitle, sizeof(xtitle), SHM->i18nstr[cuser.language][1286], fhdr->title);
+	snprintf(xtitle, sizeof(xtitle), I18N[1286], fhdr->title);
     else
 	strlcpy(xtitle, fhdr->title, sizeof(xtitle));
 
-    snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][1287], xtitle);
+    snprintf(genbuf, sizeof(genbuf), I18N[1287], xtitle);
     getdata(2, 0, genbuf, genbuf2, sizeof(genbuf2), LCECHO);
     if (*genbuf2 == 'n')
-	if (getdata(2, 0, SHM->i18nstr[cuser.language][1288], genbuf, TTLEN, DOECHO))
+	if (getdata(2, 0, I18N[1288], genbuf, TTLEN, DOECHO))
 	    strlcpy(xtitle, genbuf, sizeof(xtitle));
 
-    getdata(2, 0, SHM->i18nstr[cuser.language][1289], genbuf, 3, LCECHO);
+    getdata(2, 0, I18N[1289], genbuf, 3, LCECHO);
     if (genbuf[0] == 'l' || genbuf[0] == 's') {
 	int             currmode0 = currmode;
 
@@ -1060,7 +1060,7 @@ mail_cross_post(int ent, fileheader_t * fhdr, char *direct)
 	    write_header(xptr);
 	    currboard = save_currboard;
 
-	    fprintf(xptr, SHM->i18nstr[cuser.language][1290], cuser.userid);
+	    fprintf(xptr, I18N[1290], cuser.userid);
 
 	    b_suckinfile(xptr, fname);
 	    addsignature(xptr, 0);
@@ -1076,7 +1076,7 @@ mail_cross_post(int ent, fileheader_t * fhdr, char *direct)
 	if (!xfile.filemode)
 	    outgo_post(&xfile, xboard);
 	cuser.numposts++;
-	outmsg(SHM->i18nstr[cuser.language][1291]);
+	outmsg(I18N[1291]);
 	pressanykey();
 	currmode = currmode0;
     }
@@ -1092,7 +1092,7 @@ mail_man()
 	int             stat0 = currstat;
 
 	sethomeman(buf, cuser.userid);
-	snprintf(buf1, sizeof(buf1), SHM->i18nstr[cuser.language][1292], cuser.userid);
+	snprintf(buf1, sizeof(buf1), I18N[1292], cuser.userid);
 	a_menu(buf1, buf, 1);
 	currutmp->mode = mode0;
 	currstat = stat0;
@@ -1111,7 +1111,7 @@ mail_cite(int ent, fileheader_t * fhdr, char *direct)
     int             bid;
 
     setuserfile(fpath, fhdr->filename);
-    strlcpy(title, SHM->i18nstr[cuser.language][1293], sizeof(title));
+    strlcpy(title, I18N[1293], sizeof(title));
     strncpy(title + 3, fhdr->title, TTLEN - 3);
     title[TTLEN] = '\0';
     a_copyitem(fpath, title, 0, 1);
@@ -1123,7 +1123,7 @@ mail_cite(int ent, fileheader_t * fhdr, char *direct)
 	clrtoeol();
 	move(1, 0);
 
-	generalnamecomplete(SHM->i18nstr[cuser.language][1294],
+	generalnamecomplete(I18N[1294],
 			    buf, sizeof(buf),
 			    SHM->Bnumber,
 			    completeboard_compar,
@@ -1154,7 +1154,7 @@ mail_save(int ent, fileheader_t * fhdr, char *direct)
 
     if (HAS_PERM(PERM_MAILLIMIT)) {
 	setuserfile(fpath, fhdr->filename);
-	strlcpy(title, SHM->i18nstr[cuser.language][1295], sizeof(title));
+	strlcpy(title, I18N[1295], sizeof(title));
 	strncpy(title + 3, fhdr->title, TTLEN - 3);
 	title[TTLEN] = '\0';
 	a_copyitem(fpath, title, fhdr->owner, 1);
@@ -1173,30 +1173,30 @@ mail_waterball(int ent, fileheader_t * fhdr, char *direct)
     char            fname[500], genbuf[200];
     FILE           *fp;
 
-    if (!(strstr(fhdr->title, SHM->i18nstr[cuser.language][1296]) && strstr(fhdr->title, SHM->i18nstr[cuser.language][1297]))) {
-	vmsg(SHM->i18nstr[cuser.language][1298]);
+    if (!(strstr(fhdr->title, I18N[1296]) && strstr(fhdr->title, I18N[1297]))) {
+	vmsg(I18N[1298]);
 	return 1;
     }
     if (!address[0])
 	strlcpy(address, cuser.email, sizeof(address));
     move(b_lines - 8, 0);
-    outs(SHM->i18nstr[cuser.language][1299]);
+    outs(I18N[1299]);
     if (address[0]) {
-	snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][1300], address);
+	snprintf(genbuf, sizeof(genbuf), I18N[1300], address);
 	getdata(b_lines - 5, 0, genbuf, fname, 3, LCECHO);
 	if (fname[0] == 'q') {
-	    outmsg(SHM->i18nstr[cuser.language][1301]);
+	    outmsg(I18N[1301]);
 	    return 1;
 	}
 	if (fname[0] == 'n')
 	    address[0] = '\0';
     }
     if (!address[0]) {
-	getdata(b_lines - 5, 0, SHM->i18nstr[cuser.language][1302], fname, 60, DOECHO);
+	getdata(b_lines - 5, 0, I18N[1302], fname, 60, DOECHO);
 	if (fname[0] && strchr(fname, '.')) {
 	    strlcpy(address, fname, sizeof(address));
 	} else {
-	    vmsg(SHM->i18nstr[cuser.language][1303]);
+	    vmsg(I18N[1303]);
 	    return 1;
 	}
     }
@@ -1204,17 +1204,17 @@ mail_waterball(int ent, fileheader_t * fhdr, char *direct)
 	return -2;
     if( strstr(address, ".bbs") && HAS_PERM(PERM_NOOUTMAIL) ){
 	move(b_lines - 4, 0);
-	outs(SHM->i18nstr[cuser.language][1304]);
-	vmsg(SHM->i18nstr[cuser.language][1305]);
+	outs(I18N[1304]);
+	vmsg(I18N[1305]);
 	return FULLUPDATE;
     }
 
     //snprintf(fname, sizeof(fname), "%d\n", cmode);
     move(b_lines - 4, 0);
-    outs(SHM->i18nstr[cuser.language][1306]);
-    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1307], fname, 3, LCECHO);
+    outs(I18N[1306]);
+    getdata(b_lines - 1, 0, I18N[1307], fname, 3, LCECHO);
     if (fname[0] == 'Q' || fname[0] == 'q') {
-	outmsg(SHM->i18nstr[cuser.language][1308]);
+	outmsg(I18N[1308]);
 	return 1;
     }
     cmode = (fname[0] != '0' && fname[0] != '1') ? 1 : fname[0] - '0';
@@ -1231,7 +1231,7 @@ mail_waterball(int ent, fileheader_t * fhdr, char *direct)
     assert(fp);
     fprintf(fp, "%s\n%s\n%d\n", cuser.userid, address, cmode);
     fclose(fp);
-    vmsg(SHM->i18nstr[cuser.language][1309]);
+    vmsg(I18N[1309]);
     return FULLUPDATE;
 }
 #endif
@@ -1340,7 +1340,7 @@ m_read()
 	currutmp->mailalert = load_mailalert(cuser.userid);
 	return 0;
     } else {
-	outs(SHM->i18nstr[cuser.language][1310]);
+	outs(I18N[1310]);
 	return XEASY;
     }
 }
@@ -1416,7 +1416,7 @@ bbs_sendmail(char *fpath, char *title, char *receiver)
 		cuser.userid, str_mail_address,
 		cuser.username,
 		cuser.userid, str_mail_address);
-    fprintf(fout,"To: %s\nSubject: %s\nMime-Version: 1.0\r\nContent-Type: text/plain; charset=\"big5\"\r\nContent-Transfer-Encoding: 8bit\r\nX-Disclaimer: " BBSNAME SHM->i18nstr[cuser.language][1311],
+    fprintf(fout,"To: %s\nSubject: %s\nMime-Version: 1.0\r\nContent-Type: text/plain; charset=\"big5\"\r\nContent-Transfer-Encoding: 8bit\r\nX-Disclaimer: " BBSNAME I18N[1311],
 		receiver, title);
 
     while (fgets(genbuf, sizeof(genbuf), fin)) {
@@ -1493,16 +1493,16 @@ doforward(char *direct, fileheader_t * fh, int mode)
 	strlcpy(address, cuser.email, sizeof(address));
 
     if( mode == 'U' ){
-	vmsg(SHM->i18nstr[cuser.language][1312]);
+	vmsg(I18N[1312]);
     }
 
     if (address[0]) {
 	snprintf(genbuf, sizeof(genbuf),
-		 SHM->i18nstr[cuser.language][1313], address);
+		 I18N[1313], address);
 	getdata(b_lines, 0, genbuf, fname, 3, LCECHO);
 
 	if (fname[0] == 'q') {
-	    outmsg(SHM->i18nstr[cuser.language][1314]);
+	    outmsg(I18N[1314]);
 	    return 1;
 	}
 	if (fname[0] == 'n')
@@ -1510,7 +1510,7 @@ doforward(char *direct, fileheader_t * fh, int mode)
     }
     if (!address[0]) {
 	do {
-	    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1315], fname, 60, DOECHO);
+	    getdata(b_lines - 1, 0, I18N[1315], fname, 60, DOECHO);
 	    if (fname[0]) {
 		if (strchr(fname, '.'))
 		    strlcpy(address, fname, sizeof(address));
@@ -1518,7 +1518,7 @@ doforward(char *direct, fileheader_t * fh, int mode)
 		    snprintf(address, sizeof(address),
 			     "%s.bbs@%s", fname, MYHOSTNAME);
 	    } else {
-		vmsg(SHM->i18nstr[cuser.language][1316]);
+		vmsg(I18N[1316]);
 		return 1;
 	    }
 	} while (mode == 'Z' && strstr(address, MYHOSTNAME));
@@ -1621,7 +1621,7 @@ mail_justify(userec_t muser)
     stampfile(buf1, &mhdr);
     unlink(buf1);
     strlcpy(mhdr.owner, cuser.userid, sizeof(mhdr.owner));
-    strncpy(mhdr.title, SHM->i18nstr[cuser.language][1318], TTLEN);
+    strncpy(mhdr.title, I18N[1318], TTLEN);
     mhdr.filemode = 0;
 
     if (valid_ident(muser.email) && !invalidaddr(muser.email)) {

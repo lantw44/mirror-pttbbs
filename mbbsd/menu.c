@@ -31,12 +31,12 @@ showtitle(char *title, char *mid)
     }
 #else
     else if (currutmp->mailalert) {
-    snprintf(buf1, sizeof(buf1), "%s"TITLE_COLOR, SHM->i18nstr[cuser.language][1380]);
+    snprintf(buf1, sizeof(buf1), "%s"TITLE_COLOR, I18N[1380]);
 	mid = buf1;
 	spc = 22;
     } else if (HAS_PERM(PERM_SYSOP) && (nreg = dashs(fn_register) / 163) > 10) {
 	snprintf(numreg, sizeof(numreg),
-		 SHM->i18nstr[cuser.language][1381],
+		 I18N[1381],
 		 nreg, (int)dashs("register.new.tmp") / 163, TITLE_COLOR);
 	mid = numreg;
 	spc = 22;
@@ -50,10 +50,10 @@ showtitle(char *title, char *mid)
     buf[spc] = '\0';
 
     clear();
-    prints(SHM->i18nstr[cuser.language][1382], TITLE_COLOR,
+    prints(I18N[1382], TITLE_COLOR,
 	   title, buf, mid, buf, " " + pad,
-	currmode & MODE_SELECT ? SHM->i18nstr[cuser.language][1383] : currmode & MODE_ETC ? SHM->i18nstr[cuser.language][1384] :
-	   currmode & MODE_DIGEST ? SHM->i18nstr[cuser.language][1385] : SHM->i18nstr[cuser.language][1386]);
+	currmode & MODE_SELECT ? I18N[1383] : currmode & MODE_ETC ? I18N[1384] :
+	   currmode & MODE_DIGEST ? I18N[1385] : I18N[1386]);
 
     if (strcmp(currboard, lastboard)) {	/* change board */
 	if (currboard[0] != 0 &&
@@ -68,7 +68,7 @@ showtitle(char *title, char *mid)
 	prints("\033[32m%s", currboard);
     else
 	prints("%s", currboard);
-    prints(SHM->i18nstr[cuser.language][1387], currmode & MODE_SELECT ? 6 :
+    prints(I18N[1387], currmode & MODE_SELECT ? 6 :
 	   currmode & MODE_ETC ? 5 : currmode & MODE_DIGEST ? 2 : 7);
 }
 
@@ -83,15 +83,15 @@ show_status(void)
     int i;
     struct tm      *ptime = localtime(&now);
     char            mystatus[160];
-    char           *myweek = SHM->i18nstr[cuser.language][1388];
-    const char     *msgs[] = {SHM->i18nstr[cuser.language][1389], SHM->i18nstr[cuser.language][1390], SHM->i18nstr[cuser.language][1391], SHM->i18nstr[cuser.language][1392], SHM->i18nstr[cuser.language][1393]};
+    char           *myweek = I18N[1388];
+    const char     *msgs[] = {I18N[1389], I18N[1390], I18N[1391], I18N[1392], I18N[1393]};
 
     i = ptime->tm_wday << 1;
     snprintf(mystatus, sizeof(mystatus),
-	     SHM->i18nstr[cuser.language][1394],
+	     I18N[1394],
 	     ptime->tm_mon + 1, ptime->tm_mday, myweek[i], myweek[i + 1],
 	     ptime->tm_hour, ptime->tm_min, currutmp->birth ?
-	     SHM->i18nstr[cuser.language][1395] : SHM->today_is,
+	     I18N[1395] : SHM->today_is,
 	     SHM->UTMPnumber, cuser.userid, msgs[currutmp->pager]);
     outmsg(mystatus);
 }
@@ -155,8 +155,8 @@ show_menu(commands_t * p)
     move(menu_row, 0);
     while (p[n].desc > 0 && p[n].desc < MAX_STRING) {
 	if (HAS_PERM(p[n].level)) {
-		s = SHM->i18nstr[cuser.language][p[n].desc];
-	    snprintf(buf, sizeof(buf), s + 2, SHM->i18nstr[cuser.language][1396 + cuser.proverb % 4]);
+		s = I18N[p[n].desc];
+	    snprintf(buf, sizeof(buf), s + 2, I18N[1396 + cuser.proverb % 4]);
 	    prints("%*s  (\033[1;36m%c\033[0m)%s\n", menu_column, "", s[1],
 		   buf);
 	}
@@ -261,15 +261,15 @@ domenu(int cmdmode, char *cmdtitle, int cmd, commands_t cmdtable[])
 		    refscreen = YEA;
 
 		if (err != -1)
-		    cmd = SHM->i18nstr[cuser.language][cmdtable[lastcmdptr].desc][0];
+		    cmd = I18N[cmdtable[lastcmdptr].desc][0];
 		else
-		    cmd = SHM->i18nstr[cuser.language][cmdtable[lastcmdptr].desc][1];
-		cmd0[cmdmode] = SHM->i18nstr[cuser.language][cmdtable[lastcmdptr].desc][0];
+		    cmd = I18N[cmdtable[lastcmdptr].desc][1];
+		cmd0[cmdmode] = I18N[cmdtable[lastcmdptr].desc][0];
 	    }
 	    if (cmd >= 'a' && cmd <= 'z')
 		cmd &= ~0x20;
 	    while (++i <= total)
-		if (SHM->i18nstr[cuser.language][cmdtable[i].desc][1] == cmd)
+		if (I18N[cmdtable[i].desc][1] == cmd)
 		    break;
 	}
 
@@ -428,7 +428,7 @@ static commands_t moneylist[] = {
 };
 
 static int p_money() {
-    domenu(PSALE, SHM->i18nstr[cuser.language][1467], '0', moneylist);
+    domenu(PSALE, I18N[1467], '0', moneylist);
     return 0;
 };
 
@@ -443,7 +443,7 @@ static commands_t jceelist[] = {
 };
 
 static int m_jcee() {
-    domenu(JCEE, SHM->i18nstr[cuser.language][1473], '0', jceelist);
+    domenu(JCEE, I18N[1473], '0', jceelist);
     return 0;
 }
 #endif
@@ -480,7 +480,7 @@ static commands_t chesslist[] = {
 };
 
 static int chessroom() {
-    domenu(CHC, SHM->i18nstr[cuser.language][1486], '1', chesslist);
+    domenu(CHC, I18N[1486], '1', chesslist);
     return 0;
 }
 
@@ -501,7 +501,7 @@ static commands_t plist[] = {
 };
 
 static int playground() {
-    domenu(AMUSE, SHM->i18nstr[cuser.language][1495],'1',plist);
+    domenu(AMUSE, I18N[1495],'1',plist);
     return 0;
 }
 
@@ -513,7 +513,7 @@ static commands_t slist[] = {
 };
 
 static int forsearch() {
-    domenu(SREG, SHM->i18nstr[cuser.language][1499], '1', slist);
+    domenu(SREG, I18N[1499], '1', slist);
     return 0;
 }
 
@@ -521,43 +521,43 @@ static int forsearch() {
 
 int admin()
 {
-    domenu(ADMIN, SHM->i18nstr[cuser.language][1500], 'X', adminlist);
+    domenu(ADMIN, I18N[1500], 'X', adminlist);
     return 0;
 }
 
 int Mail()
 {
-    domenu(MAIL, SHM->i18nstr[cuser.language][1501], 'R', maillist);
+    domenu(MAIL, I18N[1501], 'R', maillist);
     return 0;
 }
 
 int Talk()
 {
-    domenu(TMENU, SHM->i18nstr[cuser.language][1502], 'U', talklist);
+    domenu(TMENU, I18N[1502], 'U', talklist);
     return 0;
 }
 
 int User()
 {
-    domenu(UMENU, SHM->i18nstr[cuser.language][1503], 'A', userlist);
+    domenu(UMENU, I18N[1503], 'A', userlist);
     return 0;
 }
 
 int Xyz()
 {
-    domenu(XMENU, SHM->i18nstr[cuser.language][1504], 'M', xyzlist);
+    domenu(XMENU, I18N[1504], 'M', xyzlist);
     return 0;
 }
 
 int Play_Play()
 {
-    domenu(PMENU, SHM->i18nstr[cuser.language][1505], 'A', playlist);
+    domenu(PMENU, I18N[1505], 'A', playlist);
     return 0;
 }
 
 int Name_Menu()
 {
-    domenu(NMENU, SHM->i18nstr[cuser.language][1506], 'O', namelist);
+    domenu(NMENU, I18N[1506], 'O', namelist);
     return 0;
 }
  

@@ -5,7 +5,7 @@ static int recommend(int ent, fileheader_t * fhdr, char *direct);
 
 #ifdef ASSESS
 static char *badpost_reason[] = {
-    I18N[245], SHM->i18nstr[cuser.language][246], SHM->i18nstr[cuser.language][247]
+    I18N[245], I18N[246], I18N[247]
 };
 #endif
 
@@ -31,10 +31,10 @@ void
 anticrosspost()
 {
 	log_file("etc/illegal_money", 1, I18N[248], cuser.userid, ctime(&now));
-    post_violatelaw(cuser.userid, I18N[249], "Cross-post", SHM->i18nstr[cuser.language][250]);
+    post_violatelaw(cuser.userid, I18N[249], "Cross-post", I18N[250]);
     cuser.userlevel |= PERM_VIOLATELAW;
     cuser.vl_count++;
-    mail_by_link(I18N[251], SHM->i18nstr[cuser.language][252],
+    mail_by_link(I18N[251], I18N[252],
 		 BBSHOME "/etc/crosspost.txt");
     u_exit("Cross Post");
     exit(0);
@@ -450,7 +450,7 @@ setupbidinfo(bid_t *bidinfo)
 static void
 print_bidinfo(FILE *io, bid_t bidinfo)
 {
-    char *payby[4]={ I18N[283],SHM->i18nstr[cuser.language][284],SHM->i18nstr[cuser.language][285],SHM->i18nstr[cuser.language][286]};
+    char *payby[4]={ I18N[283],I18N[284],I18N[285],I18N[286]};
     if(io)
     {
      if(!bidinfo.userid[0])
@@ -532,7 +532,7 @@ do_general(int isbid)
       }
     move(19, 0);
     prints(I18N[307],
-           isbid?I18N[308]:SHM->i18nstr[cuser.language][309],
+           isbid?I18N[308]:I18N[309],
 	  currboard, bp->title + 7);
 
     if(isbid)
@@ -1177,8 +1177,8 @@ hold_gamble(int ent, fileheader_t * fhdr, char *direct)
     snprintf(genbuf, sizeof(genbuf),
 	     I18N[346],
 	     currboard,
-	     i, i < 100 ? I18N[347] : i < 500 ? SHM->i18nstr[cuser.language][348] :
-	     i < 1000 ? I18N[349] : i < 5000 ? SHM->i18nstr[cuser.language][350] : SHM->i18nstr[cuser.language][351],
+	     i, i < 100 ? I18N[347] : i < 500 ? I18N[348] :
+	     i < 1000 ? I18N[349] : i < 5000 ? I18N[350] : I18N[351],
 	     bp->endgamble ? I18N[352] : "",
 	     bp->endgamble ? Cdate(&bp->endgamble) : ""
 	     );
@@ -1685,8 +1685,8 @@ del_post(int ent, fileheader_t * fhdr, char *direct)
 		    else
 			strcpy(reason, badpost_reason[i - 1]);
 		    if (!(inc_badpost(num, 1) % 10)){
-			post_violatelaw(xuser.userid, I18N[400], SHM->i18nstr[cuser.language][401], SHM->i18nstr[cuser.language][402]);
-			mail_violatelaw(xuser.userid, I18N[403], SHM->i18nstr[cuser.language][404], SHM->i18nstr[cuser.language][405]);
+			post_violatelaw(xuser.userid, I18N[400], I18N[401], I18N[402]);
+			mail_violatelaw(xuser.userid, I18N[403], I18N[404], I18N[405]);
 			xuser.userlevel |= PERM_VIOLATELAW;
 		    }
 		    sprintf(genbuf,I18N[406], reason, fhdr->title);
@@ -2112,7 +2112,7 @@ good_post(int ent, fileheader_t * fhdr, char *direct)
 	return DONOTHING;
 
     if(getans(fhdr->filemode & FILE_DIGEST ? 
-              I18N[433] : SHM->i18nstr[cuser.language][434]) == 'n')
+              I18N[433] : I18N[434]) == 'n')
 	return READ_REDRAW;
 
     if (fhdr->filemode & FILE_DIGEST) {
@@ -2201,7 +2201,7 @@ b_changerecommend(int ent, fileheader_t * fhdr, char *direct)
     bp->brdattr ^= BRD_NORECOMMEND; 
     substitute_record(fn_board, bp, sizeof(boardheader_t), currbid);
     vmsg(I18N[457],
-         (bp->brdattr & BRD_NORECOMMEND) ? I18N[458] : SHM->i18nstr[cuser.language][459]);
+         (bp->brdattr & BRD_NORECOMMEND) ? I18N[458] : I18N[459]);
     return FULLUPDATE;
 }
 

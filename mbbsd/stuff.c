@@ -331,19 +331,19 @@ gettime(int line, time_t dt, char*head)
     move(line, 0); prints("%s",head);
     i=strlen(head);
     do {
-	getdata_buf(line, i, SHM->i18nstr[cuser.language][1878], yn, 5, LCECHO);
+	getdata_buf(line, i, I18N[1878], yn, 5, LCECHO);
     } while ((endtime.tm_year = atoi(yn) - 1900) < 0 || endtime.tm_year > 200);
     snprintf(yn, sizeof(yn), "%d", ptime->tm_mon + 1);
     do {
-	getdata_buf(line, i+15, SHM->i18nstr[cuser.language][1879], yn, 3, LCECHO);
+	getdata_buf(line, i+15, I18N[1879], yn, 3, LCECHO);
     } while ((endtime.tm_mon = atoi(yn) - 1) < 0 || endtime.tm_mon > 11);
     snprintf(yn, sizeof(yn), "%d", ptime->tm_mday);
     do {
-	getdata_buf(line, i+24, SHM->i18nstr[cuser.language][1880], yn, 3, LCECHO);
+	getdata_buf(line, i+24, I18N[1880], yn, 3, LCECHO);
     } while ((endtime.tm_mday = atoi(yn)) < 1 || endtime.tm_mday > 31);
     snprintf(yn, sizeof(yn), "%d", ptime->tm_hour);
     do {
-	getdata_buf(line, i+33, SHM->i18nstr[cuser.language][1881], yn, 3, LCECHO);
+	getdata_buf(line, i+33, I18N[1881], yn, 3, LCECHO);
     } while ((endtime.tm_hour = atoi(yn)) < 0 || endtime.tm_hour > 23);
     return mktime(&endtime);
 }
@@ -388,7 +388,7 @@ capture_screen()
     FILE           *fp;
     int             i;
 
-    getdata(b_lines - 2, 0, SHM->i18nstr[cuser.language][1882],
+    getdata(b_lines - 2, 0, I18N[1882],
 	    fname, 4, LCECHO);
     if (fname[0] != 'y')
 	return;
@@ -412,7 +412,7 @@ vmsg_lines(const int lines, const char msg[])
     if (msg)
         outs((char *)msg);
     else
-		outs(SHM->i18nstr[cuser.language][1883]);
+		outs(I18N[1883]);
     do {
 	if( (ch = igetch()) == Ctrl('T') )
 	    capture_screen();
@@ -479,7 +479,7 @@ search_num(int ch, int max)
     int             x, y;
     char            genbuf[10];
 
-    outmsg(SHM->i18nstr[cuser.language][1886]);
+    outmsg(I18N[1886]);
     outc(ch);
     genbuf[0] = ch;
     getyx(&y, &x);
@@ -528,7 +528,7 @@ void
 stand_title(char *title)
 {
     clear();
-    prints(SHM->i18nstr[cuser.language][1887], title);
+    prints(I18N[1887], title);
 }
 
 void
@@ -622,11 +622,11 @@ show_help(int *index)
 
     clear();
     while (*index > 0 && *index < MAX_STRING) {
-    	str = SHM->i18nstr[cuser.language][*index];
+    	str = I18N[*index];
     	if (*str == '\0')
-    		prints(SHM->i18nstr[cuser.language][1888], str + 1);
+    		prints(I18N[1888], str + 1);
     	else if (*str == '\01')
-    		prints(SHM->i18nstr[cuser.language][1889], str + 1);
+    		prints(I18N[1889], str + 1);
     	else
     		prints("        %s\n", str);
     	index++;

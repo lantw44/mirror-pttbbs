@@ -95,30 +95,18 @@ static void
 show_data(void)
 {
     move(0, 0);
-    prints("\033[31m       ┌───────────────────────"
-	   "──────────┐\033[m\n");
-    prints("\033[45;37m倍率一\033[m\033[31m │ \033[33m[1]押一點 [2]押二點 "
-	 "[3]押三點 [4]押四點 [5]押五點 [6]押六點    \033[31m  │\033[m\n");
-    prints("\033[31m       │ \033[33m[7]押小   [8]押大                    "
-	   "                          \033[31m  │\033[m\n");
-    prints("\033[31m       │                                              "
-	   "                    │\033[m\n");
-    prints("\033[45;37m賠率三\033[m\033[31m │ \033[33m[11]押中(總點數等於11"
-	   "或10)                                     \033[31m  │\033[m\n");
-    prints("\033[31m       │                                              "
-	   "                    │\033[m\n");
-    prints("\033[45;37m賠率五\033[m\033[31m │ \033[33m[74]押小且四點 [83]押"
-	   "大且三點 [66]押連號                       \033[31m  │\033[m\n");
-    prints("\033[31m       │                                              "
-	   "                    │\033[m\n");
-    prints("\033[31m       │ \033[33m[12]押一二點 [13]押一三點 [14]押一四點"
-	   " [15]押一五點 [16]押一六點\033[31m │\033[m\n");
-    prints("\033[31m       │ \033[33m[23]押二三點 [24]押二四點 [25]押二五點"
-	   " [26]押二六點 [34]押三四點\033[31m │\033[m\n");
-    prints("\033[31m       │ \033[33m[35]押三五點 [36]押三六點 [45]押四五點"
-	   " [46]押四六點 [56]押五六點\033[31m │\033[m\n");
-    prints("\033[31m       └────────────────────────"
-	   "─────────┘\033[m\n");
+    prints(I18N[3441]);
+    prints(I18N[3442]);
+    prints(I18N[3443]);
+    prints(I18N[3444]);
+    prints(I18N[3445]);
+    prints(I18N[3446]);
+    prints(I18N[3447]);
+    prints(I18N[3448]);
+    prints(I18N[3449]);
+    prints(I18N[3450]);
+    prints(I18N[3451]);
+    prints(I18N[3452]);
 }
 
 static void
@@ -187,7 +175,7 @@ del(int value[100],int total, dicedata_t * table)
 	do {
 	    move(22, 0);
 	    clrtoeol();
-	    getdata(21, 0, "輸入退選的數字(打q離開): ", data, 3, LCECHO);
+	    getdata(21, 0, I18N[3453], data, 3, LCECHO);
 	    if (data[0] == 'q' || data[0] == 'Q')
 		return 0;
 	} while (!IsNum(data, strlen(data)));
@@ -196,20 +184,20 @@ del(int value[100],int total, dicedata_t * table)
 	for (i = 0; i < total; i++) {
 	    if (table[i].mybet == index) {
 		do {
-		    getdata(21, 0, "多少錢: ", data, 10, LCECHO);
+		    getdata(21, 0, I18N[3454], data, 10, LCECHO);
 		} while (!IsNum(data, strlen(data)));
 		money = atoi(data);
 		if (money > table[i].mymoney) {
 		    move(22, 0);
 		    clrtoeol();
-		    prints("不夠扣啦");
+		    prints(I18N[3455]);
 		    i--;
 		    continue;
 		}
 		demoney(money);
 		move(19, 0);
 		clrtoeol();
-		prints("你現在有 %u Ptt$歐", cuser.money);
+		prints(I18N[3456], cuser.money);
 		table[i].mymoney -= money;
 		show_count(value, index, -money);
 		break;
@@ -241,83 +229,81 @@ show_output(int bet[])
 	prints("                               ");
     }
     move(12, 0);
-    prints("\033[1;31m        ┌──────────────────────"
-	   "─┐\033[m\n\n\n\n\n\n");
-    prints("\033[1;31m        └──────────────────────"
-	   "─┘\033[m");
+    prints(I18N[3457]);
+    prints(I18N[3458]);
     for (i = 0; i < 3; i++, j += 25) {
 	switch (bet[i]) {
 	case 1:
 	    move(13, j);
-	    prints("\033[37m╭────╮\033[m");
+	    prints(I18N[3459]);
 	    move(14, j);
-	    prints("\033[37m│        │\033[m");
+	    prints(I18N[3460]);
 	    move(15, j);
-	    prints("\033[37m│   ●   │\033[m");
+	    prints(I18N[3461]);
 	    move(16, j);
-	    prints("\033[37m│        │\033[m");
+	    prints(I18N[3462]);
 	    move(17, j);
-	    prints("\033[37m╰────╯\033[m");
+	    prints(I18N[3463]);
 	    break;
 	case 2:
 	    move(13, j);
-	    prints("\033[37m╭────╮\033[m");
+	    prints(I18N[3464]);
 	    move(14, j);
-	    prints("\033[37m│      ●│\033[m");
+	    prints(I18N[3465]);
 	    move(15, j);
-	    prints("\033[37m│        │\033[m");
+	    prints(I18N[3466]);
 	    move(16, j);
-	    prints("\033[37m│●      │\033[m");
+	    prints(I18N[3467]);
 	    move(17, j);
-	    prints("\033[37m╰────╯\033[m");
+	    prints(I18N[3468]);
 	    break;
 	case 3:
 	    move(13, j);
-	    prints("\033[37m╭────╮\033[m");
+	    prints(I18N[3469]);
 	    move(14, j);
-	    prints("\033[37m│      ●│\033[m");
+	    prints(I18N[3470]);
 	    move(15, j);
-	    prints("\033[37m│   ●   │\033[m");
+	    prints(I18N[3471]);
 	    move(16, j);
-	    prints("\033[37m│●      │\033[m");
+	    prints(I18N[3472]);
 	    move(17, j);
-	    prints("\033[37m╰────╯\033[m");
+	    prints(I18N[3473]);
 	    break;
 	case 4:
 	    move(13, j);
-	    prints("\033[37m╭────╮\033[m");
+	    prints(I18N[3474]);
 	    move(14, j);
-	    prints("\033[37m│●    ●│\033[m");
+	    prints(I18N[3475]);
 	    move(15, j);
-	    prints("\033[37m│        │\033[m");
+	    prints(I18N[3476]);
 	    move(16, j);
-	    prints("\033[37m│●    ●│\033[m");
+	    prints(I18N[3477]);
 	    move(17, j);
-	    prints("\033[37m╰────╯\033[m");
+	    prints(I18N[3478]);
 	    break;
 	case 5:
 	    move(13, j);
-	    prints("\033[37m╭────╮\033[m");
+	    prints(I18N[3479]);
 	    move(14, j);
-	    prints("\033[37m│●    ●│\033[m");
+	    prints(I18N[3480]);
 	    move(15, j);
-	    prints("\033[37m│   ●   │\033[m");
+	    prints(I18N[3481]);
 	    move(16, j);
-	    prints("\033[37m│●    ●│\033[m");
+	    prints(I18N[3482]);
 	    move(17, j);
-	    prints("\033[37m╰────╯\033[m");
+	    prints(I18N[3483]);
 	    break;
 	case 6:
 	    move(13, j);
-	    prints("\033[37m╭────╮\033[m");
+	    prints(I18N[3484]);
 	    move(14, j);
-	    prints("\033[37m│●    ●│\033[m");
+	    prints(I18N[3485]);
 	    move(15, j);
-	    prints("\033[37m│●    ●│\033[m");
+	    prints(I18N[3486]);
 	    move(16, j);
-	    prints("\033[37m│●    ●│\033[m");
+	    prints(I18N[3487]);
 	    move(17, j);
-	    prints("\033[37m╰────╯\033[m");
+	    prints(I18N[3488]);
 	    break;
 	}
     }
@@ -338,7 +324,7 @@ dice_main(void)
     reload_money();
     if (cuser.money < 10) {
 	move(19, 0);
-	prints("\033[1;37m超過十元再來玩吧~~\033[m");
+	prints(I18N[3489]);
 	pressanykey();
 	return 0;
     }
@@ -361,15 +347,15 @@ dice_main(void)
 
 	while (1) {
 	    move(19, 0);
-	    prints("\033[1;32m你現在有\033[1;31m %u \033[1;32mPtt$歐\033[m",
+	    prints(I18N[3490],
 		   cuser.money);
-	    getdata(20, 0, "\033[1;37m數字:加選 d:退選 s:開始或離開\033[m: ",
+	    getdata(20, 0, I18N[3491],
 		    input, 5, LCECHO);
 	    reload_money();
 	    if (input[0] != 's' && input[0] != 'd' && cuser.money < 10) {
 		move(21, 0);
 		clrtoeol();
-		prints("\033[1;37m超過十元才能賭~\033[m");
+		prints(I18N[3492]);
 		continue;
 	    }
 	    if (input[0] == 'd' || input[0] == 'D') {
@@ -389,8 +375,7 @@ dice_main(void)
 	    while (1) {
 		if (cuser.money < 10)
 		    break;
-		getdata(21, 0, "\033[1;32m賭多少錢呢\033[1;37m(大於10 小於500)"
-			"\033[m: ", input, sizeof(input), LCECHO);
+		getdata(21, 0, I18N[3493], input, sizeof(input), LCECHO);
 		if (!(money = IsLegal(input)) || input[0] == '0')
 		    continue;
 		reload_money();
@@ -404,7 +389,7 @@ dice_main(void)
 			    sig = 1;
 			    break;
 			} else {
-			    vice(money, "骰子");
+			    vice(money, I18N[3494]);
 			    table[j].mymoney += money;
 			    j = -1;
 			    break;
@@ -418,13 +403,13 @@ dice_main(void)
 		    bzero((char *)&table[i], sizeof(dicedata_t));
 		    table[i].mybet = index;
 		    table[i++].mymoney = money;
-		    vice(money, "骰子");
+		    vice(money, I18N[3495]);
 		}
 		break;
 	    }
 	    reload_money();
 	    move(19, 0);
-	    prints("\033[1;32m你現在有 \033[1;31m%u\033[1;32m Ptt$歐",
+	    prints(I18N[3496],
 		   cuser.money);
 	    if (sig != 2)
 		show_count(value,index, money);
@@ -449,7 +434,7 @@ dice_main(void)
 	    total += table[j].mymoney * ya;
 	    if (table[j].mymoney * ya > 500) {	/* 超過500塊錢才做log 減少io */
 		snprintf(data, sizeof(data),
-			 "%-15s 押%-2d選項%-8d塊錢 中了%d倍 淨賺:%-8d\n",
+			 I18N[3497],
 			 cuser.userid, table[j].mybet,
 			 table[j].mymoney, ya, table[j].mymoney * ya);
 		fputs(data, winfp);
@@ -459,20 +444,19 @@ dice_main(void)
 
 	if (total > 0) {
 	    move(21, 0);
-	    prints("\033[1;32m你贏了 \033[1;31m%d\033[1;32m Ptt$ 唷~~"
-		   "                    \033[m", total);
+	    prints(I18N[3498], total);
 	} else {
 	    move(21, 0);
 	    clrtoeol();
-	    prints("\033[1;32m真可惜 下次再來碰碰運氣吧\033[m");
+	    prints(I18N[3499]);
 	}
 
 	move(19, 0);
 	clrtoeol();
-	prints("\033[1;32m你現在有 \033[1;31m%u\033[1;32m Ptt$歐\033[m",
+	prints(I18N[3500],
 	       cuser.money);
 
-	getdata(23, 0, "\033[1;32m繼續奮鬥[\033[1;37my/n\033[1;32m]\033[m: ",
+	getdata(23, 0, I18N[3501],
 		input, 2, LCECHO);
     } while (input[0] != 'n' && input[0] != 'N');
     fclose(winfp);

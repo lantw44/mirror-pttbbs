@@ -22,7 +22,7 @@ do_voteboardreply(fileheader_t * fhdr)
     clear();
     if (!CheckPostPerm()) {
 	move(5, 10);
-	prints("對不起，您目前無法在此發表文章！");
+	prints(SHM->i18nstr[cuser.language][2457]);
 	pressanykey();
 	return;
     }
@@ -48,12 +48,12 @@ do_voteboardreply(fileheader_t * fhdr)
            }
         if (yes>3) prints(genbuf);
 
-	if (!strncmp(genbuf, "連署結束時間", 12)) {
+	if (!strncmp(genbuf, SHM->i18nstr[cuser.language][2458], 12)) {
 	    ptr = strchr(genbuf, '(');
 	    assert(ptr);
 	    sscanf(ptr + 1, "%ld", &endtime);
 	    if (endtime < now) {
-		prints("連署時間已過");
+		prints(SHM->i18nstr[cuser.language][2459]);
 		pressanykey();
 		fclose(fi);
 		return;
@@ -64,8 +64,8 @@ do_voteboardreply(fileheader_t * fhdr)
         strtok(genbuf+4," \n");
 	if (!strncmp(genbuf + 4, cuser.userid, IDLEN)) {
 	    move(5, 10);
-	    prints("您已經連署過本篇了");
-	    getdata(17, 0, "要修改您之前的連署嗎？(Y/N) [N]", opnion, 3, LCECHO);
+	    prints(SHM->i18nstr[cuser.language][2460]);
+	    getdata(17, 0, SHM->i18nstr[cuser.language][2461], opnion, 3, LCECHO);
 	    if (opnion[0] != 'y') {
 		fclose(fi);
 		return;
@@ -76,12 +76,12 @@ do_voteboardreply(fileheader_t * fhdr)
     }
     fclose(fi);
     do {
-	if (!getdata(19, 0, "請問您 (Y)支持 (N)反對 這個議題：", opnion, 3, LCECHO)) {
+	if (!getdata(19, 0, SHM->i18nstr[cuser.language][2462], opnion, 3, LCECHO)) {
 	    return;
 	}
     } while (opnion[0] != 'y' && opnion[0] != 'n');
-    sprintf(genbuf, "請問您與這個議題的關係或%s理由為何：",
-	    opnion[0] == 'y' ? "支持" : "反對");
+    sprintf(genbuf, SHM->i18nstr[cuser.language][2463],
+	    opnion[0] == 'y' ? SHM->i18nstr[cuser.language][2464] : SHM->i18nstr[cuser.language][2465]);
     if (!getdata_buf(20, 0, genbuf, reason, 35, DOECHO)) {
 	return;
     }
@@ -107,7 +107,7 @@ do_voteboardreply(fileheader_t * fhdr)
     }
     if (!endtime) {
 	now += 14 * 24 * 60 * 60;
-	fprintf(fo, "連署結束時間: (%ld)%s", now, ctime(&now));
+	fprintf(fo, SHM->i18nstr[cuser.language][2466], now, ctime(&now));
 	now -= 14 * 24 * 60 * 60;
     }
     fprintf(fo, "%s", genbuf);
@@ -120,7 +120,7 @@ do_voteboardreply(fileheader_t * fhdr)
 	fprintf(fo, "%3d.%s", ++yes, genbuf + 4);
       }
     if (opnion[0] == 'y')
-	fprintf(fo, "%3d.%-15s%-34s 來源:%s\n", ++yes, cuser.userid, reason, cuser.lasthost);
+	fprintf(fo, SHM->i18nstr[cuser.language][2467], ++yes, cuser.userid, reason, cuser.lasthost);
     fprintf(fo, "%s", genbuf);
 
     for(no=0; fgets(genbuf, sizeof(genbuf), fi);) {
@@ -131,11 +131,11 @@ do_voteboardreply(fileheader_t * fhdr)
 	fprintf(fo, "%3d.%s", ++no, genbuf + 4);
     }
     if (opnion[0] == 'n')
-	fprintf(fo, "%3d.%-15s%-34s 來源:%s\n", ++no, cuser.userid, reason, cuser.lasthost);
-    fprintf(fo, "----------總計----------\n");
-    fprintf(fo, "支持人數:%-9d反對人數:%-9d\n", yes, no);
-    fprintf(fo, "\n--\n※ 發信站 :" BBSNAME "(" MYHOSTNAME
-                ") \n◆ From: 連署文章\n");
+	fprintf(fo, SHM->i18nstr[cuser.language][2468], ++no, cuser.userid, reason, cuser.lasthost);
+    fprintf(fo, SHM->i18nstr[cuser.language][2469]);
+    fprintf(fo, SHM->i18nstr[cuser.language][2470], yes, no);
+    fprintf(fo, "%s"BBSNAME"("MYHOSTNAME"%s", SHM->i18nstr[cuser.language][2471],
+                SHM->i18nstr[cuser.language][2472]);
 
     flock(fd, LOCK_UN);
     close(fd);
@@ -159,176 +159,176 @@ do_voteboard(int type)
     clear();
     if (!CheckPostPerm()) {
 	move(5, 10);
-	prints("對不起，您目前無法在此發表文章！");
+	prints(SHM->i18nstr[cuser.language][2473]);
 	pressanykey();
 	return FULLUPDATE;
     }
     move(0, 0);
     clrtobot();
-    prints("您正在使用 PTT 的連署系統\n");
-    prints("本連署系統將詢問您一些問題，請小心回答才能開始連署\n");
-    prints("任意提出連署案者，將被列入不受歡迎使用者喔\n");
+    prints(SHM->i18nstr[cuser.language][2474]);
+    prints(SHM->i18nstr[cuser.language][2475]);
+    prints(SHM->i18nstr[cuser.language][2476]);
     move(4, 0);
     clrtobot();
-    prints("(1)活動連署 (2)記名公投 ");
+    prints(SHM->i18nstr[cuser.language][2477]);
     if(type==0)
-      prints("(3)申請新板 (4)廢除舊板 (5)連署板主 \n(6)罷免板主 (7)連署小組長 (8)罷免小組長 (9)申請新群組\n");
+      prints(SHM->i18nstr[cuser.language][2478]);
 
     do {
-	getdata(6, 0, "請輸入連署類別 [0:取消]：", topic, 3, DOECHO);
+	getdata(6, 0, SHM->i18nstr[cuser.language][2479], topic, 3, DOECHO);
 	temp = atoi(topic);
     } while (temp < 0 || temp > 9 || (type && temp>2));
     switch (temp) {
     case 0:
          return FULLUPDATE;
     case 1:
-	if (!getdata(7, 0, "請輸入活動主題：", topic, 30, DOECHO))
+	if (!getdata(7, 0, SHM->i18nstr[cuser.language][2480], topic, 30, DOECHO))
 	    return FULLUPDATE;
-	snprintf(title, sizeof(title), "%s %s", "[活動連署]", topic);
+	snprintf(title, sizeof(title), "%s %s", SHM->i18nstr[cuser.language][2481], topic);
 	snprintf(genbuf, sizeof(genbuf),
-		 "%s\n\n%s%s\n", "活動連署", "活動主題: ", topic);
-	strcat(genbuf, "\n活動內容: \n");
+		 "%s\n\n%s%s\n", SHM->i18nstr[cuser.language][2482], SHM->i18nstr[cuser.language][2483], topic);
+	strcat(genbuf, SHM->i18nstr[cuser.language][2484]);
 	break;
     case 2:
-	if (!getdata(7, 0, "請輸入公投主題：", topic, 30, DOECHO))
+	if (!getdata(7, 0, SHM->i18nstr[cuser.language][2485], topic, 30, DOECHO))
 	    return FULLUPDATE;
-	snprintf(title, sizeof(title), "%s %s", "[記名公投]", topic);
+	snprintf(title, sizeof(title), "%s %s", SHM->i18nstr[cuser.language][2486], topic);
 	snprintf(genbuf, sizeof(genbuf),
-		 "%s\n\n%s%s\n", "記名公投", "公投主題: ", topic);
-	strcat(genbuf, "\n公投原因: \n");
+		 "%s\n\n%s%s\n", SHM->i18nstr[cuser.language][2487], SHM->i18nstr[cuser.language][2488], topic);
+	strcat(genbuf, SHM->i18nstr[cuser.language][2489]);
 	break;
     case 3:
 	do {
-	    if (!getdata(7, 0, "請輸入看板英文名稱：", topic, IDLEN + 1, DOECHO))
+	    if (!getdata(7, 0, SHM->i18nstr[cuser.language][2490], topic, IDLEN + 1, DOECHO))
 		return FULLUPDATE;
 	    else if (invalid_brdname(topic))
-		outs("不是正確的看板名稱");
+		outs(SHM->i18nstr[cuser.language][2491]);
 	    else if (getbnum(topic) > 0)
-		outs("本名稱已經存在");
+		outs(SHM->i18nstr[cuser.language][2492]);
 	    else
 		break;
 	} while (temp > 0);
-	snprintf(title, sizeof(title), "[申請新板] %s", topic);
+	snprintf(title, sizeof(title), SHM->i18nstr[cuser.language][2493], topic);
 	snprintf(genbuf, sizeof(genbuf),
-		 "%s\n\n%s%s\n%s", "申請新板", "英文名稱: ", topic, "中文名稱: ");
+		 "%s\n\n%s%s\n%s", SHM->i18nstr[cuser.language][2494], SHM->i18nstr[cuser.language][2495], topic, SHM->i18nstr[cuser.language][2496]);
 
-	if (!getdata(8, 0, "請輸入看板中文名稱：", topic, 20, DOECHO))
+	if (!getdata(8, 0, SHM->i18nstr[cuser.language][2497], topic, 20, DOECHO))
 	    return FULLUPDATE;
 	strcat(genbuf, topic);
-	strcat(genbuf, "\n看板類別: ");
-	if (!getdata(9, 0, "請輸入看板類別：", topic, 20, DOECHO))
+	strcat(genbuf, SHM->i18nstr[cuser.language][2498]);
+	if (!getdata(9, 0, SHM->i18nstr[cuser.language][2499], topic, 20, DOECHO))
 	    return FULLUPDATE;
 	strcat(genbuf, topic);
-	strcat(genbuf, "\n板主名單: ");
-	getdata(10, 0, "請輸入板主名單：", topic, IDLEN * 3 + 3, DOECHO);
+	strcat(genbuf, SHM->i18nstr[cuser.language][2500]);
+	getdata(10, 0, SHM->i18nstr[cuser.language][2501], topic, IDLEN * 3 + 3, DOECHO);
 	strcat(genbuf, topic);
-	strcat(genbuf, "\n申請原因: \n");
+	strcat(genbuf, SHM->i18nstr[cuser.language][2502]);
 	break;
     case 4:
         move(1,0); clrtobot();
-        generalnamecomplete("請輸入看板英文名稱：",
+        generalnamecomplete(SHM->i18nstr[cuser.language][2503],
                             topic, IDLEN+1,
                             SHM->Bnumber,
                             completeboard_compar,
                             completeboard_permission,
                             completeboard_getname);
-	snprintf(title, sizeof(title), "[廢除舊板] %s", topic);
+	snprintf(title, sizeof(title), SHM->i18nstr[cuser.language][2504], topic);
 	snprintf(genbuf, sizeof(genbuf),
-		 "%s\n\n%s%s\n", "廢除舊板", "英文名稱: ", topic);
-	strcat(genbuf, "\n廢除原因: \n");
+		 "%s\n\n%s%s\n", SHM->i18nstr[cuser.language][2505], SHM->i18nstr[cuser.language][2506], topic);
+	strcat(genbuf, SHM->i18nstr[cuser.language][2507]);
 	break;
     case 5:
         move(1,0); clrtobot();
-        generalnamecomplete("請輸入看板英文名稱：",
+        generalnamecomplete(SHM->i18nstr[cuser.language][2508],
                             topic, IDLEN+1,
                             SHM->Bnumber,
                             completeboard_compar,
                             completeboard_permission,
                             completeboard_getname);
-	snprintf(title, sizeof(title), "[連署板主] %s", topic);
-	snprintf(genbuf, sizeof(genbuf), "%s\n\n%s%s\n%s%s", "連署板主", "英文名稱: ", topic, "申請 ID : ", cuser.userid);
-	strcat(genbuf, "\n申請政見: \n");
+	snprintf(title, sizeof(title), SHM->i18nstr[cuser.language][2509], topic);
+	snprintf(genbuf, sizeof(genbuf), "%s\n\n%s%s\n%s%s", SHM->i18nstr[cuser.language][2510], SHM->i18nstr[cuser.language][2511], topic, SHM->i18nstr[cuser.language][2512], cuser.userid);
+	strcat(genbuf, SHM->i18nstr[cuser.language][2513]);
 	break;
     case 6:
         move(1,0); clrtobot();
-        generalnamecomplete("請輸入看板英文名稱：",
+        generalnamecomplete(SHM->i18nstr[cuser.language][2514],
                             topic, IDLEN+1,
                             SHM->Bnumber,
                             completeboard_compar,
                             completeboard_permission,
                             completeboard_getname);
-	snprintf(title, sizeof(title), "[罷免板主] %s", topic);
+	snprintf(title, sizeof(title), SHM->i18nstr[cuser.language][2515], topic);
 	snprintf(genbuf, sizeof(genbuf),
-		 "%s\n\n%s%s\n%s", "罷免板主", "英文名稱: ",
-		 topic, "板主 ID : ");
+		 "%s\n\n%s%s\n%s", SHM->i18nstr[cuser.language][2516], SHM->i18nstr[cuser.language][2517],
+		 topic, SHM->i18nstr[cuser.language][2518]);
         temp=getbnum(topic);
 	do {
-	    if (!getdata(7, 0, "請輸入板主ID：", topic, IDLEN + 1, DOECHO))
+	    if (!getdata(7, 0, SHM->i18nstr[cuser.language][2519], topic, IDLEN + 1, DOECHO))
 		return FULLUPDATE;
         }while (!userid_is_BM(topic, bcache[temp - 1].BM));
 	strcat(genbuf, topic);
-	strcat(genbuf, "\n罷免原因: \n");
+	strcat(genbuf, SHM->i18nstr[cuser.language][2520]);
 	break;
     case 7:
-	if (!getdata(7, 0, "請輸入小組中英文名稱：", topic, 30, DOECHO))
+	if (!getdata(7, 0, SHM->i18nstr[cuser.language][2521], topic, 30, DOECHO))
 	    return FULLUPDATE;
-	snprintf(title, sizeof(title), "[連署小組長] %s", topic);
+	snprintf(title, sizeof(title), SHM->i18nstr[cuser.language][2522], topic);
 	snprintf(genbuf, sizeof(genbuf),
-		 "%s\n\n%s%s\n%s%s", "連署小組長", "小組名稱: ",
-		 topic, "申請 ID : ", cuser.userid);
-	strcat(genbuf, "\n申請政見: \n");
+		 "%s\n\n%s%s\n%s%s", SHM->i18nstr[cuser.language][2523], SHM->i18nstr[cuser.language][2524],
+		 topic, SHM->i18nstr[cuser.language][2525], cuser.userid);
+	strcat(genbuf, SHM->i18nstr[cuser.language][2526]);
 	break;
     case 8:
-	if (!getdata(7, 0, "請輸入小組中英文名稱：", topic, 30, DOECHO))
+	if (!getdata(7, 0, SHM->i18nstr[cuser.language][2527], topic, 30, DOECHO))
 	    return FULLUPDATE;
-	snprintf(title, sizeof(title), "[罷免小組長] %s", topic);
+	snprintf(title, sizeof(title), SHM->i18nstr[cuser.language][2528], topic);
 	snprintf(genbuf, sizeof(genbuf), "%s\n\n%s%s\n%s",
-		 "罷免小組長", "小組名稱: ", topic, "小組長 ID : ");
-	if (!getdata(8, 0, "請輸入小組長ID：", topic, IDLEN + 1, DOECHO))
+		 SHM->i18nstr[cuser.language][2529], SHM->i18nstr[cuser.language][2530], topic, SHM->i18nstr[cuser.language][2531]);
+	if (!getdata(8, 0, SHM->i18nstr[cuser.language][2532], topic, IDLEN + 1, DOECHO))
 	    return FULLUPDATE;
 	strcat(genbuf, topic);
-	strcat(genbuf, "\n罷免原因: \n");
+	strcat(genbuf, SHM->i18nstr[cuser.language][2533]);
 	break;
     case 9:
-	if (!getdata(7, 0, "請輸入群組中英文名稱：", topic, 30, DOECHO))
+	if (!getdata(7, 0, SHM->i18nstr[cuser.language][2534], topic, 30, DOECHO))
 	    return FULLUPDATE;
-	snprintf(title, sizeof(title), "[申請新群組] %s", topic);
+	snprintf(title, sizeof(title), SHM->i18nstr[cuser.language][2535], topic);
 	snprintf(genbuf, sizeof(genbuf), "%s\n\n%s%s\n%s%s",
-		 "申請群組", "群組名稱: ", topic, "申請 ID : ", cuser.userid);
-	strcat(genbuf, "\n申請政見: \n");
+		 SHM->i18nstr[cuser.language][2536], SHM->i18nstr[cuser.language][2537], topic, SHM->i18nstr[cuser.language][2538], cuser.userid);
+	strcat(genbuf, SHM->i18nstr[cuser.language][2539]);
 	break;
     default:
 	return FULLUPDATE;
     }
-    outs("請輸入簡介或政見(至多五行)，要清楚填寫");
+    outs(SHM->i18nstr[cuser.language][2540]);
     for (temp = 12; temp < 17; temp++) {
-	    if (!getdata(temp, 0, "：", topic, 60, DOECHO))
+	    if (!getdata(temp, 0, SHM->i18nstr[cuser.language][2541], topic, 60, DOECHO))
 		break;
 	    strcat(genbuf, topic);
 	    strcat(genbuf, "\n");
 	}
     if (temp == 11)
 	    return FULLUPDATE;
-    strcat(genbuf, "連署結束時間: ");
+    strcat(genbuf, SHM->i18nstr[cuser.language][2542]);
     now += 14 * 24 * 60 * 60;
     snprintf(topic, sizeof(topic), "(%ld)", now);
     strcat(genbuf, topic);
     strcat(genbuf, ctime(&now));
     now -= 14 * 24 * 60 * 60;
-    strcat(genbuf, "----------支持----------\n");
-    strcat(genbuf, "----------反對----------\n");
-    outs("開始連署嘍");
+    strcat(genbuf, SHM->i18nstr[cuser.language][2543]);
+    strcat(genbuf, SHM->i18nstr[cuser.language][2544]);
+    outs(SHM->i18nstr[cuser.language][2545]);
     setbpath(fpath, currboard);
     stampfile(fpath, &votefile);
 
     if (!(fp = fopen(fpath, "w"))) {
-	outs("開檔失敗，請稍候重來一次");
+	outs(SHM->i18nstr[cuser.language][2546]);
 	return FULLUPDATE;
     }
-    fprintf(fp, "%s%s %s%s\n%s%s\n%s%s", "作者: ", cuser.userid,
-	    "看板: ", currboard,
-	    "標題: ", title,
-	    "時間: ", ctime(&now));
+    fprintf(fp, "%s%s %s%s\n%s%s\n%s%s", SHM->i18nstr[cuser.language][2547], cuser.userid,
+	    SHM->i18nstr[cuser.language][2548], currboard,
+	    SHM->i18nstr[cuser.language][2549], title,
+	    SHM->i18nstr[cuser.language][2550], ctime(&now));
     fprintf(fp, "%s\n", genbuf);
     fclose(fp);
     strlcpy(votefile.owner, cuser.userid, sizeof(votefile.owner));

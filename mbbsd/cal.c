@@ -31,12 +31,12 @@ lockutmpmode(int unmode, int state)
 	clear();
 	move(10, 20);
 	if (errorno == 1)
-	    prints(SHM->i18nstr[cuser.language][532],
-		   SHM->i18nstr[cuser.language][ModeTypeTable[currutmp->lockmode]],
-		   SHM->i18nstr[cuser.language][ModeTypeTable[unmode]]);
+	    prints(I18N[532],
+		   I18N[ModeTypeTable[currutmp->lockmode]],
+		   I18N[ModeTypeTable[unmode]]);
 	else
-	    prints(SHM->i18nstr[cuser.language][533],
-		   SHM->i18nstr[cuser.language][ModeTypeTable[unmode]]);
+	    prints(I18N[533],
+		   I18N[ModeTypeTable[unmode]]);
 	pressanykey();
 	return errorno;
     }
@@ -66,8 +66,8 @@ vice(int money, char *item)
     setuserfile(buf, VICE_NEW);
     log_file(buf, 1, "%8.8d\n", viceserial);
     snprintf(buf, sizeof(buf),
-	     SHM->i18nstr[cuser.language][534], item, money, viceserial);
-    mail_id(cuser.userid, buf, "etc/vice.txt", SHM->i18nstr[cuser.language][535]);
+	     I18N[534], item, money, viceserial);
+    mail_id(cuser.userid, buf, "etc/vice.txt", I18N[535]);
     return 0;
 }
 
@@ -95,50 +95,50 @@ osong(char *defaultid)
     /* Jaky 一人一天點一首 */
     if (!strcmp(buf, Cdatedate(&cuser.lastsong)) && !HAS_PERM(PERM_SYSOP)) {
 	move(22, 0);
-	vmsg(SHM->i18nstr[cuser.language][536]);
+	vmsg(I18N[536]);
 	unlockutmpmode();
 	return 0;
     }
     if (cuser.money < 200) {
 	move(22, 0);
-	vmsg(SHM->i18nstr[cuser.language][537]);
+	vmsg(I18N[537]);
 	unlockutmpmode();
 	return 0;
     }
     move(12, 0);
     clrtobot();
-    prints(SHM->i18nstr[cuser.language][538], cuser.userid);
+    prints(I18N[538], cuser.userid);
     trans_buffer[0] = 0;
     if (!defaultid) {
-	getdata(13, 0, SHM->i18nstr[cuser.language][539],
+	getdata(13, 0, I18N[539],
 		destid, sizeof(destid), DOECHO);
 	while (!destid[0]) {
-	    a_menu(SHM->i18nstr[cuser.language][540], SONGBOOK, 0);
+	    a_menu(I18N[540], SONGBOOK, 0);
 	    clear();
-	    getdata(13, 0, SHM->i18nstr[cuser.language][541],
+	    getdata(13, 0, I18N[541],
 		    destid, sizeof(destid), DOECHO);
 	}
     } else
 	strlcpy(destid, defaultid, sizeof(destid));
 
     /* Heat:點歌者匿名功能 */
-    getdata(14, 0, SHM->i18nstr[cuser.language][542], ano, sizeof(ano), DOECHO);
+    getdata(14, 0, I18N[542], ano, sizeof(ano), DOECHO);
 
     if (!destid[0]) {
 	unlockutmpmode();
 	return 0;
     }
-    getdata_str(14, 0, SHM->i18nstr[cuser.language][543], say,
-		sizeof(say), DOECHO, SHM->i18nstr[cuser.language][544]);
+    getdata_str(14, 0, I18N[543], say,
+		sizeof(say), DOECHO, I18N[544]);
     snprintf(save_title, sizeof(save_title),
-	     "%s:%s", (ano[0] == 'y') ? SHM->i18nstr[cuser.language][545] : cuser.userid, say);
-    getdata_str(16, 0, SHM->i18nstr[cuser.language][546],
+	     "%s:%s", (ano[0] == 'y') ? I18N[545] : cuser.userid, say);
+    getdata_str(16, 0, I18N[546],
 		receiver, sizeof(receiver), LCECHO, destid);
 
     if (!trans_buffer[0]) {
-	outs(SHM->i18nstr[cuser.language][547]);
+	outs(I18N[547]);
 	pressanykey();
-	a_menu(SHM->i18nstr[cuser.language][548], SONGBOOK, 0);
+	a_menu(I18N[548], SONGBOOK, 0);
     }
     if (!trans_buffer[0] || strstr(trans_buffer, "home") ||
 	strstr(trans_buffer, "boards") || !(fp = fopen(trans_buffer, "r"))) {
@@ -156,14 +156,14 @@ osong(char *defaultid)
 	unlockutmpmode();
 	return 0;
     }
-    strlcpy(mail.owner, SHM->i18nstr[cuser.language][549], sizeof(mail.owner));
+    strlcpy(mail.owner, I18N[549], sizeof(mail.owner));
     snprintf(mail.title, sizeof(mail.title),
-	     SHM->i18nstr[cuser.language][550],
-	     (ano[0] == 'y') ? SHM->i18nstr[cuser.language][551] : cuser.userid, destid);
+	     I18N[550],
+	     (ano[0] == 'y') ? I18N[551] : cuser.userid, destid);
 
     while (fgets(buf, sizeof(buf), fp)) {
 	char           *po;
-	if (!strncmp(buf, SHM->i18nstr[cuser.language][552], 6)) {
+	if (!strncmp(buf, I18N[552], 6)) {
 	    clear();
 	    move(10, 10);
 	    outs(buf);
@@ -177,7 +177,7 @@ osong(char *defaultid)
 	    po[0] = 0;
 	    snprintf(genbuf, sizeof(genbuf),
 		     "%s%s%s", buf,
-		     (ano[0] == 'y') ? SHM->i18nstr[cuser.language][553] : cuser.userid, po + 7);
+		     (ano[0] == 'y') ? I18N[553] : cuser.userid, po + 7);
 	    strlcpy(buf, genbuf, sizeof(buf));
 	}
 	while ((po = strstr(buf, "<~Des~>"))) {
@@ -204,10 +204,10 @@ osong(char *defaultid)
 	    delete_range(OSONGPATH "/.DIR", 1, nsongs - 500);
 	}
 	/* 把第一首拿掉 */
-	vice(200, SHM->i18nstr[cuser.language][554]);
+	vice(200, I18N[554]);
     }
     snprintf(save_title, sizeof(save_title),
-	     "%s:%s", (ano[0] == 'y') ? SHM->i18nstr[cuser.language][555] : cuser.userid, say);
+	     "%s:%s", (ano[0] == 'y') ? I18N[555] : cuser.userid, say);
     hold_mail(filename, destid);
 
     if (receiver[0]) {
@@ -219,7 +219,7 @@ osong(char *defaultid)
     }
     clear();
     outs(
-	 SHM->i18nstr[cuser.language][556]);
+	 I18N[556]);
     pressanykey();
     sortsong();
     topsong();
@@ -250,10 +250,10 @@ inmailbox(int m)
 int
 p_cloak()
 {
-    if (getans(currutmp->invisible ? SHM->i18nstr[cuser.language][557] : SHM->i18nstr[cuser.language][558]) != 'y')
+    if (getans(currutmp->invisible ? I18N[557] : I18N[558]) != 'y')
 	return 0;
     if (cuser.money >= 19) {
-	vice(19, SHM->i18nstr[cuser.language][559]);
+	vice(19, I18N[559]);
 	currutmp->invisible %= 2;
 	vmsg((currutmp->invisible ^= 1) ? MSG_CLOAKED : MSG_UNCLOAK);
     }
@@ -264,14 +264,14 @@ p_cloak()
 int
 p_from()
 {
-    if (getans(SHM->i18nstr[cuser.language][560]) != 'y')
+    if (getans(I18N[560]) != 'y')
 	return 0;
     reload_money();
     if (cuser.money < 49)
 	return 0;
-    if (getdata_buf(b_lines - 1, 0, SHM->i18nstr[cuser.language][561],
+    if (getdata_buf(b_lines - 1, 0, I18N[561],
 		    currutmp->from, sizeof(currutmp->from), DOECHO)) {
-	vice(49, SHM->i18nstr[cuser.language][562]);
+	vice(49, I18N[562]);
 	currutmp->from_alias = 0;
     }
     return 0;
@@ -284,11 +284,11 @@ p_exmail()
     int             n;
 
     if (cuser.exmailbox >= MAX_EXKEEPMAIL) {
-	vmsg(SHM->i18nstr[cuser.language][563], MAX_EXKEEPMAIL);
+	vmsg(I18N[563], MAX_EXKEEPMAIL);
 	return 0;
     }
     snprintf(buf, sizeof(buf),
-	     SHM->i18nstr[cuser.language][564], cuser.exmailbox);
+	     I18N[564], cuser.exmailbox);
 
     getdata_str(b_lines - 2, 0, buf, ans, sizeof(ans), LCECHO, "10");
 
@@ -302,7 +302,7 @@ p_exmail()
     reload_money();
     if (cuser.money < n * 1000)
 	return 0;
-    vice(n * 1000, SHM->i18nstr[cuser.language][565]);
+    vice(n * 1000, I18N[565]);
     inmailbox(n);
     return 0;
 }
@@ -317,10 +317,10 @@ mail_redenvelop(char *from, char *to, int money, char mode)
     stampfile(genbuf, &fhdr);
     if (!(fp = fopen(genbuf, "w")))
 	return;
-    fprintf(fp, SHM->i18nstr[cuser.language][566]
+    fprintf(fp, I18N[566]
 	    ,from, ctime(&now), to, money);
     fclose(fp);
-    snprintf(fhdr.title, sizeof(fhdr.title), SHM->i18nstr[cuser.language][567]);
+    snprintf(fhdr.title, sizeof(fhdr.title), I18N[567]);
     strlcpy(fhdr.owner, from, sizeof(fhdr.owner));
 
     if (mode == 'y')
@@ -351,9 +351,9 @@ p_give()
     char            id[IDLEN + 1], money_buf[20];
 
     move(1, 0);
-    usercomplete(SHM->i18nstr[cuser.language][568], id);
+    usercomplete(I18N[568], id);
     if (!id[0] || !strcmp(cuser.userid, id) ||
-	!getdata(2, 0, SHM->i18nstr[cuser.language][569], money_buf, 7, LCECHO))
+	!getdata(2, 0, I18N[569], money_buf, 7, LCECHO))
 	return 0;
     money = atoi(money_buf);
     reload_money();
@@ -363,9 +363,9 @@ p_give()
 	    return 0;		/* 繳完稅就沒錢給了 */
 	deumoney(searchuser(id), money - tax);
 	demoney(-money);
-	log_file(FN_MONEY,1, SHM->i18nstr[cuser.language][570],
+	log_file(FN_MONEY,1, I18N[570],
                  cuser.userid, id, money - tax, ctime(&now));
-	mail_redenvelop(cuser.userid, id, money - tax, getans(SHM->i18nstr[cuser.language][571]));
+	mail_redenvelop(cuser.userid, id, money - tax, getans(I18N[571]));
     }
     return 0;
 }
@@ -378,15 +378,15 @@ p_sysinfo(void)
     extern char    *compile_time;
 
     load = cpuload(NULL);
-    cpuloadstr = (load < 5 ? SHM->i18nstr[cuser.language][572] : (load < 20 ? SHM->i18nstr[cuser.language][573] : SHM->i18nstr[cuser.language][574]));
+    cpuloadstr = (load < 5 ? I18N[572] : (load < 20 ? I18N[573] : I18N[574]));
 
     clear();
-    showtitle(SHM->i18nstr[cuser.language][575], BBSNAME);
+    showtitle(I18N[575], BBSNAME);
     move(2, 0);
-    prints(SHM->i18nstr[cuser.language][576]);
+    prints(I18N[576]);
     prints(TITLE_COLOR BBSNAME);
     prints("\033[m (" MYIP);
-    prints(SHM->i18nstr[cuser.language][577],
+    prints(I18N[577],
 	   cpuloadstr, SHM->UTMPnumber,
 #ifdef DYMAX_ACTIVE
 	   GLOBALVAR[9] > 1000 ? GLOBALVAR[9] : MAX_ACTIVE,
@@ -397,10 +397,10 @@ p_sysinfo(void)
     if (HAS_PERM(PERM_SYSOP)) {
 	struct rusage ru;
 	getrusage(RUSAGE_SELF, &ru);
-	prints(SHM->i18nstr[cuser.language][578],
+	prints(I18N[578],
 	       ((int)sbrk(0) - 0x8048000) / 1024,
 	       (int)ru.ru_idrss, (int)ru.ru_isrss);
-	prints(SHM->i18nstr[cuser.language][579]
+	prints(I18N[579]
 #ifdef CRITICAL_MEMORY
 		" CRITICAL_MEMORY"
 #endif

@@ -190,3 +190,5 @@
 #define REPLYING        0
 #define RECVINREPLYING  1
 #endif
+
+#define I18N SHM->i18nstr[cuser.language]

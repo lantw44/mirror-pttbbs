@@ -379,7 +379,7 @@ safe_article_delete(int ent, fileheader_t *fhdr, char *direct)
 {
     fileheader_t newfhdr;
     memcpy(&newfhdr, fhdr, sizeof(fileheader_t));
-    sprintf(newfhdr.title, "(本文已被刪除)");
+    sprintf(newfhdr.title, I18N[1854]);
     strcpy(newfhdr.filename, ".deleted");
     strcpy(newfhdr.owner, "-");
     substitute_record(direct, &newfhdr, sizeof(newfhdr), ent);
@@ -408,7 +408,7 @@ safe_article_delete_range(char *direct, int from, int to)
 	    strlcpy(ptr, newfhdr.filename, sizeof(newfhdr.filename));
 	    unlink(fn);
 
-	    sprintf(newfhdr.title, "(本文已被刪除)");
+	    sprintf(newfhdr.title, I18N[1855]);
 	    strcpy(newfhdr.filename, ".deleted");
 	    strcpy(newfhdr.owner, "-");
 	    // because off_t is unsigned, we could NOT seek backward.

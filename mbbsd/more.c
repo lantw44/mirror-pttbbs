@@ -114,7 +114,7 @@ more_readln(int fd, unsigned char *buf)
 int
 more(char *fpath, int promptend)
 {
-    char    *head[4] = {SHM->i18nstr[cuser.language][1528], SHM->i18nstr[cuser.language][1529], SHM->i18nstr[cuser.language][1530], SHM->i18nstr[cuser.language][1531]};
+    char    *head[4] = {I18N[1528], I18N[1529], I18N[1530], I18N[1531]};
     char           *ptr, *word = NULL, buf[ANSILINELEN + 1];
     struct stat     st;
 
@@ -207,7 +207,7 @@ more(char *fpath, int promptend)
 	    /* ※處理引用者 & 引言 */
 	    if ((buf[1] == ' ') && (buf[0] == ':' || buf[0] == '>'))
 		word = "\033[36m";
-	    else if (!strncmp(buf, SHM->i18nstr[cuser.language][1532], 2) || !strncmp(buf, "==>", 3))
+	    else if (!strncmp(buf, I18N[1532], 2) || !strncmp(buf, "==>", 3))
 		word = "\033[32m";
 
 	    if (word)
@@ -298,13 +298,13 @@ more(char *fpath, int promptend)
 	    } else
 		color = 2;
 
-	    prints(SHM->i18nstr[cuser.language][1533],
+	    prints(I18N[1533],
 		   printcolor[(int)color],
 		   pageno,
 		   (int)((viewed * 100) / fsize),
 		   "\033[31;47m",
-		   SHM->i18nstr[cuser.language][1534],
-		   SHM->i18nstr[cuser.language][1535]);
+		   I18N[1534],
+		   I18N[1535]);
 
 
 	    while (line == b_lines || (line > 0 && viewed == fsize)) {
@@ -328,11 +328,11 @@ more(char *fpath, int promptend)
 			char            ans[4] = "n";
 
 			*search_str = search_char0;
-			getdata_buf(b_lines - 1, 0, SHM->i18nstr[cuser.language][1536], search_str,
+			getdata_buf(b_lines - 1, 0, I18N[1536], search_str,
 				    40, DOECHO);
 			if (*search_str) {
 			    searching = 1;
-			    if (getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1537],
+			    if (getdata(b_lines - 1, 0, I18N[1537],
 				   ans, sizeof(ans), LCECHO) && *ans == 'y')
 				fptr = strstr;
 			    else
@@ -460,7 +460,7 @@ more(char *fpath, int promptend)
 		    break;
 
 		case Ctrl('T'):
-		    getdata(b_lines - 2, 0, SHM->i18nstr[cuser.language][1538],
+		    getdata(b_lines - 2, 0, I18N[1538],
 			    buf, 4, LCECHO);
 		    if (buf[0] == 'y') {
 		    	setuserfile(buf, ask_tmpbuf(b_lines - 1));

@@ -19,7 +19,7 @@ int search_user_bybakpwd(void);
 int m_board(void);
 int m_register(void);
 int cat_register(void);
-unsigned int setperms(unsigned int pbits, char *pstring[]);
+unsigned int setperms(unsigned int pbits, int *pstring);
 void setup_man(boardheader_t * board);
 void delete_symbolic_link(boardheader_t *bh, int bid);
 int make_symbolic_link(char *bname, int gid);
@@ -513,7 +513,7 @@ int dashl(char *fname);
 char *subject(char *title);
 void setdirpath(char *buf, char *direct, char *fname);
 int str_checksum(char *str);
-void show_help(char **helptext, int start, int num);
+void show_help(int *index);
 int belong(char *filelist, char *key);
 char *Cdatedate(time_t *clock);
 void sethomeman(char *buf, char *userid);
@@ -680,9 +680,6 @@ void touchbtotal(int bid);
 /* util_cache.c */
 void reload_pttcache(void);
 
-#ifdef I18N
-/* i18n.c */
 void load_i18nstring(void);
-#endif
 
 #endif

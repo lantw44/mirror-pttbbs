@@ -66,7 +66,7 @@ search_key_user(char *passwdfile, int mode)
 
     assert(fp1);
     clear();
-    getdata(0, 0, mode ? I18N[4] : SHM->i18nstr[cuser.language][5], key, sizeof(key), DOECHO);
+    getdata(0, 0, mode ? I18N[4] : I18N[5], key, sizeof(key), DOECHO);
     if(!key[0])
 	return 0;
     while ((fread(&user, sizeof(user), 1, fp1)) > 0 && coun < MAX_USERS) {
@@ -208,7 +208,7 @@ static void
 bperm_msg(boardheader_t * board)
 {
     prints(I18N[20], board->brdname,
-	   board->brdattr & BRD_POSTMASK ? I18N[21] : SHM->i18nstr[cuser.language][22]);
+	   board->brdattr & BRD_POSTMASK ? I18N[21] : I18N[22]);
 }
 
 unsigned int
@@ -221,10 +221,10 @@ setperms(unsigned int pbits, int *pstring)
     for (i = 0; i < NUMPERMS / 2; i++) {
 	prints("%c. %-20s %-15s %c. %-20s %s\n",
 	       'A' + i, I18N[pstring[i]],
-	       ((pbits >> i) & 1 ? I18N[23] : SHM->i18nstr[cuser.language][24]),
+	       ((pbits >> i) & 1 ? I18N[23] : I18N[24]),
 	       i < 10 ? 'Q' + i : '0' + i - 10,
 	       I18N[pstring[i + 16]],
-	       ((pbits >> (i + 16)) & 1 ? I18N[25] : SHM->i18nstr[cuser.language][26]));
+	       ((pbits >> (i + 16)) & 1 ? I18N[25] : I18N[26]));
     }
     clrtobot();
     while(
@@ -238,7 +238,7 @@ setperms(unsigned int pbits, int *pstring)
 	else {
 	    pbits ^= (1 << i);
 	    move(i % 16 + 4, i <= 15 ? 24 : 64);
-	    prints((pbits >> i) & 1 ? I18N[28] : SHM->i18nstr[cuser.language][29]);
+	    prints((pbits >> i) & 1 ? I18N[28] : I18N[29]);
 	}
     }
     return pbits;
@@ -322,7 +322,7 @@ m_mod_board(char *bname)
     case 'v':
 	memcpy(&newbh, &bh, sizeof(bh));
 	outs(I18N[36]);
-	outs((bh.brdattr & BRD_BAD) ? I18N[37] : SHM->i18nstr[cuser.language][38]);
+	outs((bh.brdattr & BRD_BAD) ? I18N[37] : I18N[38]);
 	getdata(21, 0, I18N[39], genbuf, 5, LCECHO);
 	if (genbuf[0] == 'y') {
 	    if (newbh.brdattr & BRD_BAD)
@@ -353,7 +353,7 @@ m_mod_board(char *bname)
 	    memset(&bh, 0, sizeof(bh));
 	    snprintf(bh.title, sizeof(bh.title),
 		     I18N[40], bname, cuser.userid);
-	    post_msg("Security", bh.title, I18N[41], SHM->i18nstr[cuser.language][42]);
+	    post_msg("Security", bh.title, I18N[41], I18N[42]);
 	    substitute_record(fn_board, &bh, sizeof(bh), bid);
 	    reset_board(bid);
 	    sort_bcache();
@@ -593,7 +593,7 @@ x_file()
     }
     aborted = vedit(fpath, NA, NULL);
     prints(I18N[67], fpath,
-	   (aborted == -1) ? I18N[68] : SHM->i18nstr[cuser.language][69]);
+	   (aborted == -1) ? I18N[68] : I18N[69]);
     pressanykey();
     return FULLUPDATE;
 }
@@ -778,8 +778,8 @@ auto_scan(char fdata[][STRLEN], char ans[])
     int             i;
     char            temp[10];
 
-    if (!strncmp(fdata[2], I18N[87], 2) || strstr(fdata[2], SHM->i18nstr[cuser.language][88])
-	|| strstr(fdata[2], I18N[89]) || strstr(fdata[2], SHM->i18nstr[cuser.language][90])) {
+    if (!strncmp(fdata[2], I18N[87], 2) || strstr(fdata[2], I18N[88])
+	|| strstr(fdata[2], I18N[89]) || strstr(fdata[2], I18N[90])) {
 	ans[0] = '0';
 	return 1;
     }
@@ -815,23 +815,23 @@ auto_scan(char fdata[][STRLEN], char ans[])
 	return 5;
     }
     if (strstr(fdata[3], I18N[96])) {
-	if (strstr(fdata[3], I18N[97]) || strstr(fdata[3], SHM->i18nstr[cuser.language][98]) ||
-	    strstr(fdata[3], I18N[99]) || strstr(fdata[3], SHM->i18nstr[cuser.language][100]) ||
-	    strstr(fdata[3], I18N[101]) || strstr(fdata[3], SHM->i18nstr[cuser.language][102]) ||
-	    strstr(fdata[3], I18N[103]) || strstr(fdata[3], SHM->i18nstr[cuser.language][104]) ||
-	    strstr(fdata[3], I18N[105]) || strstr(fdata[3], SHM->i18nstr[cuser.language][106]) ||
-	    strstr(fdata[3], I18N[107]) || strstr(fdata[3], SHM->i18nstr[cuser.language][108]))
+	if (strstr(fdata[3], I18N[97]) || strstr(fdata[3], I18N[98]) ||
+	    strstr(fdata[3], I18N[99]) || strstr(fdata[3], I18N[100]) ||
+	    strstr(fdata[3], I18N[101]) || strstr(fdata[3], I18N[102]) ||
+	    strstr(fdata[3], I18N[103]) || strstr(fdata[3], I18N[104]) ||
+	    strstr(fdata[3], I18N[105]) || strstr(fdata[3], I18N[106]) ||
+	    strstr(fdata[3], I18N[107]) || strstr(fdata[3], I18N[108]))
 	    good++;
     } else if (strstr(fdata[3], I18N[109]))
 	good++;
 
-    if (strstr(fdata[4], I18N[110]) || strstr(fdata[4], SHM->i18nstr[cuser.language][111]) ||
+    if (strstr(fdata[4], I18N[110]) || strstr(fdata[4], I18N[111]) ||
 	strstr(fdata[4], I18N[112])) {
 	ans[0] = '2';
 	return 3;
     }
-    if (strstr(fdata[4], I18N[113]) || strstr(fdata[4], SHM->i18nstr[cuser.language][114])) {
-	if (strstr(fdata[4], I18N[115]) || strstr(fdata[4], SHM->i18nstr[cuser.language][116])) {
+    if (strstr(fdata[4], I18N[113]) || strstr(fdata[4], I18N[114])) {
+	if (strstr(fdata[4], I18N[115]) || strstr(fdata[4], I18N[116])) {
 	    if (strstr(fdata[4], I18N[117]))
 		good++;
 	}
@@ -864,8 +864,8 @@ scan_register_form(char *regfile, int automode, int neednum)
 	"uid", "ident", "name", "career", "addr", "phone", "email", NULL
     };
     char    *finfo[] = {
-	I18N[118], SHM->i18nstr[cuser.language][119], SHM->i18nstr[cuser.language][120], SHM->i18nstr[cuser.language][121], SHM->i18nstr[cuser.language][122],
-	I18N[123], SHM->i18nstr[cuser.language][124], NULL
+	I18N[118], I18N[119], I18N[120], I18N[121], I18N[122],
+	I18N[123], I18N[124], NULL
     };
     char    *reason[] = {
 	I18N[125],
@@ -945,7 +945,7 @@ scan_register_form(char *regfile, int automode, int neednum)
 	    	prints(I18N[139], finfo[0], fdata[0]);
 		prints(I18N[140], finfo[1], fdata[1]);
 #ifdef FOREIGN_REG
-		prints(I18N[141], finfo[2], fdata[2], muser.uflag2 & FOREIGN ? SHM->i18nstr[cuser.language][142] : "");
+		prints(I18N[141], finfo[2], fdata[2], muser.uflag2 & FOREIGN ? I18N[142] : "");
 #else
 		prints(I18N[143], finfo[2], fdata[2]);
 #endif

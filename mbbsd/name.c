@@ -294,7 +294,7 @@ namecomplete(char *prompt, char *data)
 	    len = MaxLen(morelist, p_lines);
 	    move(2, 0);
 	    clrtobot();
-	    printdash(SHM->i18nstr[cuser.language][1539]);
+	    printdash(I18N[1539]);
 	    while (len + col < 80) {
 		int             i;
 
@@ -418,7 +418,7 @@ usercomplete(char *prompt, char *data)
 	    len = UserMaxLen((arrptr) cwlist, cwnum, morenum, p_lines);
 	    move(2, 0);
 	    clrtobot();
-	    printdash(SHM->i18nstr[cuser.language][1540]);
+	    printdash(I18N[1540]);
 	    while (len + col < 79) {
 		int             i;
 
@@ -591,7 +591,7 @@ generalnamecomplete(char *prompt, char *data, int len, size_t nmemb,
 	    clearbot = YEA;
 	    move(2, 0);
 	    clrtobot();
-	    printdash(SHM->i18nstr[cuser.language][1541]);
+	    printdash(I18N[1541]);
 
 	    col = 0;
 	    while (len + col < 79) {

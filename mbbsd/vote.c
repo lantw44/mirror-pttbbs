@@ -162,8 +162,8 @@ vote_report(char *bname, char *fname, char *fpath)
     /* append record to .DIR */
 
     memset(&header, 0, sizeof(fileheader_t));
-    strlcpy(header.owner, SHM->i18nstr[cuser.language][2378], sizeof(header.owner));
-    snprintf(header.title, sizeof(header.title), SHM->i18nstr[cuser.language][2379], bname);
+    strlcpy(header.owner, I18N[2378], sizeof(header.owner));
+    snprintf(header.title, sizeof(header.title), I18N[2379], bname);
     {
 	register struct tm *ptime = localtime(&dtime);
 
@@ -261,10 +261,10 @@ b_result_one(boardheader_t * fh, int ind, int *total)
 
     if ((xfp = fopen(buf, "r"))) {
 	fgets(inbuf, sizeof(inbuf), xfp);
-	fprintf(tfp, SHM->i18nstr[cuser.language][2380], msg_seperator, inbuf);
+	fprintf(tfp, I18N[2380], msg_seperator, inbuf);
 	fclose(xfp);
     }
-    fprintf(tfp, SHM->i18nstr[cuser.language][2381],
+    fprintf(tfp, I18N[2381],
 	    msg_seperator, ctime(&closetime));
     fh->vtime = now;
 
@@ -276,13 +276,13 @@ b_result_one(boardheader_t * fh, int ind, int *total)
     if ((cfp = fopen(b_control, "r"))) {
 	fgets(inbuf, sizeof(inbuf), cfp);
 	fgets(inbuf, sizeof(inbuf), cfp);
-	fprintf(tfp, SHM->i18nstr[cuser.language][2382],
+	fprintf(tfp, I18N[2382],
 		people_num, junk);
-	fprintf(tfp, SHM->i18nstr[cuser.language][2383]);
+	fprintf(tfp, I18N[2383]);
 	for (junk = 0; junk < item_num; junk++) {
 	    fgets(inbuf, sizeof(inbuf), cfp);
 	    inbuf[(strlen(inbuf) - 1)] = '\0';
-	    fprintf(tfp, SHM->i18nstr[cuser.language][2384], inbuf + 3, counts[junk],                
+	    fprintf(tfp, I18N[2384], inbuf + 3, counts[junk],                
 		    (float)(counts[junk] * 100) / (float)(people_num),
 		    (float)(counts[junk] * 100) / (float)(*total));
 	}
@@ -291,12 +291,12 @@ b_result_one(boardheader_t * fh, int ind, int *total)
     unlink(b_control);
     free(counts);
 
-    fprintf(tfp, SHM->i18nstr[cuser.language][2385], msg_seperator);
+    fprintf(tfp, I18N[2385], msg_seperator);
     setbfile(buf, bname, STR_new_comments);
     b_suckinfile(tfp, buf);
     unlink(buf);
 
-    fprintf(tfp, SHM->i18nstr[cuser.language][2386], msg_seperator, *total);
+    fprintf(tfp, I18N[2386], msg_seperator, *total);
     fclose(tfp);
 
     setbfile(b_report, bname, "report");
@@ -437,7 +437,7 @@ vote_view(char *bname, int vote_index)
 
     if ((fp = fopen(buf, "r"))) {
 	fgets(inbuf, sizeof(inbuf), fp);
-	prints(SHM->i18nstr[cuser.language][2387], inbuf);
+	prints(I18N[2387], inbuf);
 	fclose(fp);
     }
     setbfile(buf, bname, STR_new_control);
@@ -449,12 +449,12 @@ vote_view(char *bname, int vote_index)
     fscanf(fp, "%hd,%hd\n%lu\n", &item_num, &i, &closetime);
     counts = (int *)malloc(item_num * sizeof(int));
 
-    prints(SHM->i18nstr[cuser.language][2388], atoi(inbuf), (num / sizeof(short)),
+    prints(I18N[2388], atoi(inbuf), (num / sizeof(short)),
 	   ctime(&closetime));
 
     /* Thor: 開放 票數 預知 */
     setbfile(buf, bname, STR_new_flags);
-    prints(SHM->i18nstr[cuser.language][2389], b_nonzeroNum(buf));
+    prints(I18N[2389], b_nonzeroNum(buf));
 
     setbfile(buf, bname, STR_new_ballots);
 #if 0 // backward compatible
@@ -471,7 +471,7 @@ vote_view(char *bname, int vote_index)
 	inbuf[(strlen(inbuf) - 1)] = '\0';
 	inbuf[30] = '\0';	/* truncate */
 	move(num % 15 + 6, num / 15 * 40);
-	prints(SHM->i18nstr[cuser.language][2390], inbuf, counts[i]);
+	prints(I18N[2390], inbuf, counts[i]);
 	total += counts[i];
 	if (num == 29) {
 	    num = -1;
@@ -485,8 +485,8 @@ vote_view(char *bname, int vote_index)
     pos = getbnum(bname);
     fhp = bcache + pos - 1;
     move(t_lines - 3, 0);
-    prints(SHM->i18nstr[cuser.language][2391], total);
-    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][2392], genbuf,
+    prints(I18N[2391], total);
+    getdata(b_lines - 1, 0, I18N[2392], genbuf,
 	    4, LCECHO);
     if (genbuf[0] == 'a') {
 	setbfile(buf, bname, STR_new_control);
@@ -543,7 +543,7 @@ vote_view_all(char *bname)
 	    fgets(inbuf, sizeof(inbuf), xfp);
 	    fclose(xfp);
 	} else
-	    strlcpy(inbuf, SHM->i18nstr[cuser.language][2393], sizeof(inbuf));
+	    strlcpy(inbuf, I18N[2393], sizeof(inbuf));
 	prints("%s\n", inbuf);
     }
     for (i = 1; i < 20; i++) {
@@ -562,14 +562,14 @@ vote_view_all(char *bname)
 		fgets(inbuf, sizeof(inbuf), xfp);
 		fclose(xfp);
 	    } else
-		strlcpy(inbuf, SHM->i18nstr[cuser.language][2394], sizeof(inbuf));
+		strlcpy(inbuf, I18N[2394], sizeof(inbuf));
 	    prints("%s\n", inbuf);
 	}
     }
 
     if (x < 0)
 	return FULLUPDATE;
-    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][2395], x);
+    snprintf(buf, sizeof(buf), I18N[2395], x);
 
     getdata(b_lines - 1, 0, buf, genbuf, 4, LCECHO);
 
@@ -605,13 +605,13 @@ vote_maintain(char *bname)
     if ((pos = getbnum(bname)) <= 0)
 	return 0;
 
-    stand_title(SHM->i18nstr[cuser.language][2396]);
+    stand_title(I18N[2396]);
     fhp = bcache + pos - 1;
 
     /* CharlieL */
     if (fhp->bvote != 2 && fhp->bvote != 0) {
 	getdata(b_lines - 1, 0,
-		SHM->i18nstr[cuser.language][2397],
+		I18N[2397],
 		genbuf, 4, LCECHO);
 	if (genbuf[0] == 'v')
 	    return vote_view_all(bname);
@@ -698,22 +698,22 @@ vote_maintain(char *bname)
     }
     clear();
     move(0, 0);
-    prints(SHM->i18nstr[cuser.language][2398], x);
+    prints(I18N[2398], x);
     setbfile(buf, bname, STR_new_title);
-    getdata(4, 0, SHM->i18nstr[cuser.language][2399], inbuf, 50, LCECHO);
+    getdata(4, 0, I18N[2399], inbuf, 50, LCECHO);
     if (inbuf[0] == '\0')
-	strlcpy(inbuf, SHM->i18nstr[cuser.language][2400], sizeof(inbuf));
+	strlcpy(inbuf, I18N[2400], sizeof(inbuf));
     fp = fopen(buf, "w");
     assert(fp);
     fprintf(fp, "%s", inbuf);
     fclose(fp);
 
-    prints(SHM->i18nstr[cuser.language][2401]);
+    prints(I18N[2401]);
     pressanykey();
     setbfile(buf, bname, STR_new_desc);
     aborted = vedit(buf, NA, NULL);
     if (aborted == -1) {
-	vmsg(SHM->i18nstr[cuser.language][2402]);
+	vmsg(I18N[2402]);
 	return FULLUPDATE;
     }
     aborted = 0;
@@ -721,13 +721,13 @@ vote_maintain(char *bname)
     unlink(buf);
 
     getdata(4, 0,
-	    SHM->i18nstr[cuser.language][2403],
+	    I18N[2403],
 	    inbuf, 2, LCECHO);
     setbfile(buf, bname, STR_new_limited);
     if (inbuf[0] == 'y') {
 	fp = fopen(buf, "w");
 	assert(fp);
-	//fprintf(fp, SHM->i18nstr[cuser.language][2404]);
+	//fprintf(fp, I18N[2404]);
 	fclose(fp);
 	friend_edit(FRIEND_CANVOTE);
     } else {
@@ -735,7 +735,7 @@ vote_maintain(char *bname)
 	    unlink(buf);
     }
     clear();
-    getdata(0, 0, SHM->i18nstr[cuser.language][2405], inbuf, 4, DOECHO);
+    getdata(0, 0, I18N[2405], inbuf, 4, DOECHO);
 
     closetime = atoi(inbuf);
     if (closetime <= 0)
@@ -749,7 +749,7 @@ vote_maintain(char *bname)
     assert(fp);
     fprintf(fp, "000,000\n%lu\n", closetime);
 
-    outs(SHM->i18nstr[cuser.language][2406]);
+    outs(I18N[2406]);
     num = 0;
     x = 0;	/* x is the page number */
     while (!aborted) {
@@ -774,7 +774,7 @@ vote_maintain(char *bname)
 	    num = 0;
 	}
     }
-    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][2407], x * 30 + num);
+    snprintf(buf, sizeof(buf), I18N[2407], x * 30 + num);
 
     getdata(t_lines - 3, 0, buf, inbuf, 3, DOECHO);
 
@@ -799,7 +799,7 @@ vote_maintain(char *bname)
     if (substitute_record(fn_board, fhp, sizeof(*fhp), pos) == -1)
 	outs(err_board_update);
     reset_board(pos);
-    outs(SHM->i18nstr[cuser.language][2408]);
+    outs(I18N[2408]);
 
     return FULLUPDATE;
 }
@@ -872,22 +872,22 @@ user_vote_one(char *bname, int ind)
 	setbfile(buf, bname, FN_CANVOTE);
 	if (!belong(buf, cuser.userid)) {
 	    fclose(cfp);
-	    vmsg(SHM->i18nstr[cuser.language][2409]);
+	    vmsg(I18N[2409]);
 	    return FULLUPDATE;
 	} else {
-	    vmsg(SHM->i18nstr[cuser.language][2410]);
+	    vmsg(I18N[2410]);
 	    more(buf, YEA);
 	}
     }
     if (vote_flag(bname, ind, '\0')) {
-	vmsg(SHM->i18nstr[cuser.language][2411]);
+	vmsg(I18N[2411]);
 	return FULLUPDATE;
     }
     setutmpmode(VOTING);
     setbfile(buf, bname, STR_new_desc);
     more(buf, YEA);
 
-    stand_title(SHM->i18nstr[cuser.language][2412]);
+    stand_title(I18N[2412]);
     if ((pos = getbnum(bname)) <= 0)
 	return 0;
 
@@ -903,7 +903,7 @@ user_vote_one(char *bname, int ind)
     memset(choices, 0, sizeof(choices));
     max_page = (item_num - 1)/ 30 + 1;
 
-    prints(SHM->i18nstr[cuser.language][2413],
+    prints(I18N[2413],
 	   tickets, ctime(&closetime));
 
 #define REDO_DRAW	1
@@ -938,14 +938,14 @@ user_vote_one(char *bname, int ind)
 
 	vote[0] = vote[1] = '\0';
 	move(t_lines - 2, 0);
-	prints(SHM->i18nstr[cuser.language][2414], tickets - i);
-	getdata(t_lines - 4, 0, SHM->i18nstr[cuser.language][2415], vote, sizeof(vote), DOECHO);
+	prints(I18N[2414], tickets - i);
+	getdata(t_lines - 4, 0, I18N[2415], vote, sizeof(vote), DOECHO);
 	*vote = toupper(*vote);
 
 #define CURRENT_CHOICE \
     chosen[curr_page * 30 + vote[0] - 'A']
 	if (vote[0] == '0' || (!vote[0] && !i)) {
-	    outs(SHM->i18nstr[cuser.language][2416]);
+	    outs(I18N[2416]);
 	    break;
 	} else if (vote[0] == '1' && i);
 	else if (!vote[0])
@@ -987,11 +987,11 @@ user_vote_one(char *bname, int ind)
 	}
 
 	if (vote_flag(bname, ind, vote[0]) != 0)
-	    prints(SHM->i18nstr[cuser.language][2417]);
+	    prints(I18N[2417]);
 	else {
 	    setbfile(buf, bname, STR_new_ballots);
 	    if ((fd = open(buf, O_WRONLY | O_CREAT | O_APPEND, 0600)) == 0)
-		outs(SHM->i18nstr[cuser.language][2418]);
+		outs(I18N[2418]);
 	    else {
 		struct stat     statb;
 		char            buf[3], mycomments[3][74], b_comments[80];
@@ -1008,18 +1008,18 @@ user_vote_one(char *bname, int ind)
 		fstat(fd, &statb);
 		close(fd);
 		getdata(b_lines - 2, 0,
-			SHM->i18nstr[cuser.language][2419],
+			I18N[2419],
 			buf, 3, DOECHO);
 		if (buf[0] == 'Y' || buf[0] == 'y') {
 		    do {
 			move(5, 0);
 			clrtobot();
-			outs(SHM->i18nstr[cuser.language][2420]);
+			outs(I18N[2420]);
 			for (i = 0; (i < 3) &&
-			     getdata(7 + i, 0, SHM->i18nstr[cuser.language][2421],
+			     getdata(7 + i, 0, I18N[2421],
 				     mycomments[i], sizeof(mycomments[i]),
 				     DOECHO); i++);
-			getdata(b_lines - 2, 0, SHM->i18nstr[cuser.language][2422], buf, 3, LCECHO);
+			getdata(b_lines - 2, 0, I18N[2422], buf, 3, LCECHO);
 		    } while (buf[0] == 'E' || buf[0] == 'e');
 		    if (buf[0] == 'Q' || buf[0] == 'q')
 			break;
@@ -1027,7 +1027,7 @@ user_vote_one(char *bname, int ind)
 		    if (mycomments[0])
 			if ((fcm = fopen(b_comments, "a"))) {
 			    fprintf(fcm,
-				    SHM->i18nstr[cuser.language][2423],
+				    I18N[2423],
 				    cuser.userid);
 			    for (i = 0; i < 3; i++)
 				fprintf(fcm, "    %s\n", mycomments[i]);
@@ -1036,7 +1036,7 @@ user_vote_one(char *bname, int ind)
 			}
 		}
 		move(b_lines - 1, 0);
-		prints(SHM->i18nstr[cuser.language][2424]);
+		prints(I18N[2424]);
 	    }
 	}
 	break;
@@ -1067,11 +1067,11 @@ user_vote(char *bname)
     clrtobot();
 
     if (fhp->bvote == 2 || fhp->bvote == 0) {
-	vmsg(SHM->i18nstr[cuser.language][2425]);
+	vmsg(I18N[2425]);
 	return FULLUPDATE;
     }
     if (!HAS_PERM(PERM_LOGINOK)) {
-	vmsg(SHM->i18nstr[cuser.language][2426]);
+	vmsg(I18N[2426]);
 	return FULLUPDATE;
     }
     strlcpy(STR_new_control, STR_bv_control, sizeof(STR_new_control));
@@ -1088,7 +1088,7 @@ user_vote(char *bname)
 	    fgets(inbuf, sizeof(inbuf), xfp);
 	    fclose(xfp);
 	} else
-	    strlcpy(inbuf, SHM->i18nstr[cuser.language][2427], sizeof(inbuf));
+	    strlcpy(inbuf, I18N[2427], sizeof(inbuf));
 	prints("%s\n", inbuf);
     }
     for (i = 1; i < 20; i++) {
@@ -1107,7 +1107,7 @@ user_vote(char *bname)
 		fgets(inbuf, sizeof(inbuf), xfp);
 		fclose(xfp);
 	    } else
-		strlcpy(inbuf, SHM->i18nstr[cuser.language][2428], sizeof(inbuf));
+		strlcpy(inbuf, I18N[2428], sizeof(inbuf));
 	    prints("%s\n", inbuf);
 	}
     }
@@ -1115,7 +1115,7 @@ user_vote(char *bname)
     if (x < 0)
 	return FULLUPDATE;
 
-    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][2429], x);
+    snprintf(buf, sizeof(buf), I18N[2429], x);
 
     getdata(b_lines - 1, 0, buf, genbuf, 4, LCECHO);
 
@@ -1145,7 +1145,7 @@ vote_results(char *bname)
 
     setbfile(buf, bname, STR_bv_results);
     if (more(buf, YEA) == -1)
-	vmsg(SHM->i18nstr[cuser.language][2430]);
+	vmsg(I18N[2430]);
     return FULLUPDATE;
 }
 

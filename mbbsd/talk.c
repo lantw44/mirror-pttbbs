@@ -3,10 +3,10 @@
 
 #define QCAST   int (*)(const void *, const void *)
 
-//#define sig_des [(a)] (SHM->i18nstr[cuser.language][1896 + (a)])
-#define sig_des(a) (SHM->i18nstr[cuser.language][1896 + (a)])
+//#define sig_des [(a)] (I18N[1896 + (a)])
+#define sig_des(a) (I18N[1896 + (a)])
 /*static char    *sig_des[] = {
-    SHM->i18nstr[cuser.language][1896], SHM->i18nstr[cuser.language][1897], "", SHM->i18nstr[cuser.language][1898], SHM->i18nstr[cuser.language][1899], SHM->i18nstr[cuser.language][1900]
+    I18N[1896], I18N[1897], "", I18N[1898], I18N[1899], I18N[1900]
 };*/
 
 #define MAX_SHOW_MODE 4
@@ -77,7 +77,7 @@ char           *
 modestring(userinfo_t * uentp, int simple)
 {
     static char     modestr[40];
-    char    *notonline = SHM->i18nstr[cuser.language][1901];
+    char    *notonline = I18N[1901];
     register int    mode = uentp->mode;
     register char  *word;
     int             fri_stat;
@@ -85,9 +85,9 @@ modestring(userinfo_t * uentp, int simple)
     /* for debugging */
     if (mode >= MAX_MODES) {
 	syslog(LOG_WARNING, "what!? mode = %d", mode);
-	word = SHM->i18nstr[cuser.language][ModeTypeTable[mode % MAX_MODES]];
+	word = I18N[ModeTypeTable[mode % MAX_MODES]];
     } else
-	word = SHM->i18nstr[cuser.language][ModeTypeTable[mode]];
+	word = I18N[ModeTypeTable[mode]];
     fri_stat = friend_stat(currutmp, uentp);
     if (!(HAS_PERM(PERM_SYSOP) || HAS_PERM(PERM_SEECLOAK)) &&
 	((uentp->invisible || (fri_stat & HRM)) &&
@@ -95,18 +95,18 @@ modestring(userinfo_t * uentp, int simple)
 	return notonline;
     else if (mode == EDITING) {
 	snprintf(modestr, sizeof(modestr), "E:%s",
-		SHM->i18nstr[cuser.language][ModeTypeTable[uentp->destuid < EDITING ? uentp->destuid :
+		I18N[ModeTypeTable[uentp->destuid < EDITING ? uentp->destuid :
 			      EDITING]]);
 	word = modestr;
     } else if (!mode && *uentp->chatid == 1) {
 	if (!simple)
 	    snprintf(modestr, sizeof(modestr),
-		     SHM->i18nstr[cuser.language][1902], getuserid(uentp->destuid));
+		     I18N[1902], getuserid(uentp->destuid));
 	else
-	    snprintf(modestr, sizeof(modestr), SHM->i18nstr[cuser.language][1903]);
+	    snprintf(modestr, sizeof(modestr), I18N[1903]);
     } 
     else if (!mode && *uentp->chatid == 3)
-	snprintf(modestr, sizeof(modestr), SHM->i18nstr[cuser.language][1904]);
+	snprintf(modestr, sizeof(modestr), I18N[1904]);
     else if (
 #ifdef NOKILLWATERBALL
 	     uentp->msgcount > 0
@@ -116,15 +116,15 @@ modestring(userinfo_t * uentp, int simple)
 	     )
 	if (uentp->msgcount < 10) {
 	    char           *cnum[10] =
-	    {"", SHM->i18nstr[cuser.language][1905], SHM->i18nstr[cuser.language][1906], SHM->i18nstr[cuser.language][1907], SHM->i18nstr[cuser.language][1908], SHM->i18nstr[cuser.language][1909], SHM->i18nstr[cuser.language][1910], SHM->i18nstr[cuser.language][1911],
-	    SHM->i18nstr[cuser.language][1912], SHM->i18nstr[cuser.language][1913]};
+	    {"", I18N[1905], I18N[1906], I18N[1907], I18N[1908], I18N[1909], I18N[1910], I18N[1911],
+	    I18N[1912], I18N[1913]};
 	    snprintf(modestr, sizeof(modestr),
-		     SHM->i18nstr[cuser.language][1914], cnum[(int)(uentp->msgcount)]);
+		     I18N[1914], cnum[(int)(uentp->msgcount)]);
 	} else
-	    snprintf(modestr, sizeof(modestr), SHM->i18nstr[cuser.language][1915]);
+	    snprintf(modestr, sizeof(modestr), I18N[1915]);
     else if (!mode)
 	return (uentp->destuid == 6) ? uentp->chatid :
-	    SHM->i18nstr[cuser.language][1890 + ((0 <= uentp->destuid && uentp->destuid < 6) ?
+	    I18N[1890 + ((0 <= uentp->destuid && uentp->destuid < 6) ?
 			  uentp->destuid : 0)];
     else if (simple)
 	return word;
@@ -132,24 +132,24 @@ modestring(userinfo_t * uentp, int simple)
 	snprintf(modestr, sizeof(modestr), "%s (%s)", word, uentp->chatid);
     else if (mode == TALK) {
 	if (!isvisible_uid(uentp->destuid))	/* Leeym 對方(紫色)隱形 */
-	    snprintf(modestr, sizeof(modestr), "%s", SHM->i18nstr[cuser.language][1916]);
+	    snprintf(modestr, sizeof(modestr), "%s", I18N[1916]);
 	/* Leeym * 大家自己發揮吧！ */
 	else
 	    snprintf(modestr, sizeof(modestr),
 		     "%s %s", word, getuserid(uentp->destuid));
     } else if (mode == M_FIVE) {
 	if (!isvisible_uid(uentp->destuid))
-	    snprintf(modestr, sizeof(modestr), "%s", SHM->i18nstr[cuser.language][1917]);
+	    snprintf(modestr, sizeof(modestr), "%s", I18N[1917]);
 	else
 	    snprintf(modestr, sizeof(modestr), "%s %s", word, getuserid(uentp->destuid));
     } else if (mode == CHESSWATCHING) {
-	snprintf(modestr, sizeof(modestr), SHM->i18nstr[cuser.language][1918]);
+	snprintf(modestr, sizeof(modestr), I18N[1918]);
     } else if (mode == CHC) {
 	if (isvisible_uid(uentp->destuid))
-	    snprintf(modestr, sizeof(modestr), "%s", SHM->i18nstr[cuser.language][1919]);
+	    snprintf(modestr, sizeof(modestr), "%s", I18N[1919]);
 	else
 	    snprintf(modestr, sizeof(modestr),
-		     SHM->i18nstr[cuser.language][1920], getuserid(uentp->destuid));
+		     I18N[1920], getuserid(uentp->destuid));
     } else if (mode != PAGE && mode != TQUERY)
 	return word;
     else
@@ -322,7 +322,7 @@ my_kick(userinfo_t * uentp)
 	log_usies("KICK ", genbuf);
 	if ((uentp->pid <= 0 || kill(uentp->pid, SIGHUP) == -1) && (errno == ESRCH))
 	    purge_utmp(uentp);
-	outs(SHM->i18nstr[cuser.language][1921]);
+	outs(I18N[1921]);
     } else
 	outs(msg_cancel);
     pressanykey();
@@ -336,12 +336,12 @@ chicken_query(char *userid)
 	    time_diff(&(xuser.mychicken));
 	    if (!isdeadth(&(xuser.mychicken))) {
 		show_chicken_data(&(xuser.mychicken), NULL);
-		prints(SHM->i18nstr[cuser.language][1922], userid);
+		prints(I18N[1922], userid);
 	    }
 	} else {
 	    move(1, 0);
 	    clrtobot();
-	    prints(SHM->i18nstr[cuser.language][1923], userid);
+	    prints(I18N[1923], userid);
 	}
 	pressanykey();
     }
@@ -355,8 +355,8 @@ my_query(char *uident)
     unsigned long int j;
     userinfo_t     *uentp;
     const char *money[10] =
-    {SHM->i18nstr[cuser.language][1924], SHM->i18nstr[cuser.language][1925], SHM->i18nstr[cuser.language][1926], SHM->i18nstr[cuser.language][1927], SHM->i18nstr[cuser.language][1928],
-    SHM->i18nstr[cuser.language][1929], SHM->i18nstr[cuser.language][1930], SHM->i18nstr[cuser.language][1931], SHM->i18nstr[cuser.language][1932], SHM->i18nstr[cuser.language][1933]};
+    {I18N[1924], I18N[1925], I18N[1926], I18N[1927], I18N[1928],
+    I18N[1929], I18N[1930], I18N[1931], I18N[1932], I18N[1933]};
     const char *sex[8] =
     {MSG_BIG_BOY, MSG_BIG_GIRL,
 	MSG_LITTLE_BOY, MSG_LITTLE_GIRL,
@@ -376,7 +376,7 @@ my_query(char *uident)
 	j = muser.money;
 	for (i = 0; i < 10 && j > 10; i++)
 	    j /= 10;
-	prints(SHM->i18nstr[cuser.language][1934],
+	prints(I18N[1934],
 	       muser.userid,
 	       muser.username,
 	       26 - strlen(muser.userid) - strlen(muser.username), "",
@@ -385,33 +385,33 @@ my_query(char *uident)
 	    prints(" ($%d)", muser.money);
 	prints("\n");
 
-	prints(SHM->i18nstr[cuser.language][1935], muser.numlogins);
+	prints(I18N[1935], muser.numlogins);
 	move(2, 40);
 #ifdef ASSESS
-	prints(SHM->i18nstr[cuser.language][1936], muser.numposts, muser.goodpost, muser.badpost);
+	prints(I18N[1936], muser.numposts, muser.goodpost, muser.badpost);
 #else
-	prints(SHM->i18nstr[cuser.language][1937], muser.numposts);
+	prints(I18N[1937], muser.numposts);
 #endif
 
-	prints(SHM->i18nstr[cuser.language][1938],
+	prints(I18N[1938],
 	       (uentp && isvisible_stat(currutmp, uentp, fri_stat)) ?
-	       modestring(uentp, 0) : SHM->i18nstr[cuser.language][1939]);
+	       modestring(uentp, 0) : I18N[1939]);
 
 	outs(((uentp && uentp->mailalert) || load_mailalert(muser.userid))
-	     ? SHM->i18nstr[cuser.language][1940] :
-	     SHM->i18nstr[cuser.language][1941]);
-	prints(SHM->i18nstr[cuser.language][1942],
+	     ? I18N[1940] :
+	     I18N[1941]);
+	prints(I18N[1942],
 	       Cdate(&muser.lastlogin),
-	       (muser.lasthost[0] ? muser.lasthost : SHM->i18nstr[cuser.language][1943]));
-	prints(SHM->i18nstr[cuser.language][1944],
+	       (muser.lasthost[0] ? muser.lasthost : I18N[1943]));
+	prints(I18N[1944],
 	       muser.five_win, muser.five_lose, muser.five_tie,
 	       muser.chc_win, muser.chc_lose, muser.chc_tie);
 #ifdef ASSESS
-	prints(SHM->i18nstr[cuser.language][1945], muser.goodsale, muser.badsale);
+	prints(I18N[1945], muser.goodsale, muser.badsale);
 	move(6, 40);
 #endif
 	if ((uentp && ((fri_stat & HFM) || strcmp(muser.userid,cuser.userid) == 0) && !uentp->invisible))
-	    prints(SHM->i18nstr[cuser.language][1946], sex[muser.sex % 8]);
+	    prints(I18N[1946], sex[muser.sex % 8]);
 
 	showplans(uident);
 	pressanykey();
@@ -439,11 +439,11 @@ water_scr(water_t * tw, int which, char type)
 	    prints(" ");
 	    move(16 + i, 4);
 	    if (tw->msg[(tw->top - i + 4) % 5].last_call_in[0] != 0)
-		prints(SHM->i18nstr[cuser.language][1947],
+		prints(I18N[1947],
 		       colors[i],
 		       tw->msg[(tw->top - i + 4) % 5].last_call_in);
 	    else
-		prints(SHM->i18nstr[cuser.language][1948]);
+		prints(I18N[1948]);
 	}
 
 	move(21, 4);
@@ -455,14 +455,14 @@ water_scr(water_t * tw, int which, char type)
 	move(0, 0);
 	prints(" ");
 	move(0, 0);
-	prints(SHM->i18nstr[cuser.language][1949], tw->userid);
+	prints(I18N[1949], tw->userid);
 	clrtoeol();
 	move(0, strlen(tw->userid) + 6);
     } else {
 	move(8 + which, 28);
 	prints("123456789012345678901234567890");
 	move(8 + which, 28);
-	prints(SHM->i18nstr[cuser.language][1950],
+	prints(I18N[1950],
 	       tw->uin ? ' ' : 'x',
 	       tw->userid);
     }
@@ -488,7 +488,7 @@ my_write2(void)
 
     //init screen
 	move(7, 28);
-    prints(SHM->i18nstr[cuser.language][1951]);
+    prints(I18N[1951]);
     for (i = 0; i < 5; ++i)
 	if (swater[i] == NULL || swater[i]->pid == 0)
 	    break;
@@ -500,9 +500,9 @@ my_write2(void)
 	    water_scr(swater[i], i, 0);
 	}
     move(15, 4);
-    prints(SHM->i18nstr[cuser.language][1952]);
+    prints(I18N[1952]);
     move(22, 4);
-    prints(SHM->i18nstr[cuser.language][1953]);
+    prints(I18N[1953]);
     water_scr(swater[0], 0, 1);
     refresh();
 
@@ -547,7 +547,7 @@ my_write2(void)
 	    move(0, 0);
 	    prints("\033[m");
 	    clrtoeol();
-	    snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][1954], tw->userid);
+	    snprintf(genbuf, sizeof(genbuf), I18N[1954], tw->userid);
 	    if (!oldgetdata(0, 0, genbuf, msg,
 			    80 - strlen(tw->userid) - 6, DOECHO))
 		break;
@@ -588,7 +588,7 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
     strlcpy(destid, id, sizeof(destid));
 
     if (!uin && !(flag == 0 && water_which->count > 0)) {
-	vmsg(SHM->i18nstr[cuser.language][1955]);
+	vmsg(I18N[1955]);
 	watermode = -1;
 	return 0;
     }
@@ -602,7 +602,7 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
 	/* 一般水球 */
 	watermode = 0;
 	if (!(len = getdata(0, 0, prompt, msg, 56, DOECHO))) {
-	    outmsg(SHM->i18nstr[cuser.language][1956]);
+	    outmsg(I18N[1956]);
 	    clrtoeol();
 	    refresh();
 	    currutmp->chatid[0] = c0;
@@ -626,7 +626,7 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
 
     strip_ansi(msg, msg, STRIP_ALL);
     if (uin && *uin->userid && (flag == 0 || flag == 4)) {
-	snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][1957], uin->userid, msg);
+	snprintf(buf, sizeof(buf), I18N[1957], uin->userid, msg);
 	getdata(0, 0, buf, genbuf, 3, LCECHO);
 	if (genbuf[0] == 'n') {
 	    currutmp->chatid[0] = c0;
@@ -638,7 +638,7 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
     }
     watermode = -1;
     if (!uin || !*uin->userid || strcasecmp(destid, uin->userid)) {
-	vmsg(SHM->i18nstr[cuser.language][1959]);
+	vmsg(I18N[1959]);
 	currutmp->chatid[0] = c0;
 	currutmp->mode = mode0;
 	currstat = currstat0;
@@ -669,7 +669,7 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
 		uin->pager == 2 ||
 		(uin->pager == 4 &&
 		 !(fri_stat & HFM))))
-	outmsg(SHM->i18nstr[cuser.language][1960]);
+	outmsg(I18N[1960]);
     else {
 	int     write_pos = uin->msgcount; /* try to avoid race */
 	if ( write_pos < (MAX_MSGS - 1) ) { /* race here */
@@ -684,7 +684,7 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
 		    sizeof(uin->msgs[write_pos].last_call_in));
 	    uin->pager = pager0;
 	} else if (flag != 2)
-	    outmsg(SHM->i18nstr[cuser.language][1961]);
+	    outmsg(I18N[1961]);
 
 	if (uin->msgcount >= 1 &&
 #ifdef NOKILLWATERBALL
@@ -693,11 +693,11 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
 	    (uin->pid <= 0 || kill(uin->pid, SIGUSR2) == -1) 
 #endif
 	    && flag != 2)
-	    outmsg(SHM->i18nstr[cuser.language][1962]);
+	    outmsg(I18N[1962]);
 	else if (uin->msgcount == 1 && flag != 2)
-	    outmsg(SHM->i18nstr[cuser.language][1963]);
+	    outmsg(I18N[1963]);
 	else if (uin->msgcount > 1 && uin->msgcount < MAX_MSGS && flag != 2)
-	    outmsg(SHM->i18nstr[cuser.language][1964]);
+	    outmsg(I18N[1964]);
     }
 
     clrtoeol();
@@ -738,10 +738,10 @@ t_display_new(void)
 
     if (water[0].count && watermode > 0) {
 	move(1, 0);
-	outs(SHM->i18nstr[cuser.language][1965]);
+	outs(I18N[1965]);
 	outs(WATERMODE(WATER_ORIG) ?
-	     SHM->i18nstr[cuser.language][1966] :
-	     SHM->i18nstr[cuser.language][1967]);
+	     I18N[1966] :
+	     I18N[1967]);
 	if (WATERMODE(WATER_NEW)) {
 	    move(2, 0);
 	    clrtoeol();
@@ -762,7 +762,7 @@ t_display_new(void)
 		    } else
 			prints("              ");
 		else
-		    prints(SHM->i18nstr[cuser.language][1968],
+		    prints(I18N[1968],
 			   water_which == &water[0] ? "\033[1;33;47m " :
 			   " "
 			);
@@ -795,7 +795,7 @@ t_display_new(void)
 	    i++;
 	}
 	move(i + off, 0);
-	outs(SHM->i18nstr[cuser.language][1969]);
+	outs(I18N[1969]);
 	if (WATERMODE(WATER_NEW))
 	    while (i++ <= water[0].count) {
 		move(i + off, 0);
@@ -816,8 +816,8 @@ t_display(void)
     setuserfile(genbuf, fn_writelog);
     if (more(genbuf, YEA) != -1) {
 	move(b_lines - 4, 0);
-	outs(SHM->i18nstr[cuser.language][1970]);
-	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1971],
+	outs(I18N[1970]);
+	getdata(b_lines - 1, 0, I18N[1971],
 		ans, sizeof(ans), LCECHO);
 	if (*ans == 'm') {
 	    fileheader_t    mymail;
@@ -827,8 +827,8 @@ t_display(void)
 	    stampfile(buf, &mymail);
 
 	    mymail.filemode = FILE_READ ;
-	    strlcpy(mymail.owner, SHM->i18nstr[cuser.language][1972], sizeof(mymail.owner));
-	    strlcpy(mymail.title, SHM->i18nstr[cuser.language][1973], sizeof(mymail.title));
+	    strlcpy(mymail.owner, I18N[1972], sizeof(mymail.owner));
+	    strlcpy(mymail.title, I18N[1973], sizeof(mymail.title));
 	    sethomedir(title, cuser.userid);
 	    Rename(genbuf, buf);
 	    append_record(title, &mymail, sizeof(mymail));
@@ -1008,7 +1008,7 @@ do_talk(int fd)
     setutmpmode(TALK);
 
     ch = 58 - strlen(save_page_requestor);
-    snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][1974], cuser.userid, cuser.username);
+    snprintf(genbuf, sizeof(genbuf), I18N[1974], cuser.userid, cuser.username);
     i = ch - strlen(genbuf);
     if (i >= 0)
 	i = (i >> 1) + 1;
@@ -1020,7 +1020,7 @@ do_talk(int fd)
     data[i] = '\0';
 
     snprintf(mid_line, sizeof(mid_line),
-	     SHM->i18nstr[cuser.language][1975], data, genbuf, save_page_requestor, data);
+	     I18N[1975], data, genbuf, save_page_requestor, data);
 
     memset(&mywin, 0, sizeof(mywin));
     memset(&itswin, 0, sizeof(itswin));
@@ -1051,7 +1051,7 @@ do_talk(int fd)
 		    break;
 		move(b_lines, 0);
 		clrtoeol();
-		outs(SHM->i18nstr[cuser.language][1976]);
+		outs(I18N[1976]);
 		im_leaving = 1;
 		continue;
 	    }
@@ -1092,13 +1092,13 @@ do_talk(int fd)
 	char            ans[4];
 	int             i;
 
-	fprintf(flog, SHM->i18nstr[cuser.language][1977],
+	fprintf(flog, I18N[1977],
 		Cdatelite(&now));
 	for (i = 0; i < scr_lns; i++)
 	    fprintf(flog, "%.*s\n", big_picture[i].len, big_picture[i].data);
 	fclose(flog);
 	more(fpath, NA);
-	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1978],
+	getdata(b_lines - 1, 0, I18N[1978],
 		ans, sizeof(ans), LCECHO);
 	if (*ans == 'm') {
 	    fileheader_t    mymail;
@@ -1107,9 +1107,9 @@ do_talk(int fd)
 	    sethomepath(genbuf, cuser.userid);
 	    stampfile(genbuf, &mymail);
 	    mymail.filemode = FILE_READ ;
-	    strlcpy(mymail.owner, SHM->i18nstr[cuser.language][1979], sizeof(mymail.owner));
+	    strlcpy(mymail.owner, I18N[1979], sizeof(mymail.owner));
 	    snprintf(mymail.title, sizeof(mymail.title),
-		     SHM->i18nstr[cuser.language][1980],
+		     I18N[1980],
 		     getuserid(currutmp->destuid));
 	    sethomedir(title, cuser.userid);
 	    Rename(fpath, genbuf);
@@ -1158,7 +1158,7 @@ int make_connection_to_somebody(userinfo_t *uin, int timeout){
     if (pid > 0)
 	kill(pid, SIGUSR1);
     clear();
-    prints(SHM->i18nstr[cuser.language][1981], uin->userid);
+    prints(I18N[1981], uin->userid);
 
     listen(sock, 1);
     add_io(sock, timeout);
@@ -1170,7 +1170,7 @@ int make_connection_to_somebody(userinfo_t *uin, int timeout){
 	    if (!ch && uin->chatid[0] == 1 &&
 		    uin->destuip == currutmp - &SHM->uinfo[0]) {
 		bell();
-		outmsg(SHM->i18nstr[cuser.language][1982]);
+		outmsg(I18N[1982]);
 		refresh();
 	    } else if (ch == EDITING || ch == TALK || ch == CHATING ||
 		    ch == PAGE || ch == MAILALL || ch == MONITOR ||
@@ -1180,7 +1180,7 @@ int make_connection_to_somebody(userinfo_t *uin, int timeout){
 		add_io(0, 0);
 		close(sock);
 		currutmp->sockactive = currutmp->destuid = 0;
-		vmsg(SHM->i18nstr[cuser.language][1983]);
+		vmsg(I18N[1983]);
 		unlockutmpmode();
 		return -1;
 	    } else {
@@ -1188,7 +1188,7 @@ int make_connection_to_somebody(userinfo_t *uin, int timeout){
 		add_io(sock, 20);	/* added for linux... achen */
 #endif
 		move(0, 0);
-		outs(SHM->i18nstr[cuser.language][1984]);
+		outs(I18N[1984]);
 		bell();
 
 		uin->destuip = currutmp - &SHM->uinfo[0];
@@ -1239,30 +1239,30 @@ my_talk(userinfo_t * uin, int fri_stat, char defact)
 	    kill(uin->pid, SIGUSR1);
 	    sock = make_connection_to_somebody(uin, 20);
 	    if (sock < 0)
-		vmsg(SHM->i18nstr[cuser.language][1985]);
+		vmsg(I18N[1985]);
 	    else {
 		strlcpy(currutmp->mateid, uin->userid, sizeof(currutmp->mateid));
 		chc(sock, CHC_WATCH);
 	    }
 	}
 	else
-	    outs(SHM->i18nstr[cuser.language][1986]);
+	    outs(I18N[1986]);
     } else if (!HAS_PERM(PERM_SYSOP) &&
 	       (((fri_stat & HRM) && !(fri_stat & HFM)) ||
 		((!uin->pager) && !(fri_stat & HFM)))) {
-	outs(SHM->i18nstr[cuser.language][1987]);
+	outs(I18N[1987]);
     } else if (!HAS_PERM(PERM_SYSOP) &&
 	     (((fri_stat & HRM) && !(fri_stat & HFM)) || uin->pager == 2)) {
-	outs(SHM->i18nstr[cuser.language][1988]);
+	outs(I18N[1988]);
     } else if (!HAS_PERM(PERM_SYSOP) &&
 	       !(fri_stat & HFM) && uin->pager == 4) {
-	outs(SHM->i18nstr[cuser.language][1989]);
+	outs(I18N[1989]);
     } else if (!(pid = uin->pid) /* || (kill(pid, 0) == -1) */ ) {
 	//resetutmpent();
 	outs(msg_usr_left);
     } else {
 	showplans(uin->userid);
-	getdata(2, 0, SHM->i18nstr[cuser.language][1990], genbuf, 4, LCECHO);
+	getdata(2, 0, I18N[1990], genbuf, 4, LCECHO);
 	switch (*genbuf) {
 	case 'y':
 	case 't':
@@ -1287,8 +1287,8 @@ my_talk(userinfo_t * uin, int fri_stat, char defact)
 	    if (!cuser.mychicken.name[0] || !xuser.mychicken.name[0])
 		error = 2;
 	    if (error) {
-		vmsg(error == 2 ? SHM->i18nstr[cuser.language][1991] :
-		       SHM->i18nstr[cuser.language][1992]);
+		vmsg(error == 2 ? I18N[1991] :
+		       I18N[1992]);
 		return;
 	    }
 	    uin->sig = SIG_PK;
@@ -1338,41 +1338,41 @@ my_talk(userinfo_t * uin, int fri_stat, char defact)
 	    }
 	} else {
 	    move(9, 9);
-	    outs(SHM->i18nstr[cuser.language][1993]);
+	    outs(I18N[1993]);
 	    switch (c) {
 	    case 'a':
-		outs(SHM->i18nstr[cuser.language][1994]);
+		outs(I18N[1994]);
 		break;
 	    case 'b':
-		prints(SHM->i18nstr[cuser.language][1995], sig_des(uin->sig));
+		prints(I18N[1995], sig_des(uin->sig));
 		break;
 	    case 'd':
-		outs(SHM->i18nstr[cuser.language][1996]);
+		outs(I18N[1996]);
 		break;
 	    case 'c':
-		outs(SHM->i18nstr[cuser.language][1997]);
+		outs(I18N[1997]);
 		break;
 	    case 'e':
-		outs(SHM->i18nstr[cuser.language][1998]);
+		outs(I18N[1998]);
 		break;
 	    case 'f':
 		{
 		    char            msgbuf[60];
 
 		    read(msgsock, msgbuf, 60);
-		    prints(SHM->i18nstr[cuser.language][1999], sig_des(uin->sig));
+		    prints(I18N[1999], sig_des(uin->sig));
 		    move(10, 18);
 		    outs(msgbuf);
 		}
 		break;
 	    case '1':
-		prints(SHM->i18nstr[cuser.language][2000], sig_des(uin->sig));
+		prints(I18N[2000], sig_des(uin->sig));
 		break;
 	    case '2':
-		prints(SHM->i18nstr[cuser.language][2001], sig_des(uin->sig));
+		prints(I18N[2001], sig_des(uin->sig));
 		break;
 	    default:
-		prints(SHM->i18nstr[cuser.language][2002], sig_des(uin->sig));
+		prints(I18N[2002], sig_des(uin->sig));
 	    }
 	    close(msgsock);
 	}
@@ -1394,17 +1394,17 @@ t_showhelp()
 {
     clear();
 
-    outs(SHM->i18nstr[cuser.language][2003]);
+    outs(I18N[2003]);
 
     if (HAS_PERM(PERM_PAGE)) {
-	outs(SHM->i18nstr[cuser.language][2004]);
+	outs(I18N[2004]);
     }
     if (HAS_PERM(PERM_SYSOP)) {
-	outs(SHM->i18nstr[cuser.language][2005]);
-	outs(SHM->i18nstr[cuser.language][2006]);
-	outs(SHM->i18nstr[cuser.language][2007]);
+	outs(I18N[2005]);
+	outs(I18N[2006]);
+	outs(I18N[2007]);
 #if defined(SHOWBOARD) && defined(DEBUG)
-	outs(SHM->i18nstr[cuser.language][2008]);
+	outs(I18N[2008]);
 #endif
     }
     pressanykey();
@@ -1693,10 +1693,10 @@ draw_pickup(int drawall, pickup_t * pickup, int pickup_way,
 	    int show_pid, int myfriend, int friendme, int bfriend, int badfriend)
 {
     char           *msg_pickup_way[PICKUP_WAYS] = {
-	SHM->i18nstr[cuser.language][2009], SHM->i18nstr[cuser.language][2010], SHM->i18nstr[cuser.language][2011], SHM->i18nstr[cuser.language][2012], SHM->i18nstr[cuser.language][2013], SHM->i18nstr[cuser.language][2014], SHM->i18nstr[cuser.language][2015]
+	I18N[2009], I18N[2010], I18N[2011], I18N[2012], I18N[2013], I18N[2014], I18N[2015]
     };
     char           *MODE_STRING[MAX_SHOW_MODE] = {
-	SHM->i18nstr[cuser.language][2016], SHM->i18nstr[cuser.language][2017], SHM->i18nstr[cuser.language][2018], SHM->i18nstr[cuser.language][2019]
+	I18N[2016], I18N[2017], I18N[2018], I18N[2019]
     };
     char            pagerchar[5] = "* -Wf";
 
@@ -1709,21 +1709,21 @@ draw_pickup(int drawall, pickup_t * pickup, int pickup_way,
 #endif
 
     if (drawall) {
-	showtitle((cuser.uflag & FRIEND_FLAG) ? SHM->i18nstr[cuser.language][2020] : SHM->i18nstr[cuser.language][2021],
+	showtitle((cuser.uflag & FRIEND_FLAG) ? I18N[2020] : I18N[2021],
 		  BBSName);
-	prints(SHM->i18nstr[cuser.language][2022],
+	prints(I18N[2022],
 	       show_uid ? "UID" : "No.",
 	       (HAS_PERM(PERM_SEECLOAK) || HAS_PERM(PERM_SYSOP)) ? 'C' : ' ',
-	       SHM->i18nstr[cuser.language][2023],
+	       I18N[2023],
 	       MODE_STRING[show_mode],
-	       show_board ? "Board" : SHM->i18nstr[cuser.language][2024],
-	       show_pid ? "       PID" : SHM->i18nstr[cuser.language][2025]
+	       show_board ? "Board" : I18N[2024],
+	       show_pid ? "       PID" : I18N[2025]
 	    );
 	move(b_lines, 0);
-	outs(SHM->i18nstr[cuser.language][2026]);
+	outs(I18N[2026]);
     }
     move(1, 0);
-    prints(SHM->i18nstr[cuser.language][2027],
+    prints(I18N[2027],
 	   msg_pickup_way[pickup_way], SHM->UTMPnumber,
 	   myfriend, friendme, currutmp->brc_id ? (bfriend + 1) : 0, badfriend);
 
@@ -1738,7 +1738,7 @@ draw_pickup(int drawall, pickup_t * pickup, int pickup_way,
 	    continue;
 	}
 	if (!uentp->pid) {
-	    prints(SHM->i18nstr[cuser.language][2028], ch);
+	    prints(I18N[2028], ch);
 	    continue;
 	}
 	if (PERM_HIDE(uentp))
@@ -1765,9 +1765,9 @@ draw_pickup(int drawall, pickup_t * pickup, int pickup_way,
 #endif
 
 	if ((uentp->userlevel & PERM_VIOLATELAW))
-	    memcpy(mind, SHM->i18nstr[cuser.language][2029], 4);
+	    memcpy(mind, I18N[2029], 4);
 	else if (uentp->birth)
-	    memcpy(mind, SHM->i18nstr[cuser.language][2030], 4);
+	    memcpy(mind, I18N[2030], 4);
 	else
 	    memcpy(mind, uentp->mind, 4);
 	mind[4] = 0;
@@ -1822,7 +1822,7 @@ call_in(userinfo_t * uentp, int fri_stat)
 {
     if (iswritable_stat(uentp, fri_stat)) {
 	char            genbuf[60];
-	snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][2031], uentp->userid);
+	snprintf(genbuf, sizeof(genbuf), I18N[2031], uentp->userid);
 	my_write(uentp->pid, genbuf, uentp->userid, 0, NULL);
 	return 1;
     }
@@ -1933,7 +1933,7 @@ userlist(void)
 		if (HAS_PERM(PERM_SYSOP)) {
 		    char            buf[100];
 		    snprintf(buf, sizeof(buf),
-			     SHM->i18nstr[cuser.language][2032], currutmp->userid);
+			     I18N[2032], currutmp->userid);
 		    if (!getdata(1, 0, buf, currutmp->userid,
 				 sizeof(buf), DOECHO))
 			strlcpy(currutmp->userid, cuser.userid, sizeof(currutmp->userid));
@@ -1945,7 +1945,7 @@ userlist(void)
 		if (HAS_PERM(PERM_SYSOP)) {
 		    char            buf[100];
 
-		    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][2033], currutmp->from);
+		    snprintf(buf, sizeof(buf), I18N[2033], currutmp->from);
 		    if (!getdata(1, 0, buf, currutmp->from,
 				 sizeof(currutmp->from), DOECHO))
 			strncpy(currutmp->from, buf, 23);
@@ -2124,14 +2124,14 @@ userlist(void)
 		    char            genbuf[60];
 		    char            ans[4];
 
-		    if (!getdata(0, 0, SHM->i18nstr[cuser.language][2034], genbuf, sizeof(genbuf), DOECHO))
+		    if (!getdata(0, 0, I18N[2034], genbuf, sizeof(genbuf), DOECHO))
 			break;
-		    if (getdata(0, 0, SHM->i18nstr[cuser.language][2035],
+		    if (getdata(0, 0, I18N[2035],
 				ans, sizeof(ans), LCECHO) &&
 			*ans == 'n')
 			break;
 		    if (!(cuser.uflag & FRIEND_FLAG) && HAS_PERM(PERM_SYSOP)) {
-			getdata(1, 0, SHM->i18nstr[cuser.language][2036],
+			getdata(1, 0, I18N[2036],
 				ans, sizeof(ans), LCECHO);
 			if( *ans != 'y' && *ans != 'Y' ){
 			    vmsg("abort");
@@ -2180,7 +2180,7 @@ userlist(void)
 		    int             id;
 		    userec_t        muser;
 		    strlcpy(currauthor, uentp->userid, sizeof(currauthor));
-		    stand_title(SHM->i18nstr[cuser.language][2037]);
+		    stand_title(I18N[2037]);
 		    move(1, 0);
 		    if ((id = getuser(uentp->userid)) > 0) {
 			memcpy(&muser, &xuser, sizeof(muser));
@@ -2193,12 +2193,12 @@ userlist(void)
 
 	    case 'i':{
 		    char            mindbuf[5];
-		    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][2038],
+		    getdata(b_lines - 1, 0, I18N[2038],
 			    mindbuf, sizeof(mindbuf), DOECHO);
-		    if (strcmp(mindbuf, SHM->i18nstr[cuser.language][2039]) == 0)
-			vmsg(SHM->i18nstr[cuser.language][2040]);
-		    else if (strcmp(mindbuf, SHM->i18nstr[cuser.language][2041]) == 0)
-			vmsg(SHM->i18nstr[cuser.language][2042]);
+		    if (strcmp(mindbuf, I18N[2039]) == 0)
+			vmsg(I18N[2040]);
+		    else if (strcmp(mindbuf, I18N[2041]) == 0)
+			vmsg(I18N[2042]);
 		    else
 			memcpy(currutmp->mind, mindbuf, 4);
 		}
@@ -2232,7 +2232,7 @@ userlist(void)
 		break;
 	    case 'a':
 		if (HAS_PERM(PERM_LOGINOK) && !(fri_stat & IFH)) {
-		    if (getans(SHM->i18nstr[cuser.language][2043]) == 'y') {
+		    if (getans(I18N[2043]) == 'y') {
 			friend_add(uentp->userid, FRIEND_OVERRIDE,uentp->username);
 			friend_load(FRIEND_OVERRIDE);
 		    }
@@ -2242,7 +2242,7 @@ userlist(void)
 
 	    case 'd':
 		if (HAS_PERM(PERM_LOGINOK) && (fri_stat & IFH)) {
-		    if (getans(SHM->i18nstr[cuser.language][2044]) == 'y') {
+		    if (getans(I18N[2044]) == 'y') {
 			friend_delete(uentp->userid, FRIEND_OVERRIDE);
 			friend_load(FRIEND_OVERRIDE);
 		    }
@@ -2269,15 +2269,15 @@ userlist(void)
 		    strcmp(uentp->userid, cuser.userid) != 0) {
 		    char genbuf[10];
 		    move(b_lines - 2, 0);
-		    prints(SHM->i18nstr[cuser.language][2045], uentp->userid);
-		    if (getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][2046],
+		    prints(I18N[2045], uentp->userid);
+		    if (getdata(b_lines - 1, 0, I18N[2046],
 				genbuf, 7, LCECHO)) {
 			clrtoeol();
 			if ((ch = atoi(genbuf)) <= 0 || ch <= give_tax(ch)){
 			    redrawall = redraw = 1;
 			    break;
 			}
-			sprintf(genbuf, SHM->i18nstr[cuser.language][2047], uentp->userid, ch);
+			sprintf(genbuf, I18N[2047], uentp->userid, ch);
 			if (getans(genbuf) != 'y'){
 			    redrawall = redraw = 1;
 			    break;
@@ -2285,18 +2285,18 @@ userlist(void)
 			reload_money();
 
 			if (ch > cuser.money) {
-			    outs(SHM->i18nstr[cuser.language][2048]);
+			    outs(I18N[2048]);
 			} else {
 			    deumoney(uentp->uid, ch - give_tax(ch));
-			    log_file(FN_MONEY, 1, SHM->i18nstr[cuser.language][2050],
+			    log_file(FN_MONEY, 1, I18N[2050],
 			    	cuser.userid,uentp->userid, ch,ctime(&currutmp->lastact));
 			    mail_redenvelop(cuser.userid, uentp->userid,
 					    ch - give_tax(ch), 'Y');
-				vmsg(SHM->i18nstr[cuser.language][2049],demoney(-ch));
+				vmsg(I18N[2049],demoney(-ch));
 			}
 		    } else {
 			clrtoeol();
-			vmsg(SHM->i18nstr[cuser.language][2051]);
+			vmsg(I18N[2051]);
 		    }
 		    redrawall = redraw = 1;
 		}
@@ -2304,8 +2304,8 @@ userlist(void)
 
 	    case 'm':
 		if (HAS_PERM(PERM_BASIC)) {
-		    stand_title(SHM->i18nstr[cuser.language][2052]);
-		    prints(SHM->i18nstr[cuser.language][2053], uentp->userid);
+		    stand_title(I18N[2052]);
+		    prints(I18N[2053], uentp->userid);
 		    my_send(uentp->userid);
 		    setutmpmode(LUSERS);
 		    redrawall = redraw = 1;
@@ -2348,12 +2348,12 @@ userlist(void)
 	    case Ctrl('W'):
 		if (HAS_PERM(PERM_LOGINOK)) {
 		    int             tmp;
-		    char           *wm[3] = {SHM->i18nstr[cuser.language][2054], SHM->i18nstr[cuser.language][2055], SHM->i18nstr[cuser.language][2056]};
+		    char           *wm[3] = {I18N[2054], I18N[2055], I18N[2056]};
 		    tmp = cuser.uflag2 & WATER_MASK;
 		    cuser.uflag2 -= tmp;
 		    tmp = (tmp + 1) % 3;
 		    cuser.uflag2 |= tmp;
-		    vmsg(SHM->i18nstr[cuser.language][2057], wm[tmp]);
+		    vmsg(I18N[2057], wm[tmp]);
 		    redrawall = redraw = 1;
 		}
 		break;
@@ -2367,7 +2367,7 @@ userlist(void)
 		break;
 
 	    case 'N':
-		oldgetdata(1, 0, SHM->i18nstr[cuser.language][2058],
+		oldgetdata(1, 0, I18N[2058],
 			cuser.username, sizeof(cuser.username), DOECHO);
 		strcpy(currutmp->username, cuser.username);
 		redrawall = redraw = 1;
@@ -2420,7 +2420,7 @@ t_idle(void)
     char            passbuf[PASSLEN];
 
     setutmpmode(IDLE);
-    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][2059], genbuf, 3, DOECHO);
+    getdata(b_lines - 1, 0, I18N[2059], genbuf, 3, DOECHO);
     if (genbuf[0] == 'q' || genbuf[0] == 'Q') {
 	currutmp->mode = mode0;
 	currstat = stat0;
@@ -2432,14 +2432,14 @@ t_idle(void)
 
     if (currutmp->destuid == 6)
 	if (!cuser.userlevel ||
-	    !getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][2060],
+	    !getdata(b_lines - 1, 0, I18N[2060],
 		     currutmp->chatid, sizeof(currutmp->chatid), DOECHO))
 	    currutmp->destuid = 0;
     do {
 	move(b_lines - 2, 0);
 	clrtoeol();
-	prints(SHM->i18nstr[cuser.language][2061], (currutmp->destuid != 6) ?
-		 SHM->i18nstr[cuser.language][1890 + currutmp->destuid] : currutmp->chatid);
+	prints(I18N[2061], (currutmp->destuid != 6) ?
+		 I18N[1890 + currutmp->destuid] : currutmp->chatid);
 	refresh();
 	getdata(b_lines - 1, 0, MSG_PASSWD, passbuf, sizeof(passbuf), NOECHO);
 	passbuf[8] = '\0';
@@ -2459,7 +2459,7 @@ t_qchicken(void)
 {
     char            uident[STRLEN];
 
-    stand_title(SHM->i18nstr[cuser.language][2062]);
+    stand_title(I18N[2062]);
     usercomplete(msg_uid, uident);
     if (uident[0])
 	chicken_query(uident);
@@ -2471,7 +2471,7 @@ t_query(void)
 {
     char            uident[STRLEN];
 
-    stand_title(SHM->i18nstr[cuser.language][2063]);
+    stand_title(I18N[2063]);
     usercomplete(msg_uid, uident);
     if (uident[0])
 	my_query(uident);
@@ -2489,7 +2489,7 @@ t_talk()
      * if (count_ulist() <= 1){ outs("目前線上只有您一人，快邀請朋友來光臨【"
      * BBSNAME "】吧！"); return XEASY; }
      */
-    stand_title(SHM->i18nstr[cuser.language][2064]);
+    stand_title(I18N[2064]);
     generalnamecomplete(msg_uid, uident, sizeof(uident),
 			SHM->UTMPnumber,
 			completeutmp_compar,
@@ -2507,9 +2507,9 @@ t_talk()
     /* multi-login check */
     unum = 1;
     while ((ucount = count_logins(tuid, 0)) > 1) {
-	outs(SHM->i18nstr[cuser.language][2065]);
+	outs(I18N[2065]);
 	count_logins(tuid, 1);
-	getdata(1, 33, SHM->i18nstr[cuser.language][2066], genbuf, 4, DOECHO);
+	getdata(1, 33, I18N[2066], genbuf, 4, DOECHO);
 	unum = atoi(genbuf);
 	if (unum == 0)
 	    return 0;
@@ -2535,7 +2535,7 @@ reply_connection_request(userinfo_t *uip)
 
     if (uip->mode != PAGE) {
 	snprintf(genbuf, sizeof(genbuf),
-		 SHM->i18nstr[cuser.language][2067], page_requestor);
+		 I18N[2067], page_requestor);
 	getdata(0, 0, genbuf, buf, sizeof(buf), LCECHO);
 	return -1;
     }
@@ -2575,25 +2575,25 @@ talkreply(void)
     clear();
 
     prints("\n\n");
-    prints(SHM->i18nstr[cuser.language][2068], sig_des(sig));
-    prints(SHM->i18nstr[cuser.language][2069],
+    prints(I18N[2068], sig_des(sig));
+    prints(I18N[2069],
 	    sig_des(sig), sig_des(sig));
-    prints(SHM->i18nstr[cuser.language][2070]);
-    prints(SHM->i18nstr[cuser.language][2071]);
-    prints(SHM->i18nstr[cuser.language][2072], sig_des(sig), sig_des(sig));
+    prints(I18N[2070]);
+    prints(I18N[2071]);
+    prints(I18N[2072], sig_des(sig), sig_des(sig));
 
     getuser(uip->userid);
     currutmp->msgs[0].pid = uip->pid;
     strlcpy(currutmp->msgs[0].userid, uip->userid, sizeof(currutmp->msgs[0].userid));
-    strlcpy(currutmp->msgs[0].last_call_in, SHM->i18nstr[cuser.language][2073],
+    strlcpy(currutmp->msgs[0].last_call_in, I18N[2073],
 	    sizeof(currutmp->msgs[0].last_call_in));
-    prints(SHM->i18nstr[cuser.language][2074],
+    prints(I18N[2074],
 	    uip->from, xuser.numlogins, xuser.numposts);
     showplans(uip->userid);
     show_call_in(0, 0);
 
     snprintf(genbuf, sizeof(genbuf),
-	    SHM->i18nstr[cuser.language][2075],
+	    I18N[2075],
 	    page_requestor, sig_des(sig));
     getdata(0, 0, genbuf, buf, sizeof(buf), LCECHO);
     a = reply_connection_request(uip);
@@ -2602,8 +2602,8 @@ talkreply(void)
 	buf[0] = 'n';
     write(a, buf, 1);
     if (buf[0] == 'f' || buf[0] == 'F') {
-	if (!getdata(b_lines, 0, SHM->i18nstr[cuser.language][2076], genbuf, 60, DOECHO))
-	    strlcpy(genbuf, SHM->i18nstr[cuser.language][2077], sizeof(genbuf));
+	if (!getdata(b_lines, 0, I18N[2076], genbuf, 60, DOECHO))
+	    strlcpy(genbuf, I18N[2077], sizeof(genbuf));
 	write(a, genbuf, 60);
     }
 

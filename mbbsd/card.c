@@ -31,7 +31,7 @@ static int
 card_select(int *now)
 {
     char           *cc[2] = {"\033[44m            \033[m",
-    SHM->i18nstr[cuser.language][580]};
+    I18N[580]};
 
     while (1) {
 	move(20, 0);
@@ -79,55 +79,55 @@ static void
 card_display(int cline, int number, int flower, int show)
 {
     int             color = 31;
-    char           *cn[13] = {SHM->i18nstr[cuser.language][581], SHM->i18nstr[cuser.language][582], SHM->i18nstr[cuser.language][583], SHM->i18nstr[cuser.language][584], SHM->i18nstr[cuser.language][585], SHM->i18nstr[cuser.language][586],
-    SHM->i18nstr[cuser.language][587], SHM->i18nstr[cuser.language][588], SHM->i18nstr[cuser.language][589], "10", SHM->i18nstr[cuser.language][590], SHM->i18nstr[cuser.language][591], SHM->i18nstr[cuser.language][592]};
+    char           *cn[13] = {I18N[581], I18N[582], I18N[583], I18N[584], I18N[585], I18N[586],
+    I18N[587], I18N[588], I18N[589], "10", I18N[590], I18N[591], I18N[592]};
     if (flower == 0 || flower == 3)
 	color = 36;
     if ((show < 0) && (cline > 1 && cline < 8))
-	prints(SHM->i18nstr[cuser.language][593]);
+	prints(I18N[593]);
     else
 	switch (cline) {
 	case 1:
-	    prints(SHM->i18nstr[cuser.language][594]);
+	    prints(I18N[594]);
 	    break;
 	case 2:
-	    prints(SHM->i18nstr[cuser.language][595], color, cn[number - 1]);
+	    prints(I18N[595], color, cn[number - 1]);
 	    break;
 	case 3:
 	    if (flower == 1)
-		prints(SHM->i18nstr[cuser.language][596], color);
+		prints(I18N[596], color);
 	    else
-		prints(SHM->i18nstr[cuser.language][597], color);
+		prints(I18N[597], color);
 	    break;
 	case 4:
 	    if (flower == 1)
-		prints(SHM->i18nstr[cuser.language][598], color);
+		prints(I18N[598], color);
 	    else if (flower == 3)
-		prints(SHM->i18nstr[cuser.language][599], color);
+		prints(I18N[599], color);
 	    else
-		prints(SHM->i18nstr[cuser.language][600], color);
+		prints(I18N[600], color);
 	    break;
 	case 5:
 	    if (flower == 0)
-		prints(SHM->i18nstr[cuser.language][601], color);
+		prints(I18N[601], color);
 	    else if (flower == 3)
-		prints(SHM->i18nstr[cuser.language][602], color);
+		prints(I18N[602], color);
 	    else
-		prints(SHM->i18nstr[cuser.language][603], color);
+		prints(I18N[603], color);
 	    break;
 	case 6:
 	    if (flower == 0)
-		prints(SHM->i18nstr[cuser.language][604], color);
+		prints(I18N[604], color);
 	    else if (flower == 3)
-		prints(SHM->i18nstr[cuser.language][605], color);
+		prints(I18N[605], color);
 	    else
-		prints(SHM->i18nstr[cuser.language][606], color);
+		prints(I18N[606], color);
 	    break;
 	case 7:
-	    prints(SHM->i18nstr[cuser.language][607], color, cn[number - 1]);
+	    prints(I18N[607], color, cn[number - 1]);
 	    break;
 	case 8:
-	    prints(SHM->i18nstr[cuser.language][608]);
+	    prints(I18N[608]);
 	    break;
 	}
 }
@@ -176,11 +176,11 @@ card_start(char name[])
     clear();
     stand_title(name);
     move(1, 0);
-    prints(SHM->i18nstr[cuser.language][609]);
+    prints(I18N[609]);
     move(10, 0);
-    prints(SHM->i18nstr[cuser.language][610]);
+    prints(I18N[610]);
     move(19, 0);
-    prints(SHM->i18nstr[cuser.language][611]);
+    prints(I18N[611]);
 }
 
 static int
@@ -262,14 +262,14 @@ card_99()
     int             cpu[5], c[5], me[5], m[5];
     int             cards[52];
     int             count = 0;
-    char           *ff[4] = {SHM->i18nstr[cuser.language][612], SHM->i18nstr[cuser.language][613],
-    SHM->i18nstr[cuser.language][614], SHM->i18nstr[cuser.language][615]};
-    char           *cn[13] = {SHM->i18nstr[cuser.language][616], SHM->i18nstr[cuser.language][617], SHM->i18nstr[cuser.language][618], SHM->i18nstr[cuser.language][619], SHM->i18nstr[cuser.language][620], SHM->i18nstr[cuser.language][621],
-    SHM->i18nstr[cuser.language][622], SHM->i18nstr[cuser.language][623], SHM->i18nstr[cuser.language][624], "10", SHM->i18nstr[cuser.language][625], SHM->i18nstr[cuser.language][626], SHM->i18nstr[cuser.language][627]};
+    char           *ff[4] = {I18N[612], I18N[613],
+    I18N[614], I18N[615]};
+    char           *cn[13] = {I18N[616], I18N[617], I18N[618], I18N[619], I18N[620], I18N[621],
+    I18N[622], I18N[623], I18N[624], "10", I18N[625], I18N[626], I18N[627]};
     for (i = 0; i < 5; i++)
 	cpu[i] = c[i] = me[i] = m[i] = -1;
     setutmpmode(CARD_99);
-    card_start(SHM->i18nstr[cuser.language][628]);
+    card_start(I18N[628]);
     card_new(cards);
     for (i = 0; i < 5; i++) {
 	cpu[i] = card_give(cards);
@@ -281,8 +281,8 @@ card_99()
     turn = 1;
     move(21, 0);
     clrtoeol();
-    prints(SHM->i18nstr[cuser.language][629], count, 99 - count);
-    prints(SHM->i18nstr[cuser.language][630]);
+    prints(I18N[629], count, 99 - count);
+    prints(I18N[630]);
     while (1) {
 	i = card_select(&j);
 	if (i == 0)		/* 放棄遊戲 */
@@ -290,7 +290,7 @@ card_99()
 	count = card_99_add(card_number(me[j]), i, count);
 	move(21 + (turn / 2) % 2, 0);
 	clrtoeol();
-	prints(SHM->i18nstr[cuser.language][631],
+	prints(I18N[631],
 	       turn, ff[card_flower(me[j])],
 	       cn[card_number(me[j]) - 1], count, 99 - count);
 	me[j] = card_give(cards);
@@ -302,14 +302,14 @@ card_99()
 	if (count > 99) {
 	    move(22, 0);
 	    clrtoeol();
-	    prints(SHM->i18nstr[cuser.language][632],
+	    prints(I18N[632],
 		   turn, count, 99 - count);
 	    pressanykey();
 	    return 0;
 	}
 	i = card_99_cpu(cpu, &count);
 	move(21 + (turn / 2 + 1) % 2, 40);
-	prints(SHM->i18nstr[cuser.language][633],
+	prints(I18N[633],
 	       turn, ff[card_flower(cpu[i])],
 	       cn[card_number(cpu[i]) - 1], count, 99 - count);
 	cpu[i] = card_give(cards);
@@ -319,7 +319,7 @@ card_99()
 	if (count > 99) {
 	    move(22, 0);
 	    clrtoeol();
-	    prints(SHM->i18nstr[cuser.language][634],
+	    prints(I18N[634],
 		   turn, count, 99 - count);
 	    pressanykey();
 	    return 0;
@@ -372,7 +372,7 @@ card_double_ask()
     char            buf[100], buf2[3];
 
     snprintf(buf, sizeof(buf),
-	     SHM->i18nstr[cuser.language][635],
+	     I18N[635],
 	     cuser.userid, cuser.money, JACK);
     reload_money();
     if (cuser.money < JACK)
@@ -388,7 +388,7 @@ card_ask()
 {
     char            buf[100], buf2[3];
 
-    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][636],
+    snprintf(buf, sizeof(buf), I18N[636],
 	    cuser.userid, cuser.money);
     getdata(20, 0, buf, buf2, sizeof(buf2), LCECHO);
     if (buf2[0] == 'y' || buf2[0] == 'Y')
@@ -432,13 +432,13 @@ card_jack(int *db)
 
     if ((*db) < 0) {
 	card_new(cards);
-	card_start(SHM->i18nstr[cuser.language][637]);
+	card_start(I18N[637]);
 	for (i = 0; i < 2; i++) {
 	    cpu[i] = card_give(cards);
 	    me[i] = card_give(cards);
 	}
     } else {
-	card_start(SHM->i18nstr[cuser.language][638]);
+	card_start(I18N[638]);
 	cpu[0] = card_give(cards);
 	cpu[1] = card_give(cards);
 	me[0] = *db;
@@ -450,11 +450,11 @@ card_jack(int *db)
 	(card_number(me[1]) == 0 && card_number(me[0]) == 12)) {
 	if (card_flower(me[0]) == 0 && card_flower(me[1]) == 0) {
 	    game_log(JACK, JACK * 10);
-	    vmsg(SHM->i18nstr[cuser.language][639], JACK * 10);
+	    vmsg(I18N[639], JACK * 10);
 	    return 0;
 	} else {
 	    game_log(JACK, JACK * 5);
-	    vmsg(SHM->i18nstr[cuser.language][640], JACK * 5);
+	    vmsg(I18N[640], JACK * 5);
 	    return 0;
 	}
     }
@@ -463,7 +463,7 @@ card_jack(int *db)
 	c[0] = 1;
 	card_show(cpu, c, me, m);
 	game_log(JACK, 0);
-	vmsg(SHM->i18nstr[cuser.language][641]);
+	vmsg(I18N[641]);
 	return 0;
     }
     if ((*db < 0) && (card_number(me[0]) == card_number(me[1])) &&
@@ -479,20 +479,20 @@ card_jack(int *db)
 	card_show(cpu, c, me, m);
 	if (card_alls_lower(me) > 21) {
 	    game_log(JACK, 0);
-	    vmsg(SHM->i18nstr[cuser.language][642]);
+	    vmsg(I18N[642]);
 	    return 0;
 	}
 	i++;
 	if ((i == 3) && (card_number(me[0]) == 7) &&
 	    (card_number(me[1]) == 7) && (card_number(me[2]) == 7)) {
 	    game_log(JACK, JACK * 7);
-	    vmsg(SHM->i18nstr[cuser.language][643], JACK * 7);
+	    vmsg(I18N[643], JACK * 7);
 	    return 0;
 	}
     }
     if (i == 5) {		/* 過五關 */
 	game_log(JACK, JACK * 5);
-	vmsg(SHM->i18nstr[cuser.language][644], 5 * JACK);
+	vmsg(I18N[644], 5 * JACK);
 	return 0;
     }
     j = 2;
@@ -504,14 +504,14 @@ card_jack(int *db)
 	if (card_alls_lower(cpu) > 21) {
 	    card_show(cpu, c, me, m);
 	    game_log(JACK, JACK * 2);
-	    vmsg(SHM->i18nstr[cuser.language][645], JACK * 2);
+	    vmsg(I18N[645], JACK * 2);
 	    return 0;
 	}
 	j++;
     }
     card_show(cpu, c, me, m);
     game_log(JACK, 0);
-    vmsg(SHM->i18nstr[cuser.language][646]);
+    vmsg(I18N[646]);
     return 0;
 }
 
@@ -525,16 +525,16 @@ g_card_jack()
     while (1) {
 	reload_money();
 	if (cuser.money < JACK) {
-	    outs(SHM->i18nstr[cuser.language][647]);
+	    outs(I18N[647]);
 	    return 0;
 	}
-	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][648],
+	getdata(b_lines - 1, 0, I18N[648],
 		buf, 3, LCECHO);
 	if ((*buf != 'y') && (*buf != 'Y'))
 	    break;
 	else {
 	    db = -1;
-	    vice(PMONEY, SHM->i18nstr[cuser.language][649]);
+	    vice(PMONEY, I18N[649]);
 	    card_jack(&db);
 	    if (db >= 0)
 		card_jack(&db);
@@ -563,7 +563,7 @@ ten_helf()
     int             cpu[5], c[5], me[5], m[5];
     int             cards[52];
 
-    card_start(SHM->i18nstr[cuser.language][650]);
+    card_start(I18N[650]);
     card_new(cards);
     for (i = 0; i < 5; i++)
 	cpu[i] = c[i] = me[i] = m[i] = -1;
@@ -579,14 +579,14 @@ ten_helf()
 	card_show(cpu, c, me, m);
 	if (card_all(me) > 21) {
 	    game_log(TEN_HALF, 0);
-	    vmsg(SHM->i18nstr[cuser.language][651]);
+	    vmsg(I18N[651]);
 	    return 0;
 	}
 	i++;
     }
     if (i == 5) {		/* 過五關 */
 	game_log(TEN_HALF, PMONEY * 5);
-	vmsg(SHM->i18nstr[cuser.language][652], 5 * PMONEY);
+	vmsg(I18N[652], 5 * PMONEY);
 	return 0;
     }
     j = 1;
@@ -598,14 +598,14 @@ ten_helf()
 	if (card_all(cpu) > 21) {
 	    card_show(cpu, c, me, m);
 	    game_log(TEN_HALF, PMONEY * 2);
-	    vmsg(SHM->i18nstr[cuser.language][653], PMONEY * 2);
+	    vmsg(I18N[653], PMONEY * 2);
 	    return 0;
 	}
 	j++;
     }
     card_show(cpu, c, me, m);
     game_log(TEN_HALF, 0);
-    vmsg(SHM->i18nstr[cuser.language][654]);
+    vmsg(I18N[654]);
     return 0;
 }
 
@@ -618,16 +618,16 @@ g_ten_helf()
     while (1) {
 	reload_money();
 	if (cuser.money < TEN_HALF) {
-	    outs(SHM->i18nstr[cuser.language][655]);
+	    outs(I18N[655]);
 	    return 0;
 	}
 	getdata(b_lines - 1, 0,
-		SHM->i18nstr[cuser.language][656],
+		I18N[656],
 		buf, 3, LCECHO);
 	if (buf[0] != 'y' && buf[0] != 'Y')
 	    return 0;
 	else {
-	    vice(PMONEY, SHM->i18nstr[cuser.language][657]);
+	    vice(PMONEY, I18N[657]);
 	    ten_helf();
 	}
     }

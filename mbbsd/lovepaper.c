@@ -20,16 +20,16 @@ x_love()
     move(1, 0);
     clrtobot();
 
-    outs(SHM->i18nstr[cuser.language][1195]);
-    outs(SHM->i18nstr[cuser.language][1196]);
+    outs(I18N[1195]);
+    outs(I18N[1196]);
 
-    if (!getdata(7, 0, SHM->i18nstr[cuser.language][1197], receiver, sizeof(receiver), DOECHO))
+    if (!getdata(7, 0, I18N[1197], receiver, sizeof(receiver), DOECHO))
 	return 0;
     if (receiver[0] && !(searchuser(receiver) &&
-			 getdata(8, 0, SHM->i18nstr[cuser.language][1198], save_title,
+			 getdata(8, 0, I18N[1198], save_title,
 				 sizeof(save_title), DOECHO))) {
 	move(10, 0);
-	outs(SHM->i18nstr[cuser.language][1199]);
+	outs(I18N[1199]);
 	pressanykey();
 	return 0;
     }
@@ -88,7 +88,7 @@ x_love()
 	if (vedit(path, YEA, NULL) == -1) {
 	    unlink(path);
 	    clear();
-	    outs(SHM->i18nstr[cuser.language][1200]);
+	    outs(I18N[1200]);
 	    pressanykey();
 	    return -2;
 	}

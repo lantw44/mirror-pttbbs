@@ -18,7 +18,7 @@ printchatline(char *str)
     }
     outs(str);
     outc('\n');
-    outs(SHM->i18nstr[cuser.language][658]);
+    outs(I18N[658]);
 
     if (flog)
 	fprintf(flog, "%s\n", str);
@@ -34,7 +34,7 @@ chat_clear()
     move(b_lines, 0);
     clrtoeol();
     move(chatline = 2, 0);
-    outs(SHM->i18nstr[cuser.language][659]);
+    outs(I18N[659]);
 }
 
 static void
@@ -92,7 +92,7 @@ chat_recv(int fd, char chatroom[IDLEN], char *chatid)
 	    case 't':
 		move(0, 0);
 		clrtoeol();
-		prints(SHM->i18nstr[cuser.language][660],
+		prints(I18N[660],
 		       chatroom, bptr + 2);
 	    }
 	} else
@@ -131,7 +131,7 @@ printuserent(userinfo_t * uentp)
 	     uentp->invisible ? '#' : ' ',
 	     modestring(uentp, 1));
     if (cnt < 2)
-	strcat(pline, SHM->i18nstr[cuser.language][661]);
+	strcat(pline, I18N[661]);
     strcat(uline, pline);
     if (++cnt == 3) {
 	printchatline(uline);
@@ -154,30 +154,30 @@ static void
 chat_help(char *arg)
 {
     if (strstr(arg, " op")) {
-	printchatline(SHM->i18nstr[cuser.language][662]);
-	chathelp("[/f]lag [+-][ls]", SHM->i18nstr[cuser.language][663]);
-	chathelp("[/i]nvite <id>", SHM->i18nstr[cuser.language][664]);
-	chathelp("[/k]ick <id>", SHM->i18nstr[cuser.language][665]);
-	chathelp("[/o]p <id>", SHM->i18nstr[cuser.language][666]);
-	chathelp("[/t]opic <text>", SHM->i18nstr[cuser.language][667]);
-	chathelp("[/w]all", SHM->i18nstr[cuser.language][668]);
+	printchatline(I18N[662]);
+	chathelp("[/f]lag [+-][ls]", I18N[663]);
+	chathelp("[/i]nvite <id>", I18N[664]);
+	chathelp("[/k]ick <id>", I18N[665]);
+	chathelp("[/o]p <id>", I18N[666]);
+	chathelp("[/t]opic <text>", I18N[667]);
+	chathelp("[/w]all", I18N[668]);
     } else {
-	chathelp("[//]help", SHM->i18nstr[cuser.language][669]);
-	chathelp("[/.]help", SHM->i18nstr[cuser.language][670]);
-	chathelp("[/h]elp op", SHM->i18nstr[cuser.language][671]);
-	chathelp("[/a]ct <msg>", SHM->i18nstr[cuser.language][672]);
-	chathelp("[/b]ye [msg]", SHM->i18nstr[cuser.language][673]);
-	chathelp("[/c]lear", SHM->i18nstr[cuser.language][674]);
-	chathelp("[/j]oin <room>", SHM->i18nstr[cuser.language][675]);
-	chathelp("[/l]ist [room]", SHM->i18nstr[cuser.language][676]);
-	chathelp("[/m]sg <id> <msg>", SHM->i18nstr[cuser.language][677]);
-	chathelp("[/n]ick <id>", SHM->i18nstr[cuser.language][678]);
-	chathelp("[/p]ager", SHM->i18nstr[cuser.language][679]);
-	chathelp("[/q]uery", SHM->i18nstr[cuser.language][680]);
-	chathelp("[/r]oom", SHM->i18nstr[cuser.language][681]);
-	chathelp("[/u]sers", SHM->i18nstr[cuser.language][682]);
-	chathelp("[/w]ho", SHM->i18nstr[cuser.language][683]);
-	chathelp("[/w]hoin <room>", SHM->i18nstr[cuser.language][684]);
+	chathelp("[//]help", I18N[669]);
+	chathelp("[/.]help", I18N[670]);
+	chathelp("[/h]elp op", I18N[671]);
+	chathelp("[/a]ct <msg>", I18N[672]);
+	chathelp("[/b]ye [msg]", I18N[673]);
+	chathelp("[/c]lear", I18N[674]);
+	chathelp("[/j]oin <room>", I18N[675]);
+	chathelp("[/l]ist [room]", I18N[676]);
+	chathelp("[/m]sg <id> <msg>", I18N[677]);
+	chathelp("[/n]ick <id>", I18N[678]);
+	chathelp("[/p]ager", I18N[679]);
+	chathelp("[/q]uery", I18N[680]);
+	chathelp("[/r]oom", I18N[681]);
+	chathelp("[/u]sers", I18N[682]);
+	chathelp("[/w]ho", I18N[683]);
+	chathelp("[/w]hoin <room>", I18N[684]);
     }
 }
 
@@ -187,7 +187,7 @@ chat_date()
     char            genbuf[200];
 
     snprintf(genbuf, sizeof(genbuf),
-	     SHM->i18nstr[cuser.language][686], BBSNAME, Cdate(&now));
+	     I18N[686], BBSNAME, Cdate(&now));
     printchatline(genbuf);
 }
 
@@ -196,8 +196,8 @@ chat_pager()
 {
     char            genbuf[200];
 
-    char           *msgs[] = {SHM->i18nstr[cuser.language][687], SHM->i18nstr[cuser.language][688], SHM->i18nstr[cuser.language][689], SHM->i18nstr[cuser.language][690], SHM->i18nstr[cuser.language][691]};
-    snprintf(genbuf, sizeof(genbuf), SHM->i18nstr[cuser.language][692],
+    char           *msgs[] = {I18N[687], I18N[688], I18N[689], I18N[690], I18N[691]};
+    snprintf(genbuf, sizeof(genbuf), I18N[692],
 	     msgs[currutmp->pager = (currutmp->pager + 1) % 5]);
     printchatline(genbuf);
 }
@@ -214,14 +214,14 @@ chat_query(char *arg)
 	char            buf[128], *ptr;
 	FILE           *fp;
 
-	snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][693],
+	snprintf(buf, sizeof(buf), I18N[693],
 		 xuser.userid, xuser.username,
 		 xuser.numlogins, xuser.numposts);
 	printchatline(buf);
 
 	snprintf(buf, sizeof(buf),
-		 SHM->i18nstr[cuser.language][694], Cdate(&xuser.lastlogin),
-		(xuser.lasthost[0] ? xuser.lasthost : SHM->i18nstr[cuser.language][695]));
+		 I18N[694], Cdate(&xuser.lastlogin),
+		(xuser.lasthost[0] ? xuser.lasthost : I18N[695]));
 	printchatline(buf);
 
 	sethomefile(buf, xuser.userid, fn_plans);
@@ -242,13 +242,13 @@ static void
 chat_users()
 {
 	char buf[256];
-	snprintf(buf, sizeof(buf), "%s%s%s", SHM->i18nstr[cuser.language][696], BBSNAME, SHM->i18nstr[cuser.language][697]);
+	snprintf(buf, sizeof(buf), "%s%s%s", I18N[696], BBSNAME, I18N[697]);
     printchatline("");
     printchatline(buf);
     printchatline(msg_shortulist);
 
     if (apply_ulist(printuserent) == -1)
-	printchatline(SHM->i18nstr[cuser.language][698]);
+	printchatline(I18N[698]);
     printuserent(NULL);
 }
 
@@ -309,7 +309,7 @@ t_chat()
     int             chatting = YEA;
     char            fpath[80];
 
-    outs(SHM->i18nstr[cuser.language][699]);
+    outs(I18N[699]);
     if (!(h = gethostbyname("localhost"))) {
 	perror("gethostbyname");
 	return -1;
@@ -323,7 +323,7 @@ t_chat()
     sin.sin_port = htons(NEW_CHATPORT);
     cfd = socket(sin.sin_family, SOCK_STREAM, 0);
     if (connect(cfd, (struct sockaddr *) & sin, sizeof sin) != 0) {
-	outs(SHM->i18nstr[cuser.language][700]);
+	outs(I18N[700]);
 	system("bin/xchatd");
 	pressanykey();
 	close(cfd);
@@ -331,7 +331,7 @@ t_chat()
     }
 
     while (1) {
-	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][701], chatid, 9, DOECHO);
+	getdata(b_lines - 1, 0, I18N[701], chatid, 9, DOECHO);
 	if(!chatid[0])
 	    strlcpy(chatid, cuser.userid, sizeof(chatid));
 	chatid[8] = '\0';
@@ -348,11 +348,11 @@ t_chat()
 	if (!strcmp(inbuf, CHAT_LOGIN_OK))
 	    break;
 	else if (!strcmp(inbuf, CHAT_LOGIN_EXISTS))
-	    ptr = SHM->i18nstr[cuser.language][702];
+	    ptr = I18N[702];
 	else if (!strcmp(inbuf, CHAT_LOGIN_INVALID))
-	    ptr = SHM->i18nstr[cuser.language][703];
+	    ptr = I18N[703];
 	else if (!strcmp(inbuf, CHAT_LOGIN_BOGUS))
-	    ptr = SHM->i18nstr[cuser.language][704];
+	    ptr = I18N[704];
 
 	move(b_lines - 2, 0);
 	outs(ptr);
@@ -376,7 +376,7 @@ t_chat()
     move(STOP_LINE, 0);
     outs(msg_seperator);
     move(STOP_LINE, 60);
-    outs(SHM->i18nstr[cuser.language][705]);
+    outs(I18N[705]);
     move(1, 0);
     outs(msg_seperator);
     print_chatid(chatid);
@@ -413,7 +413,7 @@ t_chat()
 
 	if (!newmail && currutmp->mailalert) {
 	    newmail = 1;
-	    printchatline(SHM->i18nstr[cuser.language][706]);
+	    printchatline(I18N[706]);
 	}
 	if (ch == I_OTHERDATA) {/* incoming */
 	    if (chat_recv(cfd, chatroom, chatid) == -1) {
@@ -514,7 +514,7 @@ t_chat()
 
 	fclose(flog);
 	more(fpath, NA);
-	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][707],
+	getdata(b_lines - 1, 0, I18N[707],
 		ans, sizeof(ans), LCECHO);
 	if (*ans == 'm') {
 	    fileheader_t    mymail;
@@ -524,8 +524,8 @@ t_chat()
 	    sethomepath(genbuf, cuser.userid);
 	    stampfile(genbuf, &mymail);
 	    mymail.filemode = FILE_READ ;
-	    strlcpy(mymail.owner, SHM->i18nstr[cuser.language][708], sizeof(mymail.owner));
-	    strlcpy(mymail.title, SHM->i18nstr[cuser.language][709], sizeof(mymail.title));
+	    strlcpy(mymail.owner, I18N[708], sizeof(mymail.owner));
+	    strlcpy(mymail.title, I18N[709], sizeof(mymail.title));
 	    sethomedir(title, cuser.userid);
 	    append_record(title, &mymail, sizeof(mymail));
 	    Rename(fpath, genbuf);

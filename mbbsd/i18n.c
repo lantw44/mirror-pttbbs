@@ -6,7 +6,6 @@
 #define MAX_STRING_LEN 4096
 #define MAX_BUFFER_SIZE (MAX_LANG * MAX_STRING * 20)
 
-#ifdef I18N
 int parse_hex(unsigned char *buf, unsigned char *ret) {
 	int len = 0;
 	unsigned char table[] = "0123456789ABCDEF";
@@ -151,4 +150,3 @@ void load_i18nstring() {
 		load_language(lang_file[i], SHM->i18nstr[i], &offset);
 	}
 }
-#endif

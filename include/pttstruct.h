@@ -463,8 +463,13 @@ typedef struct word_t {
 typedef struct commands_t {
     int     (*cmdfunc)();
     int     level;
-    char    *desc;                   /* next/key/description */
+    int    desc;                   /* next/key/description */
 } commands_t;
+
+typedef struct loginview_file_t {
+	char *path;
+	int string_index;
+} loginview_file_t;
 
 typedef struct MailQueue {
     char    filepath[FNLEN];

@@ -63,7 +63,7 @@ static char     fp_bak[] = "bak";
 static void
 indigestion(int i)
 {
-    fprintf(stderr, SHM->i18nstr[cuser.language][978], i);
+    fprintf(stderr, I18N[978], i);
 }
 
 /* Thor: ansi 座標轉換  for color 編輯模式 */
@@ -121,7 +121,7 @@ n2ansi(int nx, textline_t * line)
 static void
 edit_msg()
 {
-    char    *edit_mode[2] = {SHM->i18nstr[cuser.language][979], SHM->i18nstr[cuser.language][980]};
+    char    *edit_mode[2] = {I18N[979], I18N[980]};
     register int    n = currpnt;
 
     if (my_ansimode)		/* Thor: 作 ansi 編輯 */
@@ -129,7 +129,7 @@ edit_msg()
     n++;
     move(b_lines, 0);
     clrtoeol();
-    prints(SHM->i18nstr[cuser.language][981],
+    prints(I18N[981],
 	   "37;44",
 	   edit_mode[insert_character],
 	   my_ansimode ? 'A' : 'a', indent_mode ? 'I' : 'i',
@@ -527,7 +527,7 @@ ask_tmpbuf(int y)
     static char     fp_buf[10] = "buf.0";
     char     msg[36];
     
-    strlcpy(msg, SHM->i18nstr[cuser.language][982], sizeof(msg));
+    strlcpy(msg, I18N[982], sizeof(msg));
     msg[19] = fp_buf[4];
     do {
 	if (!getdata(y, 0, msg, fp_buf + 4, 4, DOECHO))
@@ -555,7 +555,7 @@ read_tmpbuf(int n)
 
     setuserfile(fp_tmpbuf, tmpf);
     if (n != 0 && n != 5 && more(fp_tmpbuf, NA) != -1)
-	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][983], ans, sizeof(ans), LCECHO);
+	getdata(b_lines - 1, 0, I18N[983], ans, sizeof(ans), LCECHO);
     if (*ans != 'n' && (fp = fopen(fp_tmpbuf, "r"))) {
 	load_file(fp);
 	while (curr_window_line >= b_lines) {
@@ -575,7 +575,7 @@ write_tmpbuf()
     setuserfile(fp_tmpbuf, ask_tmpbuf(3));
     if (dashf(fp_tmpbuf)) {
 	more(fp_tmpbuf, NA);
-	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][984],
+	getdata(b_lines - 1, 0, I18N[984],
 		ans, sizeof(ans), LCECHO);
 
 	if (ans[0] == 'q')
@@ -598,7 +598,7 @@ erase_tmpbuf()
 
     setuserfile(fp_tmpbuf, ask_tmpbuf(3));
     if (more(fp_tmpbuf, NA) != -1)
-	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][985],
+	getdata(b_lines - 1, 0, I18N[985],
 		ans, sizeof(ans), LCECHO);
     if (*ans == 'y')
 	unlink(fp_tmpbuf);
@@ -634,8 +634,8 @@ restore_backup()
 
     setuserfile(bakfile, fp_bak);
     if (dashf(bakfile)) {
-	stand_title(SHM->i18nstr[cuser.language][986]);
-	getdata(1, 0, SHM->i18nstr[cuser.language][987],
+	stand_title(I18N[986]);
+	getdata(1, 0, I18N[987],
 		buf, 4, LCECHO);
 	if (buf[0] != 'q') {
 	    setuserfile(buf, ask_tmpbuf(3));
@@ -660,8 +660,8 @@ garbage_line(char *str)
     while (*str == ' ' || *str == '\t')
 	str++;
     if (qlevel >= 1) {
-	if (!strncmp(str, SHM->i18nstr[cuser.language][988], 3) || !strncmp(str, "==>", 3) ||
-	    strstr(str, SHM->i18nstr[cuser.language][989]))
+	if (!strncmp(str, I18N[988], 3) || !strncmp(str, "==>", 3) ||
+	    strstr(str, I18N[989]))
 	    return 1;
     }
     return (*str == '\n');
@@ -673,7 +673,7 @@ do_quote()
     int             op;
     char            buf[256];
 
-    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][990],
+    getdata(b_lines - 1, 0, I18N[990],
 	    buf, 3, LCECHO);
     op = buf[0];
 
@@ -706,9 +706,9 @@ do_quote()
 		ptr = quote_user;
 
 	    indent_mode = 0;
-	    insert_string(SHM->i18nstr[cuser.language][991]);
+	    insert_string(I18N[991]);
 	    insert_string(ptr);
-	    insert_string(SHM->i18nstr[cuser.language][992]);
+	    insert_string(I18N[992]);
 
 	    if (op != 'a')	/* 去掉 header */
 		while (fgets(buf, 256, inf) && buf[0] != '\n');
@@ -724,7 +724,7 @@ do_quote()
 		    insert_string(Ptt_prints(buf, NO_RELOAD));
 	    else {
 		if (curredit & EDIT_LIST)	/* 去掉 mail list 之 header */
-		    while (fgets(buf, 256, inf) && (!strncmp(buf, SHM->i18nstr[cuser.language][993], 3)));
+		    while (fgets(buf, 256, inf) && (!strncmp(buf, I18N[993], 3)));
 		while (fgets(buf, 256, inf)) {
 		    if (!strcmp(buf, "--\n"))
 			break;
@@ -767,11 +767,11 @@ check_quote()
 
     if ((included_line >> 2) > post_line) {
 	move(4, 0);
-	outs(SHM->i18nstr[cuser.language][994]);
+	outs(I18N[994]);
 	{
 	    char            ans[4];
 
-	    getdata(12, 12, SHM->i18nstr[cuser.language][995],
+	    getdata(12, 12, I18N[995],
 		    ans, sizeof(ans), LCECHO);
 	    if (ans[0] == 'w')
 		return 0;
@@ -823,9 +823,9 @@ write_header(FILE * fp)
 	if (currbrdattr & BRD_ANONYMOUS) {
 	    int             defanony = (currbrdattr & BRD_DEFAULTANONYMOUS);
 	    if (defanony)
-		getdata(3, 0, SHM->i18nstr[cuser.language][996], real_name, sizeof(real_name), DOECHO);
+		getdata(3, 0, I18N[996], real_name, sizeof(real_name), DOECHO);
 	    else
-		getdata(3, 0, SHM->i18nstr[cuser.language][997],
+		getdata(3, 0, I18N[997],
 			real_name, sizeof(real_name), DOECHO);
 	    if (!real_name[0] && defanony) {
 		strlcpy(real_name, "Anonymous", sizeof(real_name));
@@ -858,7 +858,7 @@ write_header(FILE * fp)
 	    fprintf(fp, "%s %s (%s) %s %s\n", str_author1, postlog.author,
 		    (((!strcmp(real_name, "r") && defanony) ||
 		      (!real_name[0] && (!defanony))) ? cuser.username :
-		     SHM->i18nstr[cuser.language][998]),
+		     I18N[998]),
 		    local_article ? str_post2 : str_post1, currboard);
 	} else {
 	    fprintf(fp, "%s %s (%s) %s %s\n", str_author1, cuser.userid,
@@ -873,7 +873,7 @@ write_header(FILE * fp)
 
     }
     save_title[72] = '\0';
-    fprintf(fp, SHM->i18nstr[cuser.language][999], save_title, ctime(&now));
+    fprintf(fp, I18N[999], save_title, ctime(&now));
 }
 
 void
@@ -887,10 +887,10 @@ addsignature(FILE * fp, int ifuseanony)
     static char     msg[64];
     char            ch;
 
-	strlcpy(msg, SHM->i18nstr[cuser.language][1000], sizeof(msg));
+	strlcpy(msg, I18N[1000], sizeof(msg));
     if (!strcmp(cuser.userid, STR_GUEST)) {
-	fprintf(fp, "%s" BBSNAME "(" MYHOSTNAME "%s%s\n", SHM->i18nstr[cuser.language][1001],
-		SHM->i18nstr[cuser.language][1002], fromhost);
+	fprintf(fp, "%s" BBSNAME "(" MYHOSTNAME "%s%s\n", I18N[1001],
+		I18N[1002], fromhost);
 	return;
     }
     if (!ifuseanony) {
@@ -923,20 +923,20 @@ addsignature(FILE * fp, int ifuseanony)
 #ifdef HAVE_ORIGIN
 #ifdef HAVE_ANONYMOUS
     if (ifuseanony)
-	fprintf(fp, "%s"BBSNAME"("MYHOSTNAME"%s%s\n", SHM->i18nstr[cuser.language][1003],
-		SHM->i18nstr[cuser.language][1004], SHM->i18nstr[cuser.language][1005]);
+	fprintf(fp, "%s"BBSNAME"("MYHOSTNAME"%s%s\n", I18N[1003],
+		I18N[1004], I18N[1005]);
     else {
 	char            temp[33];
 
 	strncpy(temp, fromhost, 31);
 	temp[32] = '\0';
-	fprintf(fp, "%s"BBSNAME"("MYHOSTNAME"%s%s\n", SHM->i18nstr[cuser.language][1006],
-		SHM->i18nstr[cuser.language][1007], temp);
+	fprintf(fp, "%s"BBSNAME"("MYHOSTNAME"%s%s\n", I18N[1006],
+		I18N[1007], temp);
     }
 #else
     strncpy(temp, fromhost, 15);
-    fprintf(fp, "%s"BBSNAME"("MYHOSTNAME"%s%s\n", SHM->i18nstr[cuser.language][1008],
-	    SHM->i18nstr[cuser.language][1009], temp);
+    fprintf(fp, "%s"BBSNAME"("MYHOSTNAME"%s%s\n", I18N[1008],
+	    I18N[1009], temp);
 #endif
 #endif
 }
@@ -950,18 +950,18 @@ write_file(char *fpath, int saveheader, int *islocal)
     char            ans[TTLEN], *msg;
     int             aborted = 0, line = 0, checksum[3], sum = 0, po = 1;
 
-    stand_title(SHM->i18nstr[cuser.language][1010]);
+    stand_title(I18N[1010]);
     if (currstat == SMAIL)
-	msg = SHM->i18nstr[cuser.language][1011];
+	msg = I18N[1011];
     else if (local_article)
-	msg = SHM->i18nstr[cuser.language][1012];
+	msg = I18N[1012];
     else
-	msg = SHM->i18nstr[cuser.language][1013];
+	msg = I18N[1013];
     getdata(1, 0, msg, ans, 2, LCECHO);
 
     switch (ans[0]) {
     case 'a':
-	outs(SHM->i18nstr[cuser.language][1014]);
+	outs(I18N[1014]);
 	aborted = -1;
 	break;
     case 'r':
@@ -976,16 +976,16 @@ write_file(char *fpath, int saveheader, int *islocal)
 	return KEEP_EDITING;
     case 't':
 	move(3, 0);
-	prints(SHM->i18nstr[cuser.language][1015], save_title);
+	prints(I18N[1015], save_title);
 	strlcpy(ans, save_title, sizeof(ans));
-	if (getdata_buf(4, 0, SHM->i18nstr[cuser.language][1016], ans, sizeof(ans), DOECHO))
+	if (getdata_buf(4, 0, I18N[1016], ans, sizeof(ans), DOECHO))
 	    strlcpy(save_title, ans, sizeof(save_title));
 	return KEEP_EDITING;
     case 's':
 	if (!HAS_PERM(PERM_LOGINOK)) {
 	    local_article = 1;
 	    move(2, 0);
-	    prints(SHM->i18nstr[cuser.language][1017]);
+	    prints(I18N[1017]);
 	    pressanykey();
 	} else
 	    local_article = 0;
@@ -1065,7 +1065,7 @@ write_file(char *fpath, int saveheader, int *islocal)
 	    ) {
 	    ptime = localtime(&now);
 	    fprintf(fp,
-		    SHM->i18nstr[cuser.language][1018],
+		    I18N[1018],
 		    cuser.userid, fromhost,
 		    ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
 	}
@@ -1151,7 +1151,7 @@ goto_line(int lino)
     char            buf[10];
 
     if (lino > 0 ||
-	(getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1019], buf, sizeof(buf), DOECHO) &&
+	(getdata(b_lines - 1, 0, I18N[1019], buf, sizeof(buf), DOECHO) &&
 	 sscanf(buf, "%d", &lino) && lino > 0)) {
 	textline_t     *p;
 
@@ -1210,10 +1210,10 @@ search_str(int mode)
     char            ans[4] = "n";
 
     if (!mode) {
-	if (getdata_buf(b_lines - 1, 0, SHM->i18nstr[cuser.language][1020],
+	if (getdata_buf(b_lines - 1, 0, I18N[1020],
 			str, sizeof(str), DOECHO))
 	    if (*str) {
-		if (getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1021],
+		if (getdata(b_lines - 1, 0, I18N[1021],
 			    ans, sizeof(ans), LCECHO) && *ans == 'y')
 		    fptr = strstr;
 		else
@@ -1401,7 +1401,7 @@ block_del(int hide)
 	clrtoeol();
 	if (hide == 1)
 	    tmpfname[4] = 'q';
-	else if (!hide && !getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1022],
+	else if (!hide && !getdata(b_lines - 1, 0, I18N[1022],
 				   tmpfname + 4, 4, LCECHO))
 	    tmpfname[4] = '0';
 	if (tmpfname[4] < '0' || tmpfname[4] > '9')
@@ -1410,14 +1410,14 @@ block_del(int hide)
 	    setuserfile(fp_tmpbuf, tmpfname);
 	    if (tmpfname[4] != '5' && dashf(fp_tmpbuf)) {
 		more(fp_tmpbuf, NA);
-		getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1023], ans, 2, LCECHO);
+		getdata(b_lines - 1, 0, I18N[1023], ans, 2, LCECHO);
 		if (*ans == 'q')
 		    tmpfname[4] = 'q';
 		else if (*ans != 'a')
 		    *ans = 'w';
 	    }
 	    if (tmpfname[4] != '5') {
-		getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1024],
+		getdata(b_lines - 1, 0, I18N[1024],
 			ans + 2, 4, LCECHO);
 		if (ans[2] != 'y')
 		    ans[2] = 'n';
@@ -1775,7 +1775,7 @@ vedit(char *fpath, int saveheader, int *islocal)
 		line_dirty = 1;
 		break;
 	    case Ctrl('Q'):	/* Quit without saving */
-		ch = ask(SHM->i18nstr[cuser.language][1025]);
+		ch = ask(I18N[1025]);
 		if (ch == 'y' || ch == 'Y') {
 		    currutmp->mode = mode0;
 		    currutmp->destuid = destuid0;
@@ -1808,7 +1808,7 @@ vedit(char *fpath, int saveheader, int *islocal)
 		    move(b_lines - 2, 55);
 		    outs("\033[1;33;40mB\033[41mR\033[42mG\033[43mY\033[44mL\033[45mP\033[46mC\033[47mW\033[m");
 		    if (getdata(b_lines - 1, 0,
-			      SHM->i18nstr[cuser.language][1026],
+			      I18N[1026],
 				ans, sizeof(ans), LCECHO)) {
 			char            t[] = "BRGYLPCW";
 			char            color[15];
@@ -2013,7 +2013,7 @@ vedit(char *fpath, int saveheader, int *islocal)
 		{
 		    unsigned int    currstat0 = currstat;
 		    setutmpmode(EDITEXP);
-		    a_menu(SHM->i18nstr[cuser.language][1027], "etc/editexp",
+		    a_menu(I18N[1027], "etc/editexp",
 			   (HAS_PERM(PERM_SYSOP) ? SYSOP : NOBODY));
 		    currstat = currstat0;
 		}
@@ -2023,9 +2023,9 @@ vedit(char *fpath, int saveheader, int *islocal)
 
 			indent_mode = 0;
 			while (fgets(line, WRAPMARGIN + 2, fp1)) {
-			    if (!strncmp(line, SHM->i18nstr[cuser.language][1028], 5) ||
-				!strncmp(line, SHM->i18nstr[cuser.language][1029], 5) ||
-				!strncmp(line, SHM->i18nstr[cuser.language][1030], 5))
+			    if (!strncmp(line, I18N[1028], 5) ||
+				!strncmp(line, I18N[1029], 5) ||
+				!strncmp(line, I18N[1030], 5))
 				continue;
 			    insert_string(line);
 			}
@@ -2169,7 +2169,7 @@ vedit(char *fpath, int saveheader, int *islocal)
 		    char            ans[4];
 
 		    getdata(b_lines - 1, 0,
-			    SHM->i18nstr[cuser.language][1031],
+			    I18N[1031],
 			    ans, sizeof(ans), LCECHO);
 		    insert_c = (*ans) ? *ans : ' ';
 		}

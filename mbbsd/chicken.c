@@ -3,20 +3,8 @@
 
 #define NUM_KINDS   15		/* 有多少種動物 */
 
-static          const char *cage[17] = {
-    "誕生", "週歲", "幼年", "少年", "青春", "青年",
-    "青年", "活力", "壯年", "壯年", "壯年", "中年",
-    "中年", "老年", "老年", "老摳摳", "古希"};
-static          const char *chicken_type[NUM_KINDS] = {
-    "小雞", "美少女", "勇士", "蜘蛛",
-    "恐龍", "老鷹", "貓", "蠟筆小新",
-    "狗狗", "惡魔", "忍者", "ㄚ扁",
-    "馬英九", "就可人", "羅莉"};
-static          const char *chicken_food[NUM_KINDS] = {
-    "雞飼料", "營養厚片", "雞排便當", "死蝴蝶",
-    "屍體", "小雞", "貓餅乾", "小熊餅乾",
-    "寶錄", "靈氣", "飯團", "便當",
-    "雞腿", "笑話文章", "水果沙拉"};
+static          char *chicken_type[NUM_KINDS];
+static          char *chicken_food[NUM_KINDS];
 static          const int egg_price[NUM_KINDS] = {
     5, 25, 30, 40,
     80, 50, 15, 35,
@@ -27,18 +15,9 @@ static          const int food_price[NUM_KINDS] = {
     12, 12, 5, 6,
     5, 20, 15, 23,
     23, 10, 19};
-static          const char *attack_type[NUM_KINDS] = {
-    "啄", "鞭打", "槌", "咬",
-    "撞擊", "啄", "抓", "踢",
-    "咬", "燃燒", "暗擊", "棍打",
-    "劍擊", "冷凍光線", "香吻一枚"};
+static          char *attack_type[NUM_KINDS];
 
-static          const char *damage_degree[] = {
-    "蚊子似的", "騷癢似的", "小力的", "輕微的",
-    "有點疼的", "使力的", "傷人的", "重重的",
-    "使全力的", "惡狠狠的", "危險的", "瘋狂的",
-    "猛烈的", "狂風暴雨似的", "驚天動地的",
-    "致命的", NULL};
+static          char *damage_degree[16];
 
 enum {
     OO, FOOD, WEIGHT, CLEAN, RUN, ATTACK, BOOK, HAPPY, SATIS,
@@ -107,16 +86,8 @@ new_chicken()
 
     clear();
     move(2, 0);
-    outs("歡迎光臨 \033[33m◎\033[37;44m Ptt寵物市場 \033[33;40m◎\033[m.. "
-	 "目前蛋價：\n"
-	 "(a)小雞 $5   (b)美少女 $25  (c)勇士    $30  (d)蜘蛛  $40  "
-	 "(e)恐龍 $80\n"
-	 "(f)老鷹 $50  (g)貓     $15  (h)蠟筆小新$35  (i)狗狗  $17  "
-	 "(j)惡魔 $100\n"
-	 "(k)忍者 $85  (l)阿扁   $200 (m)馬英九  $200 (n)就可人$100 "
-	 "[o]羅莉 $77\n"
-	 "[0]自己 $0\n");
-    getdata_str(7, 0, "請選擇你要養的動物：", buf, 3, LCECHO, "0");
+    outs(SHM->i18nstr[cuser.language][867]);
+    getdata_str(7, 0, SHM->i18nstr[cuser.language][868], buf, 3, LCECHO, "0");
 
     buf[0] -= 'a';
     if (buf[0] < 0 || buf[0] > NUM_KINDS - 1)
@@ -127,18 +98,17 @@ new_chicken()
     reload_money();
     price = egg_price[(int)mychicken->type];
     if (cuser.money < price) {
-	prints("\n 錢不夠買蛋蛋,蛋蛋要 %d 元", price);
+	prints(SHM->i18nstr[cuser.language][869], price);
 	refresh();
 	return 0;
     }
-    vice(price, "寵物蛋");
+    vice(price, SHM->i18nstr[cuser.language][870]);
     while (strlen(mychicken->name) < 3)
-	getdata(8, 0, "幫牠取個好名字：", mychicken->name,
+	getdata(8, 0, SHM->i18nstr[cuser.language][871], mychicken->name,
 		sizeof(mychicken->name), DOECHO);
 
     snprintf(buf, sizeof(buf),
-	     "\033[31m%s \033[m養了一隻叫\033[33m %s \033[m的 "
-	     "\033[32m%s\033[m  於 %s\n", cuser.userid,
+	     SHM->i18nstr[cuser.language][872], cuser.userid,
 	     mychicken->name, chicken_type[(int)mychicken->type], ctime(&now));
     log_file(CHICKENLOG, buf, 1);
     mychicken->lastvisit = mychicken->birthday = mychicken->cbirth = now;
@@ -184,22 +154,12 @@ show_chicken_stat(chicken_t * thechicken)
     struct tm      *ptime;
 
     ptime = localtime(&thechicken->birthday);
-    prints(" Name :\033[33m%s\033[m (\033[32m%s\033[m)%*s生日  "
-	   ":\033[31m%02d\033[m年\033[31m%2d\033[m月\033[31m%2d\033[m日 "
-	   "(\033[32m%s %d歲\033[m)\n"
-	   " 體:\033[33m%5d/%-5d\033[m 法:\033[33m%5d/%-5d\033[m 攻擊力:"
-	   "\033[33m%-7d\033[m 敏捷  :\033[33m%-7d\033[m 知識 :\033[33m%-7d"
-	   "\033[m \n"
-	   " 快樂 :\033[33m%-7d\033[m 滿意 :\033[33m%-7d\033[m 疲勞  :"
-	   "\033[33m%-7d\033[m 氣質  :\033[33m%-7d \033[m體重 :"
-	   "\033[33m%-5.2f\033[m \n"
-	   " 病氣 :\033[33m%-7d\033[m 乾淨 :\033[33m%-7d\033[m 食物  :"
-	   "\033[33m%-7d\033[m 大補丸:\033[33m%-7d\033[m 藥品 :\033[33m%-7d"
-	   "\033[m \n",
+    prints(SHM->i18nstr[cuser.language][873],
 	   thechicken->name, chicken_type[(int)thechicken->type],
 	   15 - strlen(thechicken->name), "",
 	   ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday,
-	 cage[age > 16 ? 16 : age], age, thechicken->hp, thechicken->hp_max,
+	   SHM->i18nstr[cuser.language][age > 16 ? 789 : age + 789],
+	   age, thechicken->hp, thechicken->hp_max,
 	   thechicken->mm, thechicken->mm_max,
 	   thechicken->attack, thechicken->run, thechicken->book,
 	   thechicken->happy, thechicken->satis, thechicken->tiredstrong,
@@ -223,7 +183,7 @@ show_chicken_data(chicken_t * thechicken, chicken_t * pkchicken)
     /* Ptt:debug */
     thechicken->type %= NUM_KINDS;
     clear();
-    showtitle(pkchicken ? "Ｐtt鬥雞場" : "Ｐtt養雞場", BBSName);
+    showtitle(pkchicken ? SHM->i18nstr[cuser.language][874] : SHM->i18nstr[cuser.language][875], BBSName);
     move(1, 0);
 
     show_chicken_stat(thechicken);
@@ -235,48 +195,48 @@ show_chicken_data(chicken_t * thechicken, chicken_t * pkchicken)
     move(18, 0);
 
     if (thechicken->sick)
-	outs("生病了...");
+	outs(SHM->i18nstr[cuser.language][876]);
     if (thechicken->sick > thechicken->hp / 5)
-	outs("\033[5;31m擔心...病重!!\033[m");
+	outs(SHM->i18nstr[cuser.language][877]);
 
     if (thechicken->clean > 150)
-	outs("\033[31m又臭又髒的..\033[m");
+	outs(SHM->i18nstr[cuser.language][878]);
     else if (thechicken->clean > 80)
-	outs("有點髒..");
+	outs(SHM->i18nstr[cuser.language][879]);
     else if (thechicken->clean < 20)
-	outs("\033[32m很乾淨..\033[m");
+	outs(SHM->i18nstr[cuser.language][880]);
 
     if (thechicken->weight > thechicken->hp_max * 4)
-	outs("\033[31m快飽死了!.\033[m");
+	outs(SHM->i18nstr[cuser.language][881]);
     else if (thechicken->weight > thechicken->hp_max * 3)
-	outs("\033[32m飽嘟嘟..\033[m");
+	outs(SHM->i18nstr[cuser.language][882]);
     else if (thechicken->weight < (thechicken->hp_max / 4))
-	outs("\033[31m快餓死了!..\033[m");
+	outs(SHM->i18nstr[cuser.language][883]);
     else if (thechicken->weight < (thechicken->hp_max / 2))
-	outs("餓了..");
+	outs(SHM->i18nstr[cuser.language][884]);
 
     if (thechicken->tiredstrong > thechicken->hp * 1.7)
-	outs("\033[31m累得昏迷了...\033[m");
+	outs(SHM->i18nstr[cuser.language][885]);
     else if (thechicken->tiredstrong > thechicken->hp)
-	outs("累了..");
+	outs(SHM->i18nstr[cuser.language][886]);
     else if (thechicken->tiredstrong < thechicken->hp / 4)
-	outs("\033[32m精力旺盛...\033[m");
+	outs(SHM->i18nstr[cuser.language][887]);
 
     if (thechicken->hp < thechicken->hp_max / 4)
-	outs("\033[31m體力用盡..奄奄一息..\033[m");
+	outs(SHM->i18nstr[cuser.language][888]);
     if (thechicken->happy > 500)
-	outs("\033[32m很快樂..\033[m");
+	outs(SHM->i18nstr[cuser.language][889]);
     else if (thechicken->happy < 100)
-	outs("不快樂..");
+	outs(SHM->i18nstr[cuser.language][890]);
     if (thechicken->satis > 500)
-	outs("\033[32m很滿足..\033[m");
+	outs(SHM->i18nstr[cuser.language][891]);
     else if (thechicken->satis < 50)
-	outs("不滿足..");
+	outs(SHM->i18nstr[cuser.language][892]);
 
     if (pkchicken) {
 	outs("\n");
 	show_chicken_stat(pkchicken);
-	outs("[任意鍵] 攻擊對方 [q] 落跑 [o] 吃大補丸");
+	outs(SHM->i18nstr[cuser.language][893]);
     }
 }
 
@@ -314,7 +274,7 @@ ch_clean()
 static void
 ch_guess()
 {
-    char           *guess[3] = {"剪刀", "石頭", "布"}, me, ch, win;
+    char           *guess[3] = {SHM->i18nstr[cuser.language][894], SHM->i18nstr[cuser.language][895], SHM->i18nstr[cuser.language][896]}, me, ch, win;
 
     chicken_t *mychicken = &cuser.mychicken;
     mychicken->happy += time_change[(int)mychicken->type][HAPPY] * 1.5;
@@ -323,8 +283,7 @@ ch_guess()
     mychicken->attack += time_change[(int)mychicken->type][ATTACK] / 4;
     move(20, 0);
     clrtobot();
-    outs("你要出[\033[32m1\033[m]\033[33m剪刀\033[m(\033[32m2\033[m)"
-	 "\033[33m石頭\033[m(\033[32m3\033[m)\033[33m布\033[m:\n");
+    outs(SHM->i18nstr[cuser.language][897]);
     me = igetch();
     me -= '1';
     if (me > 2 || me < 0)
@@ -333,7 +292,7 @@ ch_guess()
     ch = (me + win + 3) % 3;
     prints("%s:%s !      %s:%s !.....%s",
 	   cuser.userid, guess[(int)me], mychicken->name, guess[(int)ch],
-	   win == 0 ? "平手" : win < 0 ? "耶..贏了 :D!!" : "嗚..我輸了 :~");
+	   win == 0 ? SHM->i18nstr[cuser.language][898] : win < 0 ? SHM->i18nstr[cuser.language][899] : SHM->i18nstr[cuser.language][900]);
     pressanykey();
 }
 
@@ -387,7 +346,7 @@ ch_buyitem(int money, char *picture, int *item, int haveticket)
     int             num = 0;
     char            buf[5];
 
-    getdata_str(b_lines - 1, 0, "要買多少份呢:",
+    getdata_str(b_lines - 1, 0, SHM->i18nstr[cuser.language][901],
 		buf, sizeof(buf), DOECHO, "1");
     num = atoi(buf);
     if (num < 1)
@@ -396,14 +355,14 @@ ch_buyitem(int money, char *picture, int *item, int haveticket)
     if (cuser.money > money * num) {
 	*item += num;
 	if( haveticket )
-	    vice(money * num, "購買寵物,賭盤項目");
+	    vice(money * num, SHM->i18nstr[cuser.language][902]);
 	else
 	    demoney(-money * num);
 	show_file(picture, 5, 14, NO_RELOAD);
     } else {
 	move(b_lines - 1, 0);
 	clrtoeol();
-	outs("現金不夠 !!!");
+	outs(SHM->i18nstr[cuser.language][903]);
     }
     pressanykey();
 }
@@ -445,16 +404,15 @@ ch_kill()
     chicken_t *mychicken = &cuser.mychicken;
     char            buf[150], ans[4];
 
-    snprintf(buf, sizeof(buf), "棄養這%s要被罰 100 元, 是否要棄養?(y/N)",
+    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][904],
 	    chicken_type[(int)mychicken->type]);
     getdata_str(23, 0, buf, ans, sizeof(ans), DOECHO, "N");
     if (ans[0] == 'y') {
 
-	vice(100, "棄養寵物費");
+	vice(100, SHM->i18nstr[cuser.language][905]);
 	more(CHICKEN_PIC "/deadth", YEA);
 	snprintf(buf, sizeof(buf),
-		 "\033[31m%s \033[m把 \033[33m%s\033[m\033[32m %s "
-		 "\033[m宰了 於 %s\n", cuser.userid, mychicken->name,
+		 SHM->i18nstr[cuser.language][906], cuser.userid, mychicken->name,
 		 chicken_type[(int)mychicken->type], ctime(&now));
 	log_file(CHICKENLOG, buf, 1);
 	mychicken->name[0] = 0;
@@ -494,26 +452,25 @@ ch_sell()
 	money = MAX_CHICKEN_MONEY;
     //防止怪雞
     if (mychicken->type == 1 || mychicken->type == 7) {
-	outs("\n\033[31m ㄜ..親愛的..販賣人口是會犯法的唷..\033[m");
+	outs(SHM->i18nstr[cuser.language][907]);
 	pressanykey();
 	return 0;
     }
     if (age < 5) {
-	outs("\n 還未成年不能賣");
+	outs(SHM->i18nstr[cuser.language][908]);
 	pressanykey();
 	return 0;
     }
     if (age > 30) {
-	outs("\n\033[31m 這..太老沒人要了\033[m");
+	outs(SHM->i18nstr[cuser.language][909]);
 	pressanykey();
 	return 0;
     }
-    snprintf(buf, sizeof(buf), "這隻%d歲%s可以賣 %d 元, 是否要賣?(y/N)", age,
+    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][910], age,
 	     chicken_type[(int)mychicken->type], money);
     getdata_str(23, 0, buf, ans, sizeof(ans), DOECHO, "N");
     if (ans[0] == 'y') {
-	snprintf(buf, sizeof(buf), "\033[31m%s\033[m 把 \033[33m%s\033[m "
-		"\033[32m%s\033[m 用 \033[36m%d\033[m 賣了 於 %s\n",
+	snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][911],
 		cuser.userid, mychicken->name,
 		chicken_type[(int)mychicken->type], money, ctime(&now));
 	log_file(CHICKENLOG, buf, 1);
@@ -671,8 +628,7 @@ deadtype(chicken_t * thechicken)
 
     if (thechicken == mychicken) {
 	snprintf(buf, sizeof(buf),
-		 "\033[31m%s\033[m 所疼愛的\033[33m %s\033[32m %s "
-		 "\033[m掛了 於 %s\n",
+		 SHM->i18nstr[cuser.language][912],
 		 cuser.userid, thechicken->name,
 		 chicken_type[(int)thechicken->type],
 		 ctime(&now));
@@ -725,13 +681,12 @@ ch_changename()
     chicken_t *mychicken = &cuser.mychicken;
     char            buf[150], newname[20] = "";
 
-    getdata_str(b_lines - 1, 0, "嗯..改個好名字吧:", newname, 18, DOECHO,
+    getdata_str(b_lines - 1, 0, SHM->i18nstr[cuser.language][913], newname, 18, DOECHO,
 		mychicken->name);
 
     if (strlen(newname) >= 3 && strcmp(newname, mychicken->name)) {
 	snprintf(buf, sizeof(buf),
-		 "\033[31m%s\033[m 把疼愛的\033[33m %s\033[32m %s "
-		 "\033[m改名為\033[33m %s\033[m 於 %s\n",
+		 SHM->i18nstr[cuser.language][914],
 		 cuser.userid, mychicken->name,
 		 chicken_type[(int)mychicken->type],
 		 newname, ctime(&now));
@@ -748,16 +703,7 @@ select_menu()
 
     reload_money();
     move(19, 0);
-    prints("\033[44;37m 錢 :\033[33m %-10d                                  "
-	   "                       \033[m\n"
-	   "\033[33m(\033[37m1\033[33m)清理 (\033[37m2\033[33m)吃飯 "
-	   "(\033[37m3\033[33m)猜拳 (\033[37m4\033[33m)唸書 "
-	   "(\033[37m5\033[33m)親他 (\033[37m6\033[33m)打他 "
-	   "(\033[37m7\033[33m)買%s$%d (\033[37m8\033[33m)吃補丸\n"
-	   "(\033[37m9\033[33m)吃病藥 (\033[37mo\033[33m)買大補丸$100 "
-	   "(\033[37mm\033[33m)買藥$10 (\033[37mk\033[33m)棄養 "
-	   "(\033[37ms\033[33m)賣掉 (\033[37mn\033[33m)改名 "
-	   "(\033[37mq\033[33m)離開:\033[m",
+    prints(SHM->i18nstr[cuser.language][915],
 	   cuser.money,
     /*
      * chicken_food[(int)mychicken->type],
@@ -837,43 +783,38 @@ recover_chicken(chicken_t * thechicken)
 
     if (now - thechicken->lastvisit > (60 * 60 * 24 * 7))
 	return 0;
-    outmsg("\033[33;44m★靈界守衛\033[37;45m 別害怕 我是來幫你的 \033[m");
+    outmsg(SHM->i18nstr[cuser.language][916]);
     bell();
     igetch();
-    outmsg("\033[33;44m★靈界守衛\033[37;45m 你無法丟到我水球 因為我是聖靈, "
-	   "最近缺錢想賺外快 \033[m");
+    outmsg(SHM->i18nstr[cuser.language][917]);
     bell();
     igetch();
-    snprintf(buf, sizeof(buf), "\033[33;44m★靈界守衛\033[37;45m "
-	     "你有一個剛走不久的%s要招換回來嗎? 只要%d元唷 \033[m",
+    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][918],
 	     chicken_type[(int)thechicken->type], price * 2);
     outmsg(buf);
     bell();
-    getdata_str(21, 0, "    選擇：(N:坑人嘛/y:請幫幫我)", buf, 3, LCECHO, "N");
+    getdata_str(21, 0, SHM->i18nstr[cuser.language][919], buf, 3, LCECHO, "N");
     if (buf[0] == 'y' || buf[0] == 'Y') {
 	reload_money();
 	if (cuser.money < price * 2) {
-	    outmsg("\033[33;44m★靈界守衛\033[37;45m 什麼 錢沒帶夠 "
-		   "沒錢的小鬼 快去籌錢吧 \033[m");
+	    outmsg(SHM->i18nstr[cuser.language][920]);
 	    bell();
 	    igetch();
 	    return 0;
 	}
-	strlcpy(thechicken->name, "[撿回來的]", sizeof(thechicken->name));
+	strlcpy(thechicken->name, SHM->i18nstr[cuser.language][921], sizeof(thechicken->name));
 	thechicken->hp = thechicken->hp_max;
 	thechicken->sick = 0;
 	thechicken->satis = 2;
-	vice(money, "靈界守衛");
+	vice(money, SHM->i18nstr[cuser.language][922]);
 	snprintf(buf, sizeof(buf),
-		 "\033[33;44m★靈界守衛\033[37;45m OK了 記得餵他點東西 "
-		 "不然可能失效 念在我也有玩Ptt 拿你%d就好 \033[m", money);
+		 SHM->i18nstr[cuser.language][923], money);
 	outmsg(buf);
 	bell();
 	igetch();
 	return 1;
     }
-    outmsg("\033[33;44m★靈界守衛\033[37;45m 竟然說我坑人! 這年頭命真不值錢 "
-	   "除非我再來找你 你再也沒機會了 \033[m");
+    outmsg(SHM->i18nstr[cuser.language][924]);
     bell();
     igetch();
     thechicken->lastvisit = 0;
@@ -883,10 +824,21 @@ recover_chicken(chicken_t * thechicken)
 
 #define lockreturn0(unmode, state) if(lockutmpmode(unmode, state)) return 0
 
+void copy_i18nstring() {
+	int i;
+	for (i = 0; i < NUM_KINDS; i++) {
+		chicken_type[i] = SHM->i18nstr[cuser.language][806 + i];
+		chicken_food[i] = SHM->i18nstr[cuser.language][821 + i];
+		attack_type[i] = SHM->i18nstr[cuser.language][836 + i];
+	}
+	for (i = 0; i < 16; i++)
+		damage_degree[i] = SHM->i18nstr[cuser.language][851 + i];
+}
 int
 chicken_main()
 {
     chicken_t *mychicken = &cuser.mychicken;
+    copy_i18nstring();
     lockreturn0(CHICKEN, LOCK_MULTI);
     reload_chicken();
     age = ((now - mychicken->cbirth) / (60 * 60 * 24));
@@ -928,7 +880,7 @@ chickenpk(int fd)
     memcpy(&ouser, &xuser, sizeof(userec_t));
     reload_chicken();
     if (!ochicken->name[0] || !mychicken->name[0]) {
-	outmsg("有一方沒有寵物");	/* Ptt:妨止page時把寵物賣掉 */
+	outmsg(SHM->i18nstr[cuser.language][925]);	/* Ptt:妨止page時把寵物賣掉 */
 	bell();
 	refresh();
 	add_io(0, 0);
@@ -962,11 +914,11 @@ chickenpk(int fd)
 	    case 'c':
 		catched = 1;
 		move(16, 0);
-		outs("要放他走嗎?(y/N)");
+		outs(SHM->i18nstr[cuser.language][926]);
 		break;
 	    case 'd':
 		move(16, 0);
-		outs("阿~倒下了!!");
+		outs(SHM->i18nstr[cuser.language][927]);
 		break;
 	    }
 	    if (data[0] == 'd' || data[0] == 'q' || data[0] == 'l')
@@ -981,7 +933,7 @@ chickenpk(int fd)
 	    case 'y':
 		if (catched == 1) {
 		    snprintf(data, sizeof(data),
-			     "l讓 %s 落跑了\n", ochicken->name);
+			     SHM->i18nstr[cuser.language][928], ochicken->name);
 		}
 		break;
 	    case 'n':
@@ -991,14 +943,14 @@ chickenpk(int fd)
 		r = r % (attmax + 2);
 		if (r) {
 		    snprintf(data, sizeof(data),
-			     "M%s %s%s %s 傷了 %d 點\n", mychicken->name,
+			     SHM->i18nstr[cuser.language][929], mychicken->name,
 			     damage_degree[r / 3 > 15 ? 15 : r / 3],
 			     attack_type[(int)mychicken->type],
 			     ochicken->name, r);
 		    ochicken->hp -= r;
 		} else
 		    snprintf(data, sizeof(data),
-			     "M%s 覺得手軟出擊無效\n", mychicken->name);
+			     SHM->i18nstr[cuser.language][930], mychicken->name);
 		break;
 	    case 'o':
 		if (mychicken->oo > 0) {
@@ -1007,27 +959,27 @@ chickenpk(int fd)
 		    if (mychicken->hp > mychicken->hp_max)
 			mychicken->hp = mychicken->hp_max;
 		    mychicken->tiredstrong = 0;
-		    snprintf(data, sizeof(data), "M%s 吃了顆大補丸補充體力\n",
+		    snprintf(data, sizeof(data), SHM->i18nstr[cuser.language][931],
 			     mychicken->name);
 		} else
 		    snprintf(data, sizeof(data),
-			    "M%s 想吃大補丸, 可是沒有大補丸可吃\n",
+			    SHM->i18nstr[cuser.language][932],
 			    mychicken->name);
 		break;
 	    case 'q':
 		if (r % (mychicken->run + 1) > r % (ochicken->run + 1))
-		    snprintf(data, sizeof(data), "q%s 落跑了\n",
+		    snprintf(data, sizeof(data), SHM->i18nstr[cuser.language][933],
 			     mychicken->name);
 		else
 		    snprintf(data, sizeof(data),
-			     "c%s 想落跑, 但被 %s 抓到了\n",
+			     SHM->i18nstr[cuser.language][934],
 			     mychicken->name, ochicken->name);
 		break;
 	    }
 	    if (deadtype(ochicken)) {
 		strtok(data, "\n");
 		strlcpy(buf, data, sizeof(buf));
-		snprintf(data, sizeof(data), "d%s , %s 被 %s 打死了\n",
+		snprintf(data, sizeof(data), SHM->i18nstr[cuser.language][935],
 			 buf + 1, ochicken->name, mychicken->name);
 	    }
 	    move(17, 0);

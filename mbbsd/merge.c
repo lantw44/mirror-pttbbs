@@ -71,6 +71,7 @@ m_fpg()
    rename(genbuf,buf);
    move(12,0);
    clrtobot();
+#ifdef MERGEMONEY
    reload_money(); 
    sprintf(buf, 
            "您的花園幣有 %d 換算成 Ptt 幣為 %d (匯率 155:1), \n"
@@ -78,6 +79,7 @@ m_fpg()
             man.money, man.money/155, cuser.money, cuser.money + man.money/155);
    demoney(man.money/155);
    strcat(msg, buf); 
+#endif
 
    i =  cuser.exmailbox + man.mailk + man.keepmail;
    if (i > 1000) i = 1000;

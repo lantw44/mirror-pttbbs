@@ -363,6 +363,9 @@ static commands_t talklist[] = {
     {t_talk, PERM_PAGE,     "TTalk          找人聊聊"},
     {t_chat, PERM_CHAT,     "CChat          找家茶坊喫茶去"},
     {t_display, 0,          "DDisplay       顯示上幾次熱訊"},
+#ifdef PLAY_ANGEL
+    {t_changeangel, PERM_BASIC, "CChange Angel  更換小天使"},
+#endif
     {NULL, 0, NULL}
 };
 

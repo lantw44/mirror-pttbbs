@@ -229,15 +229,23 @@ static void Customize(void)
 	move(4, 0);
 	prints("%-30s%10s\n", "A. 水球模式",
 	       wm[(cuser.uflag2 & WATER_MASK)]);
-	prints("%-30s%10s\n", "B. 接受站外信",
-	       ((cuser.userlevel & PERM_NOOUTMAIL) ? "否" : "是"));
+	prints("%-30s%10s\n", "B. 接受站外信", REJECT_OUTTAMAIL ? "否" : "是");
 	prints("%-30s%10s\n", "C. 新板自動進我的最愛",
 	       ((cuser.uflag2 & FAVNEW_FLAG) ? "是" : "否"));
 	prints("%-30s%10s\n", "D. 目前的心情", mindbuf);
 	prints("%-30s%10s\n", "E. 高亮度顯示我的最愛", 
 	       ((cuser.uflag2 & FAVNOHILIGHT) ? "否" : "是"));
-	getdata(b_lines - 1, 0, "請按 [A-E] 切換設定，按 [Return] 結束：",
-		ans, 3, DOECHO);
+#ifdef PLAY_ANGEL
+	if( HAS_PERM(PERM_ANGEL) ){
+	    prints("%-30s%10s\n", "F. 接受小主人詢問", 
+		    ((cuser.uflag2 & BEING_ANGEL) ? "是" : "否"));
+	    getdata(b_lines - 1, 0, "請按 [A-F] 切換設定，按 [Return] 結束：",
+		    ans, 3, DOECHO);
+	}else
+#else
+	    getdata(b_lines - 1, 0, "請按 [A-E] 切換設定，按 [Return] 結束：",
+		    ans, 3, DOECHO);
+#endif
 
 	switch( ans[0] ){
 	case 'A':
@@ -251,8 +259,9 @@ static void Customize(void)
 	    break;
 	case 'B':
 	case 'b':
-	    cuser.userlevel ^= PERM_NOOUTMAIL;
+	    cuser.uflag2 ^= REJ_OUTTAMAIL;
 	    break;
+
 	case 'C':
 	case 'c':
 	    cuser.uflag2 ^= FAVNEW_FLAG;
@@ -275,6 +284,14 @@ static void Customize(void)
 	case 'e':
 	    cuser.uflag2 ^= FAVNOHILIGHT;
 	    break;
+#ifdef PLAY_ANGEL
+	case 'F':
+	case 'f':
+	    if( HAS_PERM(PERM_ANGEL) ){
+		cuser.uflag2 ^= BEING_ANGEL;
+		break;
+	    }
+#endif
 	default:
 	    done = 1;
 	}

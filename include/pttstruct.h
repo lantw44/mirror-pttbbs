@@ -119,6 +119,9 @@ typedef struct userec_t {
 #define FAVNEW_FLAG     0x20   /* true if add new board into one's fav */
 #define FOREIGN         0x100  /* true if a foreign */
 #define LIVERIGHT       0x200  /* true if get "liveright" already */
+#define REJ_OUTTAMAIL   0x400 /* true if don't accept outside mails */
+#define REJECT_OUTTAMAIL (cuser.uflag2 & REJ_OUTTAMAIL)
+#define BEING_ANGEL     0x1000 /* true if willing to be angel */
 
 #define BTLEN      48             /* Length of board title */
 

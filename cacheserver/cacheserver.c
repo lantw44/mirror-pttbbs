@@ -42,7 +42,7 @@ int loadpasswd(char *pfn)
 	    strlcpy(rec.key, u.userid, sizeof(rec.key));
 	    avl_add_key((AVL_IX_REC*)&rec, &avl);
 	}
-    fprintf(stderr, "%s users added\n", nUsers);
+    fprintf(stderr, "%d users added\n", nUsers);
 
 #if 0
     rec.uid = 0;
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
 /* utils */
 int tobind(int port)
 {
-    int    i, sockfd, val;
+    int     sockfd, val;
     struct  sockaddr_in     servaddr;
 
     if( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0 )

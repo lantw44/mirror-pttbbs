@@ -1,26 +1,27 @@
 /* $Id$ */
 #include "bbs.h"
+#include <err.h>
 
 int tobind(int);
-int toread(int fd, char *buf, int len);
+int toread(int fd, void *buf, int len);
 
 struct {
     char    userid[IDLEN + 1];
     short   nFriends, nRejects;
     int     friend[MAX_FRIEND];
-    int     reject[MAX_REJECT]
+    int     reject[MAX_REJECT];
 } utmp[MAX_ACTIVE];
 
 int main(int argc, char **argv)
 {
     struct  sockaddr_in     clientaddr;
     int     ch, port = 5120, sfd, cfd, len, index, i;
-    char    buf[2048];
+    //char    buf[2048];
 
     while( (ch = getopt(argc, argv, "p:h")) != -1 )
 	switch( ch ){
 	case 'p':
-	    port = atoi(port);
+	    port = atoi(optarg);
 	    break;
 
 	case 'h':
@@ -58,7 +59,7 @@ int main(int argc, char **argv)
 /* utils */
 int tobind(int port)
 {
-    int    i, sockfd, val;
+    int     sockfd, val;
     struct  sockaddr_in     servaddr;
 
     if( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0 )
@@ -77,10 +78,10 @@ int tobind(int port)
     return sockfd;
 }
 
-int toread(int fd, char *buf, int len)
+int toread(int fd, void *buf, int len)
 {
     int     l;
-    for( l = 0 ; l < len ; l += read(fd, &buf[l], len - l) )
+    for( l = 0 ; l < len ; l += read(fd, buf + l, len - l) )
 	;
     return len;
 }

@@ -468,7 +468,7 @@ uinfo_query(userec_t * u, int real, int unum)
 		    break;
 		}
 #ifdef FOREIGN_REG
-	    if (getdata_str(i++, 0, "°êÄy 1)¥»°ê 2)¥~°ê¡G", buf, 2, DOECHO, x.uflag2 & FOREIGN ? "2" : "1"))
+	    if (getdata_str(i++, 0, "©~¥Á 1)¥xÆW 2)¨ä¥L¡G", buf, 2, DOECHO, x.uflag2 & FOREIGN ? "2" : "1"))
 		if ((fail = atoi(buf)) > 0){
 		    if (fail == 2){
 			x.uflag2 |= FOREIGN;
@@ -1153,8 +1153,8 @@ static char *isvalidphone(char *phone)
     for( i = 0 ; phone[i] != 0 ; ++i )
 	if( !isdigit(phone[i]) )
 	    return "½Ð¤£­n¥[¤À¹j²Å¸¹";
-    if (!removespace(phone) || phone[0] != '0' ||
-	strlen(phone) < 9 || phone[1] == '0' ||
+    if (!removespace(phone) || 
+	strlen(phone) < 9 || 
 	strstr(phone, "00000000") != NULL ||
 	strstr(phone, "22222222") != NULL    ) {
 	return "³o­Ó¹q¸Ü¸¹½X¨Ã¤£¦Xªk(½Ð§t°Ï½X)" ;
@@ -1293,7 +1293,7 @@ u_register(void)
 #ifdef FOREIGN_REG
 	fore[0] = 'y';
 	fore[1] = 0;
-	getfield(2, "Y/n", "¬O§_¬°¥»°êÄy¡H", fore, 2);
+	getfield(2, "Y/n", "¬O§_¬°¥xÆW©~¥ÁÁ¡H", fore, 2);
     	if (fore[0] == 'n')
 	    fore[0] |= FOREIGN;
 	else
@@ -1313,9 +1313,9 @@ u_register(void)
 	else{
 	    int i;
 	    while( 1 ){
-		getfield(3, "0123456789", "Å@·Ó¸¹½X", ident, 11);
+		getfield(3, "0123456789", "Å@·Ó¸¹½X ©Î SSN", ident, 11);
 		move(5, 2);
-		prints("ª`·N¡GÅ@·Ó¸¹½X¦³»~ªÌ±NµLªk¨ú±o¶i¤@¨BªºÅv­­¡I");
+		prints("ª`·N¡G¸¹½X¦³»~ªÌ±NµLªk¨ú±o¶i¤@¨BªºÅv­­¡I");
 		getdata(6, 0, "¬O§_½T©w(Y/N)", ans, sizeof(ans), LCECHO);
 		if (ans[0] == 'y' || ans[0] == 'Y')
 		    break;
@@ -1326,7 +1326,7 @@ u_register(void)
 		    ident[0] -= 32;
 	    if( ispersonalid(ident) ){
 		fore[0] = 0;
-		vmsg("±zªº¨­¥÷¤w§ó§ï¬°¥»°êÄy");
+		vmsg("±zªº¨­¥÷¤w§ó§ï¬°¥xÆW©~¥Á");
 	    }
 	}
 #endif
@@ -1355,7 +1355,11 @@ u_register(void)
 	    getfield(11, "§t\033[1;33m¿¤¥«\033[m¤Îªù¹ì¸¹½X"
 		     "(¥x¥_½Ð¥[\033[1;33m¦æ¬F°Ï\033[m)",
 		     "¥Ø«e¦í§}", addr, 50);
-	    if( (errcode = isvalidaddr(addr)) == NULL )
+	    if( (errcode = isvalidaddr(addr) 
+#ifdef FOREIGN_REG
+                && fore[0] ==0 
+#endif
+                ) == NULL )
 		break;
 	    else
 		vmsg(errcode);

@@ -78,15 +78,15 @@ m_fpg()
    demoney(man.money/155);
 
    cuser.exmailbox +=  (man.mailk + man.keepmail);
+   if (cuser.exmailbox > 1000) cuser.exmailbox = 1000;
    prints("您的花園信箱有 %d : %d, 匯入後共有 %d\n", 
 	    man.mailk, man.keepmail, cuser.exmailbox );
 
    if(cuser.firstlogin > man.firstlogin) d = man.firstlogin;
    else  d = cuser.firstlogin;
-   prints("花園註冊日期 %s 此帳號註冊日期 %s 將取 %s \n",
-	    Cdatedate(&(man.firstlogin)), 
-	    Cdatedate(&(cuser.firstlogin)), 
-            Cdatedate(&d) );
+   prints("花園註冊日期 %s ", Cdatedate(&(man.firstlogin)));
+   prints("此帳號註冊日期 %s 將取 ",Cdatedate(&(cuser.firstlogin)));
+   prints("%s", Cdatedate(&d) );
    cuser.firstlogin = d;
 
    if(cuser.numlogins < man.numlogins) i = man.numlogins;

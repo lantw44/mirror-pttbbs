@@ -41,7 +41,7 @@ get_sum_records(char *fpath, int size)
     char            buf[200], *p;
    
     // Ptt : should avoid big loop
-    if ((fp = open(fpath, O_RDONLY)))
+    if ((fp = open(fpath, O_RDONLY))==-1)
 	return -1;
     
     strlcpy(buf, fpath, sizeof(buf));

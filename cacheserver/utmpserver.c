@@ -6,7 +6,7 @@ int tobind(int);
 int toread(int fd, void *buf, int len);
 
 struct {
-    char    userid[IDLEN + 1];
+    int     uid;
     short   nFriends, nRejects;
     int     friend[MAX_FRIEND];
     int     reject[MAX_REJECT];
@@ -42,13 +42,13 @@ int main(int argc, char **argv)
 	toread(cfd, &index, sizeof(index));
 	if( index == -1 ){
 	    for( i = 0 ; i < MAX_ACTIVE ; ++i )
-		if( toread(cfd, utmp[i].userid, sizeof(utmp[i].userid)) &&
+		if( toread(cfd, &utmp[i].uid, sizeof(utmp[i].uid)) &&
 		    toread(cfd, utmp[i].friend, sizeof(utmp[i].friend)) &&
 		    toread(cfd, utmp[i].reject, sizeof(utmp[i].reject)) )
 		    ;
 		else
 		    for( ; i < MAX_ACTIVE ; ++i )
-			utmp[i].userid[0] = 0;
+			utmp[i].uid = 0;
 	    close(cfd);
 	    continue;
 	}
@@ -81,7 +81,12 @@ int tobind(int port)
 int toread(int fd, void *buf, int len)
 {
     int     l;
-    for( l = 0 ; l < len ; l += read(fd, buf + l, len - l) )
-	;
+    for( l = 0 ; len > 0 ; )
+	if( (l = read(fd, buf, len)) < 0 )
+	    return -1;
+	else{
+	    buf += l;
+	    len -= l;
+	}
     return len;
 }

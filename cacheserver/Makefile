@@ -1,16 +1,24 @@
 # $Id$
 .include "../pttbbs.mk"
 
-all:	cacheserver utmpserver
+PROGRAMS=	utmpserver utmpsync
 
-cacheserver:	cacheserver.c
-	${CC} ${CFLAGS} ${LDFLAGS} -o cacheserver cacheserver.c avltree.c
+all:	${PROGRAMS}
 
-utmpserver:	utmpserver.c
-	${CC} ${CFLAGS} ${LDFLAGS} -o utmpserver utmpserver.c
+#cacheserver:	cacheserver.c
+#	${CC} ${CFLAGS} ${LDFLAGS} -o cacheserver cacheserver.c avltree.c
+
+utmpsync: utmpsync.c
+	${CC} ${CFLAGS} ${LDFLAGS} -DPTTBBS_UTIL -o utmpsync utmpsync.c \
+	../util/util_*.o
+
+.for fn in utmpsync utmpserver
+${fn}: ${fn}.c
+	${CC} ${CFLAGS} ${LDFLAGS} -o ${fn} ${fn}.c
+.endfor
 
 clean:
-	rm -f cacheserver utmpserver *~
+	rm -f *~ ${PROGRAMS}
 
 test:	utmpserver
 	./utmpserver

@@ -17,7 +17,7 @@ a_copyitem(char *fpath, char *title, char *owner, int mode)
     else
 	*copyowner = 0;
     if (mode) {
-	vmsg("檔案標記完成。[注意] 拷貝後才能刪除原文!");
+	vmsg(SHM->i18nstr[cuser.language][174]);
     }
 }
 
@@ -52,9 +52,9 @@ a_showmenu(menu_t * pm)
     char            buf[PATHLEN];
     time_t          dtime;
 
-    showtitle("精華文章", pm->mtitle);
-    prints("   \033[1;36m編號    標      題%56s\033[0m",
-	   "編    選      日    期");
+    showtitle(SHM->i18nstr[cuser.language][175], pm->mtitle);
+    prints(SHM->i18nstr[cuser.language][176],
+	   SHM->i18nstr[cuser.language][177]);
 
     if (pm->num) {
 	setadir(buf, pm->path);
@@ -76,16 +76,12 @@ a_showmenu(menu_t * pm)
 		   buf);
 	}
     } else
-	outs("\n  《精華區》尚在吸取天地間的日月精華中... :)");
+	outs(SHM->i18nstr[cuser.language][178]);
 
     move(b_lines, 1);
     outs(pm->level ?
-	 "\033[34;46m 【板  主】 \033[31;47m  (h)\033[30m說明  "
-	 "\033[31m(q/←)\033[30m離開  \033[31m(n)\033[30m新增文章  "
-	 "\033[31m(g)\033[30m新增目錄  \033[31m(e)\033[30m編輯檔案  \033[m" :
-	 "\033[34;46m 【功\能鍵】 \033[31;47m  (h)\033[30m說明  "
-	 "\033[31m(q/←)\033[30m離開  \033[31m(k↑j↓)\033[30m移動游標  "
-	 "\033[31m(enter/→)\033[30m讀取資料  \033[m");
+	 SHM->i18nstr[cuser.language][179] :
+	 SHM->i18nstr[cuser.language][180]);
 }
 
 static int
@@ -94,7 +90,7 @@ a_searchtitle(menu_t * pm, int rev)
     static char     search_str[40] = "";
     int             pos;
 
-    getdata(b_lines - 1, 1, "[搜尋]關鍵字:", search_str, sizeof(search_str), DOECHO);
+    getdata(b_lines - 1, 1, SHM->i18nstr[cuser.language][181], search_str, sizeof(search_str), DOECHO);
 
     if (!*search_str)
 	return pm->now;
@@ -127,29 +123,14 @@ static void
 a_showhelp(int level)
 {
     clear();
-    outs("\033[36m【 " BBSNAME "公佈欄使用說明 】\033[m\n\n"
-	 "[←][q]         離開到上一層目錄\n"
-	 "[↑][k]         上一個選項\n"
-	 "[↓][j]         下一個選項\n"
-	 "[→][r][enter]  進入目錄／讀取文章\n"
-	 "[^B][PgUp]      上頁選單\n"
-	 "[^F][PgDn][Spc] 下頁選單\n"
-	 "[##]            移到該選項\n"
-	 "[F][U]          將文章寄回 Internet 郵箱/"
-	 "將文章 uuencode 後寄回郵箱\n");
+    outs(SHM->i18nstr[cuser.language][182]);
+    outs(BBSNAME);
+    outs(SHM->i18nstr[cuser.language][183]);
     if (level >= MANAGER) {
-	outs("\n\033[36m【 板主專用鍵 】\033[m\n"
-	     "[H]             切換為 公開/會員/板主 才能閱\讀\n"
-	     "[n/g/G]         收錄精華文章/開闢目錄/建立連線\n"
-	     "[m/d/D]         移動/刪除文章/刪除一個範圍的文章\n"
-	     "[f/T/e]         編輯標題符號/修改文章標題/內容\n"
-	     "[c/p/a]         拷貝/粘貼/附加文章\n"
-	     "[^P/^A]         粘貼/附加已用't'標記文章\n");
+	outs(SHM->i18nstr[cuser.language][184]);
     }
     if (level >= SYSOP) {
-	outs("\n\033[36m【 站長專用鍵 】\033[m\n"
-	     "[l]             建 symbolic link\n"
-	     "[N]             查詢檔名\n");
+	outs(SHM->i18nstr[cuser.language][185]);
     }
     pressanykey();
 }
@@ -202,9 +183,9 @@ static void
 a_newitem(menu_t * pm, int mode)
 {
     char    *mesg[3] = {
-	"[新增文章] 請輸入標題：",	/* ADDITEM */
-	"[新增目錄] 請輸入標題：",	/* ADDGROUP */
-	"請輸入標題："		/* ADDLINK */
+	SHM->i18nstr[cuser.language][186],	/* ADDITEM */
+	SHM->i18nstr[cuser.language][187],	/* ADDGROUP */
+	SHM->i18nstr[cuser.language][188]		/* ADDLINK */
     };
 
     char            fpath[PATHLEN], buf[PATHLEN], lpath[PATHLEN];
@@ -216,20 +197,20 @@ a_newitem(menu_t * pm, int mode)
     switch (mode) {
     case ADDITEM:
 	stampfile(fpath, &item);
-	strlcpy(item.title, "◇ ", sizeof(item.title));	/* A1BA */
+	strlcpy(item.title, SHM->i18nstr[cuser.language][189], sizeof(item.title));	/* A1BA */
 	break;
 
     case ADDGROUP:
 	stampdir(fpath, &item);
-	strlcpy(item.title, "◆ ", sizeof(item.title));	/* A1BB */
+	strlcpy(item.title, SHM->i18nstr[cuser.language][190], sizeof(item.title));	/* A1BB */
 	break;
     case ADDLINK:
 	stamplink(fpath, &item);
-	if (!getdata(b_lines - 2, 1, "新增連線：", buf, 61, DOECHO))
+	if (!getdata(b_lines - 2, 1, SHM->i18nstr[cuser.language][191], buf, 61, DOECHO))
 	    return;
 	if (invalid_pname(buf)) {
 	    unlink(fpath);
-	    outs("目的地路徑不合法！");
+	    outs(SHM->i18nstr[cuser.language][192]);
 	    igetch();
 	    return;
 	}
@@ -256,10 +237,10 @@ a_newitem(menu_t * pm, int mode)
 		break;
 	    }
 	    if (dashf(lpath)) {
-		strlcpy(item.title, "☆ ", sizeof(item.title));	/* A1B3 */
+		strlcpy(item.title, SHM->i18nstr[cuser.language][193], sizeof(item.title));	/* A1B3 */
 		break;
 	    } else if (dashd(lpath)) {
-		strlcpy(item.title, "★ ", sizeof(item.title));	/* A1B4 */
+		strlcpy(item.title, SHM->i18nstr[cuser.language][194], sizeof(item.title));	/* A1B4 */
 		break;
 	    }
 	    if (!HAS_PERM(PERM_BBSADM) && d == 1)
@@ -268,7 +249,7 @@ a_newitem(menu_t * pm, int mode)
 
 	if (!item.title[0]) {
 	    unlink(fpath);
-	    outs("目的地路徑不合法！");
+	    outs(SHM->i18nstr[cuser.language][195]);
 	    igetch();
 	    return;
 	}
@@ -292,7 +273,7 @@ a_newitem(menu_t * pm, int mode)
     case ADDLINK:
 	unlink(fpath);
 	if (symlink(lpath, fpath) == -1) {
-	    outs("無法建立 symbolic link");
+	    outs(SHM->i18nstr[cuser.language][196]);
 	    igetch();
 	    return;
 	}
@@ -317,14 +298,14 @@ a_pasteitem(menu_t * pm, int mode)
 	if (dashd(copyfile)) {
 	    for (i = 0; copyfile[i] && copyfile[i] == pm->path[i]; i++);
 	    if (!copyfile[i]) {
-		outs("將目錄拷進自己的子目錄中，會造成無窮迴圈！");
+		outs(SHM->i18nstr[cuser.language][197]);
 		igetch();
 		return;
 	    }
 	}
 	if (mode) {
 	    snprintf(buf, sizeof(buf),
-		     "確定要拷貝[%s]嗎(Y/N)？[N] ", copytitle);
+		     SHM->i18nstr[cuser.language][198], copytitle);
 	    getdata(b_lines - 1, 1, buf, ans, sizeof(ans), LCECHO);
 	} else
 	    ans[0] = 'y';
@@ -342,7 +323,7 @@ a_pasteitem(menu_t * pm, int mode)
 		    mkdir(pm->path, 0755);
 		memset(&item, 0, sizeof(fileheader_t));
 		strlcpy(item.filename, fname + 1, sizeof(item.filename));
-		memcpy(copytitle, "◎", 2);
+		memcpy(copytitle, SHM->i18nstr[cuser.language][199], 2);
 		if (HAS_PERM(PERM_BBSADM))
 		    Link(copyfile, newpath);
 		else {
@@ -350,17 +331,17 @@ a_pasteitem(menu_t * pm, int mode)
 		}
 	    } else if (dashf(copyfile)) {
 		stampfile(newpath, &item);
-		memcpy(copytitle, "◇", 2);
+		memcpy(copytitle, SHM->i18nstr[cuser.language][200], 2);
                 Copy(copyfile, newpath);
 	    } else if (dashd(copyfile)) {
 		stampdir(newpath, &item);
-		memcpy(copytitle, "◆", 2);
+		memcpy(copytitle, SHM->i18nstr[cuser.language][201], 2);
 		snprintf(buf, sizeof(buf),
 			 "/bin/cp -r %s/* %s/.D* %s", copyfile, copyfile,
 			 newpath);
 		system(buf);
 	    } else {
-		outs("無法拷貝！");
+		outs(SHM->i18nstr[cuser.language][202]);
 		igetch();
 		return;
 	    }
@@ -371,7 +352,7 @@ a_pasteitem(menu_t * pm, int mode)
 	    copyfile[0] = '\0';
 	}
     } else {
-	outs("請先執行 copy 命令後再 paste");
+	outs(SHM->i18nstr[cuser.language][203]);
 	igetch();
     }
 }
@@ -392,7 +373,7 @@ a_appenditem(menu_t * pm, int isask)
 	    if (dashf(fname)) {
 		if (isask) {
 		    snprintf(buf, sizeof(buf),
-			     "確定要將[%s]附加於此嗎(Y/N)？[N] ", copytitle);
+			     SHM->i18nstr[cuser.language][204], copytitle);
 		    getdata(b_lines - 2, 1, buf, ans, sizeof(ans), LCECHO);
 		}
 		if (ans[0] == 'y') {
@@ -403,7 +384,7 @@ a_appenditem(menu_t * pm, int isask)
 			    fprintf(fp, "\n> %s <\n\n", buf);
 			    if (isask)
 				getdata(b_lines - 1, 1,
-					"是否收錄簽名檔部份(Y/N)？[Y] ",
+					SHM->i18nstr[cuser.language][205],
 					ans, sizeof(ans), LCECHO);
 			    while (fgets(buf, sizeof(buf), fin)) {
 				if ((ans[0] == 'n') &&
@@ -418,15 +399,15 @@ a_appenditem(menu_t * pm, int isask)
 		    }
 		}
 	    } else {
-		outs("檔案不得附加於此！");
+		outs(SHM->i18nstr[cuser.language][206]);
 		igetch();
 	    }
 	} else {
-	    outs("不得附加整個目錄於檔案後！");
+	    outs(SHM->i18nstr[cuser.language][207]);
 	    igetch();
 	}
     } else {
-	outs("請先執行 copy 命令後再 append");
+	outs(SHM->i18nstr[cuser.language][208]);
 	igetch();
     }
 }
@@ -437,7 +418,7 @@ a_pastetagpost(menu_t * pm, int mode)
     fileheader_t    fhdr;
     boardheader_t  *bh = NULL;
     int             ans = 0, ent = 0, tagnum;
-    char            title[TTLEN + 1] = "◇  ";
+    char            title[TTLEN + 1];
     char            dirname[200], buf[200];
 
     if (TagBoard == 0){
@@ -460,6 +441,7 @@ a_pastetagpost(menu_t * pm, int mode)
 	    setbfile(buf, bh->brdname, fhdr.filename);
 
 	if (dashf(buf)) {
+		strcpy(title, SHM->i18nstr[cuser.language][209]);
 	    strncpy(title + 3, fhdr.title, TTLEN - 3);
 	    title[TTLEN] = '\0';
 	    a_copyitem(buf, title, 0, 0);
@@ -485,7 +467,7 @@ a_moveitem(menu_t * pm)
     char            buf[PATHLEN];
     int             fail;
 
-    snprintf(buf, sizeof(buf), "請輸入第 %d 選項的新次序：", pm->now + 1);
+    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][210], pm->now + 1);
     if (!getdata(b_lines - 1, 1, buf, newnum, sizeof(newnum), DOECHO))
 	return;
     num = (newnum[0] == '$') ? 9999 : atoi(newnum) - 1;
@@ -541,14 +523,14 @@ a_delete(menu_t * pm)
 
     if (pm->header[pm->now - pm->page].filename[0] == 'H' &&
 	pm->header[pm->now - pm->page].filename[1] == '.') {
-	getdata(b_lines - 1, 1, "您確定要刪除此精華區連線嗎(Y/N)？[N] ",
+	getdata(b_lines - 1, 1, SHM->i18nstr[cuser.language][211],
 		ans, sizeof(ans), LCECHO);
 	if (ans[0] != 'y')
 	    return;
 	if (delete_record(buf, FHSZ, pm->now + 1) == -1)
 	    return;
     } else if (dashl(fpath)) {
-	getdata(b_lines - 1, 1, "您確定要刪除此 symbolic link 嗎(Y/N)？[N] ",
+	getdata(b_lines - 1, 1, SHM->i18nstr[cuser.language][212],
 		ans, sizeof(ans), LCECHO);
 	if (ans[0] != 'y')
 	    return;
@@ -556,7 +538,7 @@ a_delete(menu_t * pm)
 	    return;
 	unlink(fpath);
     } else if (dashf(fpath)) {
-	getdata(b_lines - 1, 1, "您確定要刪除此檔案嗎(Y/N)？[N] ", ans,
+	getdata(b_lines - 1, 1, SHM->i18nstr[cuser.language][213], ans,
 		sizeof(ans), LCECHO);
 	if (ans[0] != 'y')
 	    return;
@@ -576,7 +558,7 @@ a_delete(menu_t * pm)
 	setbdir(buf, "deleted");
 	append_record(buf, &backup, sizeof(backup));
     } else if (dashd(fpath)) {
-	getdata(b_lines - 1, 1, "您確定要刪除整個目錄嗎(Y/N)？[N] ", ans,
+	getdata(b_lines - 1, 1, SHM->i18nstr[cuser.language][214], ans,
 		sizeof(ans), LCECHO);
 	if (ans[0] != 'y')
 	    return;
@@ -598,7 +580,7 @@ a_delete(menu_t * pm)
 	setadir(buf, buf);
 	append_record(buf, &backup, sizeof(backup));
     } else {			/* Ptt 損毀的項目 */
-	getdata(b_lines - 1, 1, "您確定要刪除此損毀的項目嗎(Y/N)？[N] ",
+	getdata(b_lines - 1, 1, SHM->i18nstr[cuser.language][215],
 		ans, sizeof(ans), LCECHO);
 	if (ans[0] != 'y')
 	    return;
@@ -616,7 +598,7 @@ a_newtitle(menu_t * pm)
 
     memcpy(&item, &pm->header[pm->now - pm->page], FHSZ);
     strlcpy(buf, item.title + 3, sizeof(buf));
-    if (getdata_buf(b_lines - 1, 1, "新標題：", buf, 60, DOECHO)) {
+    if (getdata_buf(b_lines - 1, 1, SHM->i18nstr[cuser.language][216], buf, 60, DOECHO)) {
 	strlcpy(item.title + 3, buf, sizeof(item.title) - 3);
 	setadir(buf, pm->path);
 	substitute_record(buf, &item, FHSZ, pm->now + 1);
@@ -645,7 +627,7 @@ a_editsign(menu_t * pm)
 
     memcpy(&item, &pm->header[pm->now - pm->page], FHSZ);
     snprintf(buf, sizeof(buf), "%c%c", item.title[0], item.title[1]);
-    if (getdata_buf(b_lines - 1, 1, "符號", buf, 5, DOECHO)) {
+    if (getdata_buf(b_lines - 1, 1, SHM->i18nstr[cuser.language][217], buf, 5, DOECHO)) {
 	item.title[0] = buf[0] ? buf[0] : ' ';
 	item.title[1] = buf[1] ? buf[1] : ' ';
 	item.title[2] = buf[2] ? buf[2] : ' ';
@@ -666,7 +648,7 @@ a_showname(menu_t * pm)
     snprintf(buf, sizeof(buf),
 	     "%s/%s", pm->path, pm->header[pm->now - pm->page].filename);
     if (dashl(buf)) {
-	prints("此 symbolic link 名稱為 %s\n",
+	prints(SHM->i18nstr[cuser.language][218],
 	       pm->header[pm->now - pm->page].filename);
 	if ((len = readlink(buf, buf, PATHLEN - 1)) >= 0) {
 	    buf[len] = '\0';
@@ -684,16 +666,16 @@ a_showname(menu_t * pm)
 		if (sym) {
 		    pressanykey();
 		    move(b_lines - 1, 1);
-		    prints("此 symbolic link 指向 %s\n", &buf[i + 1]);
+		    prints(SHM->i18nstr[cuser.language][219], &buf[i + 1]);
 		}
 	    }
 	}
     } else if (dashf(buf))
-	prints("此文章名稱為 %s", pm->header[pm->now - pm->page].filename);
+	prints(SHM->i18nstr[cuser.language][220], pm->header[pm->now - pm->page].filename);
     else if (dashd(buf))
-	prints("此目錄名稱為 %s", pm->header[pm->now - pm->page].filename);
+	prints(SHM->i18nstr[cuser.language][221], pm->header[pm->now - pm->page].filename);
     else
-	outs("此項目已損毀, 建議將其刪除！");
+	outs(SHM->i18nstr[cuser.language][222]);
     pressanykey();
 }
 
@@ -703,10 +685,8 @@ static char    *a_title;
 static void
 atitle()
 {
-    showtitle("精華文章", a_title);
-    outs("[←]離開 [→]閱\讀 [^P]發表文章 [b]備忘錄 [d]刪除 [q]精華區 "
-	 "[TAB]文摘 [h]elp\n\033[7m  編號   日 期  作  者       "
-	 "文  章  標  題\033[m");
+    showtitle(SHM->i18nstr[cuser.language][223], a_title);
+    outs(SHM->i18nstr[cuser.language][224]);
 }
 #endif
 
@@ -872,7 +852,7 @@ a_menu(char *maintitle, char *path, int lastlevel)
 		 */
 		if( !lastlevel && !HAS_PERM(PERM_SYSOP) &&
 		    !is_BM_cache(currbid) && dashd(fname) )
-		    vmsg("只有板主才可以拷貝目錄唷!");
+		    vmsg(SHM->i18nstr[cuser.language][225]);
 		else
 		    a_copyitem(fname, me.header[me.now - me.page].title, 0, 1);
 		me.page = 9999;
@@ -891,7 +871,7 @@ a_menu(char *maintitle, char *path, int lastlevel)
 #endif
 		snprintf(fname, sizeof(fname), "%s/%s", path, fhdr->filename);
 		if (*fhdr->filename == 'H' && fhdr->filename[1] == '.') {
-		  vmsg("不再支援 gopher mode, 請使用瀏覽器直接瀏覽");
+		  vmsg(SHM->i18nstr[cuser.language][226]);
 		  vmsg("gopher://%s/1/",fhdr->filename+2);
 		} else if (dashf(fname)) {
 		    int             more_result;
@@ -905,8 +885,8 @@ a_menu(char *maintitle, char *path, int lastlevel)
 			    clrtoeol();
 			    getdata(22, 1,
 				    currstat == EDITEXP ?
-				    "要把範例 Plugin 到文章嗎?[y/N]" :
-				    "確定要點這首歌嗎?[y/N]",
+				    SHM->i18nstr[cuser.language][227] :
+				    SHM->i18nstr[cuser.language][228],
 				    ans, sizeof(ans), LCECHO);
 			    if (ans[0] == 'y') {
 				strlcpy(trans_buffer,
@@ -962,7 +942,7 @@ a_menu(char *maintitle, char *path, int lastlevel)
 		a_forward(path, &me.header[me.now - me.page], ch /* == 'U' */ );
 		/* By CharlieL */
 	    } else
-		vmsg("無法轉寄此項目");
+		vmsg(SHM->i18nstr[cuser.language][229]);
 
 	    me.page = 9999;
 	    break;
@@ -970,20 +950,20 @@ a_menu(char *maintitle, char *path, int lastlevel)
 #ifdef BLOG
 	case 'b':
 	    if( !HAS_PERM(PERM_SYSOP) && !is_BM_cache(currbid) )
-		vmsg("只有板主才可以用唷!");
+		vmsg(SHM->i18nstr[cuser.language][230]);
 	    else{
 		char    genbuf[128];
 		snprintf(genbuf, sizeof(genbuf),
 			 "bin/builddb.pl -f -n %d %s", me.now, currboard);
 		system(genbuf);
-		vmsg("資料更新完成");
+		vmsg(SHM->i18nstr[cuser.language][231]);
 	    }
 	    me.page = 9999;
 	    break;
 
 	case 'B':
 	    if( !HAS_PERM(SYSOP) && !is_BM_cache(currbid) )
-		vmsg("只有板主才可以用唷!");
+		vmsg(SHM->i18nstr[cuser.language][232]);
 	    else
 		BlogMain(me.now);
 	    me.page = 9999;
@@ -1074,12 +1054,12 @@ a_menu(char *maintitle, char *path, int lastlevel)
     return returnvalue;
 }
 
-static char    *mytitle = BBSNAME "佈告欄";
-
 int
 Announce()
 {
     setutmpmode(ANNOUNCE);
+    char mytitle[256];
+    sprintf(mytitle, "%s%s", BBSNAME, SHM->i18nstr[cuser.language][233]);
     a_menu(mytitle, "man",
 	   ((HAS_PERM(PERM_SYSOP) || HAS_PERM(PERM_ANNOUNCE)) ? SYSOP :
 	    NOBODY));
@@ -1094,29 +1074,13 @@ void BlogMain(int num)
     char    genbuf[128], exit = 0;
 
     //setutmpmode(BLOGGING); /* will crash someone using old program  */
-    sprintf(genbuf, "%s的部落格", currboard);
-    showtitle("部落格", genbuf);
+    sprintf(genbuf, SHM->i18nstr[cuser.language][234], currboard);
+    showtitle(SHM->i18nstr[cuser.language][235], genbuf);
     while( !exit ){
 	move(1, 0);
-	prints("請選擇您要執行的重作:\n"
-	       "0.回到上一層\n"
-	       "1.製作部落格樣板格式\n"
-	       "  使用新的 config 目錄下樣板資料\n"
-	       "  通常在第一次使用部落格或樣板更新的時候使用\n"
-	       "\n"
-	       "2.重新製作部落格\n"
-	       "  只在部落格資料整個亂掉的時候才使用\n"
-	       "\n"
-	       "3.將本文加入部落格\n"
-	       "  將游標所在位置的文章加入部落格\n"
-	       "\n"
-	       "4.刪除迴響\n"
-	       "\n"
-	       "5.刪除一篇部落格\n"
-	       "\n"
-	       "C.建立部落格目錄 (您只有第一次時需要)\n"
+	prints(SHM->i18nstr[cuser.language][236]
 	       );
-	switch( getans("請選擇(0-5,C)？[0]") ){
+	switch( getans(SHM->i18nstr[cuser.language][237]) ){
 	case '1':
 	    snprintf(genbuf, sizeof(genbuf),
 		     "bin/builddb.pl -c %s", currboard);
@@ -1135,22 +1099,21 @@ void BlogMain(int num)
 	case '4':{
 	    char    hash[35];
 	    int     i;
-	    getdata(16, 0, "請輸入該篇的雜湊值: ",
+	    getdata(16, 0, SHM->i18nstr[cuser.language][238],
 		    hash, sizeof(hash), DOECHO);
 	    for( i = 0 ; hash[i] != 0 ; ++i ) /* 前面用 getdata() 保證有 \0 */
 		if( !islower(hash[i]) && !isnumber(hash[i]) )
 		    break;
 	    if( i != 32 ){
-		vmsg("輸入錯誤");
+		vmsg(SHM->i18nstr[cuser.language][239]);
 		break;
 	    }
 	    if( hash[0] != 0 && 
-		getans("請確定刪除(Y/N)?[N] ") == 'y' ){
+		getans(SHM->i18nstr[cuser.language][240]) == 'y' ){
 		MYSQL   mysql;
 		char    cmd[256];
 		
-		sprintf(cmd, "delete from comment where "
-			"hash='%s'&&brdname='%s'", hash, currboard);
+		sprintf(cmd, "delete from comment where hash='%s'&&brdname='%s'", hash, currboard);
 #ifdef DEBUG
 		vmsg(cmd);
 #endif
@@ -1159,7 +1122,7 @@ void BlogMain(int num)
 					  BLOGDB_PASSWD, BLOGDB_DB, 
 					  BLOGDB_PORT, BLOGDB_SOCK, 0) ||
 		      mysql_query(&mysql, cmd)) )
-		    vmsg("資料刪除完成");
+		    vmsg(SHM->i18nstr[cuser.language][241]);
 		else
 		    vmsg(
 #ifdef DEBUG
@@ -1175,7 +1138,7 @@ void BlogMain(int num)
 	    
 	case '5': {
 	    char    date[9];
-	    getdata(16, 0, "請輸入該篇的日期(yyyymmdd): ",
+	    getdata(16, 0, SHM->i18nstr[cuser.language][242],
 		    date, sizeof(date), DOECHO);
 	    snprintf(genbuf, sizeof(genbuf),
 		     "bin/builddb.pl -D %s %s", date, currboard);
@@ -1188,7 +1151,7 @@ void BlogMain(int num)
 	    char    fpath[PATHLEN], adir[PATHLEN], buf[256];
 	    sprintf(fpath, "man/boards/%c/%s", currboard[0], currboard);
 	    stampdir(fpath, &item);
-	    strlcpy(item.title, "◆ Blog", sizeof(item.title));
+	    strlcpy(item.title, SHM->i18nstr[cuser.language][243], sizeof(item.title));
 	    strlcpy(item.owner, cuser.userid, sizeof(item.owner));
 
 	    sprintf(adir, "man/boards/%c/%s/.DIR", currboard[0], currboard);
@@ -1208,7 +1171,7 @@ void BlogMain(int num)
 	    break;
 	}
 	if( !exit )
-	    vmsg("部落格完成");
+	    vmsg(SHM->i18nstr[cuser.language][244]);
     }
     currutmp->mode = oldmode;
     pressanykey();

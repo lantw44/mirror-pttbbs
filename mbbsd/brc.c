@@ -222,18 +222,33 @@ read_old_brc(int fd)
     char        brdname[BRC_STRLEN + 1];
     char       *ptr;
     brcnbrd_t   num;
+    brcbid_t    bid;
+    brcbid_t    read_brd[512];
+    int         nRead = 0, i;
 
     ptr = brc_buf;
     brc_size = 0;
     while (read(fd, brdname, BRC_STRLEN + 1) == BRC_STRLEN + 1) {
 	num = brdname[BRC_STRLEN];
 	brdname[BRC_STRLEN] = 0;
-	*(brcbid_t*)ptr = getbnum(brdname);
+	bid = getbnum(brdname);
+
+	for (i = 0; i < nRead; ++i)
+	    if (read_brd[i] == bid)
+		break;
+	if (i != nRead){
+	    lseek(fd, num * sizeof(int), SEEK_CUR);
+	    continue;
+	}
+	read_brd[nRead >= 512 ? nRead = 0 : nRead++] = bid;
+
+	*(brcbid_t*)ptr = bid;
 	ptr += sizeof(brcbid_t);
 	*(brcnbrd_t*)ptr = num;
 	ptr += sizeof(brcnbrd_t);
 	if (read(fd, ptr, sizeof(int) * num) != sizeof(int) * num)
 	    break;
+
 	brc_size += sizeof(brcbid_t) + sizeof(brcnbrd_t)
 	    + sizeof(time_t) * num;
 	ptr += sizeof(time_t) * num;

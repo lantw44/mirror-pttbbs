@@ -8,7 +8,7 @@
 int
 m_fpg()
 {
-    char genbuf[256], buf[256], userid[25], passbuf[24];
+    char genbuf[256], buf[256], userid[25], passbuf[24], msg[2048]="";
     int count=0, i;
     FILE *fp;
     ACCT man;
@@ -72,35 +72,45 @@ m_fpg()
    move(12,0);
    clrtobot();
    reload_money(); 
-   
-   prints("±zªºªá¶é¹ô¦³ %d ´«ºâ¦¨ Ptt ¹ô¬° %d (¶×²v 155:1), ¶×¤J«á¦@¦³ %d\n", 
-	    man.money, man.money/155, cuser.money + man.money/155);
+   sprintf(buf, 
+           "±zªºªá¶é¹ô¦³ %d ´«ºâ¦¨ Ptt ¹ô¬° %d (¶×²v 155:1), \n"
+           "        ­ì¦³ %d ¶×¤J«á¦@¦³ %d\n",
+            man.money, man.money/155, cuser.money, cuser.money + man.money/155);
    demoney(man.money/155);
+   strcat(msg, buf); 
 
-   cuser.exmailbox +=  (man.mailk + man.keepmail);
-   if (cuser.exmailbox > 1000) cuser.exmailbox = 1000;
-   prints("±zªºªá¶é«H½c¦³ %d : %d, ¶×¤J«á¦@¦³ %d\n", 
-	    man.mailk, man.keepmail, cuser.exmailbox );
+   i =  cuser.exmailbox + man.mailk + man.keepmail;
+   if (i > 1000) i = 1000;
+   sprintf(buf, "±zªºªá¶é«H½c¦³ %d : %d, ­ì¦³ %d ¶×¤J«á¦@¦³ %d\n", 
+	    man.mailk, man.keepmail, cuser.exmailbox, cuser.exmailbox );
+   strcat(msg, buf);
+   cuser.exmailbox = i;
 
    if(cuser.firstlogin > man.firstlogin) d = man.firstlogin;
    else  d = cuser.firstlogin;
-   prints("ªá¶éµù¥U¤é´Á %s ", Cdatedate(&(man.firstlogin)));
-   prints("¦¹±b¸¹µù¥U¤é´Á %s ±N¨ú ",Cdatedate(&(cuser.firstlogin)));
-   prints("%s", Cdatedate(&d) );
+   sprintf(buf, "ªá¶éµù¥U¤é´Á %s ", Cdatedate(&(man.firstlogin)));
+   strcat(msg,buf);
+   sprintf(buf, "¦¹±b¸¹µù¥U¤é´Á %s ±N¨ú ",Cdatedate(&(cuser.firstlogin)));
+   strcat(msg,buf);
+   prints(buf, "%s", Cdatedate(&d) );
+   strcat(msg,buf);
    cuser.firstlogin = d;
 
    if(cuser.numlogins < man.numlogins) i = man.numlogins;
    else i = cuser.numlogins;
 
-   prints("ªá¶é¶i¯¸¦¸¼Æ %d ¦¹±b¸¹ %d ±N¨ú %d \n", man.numlogins,
+   sprintf(buf, "ªá¶é¶i¯¸¦¸¼Æ %d ¦¹±b¸¹ %d ±N¨ú %d \n", man.numlogins,
 	   cuser.numlogins, i);
+   strcat(msg,buf);
    cuser.numlogins = i;
 
    if(cuser.numposts < man.numposts ) i = man.numposts;
    else i = cuser.numposts;
-   prints("ªá¶é¤å³¹¦¸¼Æ %d ¦¹±b¸¹ %d ±N¨ú %d\n", man.numposts,cuser.numposts,
-	   i); 
+   sprintf(buf, "ªá¶é¤å³¹¦¸¼Æ %d ¦¹±b¸¹ %d ±N¨ú %d\n", 
+                 man.numposts,cuser.numposts,i);
+   strcat(msg,buf);
    cuser.numposts = i;
+   prints(buf);
    while(search_ulistn(usernum,2)) 
         {vmsg("½Ð±N­«ÂÐ¤W¯¸¨ä¥L½uÃö³¬! ¦AÄ~Äò");}
    passwd_update(usernum, &cuser);
@@ -118,6 +128,7 @@ m_fpg()
 	sprintf(genbuf, "fpg/home/bbs/home/%c/%s/.DIR",
 		userid[0], userid);
 	merge_dir(buf, genbuf);
+        strcat(msg, "¶×¤J­Ó¤H«H½c\n");
     }
    if(getans("¬O§_¶×¤J­Ó¤H«H½cºëµØ°Ï? (Y/n)")!='n')
    {
@@ -126,6 +137,7 @@ m_fpg()
 	      userid[0], userid,
 	      cuser.userid[0], cuser.userid);
         system(buf);
+        strcat(msg, "¶×¤J­Ó¤H«H½cºëµØµØØ°Ï\n");
    }
    if(getans("¬O§_¶×¤J¦n¤Í¦W³æ? (·|ÂÐ»\\²{¦³³]©w, ID¥i¯à¬O¤£¦P¤H)? (y/N)")=='y')
    {
@@ -134,7 +146,17 @@ m_fpg()
        Copy(buf, genbuf);
        strcat(buf, genbuf);
        friend_load(FRIEND_OVERRIDE);
+       strcat(msg, "¶×¤J¦n¦³¤Í¤ÍÍ¦W³ææ\n");
    }
+   sprintf(buf, "±b¸¹¸¹¹¶××¤J³øø§i %s -> %s ", userid, cuser.userid);
+   post_msg("Security", buf, msg, "[¨t²Î¦w¥þ§½]");
+   sprintf(buf, "fpg/home/bbs/home/%c/%s/PttID", userid[0],userid);
+   if((fp = fopen(buf, "w")))
+     {
+        fprintf(fp, "%s\n", cuser.userid);
+        fprintf(fp, "%s", msg);
+     }
+
    vmsg("®¥³ß±z§¹¦¨±b¸¹ÅÜ¨­..");
    return 0;
 }

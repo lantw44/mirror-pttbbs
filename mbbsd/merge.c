@@ -193,7 +193,7 @@ m_fpg_brd(char *bname, char *fromdir)
   sprintf(buf, "mv fpg/home/bbs/man/boards/%s man/boards/%c/%s", fbname,
 	    bname[0], bname);
   system(buf);
-  sprintf(fh.title, "%s 精華區", fbname);
+  sprintf(fh.title, "◆ %s 精華區", fbname);
   sprintf(fh.filename, fbname);
   sprintf(fh.owner, cuser.userid);
   sprintf(buf, "man/boards/%c/%s/.DIR", bname[0], bname);

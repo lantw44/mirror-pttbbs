@@ -9,7 +9,7 @@
 
 #define BRC_BLOCKSIZE   1024
 
-#if MAX_BOARD > 32767 || BRC_MAXSIZE > 32767
+#if MAX_BOARD > 65535 || BRC_MAXSIZE > 65535
 #error Max number of boards or BRC_MAXSIZE cannot fit in unsighed short, \
 please rewrite brc.c
 #endif
@@ -138,7 +138,7 @@ brc_enlarge_buf()
 	return 0;
     memcpy(buffer, brc_buf, brc_alloc);
     free(brc_buf);
-    brc_alloc += BRC_BLOCKSIZE;
+    do brc_alloc += BRC_BLOCKSIZE; while(brc_size > brc_alloc);
     brc_buf = (char*)malloc(brc_alloc);
     memcpy(brc_buf, buffer, brc_alloc - BRC_BLOCKSIZE);
     return 1;
@@ -172,8 +172,9 @@ brc_insert_record(brcbid_t bid, brcnbrd_t num, time_t* list)
 	brc_size -= tnum;
 
 	/* put on the beginning */
-	if (num && (new_size =
-		sizeof(brcbid_t) + sizeof(brcnbrd_t) + num * sizeof(time_t))){
+	if (num){
+	    new_size = sizeof(brcbid_t) + sizeof(brcnbrd_t)
+		+ num * sizeof(time_t);
 	    brc_size += new_size;
 	    if (brc_size > brc_alloc && !brc_enlarge_buf())
 		brc_size = BRC_MAXSIZE;
@@ -330,6 +331,8 @@ brc_initial_board(const char *boardname)
 
     brc_update(); /* write back first */
     currbid = getbnum(boardname);
+    if( currbid == 0 )
+	currbid = getbnum(DEFAULT_BOARD);
     currboard = bcache[currbid - 1].brdname;
     currbrdattr = bcache[currbid - 1].brdattr;
 

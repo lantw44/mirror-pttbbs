@@ -2735,11 +2735,44 @@ t_changeangel(){
 	    buf, 3, LCECHO);
     if( buf[0] == 'y' || buf[0] == 'Y' ){
 	cuser.myangel[0] = 0;
-	vmsg("小天使更新完成，下次呼叫時會選出新的小天使");
+	outs("小天使更新完成，下次呼叫時會選出新的小天使");
     }
     return 0;
 }
 
+static int
+FindAngel(void){
+    return 0;
+}
+
+static void
+TalkToAngel(){
+    if( cuser.myangel[0] == 0 )
+	if( ! FindAngel() ){
+	    move(b_lines, 0);
+	    outs("現在沒有小天使在線上，請先在新手板上尋找答案或發問");
+	    refresh();
+	    sleep(1);
+	    if( currutmp->mode != EDITING ){
+		brc_initial_board("PttNewHand");
+		Read();
+	    }
+	    return;
+	}
+    return;
+}
+
 void
 CallAngel(){
+    screenline_t   *screen0 = calloc(t_lines, sizeof(screenline_t));
+    int x, y;
+    getyx(&y, &x);
+    memcpy(screen0, big_picture, t_lines * sizeof(screenline_t));
+
+    TalkToAngel();
+
+    memcpy(big_picture, screen0, t_lines * sizeof(screenline_t));
+    move(y, x);
+    free(screen0);
+    redoscr();
 }

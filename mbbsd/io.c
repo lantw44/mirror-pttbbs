@@ -305,8 +305,8 @@ igetch()
 		}
 	    }
 	    return ch;
-	case '\n':		/* Ptt§â \n®³±¼ */
-	    continue;
+	//case '\n':		/* Ptt§â \n®³±¼ */
+	//    continue;
 	case Ctrl('T'):
 	    if (WATERMODE(WATER_ORIG) || WATERMODE(WATER_NEW)) {
 		if (watermode > 0) {
@@ -353,6 +353,11 @@ igetch()
 		}
 	    }
 	    return ch;
+
+	case Ctrl('J'):
+	    CallAngel();
+	    continue;
+
 	case IAC:
 	    // disallow user input telnet protocol leading char IAC chr(255)
 	    // TODO parse telnet protocol

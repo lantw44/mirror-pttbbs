@@ -212,9 +212,9 @@ edit_msg()
     move(b_lines, 0);
     clrtoeol();
     prints("\033[%sm 編輯文章 \033[31;47m (^Z)\033[30m說明 "
-           "\033[31;47m(^R)\033[30m符號"
+           "\033[31;47m(^P)\033[30m符號 "
 	   "\033[31;47m(^G)\033[30m插入圖文庫 \033[31m(^X,^Q)"
-	   "\033[30m離開║%s│%c%c%c%c║ %3d:%3d  \033[m",
+	   "\033[30m離開║%s│%c%c%c%c║ %3d:%3d \033[m",
 	   "37;44",
 	   edit_mode[insert_character],
 	   my_ansimode ? 'A' : 'a', indent_mode ? 'I' : 'i',

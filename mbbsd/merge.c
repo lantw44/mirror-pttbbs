@@ -147,13 +147,14 @@ m_fpg()
 	sethomedir(buf, cuser.userid);
 	sprintf(genbuf, "fpg/home/bbs/home/%c/%s/.DIR",
 		userid[0], userid);
-	merge_dir(buf, genbuf);
+	merge_dir(buf, genbuf, 1);
         strcat(msg, "匯入個人信箱\n");
     }
    if(getans("是否匯入個人信箱精華區? (Y/n)")!='n')
    {
         sprintf(buf,
-	   "mv fpg/home/bbs/home/%c/%s/man home/%c/%s/man", 
+	   "rm -rd home/%c/%s/man>/dev/null ; mv fpg/home/bbs/home/%c/%s/man home/%c/%s", 
+              cuser.userid[0], cuser.userid,
 	      userid[0], userid,
 	      cuser.userid[0], cuser.userid);
         system(buf);

@@ -72,21 +72,40 @@ m_fpg()
    move(12,0);
    clrtobot();
 #ifdef MERGEMONEY
+    int price[10] = {74, 21, 29, 48, 67, 11, 9, 43, 57, 72};
+    unsigned int market[10], lmarket;
+
    reload_money(); 
+
+   lmarket=0;
+   for(i=0; i<10; i++)
+     lmarket += market[i]/674 *price[i];
    sprintf(buf, 
-           "您的花園幣有 %d 換算成 Ptt 幣為 %d (匯率 155:1), \n"
-           "        原有 %d 匯入後共有 %d\n",
-            man.money, man.money/155, cuser.money, cuser.money + man.money/155);
-   demoney(man.money/155);
+           "您的花園幣有 %10d 換算成 Ptt 幣為 %9d (優惠匯率 155:1), \n"
+           "    銀行有   %10d 換算為 Ptt 幣為 %9d (匯率為 674:1), \n"
+           "    花市價值 %10d 換算為 Ptt 幣為 %9d (匯率為 674:1), \n"
+           "    原有P幣  %10d 匯入後共有 %d\n",
+            man.money, man.money/155, 
+            man.bank, man.bank/674,
+            lmarket*674, lmarket,
+            cuser.money, cuser.money + man.money/155 + man.bank/674 + lmarket);
+   demoney(man.money/155 + man.bank/674 + lmarket);
    strcat(msg, buf); 
 #endif
 
    i =  cuser.exmailbox + man.mailk + man.keepmail;
    if (i > 1000) i = 1000;
-   sprintf(buf, "您的花園信箱有 %d : %d, 原有 %d 匯入後共有 %d\n", 
-	    man.mailk, man.keepmail, cuser.exmailbox, cuser.exmailbox );
+   sprintf(buf, "您的花園信箱有 %d (%dk), 原有 %d 匯入後共有 %d\n", 
+	    man.keepmail, man.mailk, cuser.exmailbox, cuser.exmailbox );
    strcat(msg, buf);
    cuser.exmailbox = i;
+
+   if(man.userlevel & PERM_MAILLIMIT)
+    {
+       sprintf(buf, "開啟信箱無上限\n");
+       strcat(msg, buf);
+       cuser.userlevel |= PERM_MAILLIMIT;
+    }
 
    if(cuser.firstlogin > man.firstlogin) d = man.firstlogin;
    else  d = cuser.firstlogin;

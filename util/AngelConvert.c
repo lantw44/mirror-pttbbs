@@ -25,6 +25,7 @@ int main(){
 	if( u.userlevel & OLD_PERM_NOOUTMAIL )
 	    u.uflag2 |= REJ_OUTTAMAIL;
 	u.userlevel &= ~PERM_ANGEL;
+	bzero(u.myangel, IDLEN + 1);
 	write(new_fd, &u, sizeof(userec_t));
 	++count;
     }

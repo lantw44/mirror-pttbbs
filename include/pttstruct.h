@@ -173,9 +173,9 @@ typedef struct boardheader_t {
     unsigned int    level;               /* 可以看此板的權限 */
     int     unused;                      /* 還沒用到 */
     int     gid;                         /* 看板所屬的類別 ID */
-    void    *next[2];	                 /* 在同一個gid下一個看板 動態產生*/
-    void    *firstchild[2];	         /* 屬於這個看板的第一個子看板 */
-    void    *parent;
+    int     next[2];	                 /* 在同一個gid下一個看板 動態產生*/
+    int    firstchild[2];	         /* 屬於這個看板的第一個子看板 */
+    int     parent;
     int     childcount;                  /* 有多少個child */
     int     nuser;                       /* 多少人在這板 */
     int     postexpire;                  /* postexpire */

@@ -224,33 +224,33 @@ int utmpfix(int argc, char **argv)
 
 /* utmpsortd --------------------------------------------------------------- */
 static int
-cmputmpuserid(int i, int j)
+cmputmpuserid(const void * i, const void * j)
 {
-    return strcasecmp(SHM->uinfo[i].userid, SHM->uinfo[j].userid);
+  return strcasecmp(SHM->uinfo[*(int*)i].userid, SHM->uinfo[*(int*)j].userid);
 }
 
 static int
-cmputmpmode(int i, int j)
+cmputmpmode(const void * i, const void * j)
 {
-    return SHM->uinfo[i].mode - SHM->uinfo[j].mode;
+    return SHM->uinfo[*(int*)i].mode - SHM->uinfo[*(int*)j].mode;
 }
 
 static int
-cmputmpidle(int i, int j)
+cmputmpidle(const void * i, const void * j)
 {
-    return SHM->uinfo[i].lastact - SHM->uinfo[j].lastact;
+    return SHM->uinfo[*(int*)i].lastact - SHM->uinfo[*(int*)j].lastact;
 }
 
 static int
-cmputmpfrom(int i, int j)
+cmputmpfrom(const void * i, const void * j)
 {
-    return strcmp(SHM->uinfo[i].from, SHM->uinfo[j].from);
+    return strcmp(SHM->uinfo[*(int*)i].from, SHM->uinfo[*(int*)j].from);
 }
 
 static int
-cmputmpfive(int i, int j)
+cmputmpfive(const void * i, const void * j)
 {
-    userinfo_t *a=&SHM->uinfo[i],*b=&SHM->uinfo[j];
+    userinfo_t *a=&SHM->uinfo[*(int*)i],*b=&SHM->uinfo[*(int*)j];
     int played_a=(a->five_win+a->five_lose+a->five_lose)!=0;
     int played_b=(b->five_win+b->five_lose+b->five_lose)!=0;
     int             type;
@@ -267,9 +267,9 @@ cmputmpfive(int i, int j)
 }
 
 static int
-cmputmpchc(int i, int j)
+cmputmpchc(const void * i, const void * j)
 {
-    userinfo_t *a=&SHM->uinfo[i],*b=&SHM->uinfo[j];
+    userinfo_t *a=&SHM->uinfo[*(int*)i],*b=&SHM->uinfo[*(int*)j];
     int total_a=a->chc_win+a->chc_lose+a->chc_lose;
     int total_b=b->chc_win+b->chc_lose+b->chc_lose;
     int played_a=(total_a!=0);
@@ -303,15 +303,15 @@ cmputmpchc(int i, int j)
 }
 
 static int
-cmputmppid(int i, int j)
+cmputmppid(const void * i, const void * j)
 {
-    return SHM->uinfo[i].pid - SHM->uinfo[j].pid;
+    return SHM->uinfo[*(int*)i].pid - SHM->uinfo[*(int*)j].pid;
 }
 
 static int
-cmputmpuid(int i, int j)
+cmputmpuid(const void * i, const void * j)
 {
-    return SHM->uinfo[i].uid - SHM->uinfo[j].uid;
+    return SHM->uinfo[*(int*)i].uid - SHM->uinfo[*(int*)j].uid;
 }
 
 inline void utmpsort(int sortall)
@@ -347,7 +347,7 @@ inline void utmpsort(int sortall)
 	   SHM->sorted[ns][0], sizeof(int) * count);
     qsort(SHM->sorted[ns][6], count, sizeof(int), cmputmpuid);
     qsort(SHM->sorted[ns][7], count, sizeof(int), cmputmppid);
-    if( sortall ){
+    if( sortall !=-1){
 	memcpy(SHM->sorted[ns][1],
 	       SHM->sorted[ns][0], sizeof(int) * count);
 	memcpy(SHM->sorted[ns][2],

@@ -498,17 +498,16 @@ void touchbtotal(int bid) {
 
 
 static int
-cmpboardname(int i, int j)
+cmpboardname(const void * i, const void * j)
 {
-    return strcasecmp(bcache[i].brdname, bcache[j].brdname);
+    return strcasecmp(bcache[*(int*)i].brdname, bcache[*(int*)j].brdname);
 }
 
 static int
-cmpboardclass(int i, int j)
+cmpboardclass(const void * i, const void * j)
 {
-    boardheader_t *brd1 = &bcache[i], *brd2 = &bcache[j];
-    return (strncmp(brd1->title, brd2->title, 4) << 8) +
-    strcasecmp(brd1->brdname, brd2->brdname);
+    boardheader_t *brd1 = &bcache[*(int*)i], *brd2 = &bcache[*(int*)j];
+    return (strncmp(brd1->title, brd2->title, 4));
 }
 
 void
@@ -521,16 +520,17 @@ sort_bcache(void)
        { sleep(1); return; }
     SHM->Bbusystate = 1;
     for (i = 0; i < SHM->Bnumber; i++) {
-	SHM->bsorted[1][i] = SHM->bsorted[0][i] = i;
+	SHM->bsorted[0][i] = i;
     }
     qsort(SHM->bsorted[0], SHM->Bnumber, sizeof(int),
 	  (QCAST) cmpboardname);
+    memcpy(SHM->bsorted[1], SHM->bsorted[0], sizeof(int)*SHM->Bnumber);
     qsort(SHM->bsorted[1], SHM->Bnumber, sizeof(int),
 	  (QCAST) cmpboardclass);
 
     for (i = 0; i < SHM->Bnumber; i++) {
-	    bcache[i].firstchild[0] = NULL;
-	    bcache[i].firstchild[1] = NULL;
+	    bcache[i].firstchild[0] = 0;
+	    bcache[i].firstchild[1] = 0;
 	}
     SHM->Bbusystate = 0;
 }
@@ -542,7 +542,7 @@ reload_bcache(void)
     if (SHM->Bbusystate) {
 	safe_sleep(1);
     }
-    else {
+   else {
 	int             fd;
 
 	SHM->Bbusystate = 1;

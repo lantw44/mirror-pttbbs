@@ -244,10 +244,9 @@ static void Customize(void)
 	    getdata(b_lines - 1, 0, "請按 [A-F] 切換設定，按 [Return] 結束：",
 		    ans, 3, DOECHO);
 	}else
-#else
+#endif
 	    getdata(b_lines - 1, 0, "請按 [A-E] 切換設定，按 [Return] 結束：",
 		    ans, 3, DOECHO);
-#endif
 
 	switch( ans[0] ){
 	case 'A':
@@ -286,11 +285,13 @@ static void Customize(void)
 	case 'e':
 	    cuser.uflag2 ^= FAVNOHILIGHT;
 	    break;
+
 #ifdef PLAY_ANGEL
 	case 'F':
 	case 'f':
 	    if( HAS_PERM(PERM_ANGEL) ){
 		cuser.uflag2 ^= BEING_ANGEL;
+		currutmp->being_angel ^= 1;
 		break;
 	    }
 #endif

@@ -422,6 +422,29 @@ pressanykey()
     refresh();
 }
 
+void
+pressanykey_or_callangel(){
+    int             ch;
+
+    outmsg("\033[37;45;1m  \033[33m(h)\033[37m 呼叫小天使        "
+	   "● 請按 \033[33m(Space/Return)\033[37m 繼續 ●"
+	   "       \033[33m(^T)\033[37m 存暫存檔   \033[m");
+    do {
+	ch = igetkey();
+
+	if (ch == Ctrl('T')) {
+	    capture_screen();
+	    break;
+	}else if (ch == 'h' || ch == 'H'){
+	    CallAngel();
+	    break;
+	}
+    } while ((ch != ' ') && (ch != KEY_LEFT) && (ch != '\r') && (ch != '\n'));
+    move(b_lines, 0);
+    clrtoeol();
+    refresh();
+}
+
 int
 vmsg(const char *fmt,...)
 {
@@ -606,7 +629,7 @@ show_help(char *helptext[])
 	else
 	    prints("        %s\n", str);
     }
-    pressanykey();
+    pressanykey_or_callangel();
 }
 #endif // _BBS_UTIL_C_
 

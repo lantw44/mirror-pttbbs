@@ -794,6 +794,8 @@ setup_utmp(int mode)
 #endif
     if (enter_uflag & CLOAK_FLAG)
 	uinfo.invisible = YEA;
+    if (cuser.uflag2 & BEING_ANGEL)
+	uinfo.being_angel = 1;
     getnewutmpent(&uinfo);
     SHM->UTMPneedsort = 1;
     if (!(cuser.numlogins % 20) && cuser.userlevel & PERM_BM)
@@ -1010,7 +1012,7 @@ do_aloha(char *hello)
 	    userinfo_t     *uentp;
 	    if ((uentp = (userinfo_t *) search_ulist_userid(userid)) && 
 		    isvisible(uentp, currutmp)) {
-		my_write(uentp->pid, genbuf, uentp->userid, 2, NULL);
+		my_write(uentp->pid, genbuf, uentp->userid, WATERBALL_ALOHA, NULL);
 	    }
 	}
 	fclose(fp);

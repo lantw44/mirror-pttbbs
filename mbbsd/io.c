@@ -293,7 +293,7 @@ igetch()
 		    show_call_in(0, 0);
 		    watermode = 0;
 		    my_write(currutmp->msgs[0].pid, "水球丟過去 ： ",
-			     currutmp->msgs[0].userid, 0, NULL);
+			     currutmp->msgs[0].userid, WATERBALL_GENERAL, NULL);
 		    i_newfd = my_newfd;
 
 		    /* 還原螢幕 */

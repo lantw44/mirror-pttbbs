@@ -291,6 +291,9 @@ domenu(int cmdmode, char *cmdtitle, int cmd, commands_t cmdtable[])
 	    while (++i <= total)
 		if (cmdtable[i].desc[1] == cmd)
 		    break;
+	    if (cmd == 'H' && i > total){
+		/* TODO: Add menu help */
+	    }
 	}
 
 	if (i > total || !HAS_PERM(cmdtable[i].level))

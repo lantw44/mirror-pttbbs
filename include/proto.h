@@ -20,6 +20,7 @@ int m_register();
 int cat_register();
 unsigned int setperms(unsigned int pbits, char *pstring[]);
 void setup_man(boardheader_t * board);
+int make_symbolic_link(int gid, int bid);
 
 /* announce */
 int a_menu(char *maintitle, char *path, int lastlevel);

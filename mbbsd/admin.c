@@ -675,6 +675,25 @@ m_newbrd(int recover)
     return 0;
 }
 
+int make_symbolic_link(int gid, int bid)
+{
+    boardheader_t   newboard;
+
+    stand_title("建立看板連結");
+    memset(&newboard, 0, sizeof(newboard));
+
+    newboard.gid = gid;
+    newboard.brdattr = BRD_NOTRAN | BRD_SYMBOLIC;
+    if (append_record(fn_board, (fileheader_t *) & newboard, sizeof(newboard)) == -1) {
+	vmsg("看板連結建來失敗");
+	return -1;
+    } else {
+	addbrd_touchcache();
+    }
+    pressanykey();
+    return 0;
+}
+
 static int
 auto_scan(char fdata[][STRLEN], char ans[])
 {

@@ -162,6 +162,8 @@ typedef struct boardheader_t {
 #define BRD_NORECOMMEND 000010000         /* 不可推薦 */
 #define BRD_BLOG        000020000         /* BLOG */
 #define BRD_BMCOUNT	000040000	  /* 板主設定列入記錄 */
+#define BRD_SYMBOLIC	000100000	  /* symbolic link to board */
+
 
 #define TTLEN      64             /* Length of title */
 #define FNLEN      33             /* Length of filename  */

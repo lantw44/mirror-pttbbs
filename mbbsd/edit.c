@@ -189,24 +189,24 @@ edit_msg()
        clrtoeol();
        if(phone_mode<20)
         {
-         prints("\033m[1;46m【%s輸入】 ", BIG_mode[phone_mode - 1]);
+         prints("\033[1;46m【%s輸入】 ", BIG_mode[phone_mode - 1]);
          for (i = 0;i < 16;i++)
             if (i < strlen(BIG5[phone_mode - 1]) / 2)
-                 prints("\033m[37m%c\033m[34m%2.2s", 
+                 prints("\033[37m%c\033[34m%2.2s", 
                    i + 'A', BIG5[phone_mode - 1] + i * 2);
             else
                  outs("   ");
-         outs("\033m[37m   `-=切換 Z表格 \033m[m");
+         outs("\033[37m   `-=切換 Z表格 \033[m");
         }
        else
         {
-         prints("\033m[1;46m【表格繪製】 /=%s *=%s形   ",
+         prints("\033[1;46m【表格繪製】 /=%s *=%s形   ",
              table_mode[(phone_mode - 20) / 4], 
              table_mode[(phone_mode - 20) % 4 + 2]);
          for (i = 0;i < 11;i++)
-             prints("\033m[37m%c\033m[34m%2.2s", i ? i + '/' : '.', 
+             prints("\033[37m%c\033[34m%2.2s", i ? i + '/' : '.', 
              table[phone_mode - 20] + i * 2);
-         outs("\033m[37m          Z內碼 \033m[m");
+         outs("\033[37m          Z內碼 \033[m");
         }
     }
     move(b_lines, 0);
@@ -1823,6 +1823,7 @@ vedit(char *fpath, int saveheader, int *islocal)
                 continue;
               case '0':
               case '1':
+              case '2':
 	      case '3':
 	      case '4':
 	      case '5':

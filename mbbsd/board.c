@@ -553,6 +553,8 @@ paste_taged_brds(int gid)
     sort_bcache();
     return 1;
 }
+static int board_help[] = {490, 491, 492, 493, 494, 495, 496, 497, 498,
+499, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, -1};
 
 static void
 choose_board(int newflag)
@@ -722,7 +724,7 @@ choose_board(int newflag)
 	    }
 	    break;
 	case 'h':
-	    show_help(SHM->i18nstr[cuser.language], 490, 20);
+	    show_help(board_help);
 	    show_brdlist(head, 1, newflag);
 	    break;
 	case '/':

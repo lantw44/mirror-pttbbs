@@ -616,20 +616,21 @@ int log_file(char *fn, int ifcreate, const char *fmt,...)
 }
 
 void
-show_help(char **helptext, int start, int num)
+show_help(int *index)
 {
     char           *str;
     int             i;
 
     clear();
-    for (i = 0; i < num && start + i < MAX_STRING; i++) {
-	    str = helptext[start + i];
-		if (*str == '\0')
-		    prints(SHM->i18nstr[cuser.language][1888], str + 1);
-		else if (*str == '\01')
-		    prints(SHM->i18nstr[cuser.language][1889], str + 1);
-		else
-		    prints("        %s\n", str);
+    while (*index > 0 && *index < MAX_STRING) {
+    	str = SHM->i18nstr[cuser.language][*index];
+    	if (*str == '\0')
+    		prints(SHM->i18nstr[cuser.language][1888], str + 1);
+    	else if (*str == '\01')
+    		prints(SHM->i18nstr[cuser.language][1889], str + 1);
+    	else
+    		prints("        %s\n", str);
+    	index++;
     }
     pressanykey();
 }

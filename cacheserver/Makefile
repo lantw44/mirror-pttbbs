@@ -1,13 +1,16 @@
 # $Id$
 .include "../pttbbs.mk"
 
-all:	cacheserver
+all:	cacheserver utmpserver
 
 cacheserver:	cacheserver.c
 	${CC} ${CFLAGS} ${LDFLAGS} -o cacheserver cacheserver.c avltree.c
 
-clean:
-	rm -f cacheserver *~
+utmpserver:	utmpserver.c
+	${CC} ${CFLAGS} ${LDFLAGS} -o utmpserver utmpserver.c
 
-test:	cacheserver
-	./cacheserver -f /home/backup/ptt2/PASSWDS.NEW -p 5120
+clean:
+	rm -f cacheserver utmpserver *~
+
+test:	utmpserver
+	./utmpserver

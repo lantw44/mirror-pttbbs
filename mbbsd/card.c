@@ -31,7 +31,7 @@ static int
 card_select(int *now)
 {
     char           *cc[2] = {"\033[44m            \033[m",
-    "\033[1;33;41m     △     \033[m"};
+    SHM->i18nstr[cuser.language][580]};
 
     while (1) {
 	move(20, 0);
@@ -79,55 +79,55 @@ static void
 card_display(int cline, int number, int flower, int show)
 {
     int             color = 31;
-    char           *cn[13] = {"Ａ", "２", "３", "４", "５", "６",
-    "７", "８", "９", "10", "Ｊ", "Ｑ", "Ｋ"};
+    char           *cn[13] = {SHM->i18nstr[cuser.language][581], SHM->i18nstr[cuser.language][582], SHM->i18nstr[cuser.language][583], SHM->i18nstr[cuser.language][584], SHM->i18nstr[cuser.language][585], SHM->i18nstr[cuser.language][586],
+    SHM->i18nstr[cuser.language][587], SHM->i18nstr[cuser.language][588], SHM->i18nstr[cuser.language][589], "10", SHM->i18nstr[cuser.language][590], SHM->i18nstr[cuser.language][591], SHM->i18nstr[cuser.language][592]};
     if (flower == 0 || flower == 3)
 	color = 36;
     if ((show < 0) && (cline > 1 && cline < 8))
-	prints("│\033[1;33;42m※※※※\033[m│");
+	prints(SHM->i18nstr[cuser.language][593]);
     else
 	switch (cline) {
 	case 1:
-	    prints("╭────╮");
+	    prints(SHM->i18nstr[cuser.language][594]);
 	    break;
 	case 2:
-	    prints("│\033[1;%dm%s\033[m      │", color, cn[number - 1]);
+	    prints(SHM->i18nstr[cuser.language][595], color, cn[number - 1]);
 	    break;
 	case 3:
 	    if (flower == 1)
-		prints("│\033[1;%dm◢◣◢◣\033[m│", color);
+		prints(SHM->i18nstr[cuser.language][596], color);
 	    else
-		prints("│\033[1;%dm  ◢◣  \033[m│", color);
+		prints(SHM->i18nstr[cuser.language][597], color);
 	    break;
 	case 4:
 	    if (flower == 1)
-		prints("│\033[1;%dm████\033[m│", color);
+		prints(SHM->i18nstr[cuser.language][598], color);
 	    else if (flower == 3)
-		prints("│\033[1;%dm◣██◢\033[m│", color);
+		prints(SHM->i18nstr[cuser.language][599], color);
 	    else
-		prints("│\033[1;%dm◢██◣\033[m│", color);
+		prints(SHM->i18nstr[cuser.language][600], color);
 	    break;
 	case 5:
 	    if (flower == 0)
-		prints("│\033[1;%dm████\033[m│", color);
+		prints(SHM->i18nstr[cuser.language][601], color);
 	    else if (flower == 3)
-		prints("│\033[1;%dm█◥◤█\033[m│", color);
+		prints(SHM->i18nstr[cuser.language][602], color);
 	    else
-		prints("│\033[1;%dm◥██◤\033[m│", color);
+		prints(SHM->i18nstr[cuser.language][603], color);
 	    break;
 	case 6:
 	    if (flower == 0)
-		prints("│\033[1;%dm  ◢◣  \033[m│", color);
+		prints(SHM->i18nstr[cuser.language][604], color);
 	    else if (flower == 3)
-		prints("│\033[1;%dm◥◢◣◤\033[m│", color);
+		prints(SHM->i18nstr[cuser.language][605], color);
 	    else
-		prints("│\033[1;%dm  ◥◤  \033[m│", color);
+		prints(SHM->i18nstr[cuser.language][606], color);
 	    break;
 	case 7:
-	    prints("│      \033[1;%dm%s\033[m│", color, cn[number - 1]);
+	    prints(SHM->i18nstr[cuser.language][607], color, cn[number - 1]);
 	    break;
 	case 8:
-	    prints("╰────╯");
+	    prints(SHM->i18nstr[cuser.language][608]);
 	    break;
 	}
 }
@@ -176,12 +176,11 @@ card_start(char name[])
     clear();
     stand_title(name);
     move(1, 0);
-    prints("    \033[1;33;41m   電  腦   \033[m");
+    prints(SHM->i18nstr[cuser.language][609]);
     move(10, 0);
-    prints("\033[1;34;44m◆～◆～◆～◆～◆～◆～◆～◆～◆～◆～◆～◆～"
-	   "◆～◆～◆～◆～◆～◆～◆～◆\033[m");
+    prints(SHM->i18nstr[cuser.language][610]);
     move(19, 0);
-    prints("    \033[1;37;42m   自  己   \033[m");
+    prints(SHM->i18nstr[cuser.language][611]);
 }
 
 static int
@@ -263,14 +262,14 @@ card_99()
     int             cpu[5], c[5], me[5], m[5];
     int             cards[52];
     int             count = 0;
-    char           *ff[4] = {"\033[1;36m黑桃", "\033[1;31m紅心",
-    "\033[1;31m方塊", "\033[1;36m黑花"};
-    char           *cn[13] = {"Ａ", "２", "３", "４", "５", "６",
-    "７", "８", "９", "10", "Ｊ", "Ｑ", "Ｋ"};
+    char           *ff[4] = {SHM->i18nstr[cuser.language][612], SHM->i18nstr[cuser.language][613],
+    SHM->i18nstr[cuser.language][614], SHM->i18nstr[cuser.language][615]};
+    char           *cn[13] = {SHM->i18nstr[cuser.language][616], SHM->i18nstr[cuser.language][617], SHM->i18nstr[cuser.language][618], SHM->i18nstr[cuser.language][619], SHM->i18nstr[cuser.language][620], SHM->i18nstr[cuser.language][621],
+    SHM->i18nstr[cuser.language][622], SHM->i18nstr[cuser.language][623], SHM->i18nstr[cuser.language][624], "10", SHM->i18nstr[cuser.language][625], SHM->i18nstr[cuser.language][626], SHM->i18nstr[cuser.language][627]};
     for (i = 0; i < 5; i++)
 	cpu[i] = c[i] = me[i] = m[i] = -1;
     setutmpmode(CARD_99);
-    card_start("天長地久");
+    card_start(SHM->i18nstr[cuser.language][628]);
     card_new(cards);
     for (i = 0; i < 5; i++) {
 	cpu[i] = card_give(cards);
@@ -282,8 +281,8 @@ card_99()
     turn = 1;
     move(21, 0);
     clrtoeol();
-    prints("[0]目前 %d , 殘 %d 點\n", count, 99 - count);
-    prints("左右鍵移動游標, [Enter]確定, [ + ]表加二十(加十), [Q/q]放棄遊戲");
+    prints(SHM->i18nstr[cuser.language][629], count, 99 - count);
+    prints(SHM->i18nstr[cuser.language][630]);
     while (1) {
 	i = card_select(&j);
 	if (i == 0)		/* 放棄遊戲 */
@@ -291,7 +290,7 @@ card_99()
 	count = card_99_add(card_number(me[j]), i, count);
 	move(21 + (turn / 2) % 2, 0);
 	clrtoeol();
-	prints("[%d]您出 %s%s\033[m 目前 \033[1;31m%d/\033[34m%d\033[m 點",
+	prints(SHM->i18nstr[cuser.language][631],
 	       turn, ff[card_flower(me[j])],
 	       cn[card_number(me[j]) - 1], count, 99 - count);
 	me[j] = card_give(cards);
@@ -303,14 +302,14 @@ card_99()
 	if (count > 99) {
 	    move(22, 0);
 	    clrtoeol();
-	    prints("[%d]結果..YOU LOSS..目前 \033[1;31m%d/\033[34m%d\033[m 點",
+	    prints(SHM->i18nstr[cuser.language][632],
 		   turn, count, 99 - count);
 	    pressanykey();
 	    return 0;
 	}
 	i = card_99_cpu(cpu, &count);
 	move(21 + (turn / 2 + 1) % 2, 40);
-	prints("[%d]電腦出 %s%s\033[m 目前 \033[1;31m%d/\033[34m%d\033[m 點",
+	prints(SHM->i18nstr[cuser.language][633],
 	       turn, ff[card_flower(cpu[i])],
 	       cn[card_number(cpu[i]) - 1], count, 99 - count);
 	cpu[i] = card_give(cards);
@@ -320,7 +319,7 @@ card_99()
 	if (count > 99) {
 	    move(22, 0);
 	    clrtoeol();
-	    prints("[%d]結果..YOU WIN!..目前 \033[1;31m%d/\033[34m%d\033[m 點",
+	    prints(SHM->i18nstr[cuser.language][634],
 		   turn, count, 99 - count);
 	    pressanykey();
 	    return 0;
@@ -373,7 +372,7 @@ card_double_ask()
     char            buf[100], buf2[3];
 
     snprintf(buf, sizeof(buf),
-	     "[ %s ]您現在共有 %d P幣,  現在要分組(加收 %d 元)嗎? [y/N]",
+	     SHM->i18nstr[cuser.language][635],
 	     cuser.userid, cuser.money, JACK);
     reload_money();
     if (cuser.money < JACK)
@@ -389,7 +388,7 @@ card_ask()
 {
     char            buf[100], buf2[3];
 
-    snprintf(buf, sizeof(buf), "[ %s ]您現在共有 %d P幣,  還要加牌嗎? [y/N]",
+    snprintf(buf, sizeof(buf), SHM->i18nstr[cuser.language][636],
 	    cuser.userid, cuser.money);
     getdata(20, 0, buf, buf2, sizeof(buf2), LCECHO);
     if (buf2[0] == 'y' || buf2[0] == 'Y')
@@ -433,13 +432,13 @@ card_jack(int *db)
 
     if ((*db) < 0) {
 	card_new(cards);
-	card_start("黑傑克");
+	card_start(SHM->i18nstr[cuser.language][637]);
 	for (i = 0; i < 2; i++) {
 	    cpu[i] = card_give(cards);
 	    me[i] = card_give(cards);
 	}
     } else {
-	card_start("黑傑克DOUBLE追加局");
+	card_start(SHM->i18nstr[cuser.language][638]);
 	cpu[0] = card_give(cards);
 	cpu[1] = card_give(cards);
 	me[0] = *db;
@@ -451,13 +450,13 @@ card_jack(int *db)
 	(card_number(me[1]) == 0 && card_number(me[0]) == 12)) {
 	if (card_flower(me[0]) == 0 && card_flower(me[1]) == 0) {
 	    move(b_lines - 1, 0);
-	    prints("非常不錯唷! (超級黑傑克!! 加 %d 元)", JACK * 10);
+	    prints(SHM->i18nstr[cuser.language][639], JACK * 10);
 	    game_log(JACK, JACK * 10);
 	    pressanykey();
 	    return 0;
 	} else {
 	    move(b_lines - 1, 0);
-	    prints("很不錯唷! (黑傑克!! 加 %d 元)", JACK * 5);
+	    prints(SHM->i18nstr[cuser.language][640], JACK * 5);
 	    game_log(JACK, JACK * 5);
 	    pressanykey();
 	    return 0;
@@ -468,7 +467,7 @@ card_jack(int *db)
 	c[0] = 1;
 	card_show(cpu, c, me, m);
 	move(b_lines - 1, 0);
-	prints("嘿嘿...不好意思....黑傑克!!");
+	prints(SHM->i18nstr[cuser.language][641]);
 	game_log(JACK, 0);
 	pressanykey();
 	return 0;
@@ -486,7 +485,7 @@ card_jack(int *db)
 	card_show(cpu, c, me, m);
 	if (card_alls_lower(me) > 21) {
 	    move(b_lines - 1, 0);
-	    prints("嗚嗚...爆掉了!");
+	    prints(SHM->i18nstr[cuser.language][642]);
 	    game_log(JACK, 0);
 	    pressanykey();
 	    return 0;
@@ -495,7 +494,7 @@ card_jack(int *db)
 	if ((i == 3) && (card_number(me[0]) == 7) &&
 	    (card_number(me[1]) == 7) && (card_number(me[2]) == 7)) {
 	    move(b_lines - 1, 0);
-	    prints("很不錯唷! (幸運七號!! 加 %d 元)", JACK * 7);
+	    prints(SHM->i18nstr[cuser.language][643], JACK * 7);
 	    game_log(JACK, JACK * 7);
 	    pressanykey();
 	    return 0;
@@ -503,7 +502,7 @@ card_jack(int *db)
     }
     if (i == 5) {		/* 過五關 */
 	move(b_lines - 1, 0);
-	prints("好厲害唷! 過五關嘍! 加P幣 %d 元!", 5 * JACK);
+	prints(SHM->i18nstr[cuser.language][644], 5 * JACK);
 	game_log(JACK, JACK * 5);
 	pressanykey();
 	return 0;
@@ -517,7 +516,7 @@ card_jack(int *db)
 	if (card_alls_lower(cpu) > 21) {
 	    card_show(cpu, c, me, m);
 	    move(b_lines - 1, 0);
-	    prints("呵呵...電腦爆掉了! 你贏了! 可得P幣 %d 元", JACK * 2);
+	    prints(SHM->i18nstr[cuser.language][645], JACK * 2);
 	    game_log(JACK, JACK * 2);
 	    pressanykey();
 	    return 0;
@@ -526,7 +525,7 @@ card_jack(int *db)
     }
     card_show(cpu, c, me, m);
     move(b_lines - 1, 0);
-    prints("哇哇...電腦贏了!");
+    prints(SHM->i18nstr[cuser.language][646]);
     game_log(JACK, 0);
     pressanykey();
     return 0;
@@ -542,16 +541,16 @@ g_card_jack()
     while (1) {
 	reload_money();
 	if (cuser.money < JACK) {
-	    outs("您的錢不夠唷!去多發表些有意義的文章再來~~~");
+	    outs(SHM->i18nstr[cuser.language][647]);
 	    return 0;
 	}
-	getdata(b_lines - 1, 0, "確定要玩黑傑克嗎 一次十元唷?(Y/N)?[N]",
+	getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][648],
 		buf, 3, LCECHO);
 	if ((*buf != 'y') && (*buf != 'Y'))
 	    break;
 	else {
 	    db = -1;
-	    vice(PMONEY, "黑傑克");
+	    vice(PMONEY, SHM->i18nstr[cuser.language][649]);
 	    card_jack(&db);
 	    if (db >= 0)
 		card_jack(&db);
@@ -580,7 +579,7 @@ ten_helf()
     int             cpu[5], c[5], me[5], m[5];
     int             cards[52];
 
-    card_start("十點半");
+    card_start(SHM->i18nstr[cuser.language][650]);
     card_new(cards);
     for (i = 0; i < 5; i++)
 	cpu[i] = c[i] = me[i] = m[i] = -1;
@@ -596,7 +595,7 @@ ten_helf()
 	card_show(cpu, c, me, m);
 	if (card_all(me) > 21) {
 	    move(b_lines - 1, 0);
-	    prints("嗚嗚...爆掉了!");
+	    prints(SHM->i18nstr[cuser.language][651]);
 	    game_log(TEN_HALF, 0);
 	    pressanykey();
 	    return 0;
@@ -605,7 +604,7 @@ ten_helf()
     }
     if (i == 5) {		/* 過五關 */
 	move(b_lines - 1, 0);
-	prints("好厲害唷! 過五關嘍! 加P幣 %d 元!", 5 * PMONEY);
+	prints(SHM->i18nstr[cuser.language][652], 5 * PMONEY);
 	game_log(TEN_HALF, PMONEY * 5);
 	pressanykey();
 	return 0;
@@ -619,7 +618,7 @@ ten_helf()
 	if (card_all(cpu) > 21) {
 	    card_show(cpu, c, me, m);
 	    move(b_lines - 1, 0);
-	    prints("呵呵...電腦爆掉了! 你贏了! 可得P幣 %d 元", PMONEY * 2);
+	    prints(SHM->i18nstr[cuser.language][653], PMONEY * 2);
 	    game_log(TEN_HALF, PMONEY * 2);
 	    pressanykey();
 	    return 0;
@@ -628,7 +627,7 @@ ten_helf()
     }
     card_show(cpu, c, me, m);
     move(b_lines - 1, 0);
-    prints("哇哇...電腦贏了!");
+    prints(SHM->i18nstr[cuser.language][654]);
     game_log(TEN_HALF, 0);
     pressanykey();
     return 0;
@@ -643,16 +642,16 @@ g_ten_helf()
     while (1) {
 	reload_money();
 	if (cuser.money < TEN_HALF) {
-	    outs("您的錢不夠唷!去多發表些有意義的文章再來~~~");
+	    outs(SHM->i18nstr[cuser.language][655]);
 	    return 0;
 	}
 	getdata(b_lines - 1, 0,
-		"\033[1;37m確定要玩十點半嗎 一次十元唷?(Y/N)?[N]\033[m",
+		SHM->i18nstr[cuser.language][656],
 		buf, 3, LCECHO);
 	if (buf[0] != 'y' && buf[0] != 'Y')
 	    return 0;
 	else {
-	    vice(PMONEY, "十點半");
+	    vice(PMONEY, SHM->i18nstr[cuser.language][657]);
 	    ten_helf();
 	}
     }

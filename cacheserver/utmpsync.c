@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 
     index = -1;
     towrite(sfd, &index, sizeof(index));
-    for( i = 0 ; i < MAX_ACTIVE ; ++i )
+    for( i = 0 ; i < USHM_SIZE ; ++i )
 	if( towrite(sfd, &SHM->uinfo[i].uid, sizeof(SHM->uinfo[i].uid)) < 0 ||
 	    towrite(sfd, SHM->uinfo[i].friend,
 		    sizeof(SHM->uinfo[i].friend)) < 0                       ||

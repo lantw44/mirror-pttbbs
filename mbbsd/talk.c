@@ -210,20 +210,27 @@ reverse_friend_stat(int stat)
     return stat1;
 }
 
-int
-login_friend_online(void)
+void login_friend_online(void)
 {
     userinfo_t     *uentp;
     int             i, stat, stat1;
     int             offset = (int)(currutmp - &SHM->uinfo[0]);
 #ifdef OUTTACACHE
     int             sfd;
-
-    if( (sfd = toconnect(OUTTACACHEHOST, OUTTACACHEPOST)) > 0 ){
+    if( (sfd = toconnect(OUTTACACHEHOST, OUTTACACHEPORT)) > 0 ){
 	if( towrite(sfd, &offset, sizeof(offset)) > 0                    &&
 	    towrite(sfd, &currutmp->uid, sizeof(currutmp->uid)) > 0      &&
 	    towrite(sfd, currutmp->friend, sizeof(currutmp->friend)) > 0 &&
 	    towrite(sfd, currutmp->reject, sizeof(currutmp->reject)) > 0 ){
+	    ocfs_t  fs;
+	    while( toread(sfd, &fs, sizeof(fs)) > 0 )
+		if( SHM->uinfo[fs.index].uid == fs.uid ){
+		    currutmp->friend_online[currutmp->friendtotal++]
+			= fs.friendstat;
+		    SHM->uinfo[fs.index].friend_online[ SHM->uinfo[fs.index].friendtotal++ ] = fs.rfriendstat;
+		}
+	    close(sfd);
+	    return;
 	}
 	close(sfd);
     }
@@ -242,7 +249,7 @@ login_friend_online(void)
 	    }
 	}
     }
-    return 0;
+    return;
 }
 
 int

@@ -565,7 +565,7 @@ int t_talk();
 int t_display();
 int my_query(char *uident);
 int logout_friend_online();
-int login_friend_online();
+void login_friend_online();
 int isvisible_uid(int tuid);
 int friend_stat(userinfo_t *me, userinfo_t * ui);
 int call_in(userinfo_t *uentp, int fri_stat);

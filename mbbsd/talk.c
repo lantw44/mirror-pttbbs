@@ -574,10 +574,13 @@ my_write2(void)
 }
 
 /*
- * 被呼叫的時機: 1. 丟群組水球 flag = 1 (pre-edit) 2. 回水球     flag = 0 3.
- * 上站aloha  flag = 2 (pre-edit) 4. 廣播       flag = 3 if SYSOP, otherwise
- * flag = 1 (pre-edit) 5. 丟水球     flag = 0 6. my_write2  flag = 4
- * (pre-edit) but confirm
+ * 被呼叫的時機:
+ * 1. 丟群組水球 flag = 1 (pre-edit)
+ * 2. 回水球     flag = 0
+ * 3. 上站aloha  flag = 2 (pre-edit)
+ * 4. 廣播       flag = 3 if SYSOP, otherwise flag = 1 (pre-edit)
+ * 5. 丟水球     flag = 0
+ * 6. my_write2  flag = 4 (pre-edit) but confirm
  */
 int
 my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
@@ -1860,6 +1863,9 @@ draw_pickup(int drawall, pickup_t * pickup, int pickup_way,
 int
 call_in(userinfo_t * uentp, int fri_stat)
 {
+    if( ! strcasecmp(uentp->userid, cuser.myangel) )
+	outmsg("直接丟水球給小天使是會被知道 ID 的喔！");
+ 
     if (iswritable_stat(uentp, fri_stat)) {
 	char            genbuf[60];
 	snprintf(genbuf, sizeof(genbuf), "Call-In %s ：", uentp->userid);
@@ -2718,3 +2724,22 @@ talkreply(void)
  * ""); } if (++linecnt < 3){ strcat(uentry, "│"); outs(uentry); } else{
  * outs(uentry); linecnt = 0; clrtoeol(); move(++lineno, 0); } return 0; }
  */
+
+/* 小天使小主人處理函式 */
+int
+t_changeangel(){
+    char buf[4];
+    if( cuser.myangel[0] == 0 ) return 0;
+    getdata(b_lines - 1, 0,
+	    "更換小天使後就無法換回了喔！ 是否要更換小天使？ [y/N]",
+	    buf, 3, LCECHO);
+    if( buf[0] == 'y' || buf[0] == 'Y' ){
+	cuser.myangel[0] = 0;
+	vmsg("小天使更新完成，下次呼叫時會選出新的小天使");
+    }
+    return 0;
+}
+
+void
+CallAngel(){
+}

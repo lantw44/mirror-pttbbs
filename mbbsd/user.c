@@ -90,6 +90,8 @@ user_display(userec_t * u, int real)
 	   get_num_records(genbuf, sizeof(fileheader_t)),
 	   u->exmailbox, u->mobile,
 	   u->month, u->day, u->year % 100, u->mychicken.name);
+    prints("                小 天 使: %s\n",
+	    u->myangel[0] ? u->myangel : "無");
     prints("                註冊日期: %s", ctime(&u->firstlogin));
     prints("                前次光臨: %s", ctime(&u->lastlogin));
     prints("                前次點歌: %s", ctime(&u->lastsong));

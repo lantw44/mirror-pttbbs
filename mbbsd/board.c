@@ -272,7 +272,6 @@ brc_unread(const char *fname, int bnum, const int *blist)
 #define NBRD_UNREAD     32
 #define NBRD_SYMBOLIC   64
 
-#define BRD_LINK_TARGET(x)	((x)->nuser)
 #define TITLE_MATCH(bptr, key)	((key)[0] && !strcasestr((bptr)->title, (key)))
 #define GROUPOP()		(currmode & MODE_GROUPOP)
 
@@ -612,9 +611,13 @@ load_boards(char *key)
 		    !((state = HasPerm(bptr)) || GROUPOP()) ||
 		    (bptr->brdattr & (BRD_GROUPBOARD | BRD_SYMBOLIC)) ||
 		    TITLE_MATCH(bptr, key) ||
-		    // XXX:
-		    // class_bid == -1 should be remove
-		    //   if symbolic link work fine
+		    /* Should "class_bid == -1" be removed if symbolic
+		     * link work fine?
+		     * Consideration:
+		     *   Symbolic link cause too much IO because 
+		     *   add/remove link will be change .BRD, but
+		     *   scanning the whole boards take much CPU.
+		     */
 		    (class_bid == -1 && bptr->nuser < 5))
 		    continue;
 		addnewbrdstat(n, state);
@@ -638,10 +641,14 @@ load_boards(char *key)
 	    state = HasPerm(bptr);
 	    if ( !(state || GROUPOP()) || TITLE_MATCH(bptr, key) )
 		continue;
+
 	    if (bptr->brdattr & BRD_SYMBOLIC) {
-		n = BRD_LINK_TARGET(bptr);
-		bptr = &bcache[n];
-		state |= NBRD_SYMBOLIC;
+
+		/* Only SYSOP knows a board is symbolic */
+		if (HAS_PERM(PERM_SYSOP))
+		    state |= NBRD_SYMBOLIC;
+		else
+		    n = BRD_LINK_TARGET(bptr) - 1;
 	    }
 	    addnewbrdstat(n, state);
 	}
@@ -919,6 +926,11 @@ set_menu_BM(char *BM)
     }
 }
 
+static void replace_link_by_target(boardstat_t *board)
+{
+    board->bid = BRD_LINK_TARGET(&bcache[board->bid - 1]);
+    board->myattr &= ~NBRD_SYMBOLIC;
+}
 
 static void
 choose_board(int newflag)
@@ -1114,7 +1126,7 @@ choose_board(int newflag)
 	    break;
 	case 'y':
 	    if (get_current_fav() != NULL || yank_flag != 0)
-	    yank_flag = (yank_flag + 1) % 2;
+		yank_flag = (yank_flag + 1) % 2;
 	    brdnum = -1;
 	    break;
 	case Ctrl('D'):
@@ -1152,14 +1164,8 @@ choose_board(int newflag)
 	    break;
 	case 'L':
 	    if (HAS_PERM(PERM_SYSOP) && class_bid > 0) {
-		tmp = generalnamecomplete("請輸入看板英文名稱：",
-                            buf, sizeof(buf),
-                            SHM->Bnumber,
-                            completeboard_compar,
-                            completeboard_permission,
-                            completeboard_getname);
-		if (tmp >= 0)
-		    make_symbolic_link(class_bid, tmp);
+		if (make_symbolic_link_interactively(class_bid) < 0)
+		    break;
 		brdnum = -1;
 		head = 9999;
 	    }
@@ -1172,6 +1178,12 @@ choose_board(int newflag)
 		if (get_fav_type(&nbrd[0]) != 0)
 		    move_in_current_folder(brdnum, num);
 		brdnum = -1;
+		head = 9999;
+	    }
+	    break;
+	case 'l':
+	    if (HAS_PERM(PERM_SYSOP) && (nbrd[num].myattr & NBRD_SYMBOLIC)) {
+		replace_link_by_target(&nbrd[num]);
 		head = 9999;
 	    }
 	    break;
@@ -1322,7 +1334,7 @@ choose_board(int newflag)
 	    num = tmp;
 	    break;
 	case 'E':
-	    if (HAS_PERM(PERM_SYSOP) || GROUP_OP()) {
+	    if (HAS_PERM(PERM_SYSOP) || GROUPOP()) {
 		ptr = &nbrd[num];
 		move(1, 1);
 		clrtobot();
@@ -1331,20 +1343,20 @@ choose_board(int newflag)
 	    }
 	    break;
 	case 'R':
-	    if (HAS_PERM(PERM_SYSOP) || GROUP_OP()) {
+	    if (HAS_PERM(PERM_SYSOP) || GROUPOP()) {
 		m_newbrd(1);
 		brdnum = -1;
 	    }
 	    break;
 	case 'B':
-	    if (HAS_PERM(PERM_SYSOP) || GROUP_OP()) {
+	    if (HAS_PERM(PERM_SYSOP) || GROUPOP()) {
 		m_newbrd(0);
 		brdnum = -1;
 	    }
 	    break;
 	case 'W':
 	    if (class_bid > 0 &&
-		(HAS_PERM(PERM_SYSOP) || GROUP_OP())) {
+		(HAS_PERM(PERM_SYSOP) || GROUPOP())) {
 		setbpath(buf, bcache[class_bid - 1].brdname);
 		mkdir(buf, 0755);	/* Ptt:開群組目錄 */
 		b_note_edit_bname(class_bid);
@@ -1364,20 +1376,25 @@ choose_board(int newflag)
 	case 'r':
 	    {
 		ptr = &nbrd[num];
-		if (yank_flag == 0 && get_fav_type(&nbrd[0]) == 0)
-		    break;
-		else if (ptr->myattr & NBRD_LINE)
-		    break;
-		else if (ptr->myattr & NBRD_FOLDER){
-		    int t = num;
-		    num = 0;
-		    fav_folder_in(ptr->bid);
-		    choose_board(0);
-		    fav_folder_out();
-		    num = t;
-		    brdnum = -1;
-		    head = 9999;
-		    break;
+		if (yank_flag == 0) {
+		    if (get_fav_type(&nbrd[0]) == 0)
+			break;
+		    else if (ptr->myattr & NBRD_LINE)
+			break;
+		    else if (ptr->myattr & NBRD_FOLDER){
+			int t = num;
+			num = 0;
+			fav_folder_in(ptr->bid);
+			choose_board(0);
+			fav_folder_out();
+			num = t;
+			brdnum = -1;
+			head = 9999;
+			break;
+		    }
+		}
+		else if (ptr->myattr & NBRD_SYMBOLIC) {
+		    replace_link_by_target(ptr);
 		}
 
 		if (!(B_BH(ptr)->brdattr & BRD_GROUPBOARD)) {	/* 非sub class */
@@ -1407,7 +1424,7 @@ choose_board(int newflag)
 		    else
 			class_bid = -1;	/* 熱門群組用 */
 
-		    if (!GROUP_OP())	/* 如果還沒有小組長權限 */
+		    if (!GROUPOP())	/* 如果還沒有小組長權限 */
 			set_menu_BM(B_BH(ptr)->BM);
 
 		    if (now < B_BH(ptr)->bupdate) {

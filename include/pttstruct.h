@@ -164,6 +164,9 @@ typedef struct boardheader_t {
 #define BRD_BMCOUNT	000040000	  /* 板主設定列入記錄 */
 #define BRD_SYMBOLIC	000100000	  /* symbolic link to board */
 
+#define BRD_LINK_TARGET(x)	((x)->postexpire)
+
+
 
 #define TTLEN      64             /* Length of title */
 #define FNLEN      33             /* Length of filename  */

@@ -239,7 +239,7 @@ static void rebuild_fav(fav_t *fp, int clean_invisible)
 		bp = &bcache[cast_board(ft)->bid - 1];
 		if (!bp->brdname[0])
 		    continue;
-		if ( clean_invisible && !Ben_Perm(bp))
+		if ( clean_invisible && !HasPerm(bp))
 		    continue;
 		break;
 	    case FAVT_LINE:

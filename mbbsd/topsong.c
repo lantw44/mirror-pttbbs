@@ -1,4 +1,4 @@
-/* $Id: topsong.c,v 1.6 2002/07/27 10:04:34 kcwu Exp $ */
+/* $Id$ */
 #include "bbs.h"
 
 #define MAX_SONGS 300
@@ -68,9 +68,7 @@ sortsong()
     }
     qsort(songs, MAX_SONGS, sizeof(songcmp_t), (QCAST) count_cmp);
     fprintf(fo,
-	    "    \033[36m──\033[37m名次\033[36m──────\033[37m歌"
-	    "  名\033[36m───────────\033[37m次數\033[36m"
-	    "──\033[32m共%ld次\033[36m──\033[m\n", totalcount);
+	    SHM->i18nstr[cuser.language][2078], totalcount);
     for (n = 0; n < 100 && songs[n].name[0]; n++) {
 	fprintf(fo, "      %5d. %-38.38s %4ld \033[32m[%.2f]\033[m\n", n + 1,
 		songs[n].name, songs[n].count,

@@ -8,28 +8,10 @@ static int      more_base, more_size, more_head;
 static unsigned char more_pool[MORE_BUFSIZE];
 
 
-static char    *more_help[] = {
-    "\0閱\讀文章功\能鍵使用說明",
-    "\01游標移動功\能鍵",
-    "(↑)                  上捲一行",
-    "(↓)(Enter)           下捲一行",
-    "(^B)(PgUp)(BackSpace) 上捲一頁",
-    "(→)(PgDn)(Space)     下捲一頁",
-    "(0)(g)(Home)          檔案開頭",
-    "($)(G) (End)          檔案結尾",
-    "\01其他功\能鍵",
-    "(/)                   搜尋字串",
-    "(n/N)                 重複正/反向搜尋",
-    "(TAB)                 URL連結",
-    "(Ctrl-T)              存到暫存檔",
-    "(:/f/b)               跳至某頁/下/上篇",
-    "(a/A)                 跳至同一作者下/上篇",
-    "([/])                 主題式閱\讀 上/下",
-    "(t)                   主題式循序閱\讀",
-    "(q)(←)               結束",
-    "(h)(H)(?)             輔助說明畫面",
-    NULL
-};
+static int    more_help[] = {1507, 1508,
+1509, 1510, 1511, 1512, 1513, 1514, 1515, 1516, 1517, 1518, 1519,
+1520, 1521, 1522, 1523, 1524, 1525, 1526, 1527, -1};
+
 
 int             beep = 0;
 
@@ -132,7 +114,7 @@ more_readln(int fd, unsigned char *buf)
 int
 more(char *fpath, int promptend)
 {
-    char    *head[4] = {"作者", "標題", "時間", "轉信"};
+    char    *head[4] = {SHM->i18nstr[cuser.language][1528], SHM->i18nstr[cuser.language][1529], SHM->i18nstr[cuser.language][1530], SHM->i18nstr[cuser.language][1531]};
     char           *ptr, *word = NULL, buf[ANSILINELEN + 1];
     struct stat     st;
 
@@ -192,12 +174,10 @@ more(char *fpath, int promptend)
 			if (!pos && ((ptr = strstr(word, str_post1)) ||
 				     (ptr = strstr(word, str_post2)))) {
 			    ptr[-1] = '\0';
-			    prints("\033[47;34m %s \033[44;37m%-53.53s"
-				"\033[47;34m %.4s \033[44;37m%-13s\033[m\n",
+			    prints("\033[47;34m %s \033[44;37m%-53.53s\033[47;34m %.4s \033[44;37m%-13s\033[m\n",
 				   head[0], word, ptr, ptr + 5);
 			} else if (pos < line)
-			    prints("\033[47;34m %s \033[44;37m%-72.72s"
-				   "\033[m\n", head[pos], word);
+			    prints("\033[47;34m %s \033[44;37m%-72.72s\033[m\n", head[pos], word);
 
 			viewed += numbytes;
 			numbytes = more_readln(fd, (unsigned char *)buf);
@@ -227,7 +207,7 @@ more(char *fpath, int promptend)
 	    /* ※處理引用者 & 引言 */
 	    if ((buf[1] == ' ') && (buf[0] == ':' || buf[0] == '>'))
 		word = "\033[36m";
-	    else if (!strncmp(buf, "※", 2) || !strncmp(buf, "==>", 3))
+	    else if (!strncmp(buf, SHM->i18nstr[cuser.language][1532], 2) || !strncmp(buf, "==>", 3))
 		word = "\033[32m";
 
 	    if (word)
@@ -318,13 +298,13 @@ more(char *fpath, int promptend)
 	    } else
 		color = 2;
 
-	    prints("\033[m\033[%sm  瀏覽 P.%d(%d%%)  %s  %-30.30s%s",
+	    prints(SHM->i18nstr[cuser.language][1533],
 		   printcolor[(int)color],
 		   pageno,
 		   (int)((viewed * 100) / fsize),
 		   "\033[31;47m",
-		   "(h)\033[30m求助  \033[31m→↓[PgUp][",
-		   "PgDn][Home][End]\033[30m游標移動  \033[31m←[q]\033[30m結束   \033[m");
+		   SHM->i18nstr[cuser.language][1534],
+		   SHM->i18nstr[cuser.language][1535]);
 
 
 	    while (line == b_lines || (line > 0 && viewed == fsize)) {
@@ -348,11 +328,11 @@ more(char *fpath, int promptend)
 			char            ans[4] = "n";
 
 			*search_str = search_char0;
-			getdata_buf(b_lines - 1, 0, "[搜尋]關鍵字:", search_str,
+			getdata_buf(b_lines - 1, 0, SHM->i18nstr[cuser.language][1536], search_str,
 				    40, DOECHO);
 			if (*search_str) {
 			    searching = 1;
-			    if (getdata(b_lines - 1, 0, "區分大小寫(Y/N/Q)? [N] ",
+			    if (getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][1537],
 				   ans, sizeof(ans), LCECHO) && *ans == 'y')
 				fptr = strstr;
 			    else
@@ -381,7 +361,7 @@ more(char *fpath, int promptend)
 			lino = line = 0;
 		    }
 		    break;
-		case 'r': // Ptt: put all reply/recommend function here
+		case 'r':
 		case 'R':
 		case 'Y':
 		case 'y':
@@ -466,7 +446,7 @@ more(char *fpath, int promptend)
 		case 'H':
 		case '?':
 		    /* Kaede Buggy ... */
-		    //i18n remark show_help(more_help);
+		    show_help(more_help);
 		    if (pageno)
 			pageno--;
 		    lino = line = 0;
@@ -480,11 +460,11 @@ more(char *fpath, int promptend)
 		    break;
 
 		case Ctrl('T'):
-		    getdata(b_lines - 2, 0, "把這篇文章收入到暫存檔？[y/N] ",
+		    getdata(b_lines - 2, 0, SHM->i18nstr[cuser.language][1538],
 			    buf, 4, LCECHO);
 		    if (buf[0] == 'y') {
-			setuserfile(buf, ask_tmpbuf(b_lines - 1));
-                        Copy(fpath, buf);
+		    	setuserfile(buf, ask_tmpbuf(b_lines - 1));
+		    	Copy(fpath, buf);
 		    }
 		    if (pageno)
 			pageno--;

@@ -776,6 +776,12 @@ my_write(pid_t pid, char *prompt, char *id, int flag, userinfo_t * puin)
 	else if (uin->msgcount > 1 && uin->msgcount < MAX_MSGS &&
 		flag != WATERBALL_ALOHA)
 	    outmsg("\033[1;33;44m¦A¸É¤W¤@²É! \033[37m*^o^*\033[m");
+
+#if defined(NOKILLWATERBALL) && defined(PLAY_ANGEL)
+	/* Questioning and answering should better deliver immediately. */
+	if ((flag == WATERBALL_ANGEL || flag == WATERBALL_ANSWER) && uin->pid)
+	    kill(uin->pid, SIGUSR2);
+#endif
     }
 
     clrtoeol();
@@ -2810,9 +2816,32 @@ t_changeangel(){
 
 static int
 FindAngel(void){
-    /* TODO: randomized choose an online angel, shouldn't be them self */
-    //strlcpy(cuser.myangel, "scw", IDLEN + 1);
-    //return 1;
+    /* TODO: randomized choose an online angel, shouldn't be themself */
+    int nAngel;
+    int i, j;
+    int choose;
+    int trial = 0;
+    do{
+	nAngel = 0;
+	j = SHM->currsorted;
+	for (i = 0; i < SHM->UTMPnumber; ++i)
+	    if (SHM->sorted[j][0][i]->userlevel & PERM_ANGEL)
+		++nAngel;
+
+	if (nAngel == 0)
+	    return 0;
+
+	choose = rand() % nAngel + 1;
+	j = SHM->currsorted;
+	for (i = 0; i < SHM->UTMPnumber && choose; ++i)
+	    if (SHM->sorted[j][0][i]->userlevel & PERM_ANGEL)
+		--choose;
+
+	if (choose == 0 && SHM->sorted[j][0][i - 1] != currutmp){
+	    strlcpy(cuser.myangel, SHM->sorted[j][0][i - 1]->userid, IDLEN + 1);
+	    return 1;
+	}
+    }while(++trial < 5);
     return 0;
 }
 

@@ -1116,6 +1116,7 @@ static char *isvalidname(char *rname)
 
 static char *isvalidcareer(char *career)
 {
+#ifndef FOREIGN_REG
     char    *rejectstr[] = {NULL};
     if (!(removespace(career) && career[0] < 0 && strlen(career) >= 6) ||
 	strcmp(career, "家裡") == 0 || HaveRejectStr(career, rejectstr) )
@@ -1126,6 +1127,7 @@ static char *isvalidcareer(char *career)
 	return "麻煩請加學校系所";
     if (strcmp(career, "學生高中") == 0)
 	return "麻煩輸入學校名稱";
+#endif
     return NULL;
 }
 

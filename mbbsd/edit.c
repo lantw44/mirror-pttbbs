@@ -2500,7 +2500,11 @@ vedit(char *fpath, int saveheader, int *islocal)
 	    }
 	    if (curr_window_line == b_lines ||
                 (phone_mode && curr_window_line == b_lines - 1)) {
-		curr_window_line = t_lines - 2;
+                if(phone_mode)
+                   curr_window_line = t_lines - 3;
+                else
+                   curr_window_line = t_lines - 2;
+
 		if (!top_of_win->next)
 		    indigestion(7);
 		else {

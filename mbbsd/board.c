@@ -38,10 +38,10 @@ void imovefav(int old)
     char buf[5];
     int new;
     
-    getdata(b_lines - 1, 0, "½Ð¿é¤J·s¦¸§Ç:", buf, sizeof(buf), DOECHO);
+    getdata(b_lines - 1, 0, SHM->i18nstr[cuser.language][468], buf, sizeof(buf), DOECHO);
     new = atoi(buf) - 1;
     if (new < 0 || brdnum <= new){
-	vmsg("¿é¤J½d³ò¦³»~!");
+	vmsg(SHM->i18nstr[cuser.language][469]);
 	return;
     }
     move_in_current_folder(old, new);
@@ -102,7 +102,7 @@ have_author(char *brdname)
     char            dirname[100];
 
     snprintf(dirname, sizeof(dirname),
-	     "¥¿¦b·j´M§@ªÌ[33m%s[m ¬ÝªO:[1;33m%s[0m.....",
+	     SHM->i18nstr[cuser.language][470],
 	     currauthor, brdname);
     move(b_lines, 0);
     clrtoeol();
@@ -425,10 +425,8 @@ get_fav_type(boardstat_t *ptr)
 static void
 brdlist_foot()
 {
-    prints("\033[34;46m  ¿ï¾Ü¬ÝªO  \033[31;47m  (c)\033[30m·s¤å³¹¼Ò¦¡  "
-	   "\033[31m(v/V)\033[30m¼Ð°O¤wÅª/¥¼Åª  \033[31m(y)\033[30m¿z¿ï%s"
-	   "  \033[31m(m)\033[30m¤Á´«³Ì·R  \033[m",
-	   yank_flag == 0 ? "³Ì·R" : yank_flag == 1 ? "³¡¥÷" : "¥þ³¡");
+    prints(SHM->i18nstr[cuser.language][471],
+	   yank_flag == 0 ? SHM->i18nstr[cuser.language][472] : yank_flag == 1 ? SHM->i18nstr[cuser.language][473] : SHM->i18nstr[cuser.language][474]);
 }
 
 static void
@@ -438,29 +436,16 @@ show_brdlist(int head, int clsflag, int newflag)
     if (class_bid == 1) {
 	currstat = CLASS;
 	myrow = 6;
-	showtitle("¤ÀÃþ¬ÝªO", BBSName);
+	showtitle(SHM->i18nstr[cuser.language][475], BBSName);
 	movie(0);
 	move(1, 0);
 	outs(
-	    "                                                              "
-	    "¢©  ¢~¡X\033[33m¡´\n"
-	    "                                                    ùá¡X  \033[m "
-	    "¢¨¢i\033[47m¡ó\033[40m¢i¢i¢©ùç\n"
-	    "  \033[44m   ¡s¡s¡s¡s¡s¡s¡s¡s                               "
-	    "\033[33mùø\033[m\033[44m ¢©¢¨¢i¢i¢i¡¿¡¿¡¿ùø \033[m\n"
-	    "  \033[44m                                                  "
-	    "\033[33m  \033[m\033[44m ¢«¢ª¢i¢i¢i¡¶¡¶¡¶ ùø\033[m\n"
-	    "                                  ¡s¡s¡s¡s¡s¡s¡s¡s    \033[33m"
-	    "¢x\033[m   ¢ª¢i¢i¢i¢i¢« ùø\n"
-	    "                                                      \033[33mùó"
-	    "¡X¡X\033[m  ¢«      ¡X¡Ï\033[m");
+	    SHM->i18nstr[cuser.language][476]);
     } else if (clsflag) {
-	showtitle("¬ÝªO¦Cªí", BBSName);
-	prints("[¡ö]¥D¿ï³æ [¡÷]¾\\Åª [¡ô¡õ]¿ï¾Ü [y]¸ü¤J [S]±Æ§Ç [/]·j´M "
-	       "[TAB]¤åºK¡E¬ÝªO [h]¨D§U\n"
-	       "\033[7m%-20s Ãþ§O Âà«H%-31s¤H®ð ªO    ¥D     \033[m",
-	       newflag ? "Á`¼Æ ¥¼Åª ¬Ý  ªO" : "  ½s¸¹  ¬Ý  ªO",
-	       "  ¤¤   ¤å   ±Ô   ­z");
+	showtitle(SHM->i18nstr[cuser.language][477], BBSName);
+	prints(SHM->i18nstr[cuser.language][478],
+	       newflag ? SHM->i18nstr[cuser.language][479] : SHM->i18nstr[cuser.language][480],
+	       SHM->i18nstr[cuser.language][481]);
 	move(b_lines, 0);
 	brdlist_foot();
     }
@@ -469,11 +454,11 @@ show_brdlist(int head, int clsflag, int newflag)
 	char    *color[8] = {"", "\033[32m",
 	    "\033[33m", "\033[36m", "\033[34m", "\033[1m",
 	"\033[1;32m", "\033[1;33m"};
-	char    *unread[2] = {"\33[37m  \033[m", "\033[1;31m£¾\033[m"};
+	char    *unread[2] = {"\33[37m  \033[m", SHM->i18nstr[cuser.language][482]};
 
 	if (yank_flag == 0 && get_fav_type(&nbrd[0]) == 0){
 	    move(3, 0);
-	    prints("        --- ªÅ¥Ø¿ý ---");
+	    prints(SHM->i18nstr[cuser.language][483]);
 	    return;
 	}
 
@@ -495,13 +480,13 @@ show_brdlist(int head, int clsflag, int newflag)
 		else if (ptr->myattr & NBRD_FOLDER){
 		    char *title = get_folder_title(ptr->bid);
 		    if( !newflag )
-			prints("%5d %c %sMyFavFolder\033[m  ¥Ø¿ý ¡¼%-34s\033[m",
+			prints(SHM->i18nstr[cuser.language][484],
 				head,
 				ptr->myattr & NBRD_TAG ? 'D' : ' ',
 				!(cuser.uflag2 & FAVNOHILIGHT) ? "\033[1;36m" : "",
 				title);
 		    else
-			prints("%6d  %sMyFavFolder\033[m  ¥Ø¿ý ¡¼%-34s\033[m",
+			prints(SHM->i18nstr[cuser.language][485],
 				get_data_number(get_fav_folder(getfolder(ptr->bid))),
 				!(cuser.uflag2 & FAVNOHILIGHT) ? "\033[1;36m" : "",
 				title);
@@ -526,11 +511,10 @@ show_brdlist(int head, int clsflag, int newflag)
 		}
 		if (class_bid != 1) {
 		    if (!GROUPOP() && !HasPerm(B_BH(ptr))) {
-			prints("Unknown??    ÁôªO ¡H³o­ÓªO¬OÁôªO");
+			prints(SHM->i18nstr[cuser.language][486]);
 		    }
 		    else {
-			prints("%s%-13s\033[m%s%5.5s\033[0;37m%2.2s\033[m"
-				"%-34.34s",
+			prints("%s%-13s\033[m%s%5.5s\033[0;37m%2.2s\033[m%-34.34s",
 				((!(cuser.uflag2 & FAVNOHILIGHT) &&
 				  getboard(ptr->bid) != NULL))? "\033[1;36m" : "",
 				B_BH(ptr)->brdname,
@@ -542,11 +526,11 @@ show_brdlist(int head, int clsflag, int newflag)
 			if (B_BH(ptr)->brdattr & BRD_BAD)
 			    prints(" X ");
 			else if (B_BH(ptr)->nuser >= 5000)
-			    prints("\033[1;34mÃz!\033[m");
+			    prints(SHM->i18nstr[cuser.language][487]);
 			else if (B_BH(ptr)->nuser >= 2000)
-			    prints("\033[1;31mÃz!\033[m");
+			    prints(SHM->i18nstr[cuser.language][488]);
 			else if (B_BH(ptr)->nuser >= 1000)
-			    prints("\033[1mÃz!\033[m");
+			    prints(SHM->i18nstr[cuser.language][489]);
 			else if (B_BH(ptr)->nuser >= 100)
 			    prints("\033[1mHOT\033[m");
 			else if (B_BH(ptr)->nuser > 50)
@@ -568,31 +552,6 @@ show_brdlist(int head, int clsflag, int newflag)
 	}
     }
 }
-
-static char    *choosebrdhelp[] = {
-    "\0¬ÝªO¿ï³æ»²§U»¡©ú",
-    "\01°ò¥»«ü¥O",
-    "(p)(¡ô)/(n)(¡õ)¤W¤@­Ó¬ÝªO / ¤U¤@­Ó¬ÝªO",
-    "(P)(^B)(PgUp)  ¤W¤@­¶¬ÝªO",
-    "(N)(^F)(PgDn)  ¤U¤@­¶¬ÝªO",
-    "($)/(s)/(/)    ³Ì«á¤@­Ó¬ÝªO / ·j´M¬ÝªO / ¥H¤¤¤å·j´M¬ÝªOÃöÁä¦r",
-    "(¼Æ¦r)         ¸õ¦Ü¸Ó¶µ¥Ø",
-    "\01¶i¶¥«ü¥O",
-    "(^W)           °g¸ô¤F §Ú¦b­þ¸Ì",
-    "(r)(¡÷)/(q)(¡ö)¶i¤J¦h¥\\¯à¾\\Åª¿ï³æ / ¦^¨ì¥D¿ï³æ",
-    "(y/Z)          §Úªº³Ì·R,­q¾\\¬ÝªO,©Ò¦³¬ÝªO / ­q¾\\·s¶}¬ÝªO",
-    "(L/g)          ¥[¤J¤À¹j½u / ¥Ø¿ý¦Ü§Úªº³Ì·R",
-    "(K/T)          ³Æ¥÷,²M²z§Úªº³Ì·R / ­×§ï§Úªº³Ì·R¥Ø¿ý¦WºÙ",
-    "(v/V)          ³q³q¬Ý§¹/¥þ³¡¥¼Åª",
-    "(S)            «ö·Ó¦r¥À/¤ÀÃþ±Æ§Ç",
-    "(t/^T/^A/^D)   ¼Ð°O¬ÝªO/¨ú®ø©Ò¦³¼Ð°O/ ±N¤w¼Ð°OªÌ¥[¤J/²¾¥X§Úªº³Ì·R",
-    "(m/M)          §â¬ÝªO¥[¤J©Î²¾¥X§Úªº³Ì·R,²¾°£¤À¹j½u/·h²¾§Úªº³Ì·R",
-    "\01¤p²Õªø«ü¥O",
-    "(E/W/B)        ³]©w¬ÝªO/³]©w¤p²Õ³Æ§Ñ/¶}·s¬ÝªO",
-    "(^P)           ²¾°Ê¤w¼Ð°O¬ÝªO¨ì¦¹¤ÀÃþ",
-    NULL
-};
-
 
 static void
 set_menu_BM(char *BM)
@@ -616,6 +575,7 @@ choose_board(int newflag)
     boardstat_t    *ptr;
     int             head = -1, ch = 0, currmodetmp, tmp, tmp1, bidtmp;
     char            keyword[13] = "", buf[64];
+    
 
     setutmpmode(newflag ? READNEW : READBRD);
     if( get_current_fav() == NULL )
@@ -630,8 +590,7 @@ choose_board(int newflag)
 	    load_boards(keyword);
 	    if (brdnum <= 0 && yank_flag > 0) {
 		if (keyword[0] != 0) {
-		    mprints(b_lines - 1, 0, "¨S¦³¥ô¦ó¬ÝªO¼ÐÃD¦³¦¹ÃöÁä¦r "
-			    "(ªO¥DÀ³ª`·N¬ÝªO¼ÐÃD©R¦W)");
+		    mprints(b_lines - 1, 0, SHM->i18nstr[cuser.language][510]);
 		    pressanykey();
 		    keyword[0] = 0;
 		    brdnum = -1;
@@ -777,20 +736,19 @@ choose_board(int newflag)
 	    }
 	    break;
 	case 'h':
-	    show_help(choosebrdhelp);
+	    show_help(SHM->i18nstr[cuser.language], 490, 20);
 	    show_brdlist(head, 1, newflag);
 	    break;
 	case '/':
-	    getdata_buf(b_lines - 1, 0, "½Ð¿é¤J¬ÝªO¤¤¤åÃöÁä¦r:",
+	    getdata_buf(b_lines - 1, 0, SHM->i18nstr[cuser.language][511],
 			keyword, sizeof(keyword), DOECHO);
 	    brdnum = -1;
 	    break;
 	case 'S':
 	    if(yank_flag == 0){
 		move(b_lines - 2, 0);
-		prints("­«·s±Æ§Ç¬ÝªO "
-			"\033[1;33m(ª`·N, ³o­Ó°Ê§@·|ÂÐ¼g­ì¨Ó³]©w)\033[m \n");
-		tmp = getans("±Æ§Ç¤è¦¡ (1)«ö·ÓªO¦W±Æ§Ç (2)«ö·ÓÃþ§O±Æ§Ç ==> [0]¨ú®ø ");
+		prints(SHM->i18nstr[cuser.language][512]);
+		tmp = getans(SHM->i18nstr[cuser.language][513]);
 		if( tmp == '1' )
 		    fav_sort_by_name();
 		else if( tmp == '2' )
@@ -809,7 +767,7 @@ choose_board(int newflag)
 	    if (HAS_PERM(PERM_SYSOP)) {
 		ptr = &nbrd[num];
 		if (ptr->myattr & NBRD_SYMBOLIC) {
-		    if (getans("½T©w§R°£³sµ²¡H[N/y]") == 'y')
+		    if (getans(SHM->i18nstr[cuser.language][514]) == 'y')
 			delete_symbolic_link(&bcache[ptr->bid - 1], ptr->bid);
 		}
 		brdnum = -1;
@@ -863,7 +821,7 @@ choose_board(int newflag)
 	    }
 	    else if (HAS_PERM(PERM_LOGINOK) && yank_flag == 0) {
 		if (fav_add_line() == NULL) {
-		    vmsg("·s¼W¥¢±Ñ¡A¤À¹j½u/Á`³Ì·R ¼Æ¶q¹F³Ì¤j­È¡C");
+		    vmsg(SHM->i18nstr[cuser.language][515]);
 		    break;
 		}
 		/* done move if it's the first item. */
@@ -886,7 +844,7 @@ choose_board(int newflag)
 		ptr = &nbrd[num];
 		if (yank_flag == 0) {
 		    if (ptr->myattr & NBRD_FAV) {
-			if (getans("§A½T©w§R°£¶Ü? [N/y]") != 'y')
+			if (getans(SHM->i18nstr[cuser.language][516]) != 'y')
 			    break;
 			fav_remove_item(ptr->bid, get_fav_type(ptr));
 			ptr->myattr &= ~NBRD_FAV;
@@ -899,7 +857,7 @@ choose_board(int newflag)
 		    }
 		    else {
 			if (fav_add_board(ptr->bid) == NULL)
-			    vmsg("§Aªº³Ì·R¤Ó¦h¤F°Õ ¯uªá¤ß");
+			    vmsg(SHM->i18nstr[cuser.language][517]);
 			else
 			    ptr->myattr |= NBRD_FAV;
 		    }
@@ -921,14 +879,14 @@ choose_board(int newflag)
 	    if (HAS_PERM(PERM_LOGINOK) && yank_flag == 0) {
 		fav_type_t  *ft;
 		if (fav_stack_full()){
-		    vmsg("¥Ø¿ý¤w¹F³Ì¤j¼h¼Æ!!");
+		    vmsg(SHM->i18nstr[cuser.language][518]);
 		    break;
 		}
 		if ((ft = fav_add_folder()) == NULL) {
-		    vmsg("·s¼W¥¢±Ñ¡A¥Ø¿ý/Á`³Ì·R ¼Æ¶q¹F³Ì¤j­È¡C");
+		    vmsg(SHM->i18nstr[cuser.language][519]);
 		    break;
 		}
-		fav_set_folder_title(ft, "·sªº¥Ø¿ý");
+		fav_set_folder_title(ft, SHM->i18nstr[cuser.language][520]);
 		/* don't move if it's the first item */
 		if (get_fav_type(&nbrd[0]) != 0)
 		    move_in_current_folder(brdnum, num);
@@ -940,7 +898,7 @@ choose_board(int newflag)
 	    if (HAS_PERM(PERM_LOGINOK) && nbrd[num].myattr & NBRD_FOLDER) {
 		fav_type_t *ft = getfolder(nbrd[num].bid);
 		strlcpy(buf, get_item_title(ft), sizeof(buf));
-		getdata_buf(b_lines - 1, 0, "½Ð¿é¤JªO¦W:", buf, 65, DOECHO);
+		getdata_buf(b_lines - 1, 0, SHM->i18nstr[cuser.language][521], buf, 65, DOECHO);
 		fav_set_folder_title(ft, buf);
 		brdnum = -1;
 	    }
@@ -949,14 +907,14 @@ choose_board(int newflag)
 	    if (HAS_PERM(PERM_LOGINOK)) {
 		char c, fname[80];
 		if (!current_fav_at_root()) {
-		    vmsg("½Ð¨ì§Úªº³Ì·R³Ì¤W¼h°õ¦æ¥»¥\\¯à");
+		    vmsg(SHM->i18nstr[cuser.language][522]);
 		    break;
 		}
 
-		c = getans("½Ð¿ï¾Ü 1)²M°£¤£¥i¨£¬ÝªO 2)³Æ¥÷§Úªº³Ì·R 3)¨ú¦^³Ì·R³Æ¥÷ [Q]");
+		c = getans(SHM->i18nstr[cuser.language][523]);
 		if(!c)
 		    break;
-		if(getans("½T©w¶Ü [y/N] ") != 'y')
+		if(getans(SHM->i18nstr[cuser.language][524]) != 'y')
 		    break;
 		switch(c){
 		    case '1':
@@ -972,7 +930,7 @@ choose_board(int newflag)
 			setuserfile(fname, FAV4);
 			sprintf(buf, "%s.bak", fname);
 			if (!dashf(buf)){
-			    vmsg("§A¨S¦³³Æ¥÷§Aªº³Ì·R³á");
+			    vmsg(SHM->i18nstr[cuser.language][525]);
 			    break;
 			}
                         Copy(buf, fname);
@@ -985,22 +943,22 @@ choose_board(int newflag)
 	    break;
 	case 'z':
 	    if (HAS_PERM(PERM_LOGINOK))
-		vmsg("¼K¼K ³o­Ó¥\\¯à¤w¸g³Q§Úªº³Ì·R¨ú¥N±¼¤F³á!");
+		vmsg(SHM->i18nstr[cuser.language][526]);
 	    break;
 	case 'Z':
 	    if (HAS_PERM(PERM_LOGINOK)) {
 		char genbuf[256];
-		sprintf(genbuf, "½T©w­n %s­q¾\\ ·s¬ÝªO? [N/y] ", cuser.uflag2 & FAVNEW_FLAG ? "¨ú®ø" : "");
+		sprintf(genbuf, SHM->i18nstr[cuser.language][527], cuser.uflag2 & FAVNEW_FLAG ? SHM->i18nstr[cuser.language][528] : "");
 		if (getans(genbuf) != 'y')
 		    break;
 
 		cuser.uflag2 ^= FAVNEW_FLAG;
 		if (cuser.uflag2 & FAVNEW_FLAG) {
 		    subscribe_newfav();
-		    vmsg("¤Á´«¬°­q¾\\·s¬ÝªO¼Ò¦¡");
+		    vmsg(SHM->i18nstr[cuser.language][529]);
 		}
 		else
-		    vmsg("¨ú®ø­q¾\\·s¬ÝªO");
+		    vmsg(SHM->i18nstr[cuser.language][530]);
 	    }
 	    break;
 

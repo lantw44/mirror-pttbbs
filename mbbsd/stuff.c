@@ -331,19 +331,19 @@ gettime(int line, time_t dt, char*head)
     move(line, 0); prints("%s",head);
     i=strlen(head);
     do {
-	getdata_buf(line, i, " 西元年:", yn, 5, LCECHO);
+	getdata_buf(line, i, SHM->i18nstr[cuser.language][1878], yn, 5, LCECHO);
     } while ((endtime.tm_year = atoi(yn) - 1900) < 0 || endtime.tm_year > 200);
     snprintf(yn, sizeof(yn), "%d", ptime->tm_mon + 1);
     do {
-	getdata_buf(line, i+15, "月:", yn, 3, LCECHO);
+	getdata_buf(line, i+15, SHM->i18nstr[cuser.language][1879], yn, 3, LCECHO);
     } while ((endtime.tm_mon = atoi(yn) - 1) < 0 || endtime.tm_mon > 11);
     snprintf(yn, sizeof(yn), "%d", ptime->tm_mday);
     do {
-	getdata_buf(line, i+24, "日:", yn, 3, LCECHO);
+	getdata_buf(line, i+24, SHM->i18nstr[cuser.language][1880], yn, 3, LCECHO);
     } while ((endtime.tm_mday = atoi(yn)) < 1 || endtime.tm_mday > 31);
     snprintf(yn, sizeof(yn), "%d", ptime->tm_hour);
     do {
-	getdata_buf(line, i+33, "時(0-23):", yn, 3, LCECHO);
+	getdata_buf(line, i+33, SHM->i18nstr[cuser.language][1881], yn, 3, LCECHO);
     } while ((endtime.tm_hour = atoi(yn)) < 0 || endtime.tm_hour > 23);
     return mktime(&endtime);
 }
@@ -388,7 +388,7 @@ capture_screen()
     FILE           *fp;
     int             i;
 
-    getdata(b_lines - 2, 0, "把這個畫面收入到暫存檔？[y/N] ",
+    getdata(b_lines - 2, 0, SHM->i18nstr[cuser.language][1882],
 	    fname, 4, LCECHO);
     if (fname[0] != 'y')
 	return;
@@ -406,9 +406,7 @@ pressanykey()
 {
     int             ch;
 
-    outmsg("\033[37;45;1m                        "
-	   "● 請按 \033[33m(Space/Return)\033[37m 繼續 ●"
-	   "       \033[33m(^T)\033[37m 存暫存檔   \033[m");
+    outmsg(SHM->i18nstr[cuser.language][1883]);
     do {
 	ch = igetkey();
 
@@ -437,11 +435,9 @@ vmsg(const char *fmt,...)
     clrtoeol();
 
     if (*msg)
-	prints("\033[1;36;44m ◆ %-55.54s \033[33;46m \033[200m\033[1431m\033[506m[請按任意鍵繼續]\033[201m \033[m", msg);
+	prints(SHM->i18nstr[cuser.language][1884], msg);
     else
-	outs("\033[46;1m                        \033[37m"
-	     "\033[200m\033[1431m\033[506m□ 請按 \033[33m(Space/Return)\033[37m 繼續 □\033[201m"
-	     "                       \033[m");
+	outs(SHM->i18nstr[cuser.language][1885]);
 
     do {
 	ch = igetkey();
@@ -475,7 +471,7 @@ search_num(int ch, int max)
     int             x, y;
     char            genbuf[10];
 
-    outmsg("\033[7m 跳至第幾項：\033[m");
+    outmsg(SHM->i18nstr[cuser.language][1886]);
     outc(ch);
     genbuf[0] = ch;
     getyx(&y, &x);
@@ -524,7 +520,7 @@ void
 stand_title(char *title)
 {
     clear();
-    prints("\033[1;37;46m【 %s 】\033[m\n", title);
+    prints(SHM->i18nstr[cuser.language][1887], title);
 }
 
 void
@@ -592,19 +588,20 @@ int log_file(char *fn, char *buf, int ifcreate)
 }
 
 void
-show_help(char *helptext[])
+show_help(char **helptext, int start, int num)
 {
     char           *str;
     int             i;
 
     clear();
-    for (i = 0; (str = helptext[i]); i++) {
-	if (*str == '\0')
-	    prints("\033[1m【 %s 】\033[0m\n", str + 1);
-	else if (*str == '\01')
-	    prints("\n\033[36m【 %s 】\033[m\n", str + 1);
-	else
-	    prints("        %s\n", str);
+    for (i = 0; i < num, start + i < MAX_STRING; i++) {
+	    str = helptext[start + i];
+		if (*str == '\0')
+		    prints(SHM->i18nstr[cuser.language][1888], str + 1);
+		else if (*str == '\01')
+		    prints(SHM->i18nstr[cuser.language][1889], str + 1);
+		else
+		    prints("        %s\n", str);
     }
     pressanykey();
 }

@@ -2464,7 +2464,7 @@ static char    *board_help[] = {
 static int
 b_help()
 {
-    show_help(board_help);
+    //i18n remark show_help(board_help);
     return FULLUPDATE;
 }
 

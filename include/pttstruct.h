@@ -426,14 +426,12 @@ typedef struct {
     time_t  Ftouchtime;
     int     Fbusystate;
 
-#ifdef I18N    
     /* i18n(internationlization) */
     char	*i18nstr[MAX_LANG][MAX_STRING];
     char	i18nstrbody[20 * MAX_LANG * MAX_STRING]; 
     	/* Based on the statistis, we found the lengh of one string
     	   is 20 bytes approximately.
     	*/
-#endif    
 } SHM_t;
 
 typedef struct {

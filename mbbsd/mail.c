@@ -1089,7 +1089,7 @@ static char    *mail_help[] = {
 static int
 m_help()
 {
-    show_help(mail_help);
+    //i18n remark show_help(mail_help);
     return FULLUPDATE;
 }
 

@@ -473,7 +473,7 @@ more(char *fpath, int promptend)
 		case 'H':
 		case '?':
 		    /* Kaede Buggy ... */
-		    show_help(more_help);
+		    //i18n remark show_help(more_help);
 		    if (pageno)
 			pageno--;
 		    lino = line = 0;

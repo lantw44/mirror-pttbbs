@@ -1313,9 +1313,9 @@ u_register(void)
 	else{
 	    int i;
 	    while( 1 ){
-		getfield(3, "0123456789", "護照號碼 或 SSN", ident, 11);
+		getfield(3, "0123456789","身分證號 護照號碼 或 SSN", ident, 11);
 		move(5, 2);
-		prints("注意：號碼有誤者將無法取得進一步的權限！");
+		prints("  號碼有誤者將無法取得進一步的權限！");
 		getdata(6, 0, "是否確定(Y/N)", ans, sizeof(ans), LCECHO);
 		if (ans[0] == 'y' || ans[0] == 'Y')
 		    break;
@@ -1339,9 +1339,8 @@ u_register(void)
 	}
 
 	move(11, 0);
-	prints("麻煩您盡量詳細的填寫您的服務單位, 大專院校請麻煩"
-	       "加\033[1;33m系所\033[m, 公司單位請加職稱\n"
-	       "請不要用簡寫以免造成誤會 :)"
+	prints("  盡量詳細的填寫您的服務單位, 大專院校請麻煩"
+	       "  加\033[1;33m系所\033[m, 公司單位請加職稱\n"
 	       );
 	while (1) {
 	    getfield(9, "學校(含\033[1;33m系所年級\033[m)或單位職稱",

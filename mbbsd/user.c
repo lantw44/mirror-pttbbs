@@ -290,11 +290,11 @@ static void Customize(void)
 	case 'F':
 	case 'f':
 	    if( HAS_PERM(PERM_ANGEL) ){
-		cuser.uflag2 ^= BEING_ANGEL;
-		currutmp->being_angel ^= 1;
+		t_switchangel();
 		break;
 	    }
 #endif
+
 	default:
 	    done = 1;
 	}

@@ -252,7 +252,7 @@ igetch()
 		return (ch);
 
 	    if (currutmp->msgs[0].pid &&
-		WATERMODE(WATER_OFO) && wmofo == -1) {
+		WATERMODE(WATER_OFO) && wmofo == NOTREPLYING) {
 		int             y, x, my_newfd;
 		screenline_t   *screen0 = calloc(t_lines, sizeof(screenline_t));
 		memcpy(screen0, big_picture, t_lines * sizeof(screenline_t));
@@ -292,8 +292,25 @@ igetch()
 		    i_newfd = 0;
 		    show_call_in(0, 0);
 		    watermode = 0;
-		    my_write(currutmp->msgs[0].pid, "水球丟過去 ： ",
-			     currutmp->msgs[0].userid, WATERBALL_GENERAL, NULL);
+#ifndef PLAY_ANGEL
+		    my_write(currutmp->msgs[0].pid, "水球丟過去： ",
+			    currutmp->msgs[0].userid, WATERBALL_GENERAL, NULL);
+#else
+		    switch (currutmp->msgs[0].msgmode){
+			case MSG_GENERAL:
+			    my_write(currutmp->msgs[0].pid, "水球丟過去： ",
+				    currutmp->msgs[0].userid, WATERBALL_GENERAL, NULL);
+			    break;
+			case MSG_FROMANGEL:
+			    my_write(currutmp->msgs[0].pid, "再問他一次： ",
+				    currutmp->msgs[0].userid, WATERBALL_ANGEL, NULL);
+			    break;
+			case MSG_TOANGEL:
+			    my_write(currutmp->msgs[0].pid, "回答小主人： ",
+				    currutmp->msgs[0].userid, WATERBALL_ANSWER, NULL);
+			    break;
+		    }
+#endif
 		    i_newfd = my_newfd;
 
 		    /* 還原螢幕 */

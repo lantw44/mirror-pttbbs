@@ -310,7 +310,12 @@ add_history(msgque_t * msg)
 	add_history_water(&water[0], msg);
     if (WATERMODE(WATER_NEW) || WATERMODE(WATER_OFO)) {
 	for (i = 0; i < 5 && swater[i]; i++)
-	    if (swater[i]->pid == msg->pid)
+	    if (swater[i]->pid == msg->pid
+#ifdef PLAY_ANGEL
+		    && swater[i]->msg[0].msgmode == msg->msgmode
+		    /* When throwing waterball to angel directly */
+#endif
+	       	)
 		break;
 	if (i == 5) {
 	    waterinit = 1;

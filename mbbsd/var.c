@@ -334,13 +334,14 @@ int             automargins = 1;
 time_t          now;
 int             KEY_ESC_arg;
 int             watermode = -1;
-int             wmofo = -1;
+int             wmofo = NOTREPLYING;
 /*
  * WATERMODE(WATER_ORIG) | WATERMODE(WATER_NEW):
  * ????????????????????
- * Ptt 水球回顧 e = -1
- * 沒在回水球 = 0   在回上一顆水球  (Ctrl-R) > 0   在回前 n 顆水球 (Ctrl-R
- * Ctrl-R)
+ * Ptt 水球回顧   (FIXME: guessed by scw)
+ * watermode = -1 沒在回水球
+ *           = 0   在回上一顆水球  (Ctrl-R)
+ *           > 0   在回前 n 顆水球 (Ctrl-R Ctrl-R)
  * 
  * WATERMODE(WATER_OFO)  by in2
  * wmofo     = NOTREPLYING     沒在回水球

@@ -97,7 +97,7 @@ brc_find_record(int bid, int *num)
 {
     char *p;
     brcnbrd_t tnum;
-    ptr = brc_findrecord_in(brc_buf, brc_buf + brc_size, bid, &tnum);
+    p = brc_findrecord_in(brc_buf, brc_buf + brc_size, bid, &tnum);
     *num = tnum;
     if (p)
 	return (time_t*)(p + sizeof(brcbid_t) + sizeof(brcnbrd_t));

@@ -896,7 +896,7 @@ chc_init(int s, chcusr_t *user1, chcusr_t *user2, board_t board, play_func_t pla
     chc_redraw(user1, user2, board);
     add_io(s, 0);
 
-    signal(SIGUSR1, chc_watch_request);
+    Signal(SIGUSR1, chc_watch_request);
 
     if (my->turn && !(chc_mode & CHC_WATCH))
 	chc_broadcast_recv(act_list, board);
@@ -926,7 +926,7 @@ chc(int s, int mode)
     char	    mode0 = currutmp->mode;
     char	    file[80];
 
-    signal(SIGUSR1, SIG_IGN);
+    Signal(SIGUSR1, SIG_IGN);
 
     chc_mode = mode;
     chc_bp = &board;
@@ -963,7 +963,7 @@ chc(int s, int mode)
     }
     else
 	chc_log_close();
-    signal(SIGUSR1, talk_request);
+    Signal(SIGUSR1, talk_request);
 }
 
 static userinfo_t *

@@ -1007,17 +1007,17 @@ start_client()
     login_start_time = time(0);
     currmode = 0;
 
-    signal(SIGHUP, abort_bbs);
-    signal(SIGTERM, abort_bbs);
-    signal(SIGPIPE, abort_bbs);
+    Signal(SIGHUP, abort_bbs);
+    Signal(SIGTERM, abort_bbs);
+    Signal(SIGPIPE, abort_bbs);
 
-    signal(SIGINT, abort_bbs_debug);
-    signal(SIGQUIT, abort_bbs_debug);
-    signal(SIGILL, abort_bbs_debug);
-    signal(SIGABRT, abort_bbs_debug);
-    signal(SIGFPE, abort_bbs_debug);
-    signal(SIGBUS, abort_bbs_debug);
-    signal(SIGSEGV, abort_bbs_debug);
+    Signal(SIGINT, abort_bbs_debug);
+    Signal(SIGQUIT, abort_bbs_debug);
+    Signal(SIGILL, abort_bbs_debug);
+    Signal(SIGABRT, abort_bbs_debug);
+    Signal(SIGFPE, abort_bbs_debug);
+    Signal(SIGBUS, abort_bbs_debug);
+    Signal(SIGSEGV, abort_bbs_debug);
 
     signal_restart(SIGUSR1, talk_request);
     signal_restart(SIGUSR2, write_request);
@@ -1029,7 +1029,7 @@ start_client()
 	exit(1);
 
     do_term_init();
-    signal(SIGALRM, abort_bbs);
+    Signal(SIGALRM, abort_bbs);
     alarm(600);
 
     login_query();		/* Ptt 加上login time out */
@@ -1042,7 +1042,7 @@ start_client()
 	b_closepolls();
 	SHM->close_vote_time = now;
     }
-    signal(SIGALRM, SIG_IGN);
+    Signal(SIGALRM, SIG_IGN);
 
     domenu(MMENU, "主功\能表", (currutmp->mailalert ? 'M' : 'C'), cmdlist);
 }
@@ -1122,7 +1122,7 @@ getremotename(struct sockaddr_in * from, char *rhost, char *rname)
 
     hp = NULL;
     if (setjmp(byebye) == 0) {
-	signal(SIGALRM, timeout);
+	Signal(SIGALRM, timeout);
 	alarm(3);
 	hp = gethostbyaddr((char *)&from->sin_addr, sizeof(struct in_addr),
 			   from->sin_family);
@@ -1153,7 +1153,7 @@ getremotename(struct sockaddr_in * from, char *rhost, char *rname)
     }
     /* Set up a timer so we won't get stuck while waiting for the server. */
     if (setjmp(byebye) == 0) {
-	signal(SIGALRM, timeout);
+	Signal(SIGALRM, timeout);
 	alarm(RFC931_TIMEOUT);
 
 	/*
@@ -1251,11 +1251,11 @@ main(int argc, char *argv[], char *envp[])
     start_time = time(NULL);
 
     /* avoid SIGPIPE */
-    signal(SIGPIPE, SIG_IGN);
+    Signal(SIGPIPE, SIG_IGN);
 
     /* avoid erroneous signal from other mbbsd */
-    signal(SIGUSR1, SIG_IGN);
-    signal(SIGUSR2, SIG_IGN);
+    Signal(SIGUSR1, SIG_IGN);
+    Signal(SIGUSR2, SIG_IGN);
 
     attach_SHM();
     if( (argc == 3 && shell_login(argc, argv, envp)) ||

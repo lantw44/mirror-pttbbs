@@ -4,7 +4,7 @@
 
 /* os dependant include file, define */
 #ifdef __FreeBSD__
-    #if __FreeBSD__ >=5
+    #if __FreeBSD__ >= 5
         #include <sys/limits.h>
     #else
         #include <machine/limits.h>
@@ -43,8 +43,21 @@
 	#define NEED_INET_PTON
     #endif
 
+    #if __OS_MAJOR_VERSION__ == 5 && __OS_MAJOR_VERSION__ < 6
+	#define NEED_BSD_SIGNAL
+    #endif
+
 #else
+
     #warning "Unknown OSTYPE"
+
+#endif
+
+
+#ifdef Solaris
+    #define Signal (bsd_signal)
+#else
+    #define Signal (signal)
 #endif
 
 

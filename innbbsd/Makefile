@@ -31,6 +31,7 @@ BBS_REC = $(BBS_UTIL)/util_record.o $(BBS_UTIL)/util_cache.o \
 	  $(BBS_UTIL)/util_var.o $(BBS_REC_EXTRA_$(OSTYPE))
 
 BBS_REC_EXTRA_Linux = $(BBS_UTIL)/util_osdep.o
+BBS_REC_EXTRA_Solaris = $(BBS_UTIL)/util_osdep.o
 
 #########################
 #

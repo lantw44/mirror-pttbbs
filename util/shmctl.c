@@ -365,7 +365,7 @@ inline void utmpsort(int sortall)
 	qsort(SHM->sorted[ns][5], count, sizeof(int), cmputmpchc);
 	memset(nusers, 0, sizeof(nusers));
 	for (i = 0; i < count; ++i) {
-	    uentp = &SHM->bcache[SHM->sorted[ns][0][i]];
+	    uentp = &SHM->uinfo[SHM->sorted[ns][0][i]];
 	    if (uentp && uentp->pid &&
 		0 < uentp->brc_id && uentp->brc_id < MAX_BOARD)
 		++nusers[uentp->brc_id - 1];

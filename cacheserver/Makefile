@@ -6,5 +6,8 @@ all:	cacheserver
 cacheserver:	cacheserver.c
 	${CC} ${CFLAGS} ${LDFLAGS} -o cacheserver cacheserver.c avltree.c
 
+clean:
+	rm -f cacheserver *~
+
 test:	cacheserver
-	./cacheserver -p /home/backup/ptt/PASSWDS.NEW
+	./cacheserver -f /home/backup/ptt2/PASSWDS.NEW -p 5120

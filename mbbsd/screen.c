@@ -329,6 +329,9 @@ outc(unsigned char c)
 	if (cur_col < slp->smod)
 	    slp->smod = cur_col;
     }
+
+/* never true statment
+
     if (++cur_col >= scr_cols) {
 	if (standing && (slp->mode & STANDOUT)) {
 	    standing = 0;
@@ -338,29 +341,7 @@ outc(unsigned char c)
 	if (cur_ln < scr_lns)
 	    cur_ln++;
     }
-}
-
-static void
-parsecolor(char *buf)
-{
-    char           *val;
-    char            data[24];
-    short	    len = 0;
-
-    data[0] = '\0';
-    val = (char *)strtok(buf, ";");
-
-    while (val) {
-	if (atoi(val) < 30) {
-	    if (data[0]) {
-		data[len++] = ';';
-		data[len] = 0;
-	    }
-	    strcpy(&data[len], val);
-	}
-	val = (char *)strtok(NULL, ";");
-    }
-    strlcpy(buf, data, sizeof(data));
+*/
 }
 
 int

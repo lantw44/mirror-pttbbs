@@ -74,10 +74,6 @@ int board_digest();
 
 /* board */
 #define setutmpbid(bid) currutmp->brc_id=bid;
-int brc_unread(const char *fname, int bnum, const int *blist);
-int brc_initial_board(const char *boardname);
-void brc_update();
-void brc_finalize();
 int HasPerm(boardheader_t *bptr);
 int New();
 int Boards();
@@ -88,6 +84,17 @@ int validboard(int bid);
 #ifdef CRITICAL_MEMORY
 void sigfree(int);
 #endif
+
+/* brc */
+void brc_initialize();
+void brc_finalize();
+int brc_unread(const char *fname, int bnum, const int *blist);
+int brc_unread_time(time_t ftime, int bnum, const int *blist);
+int brc_initial_board(const char *boardname);
+void brc_update();
+int brc_read_record(const char* bname, int* num, int* list);
+void brc_trunc(const char* brdname, int ftime);
+void brc_addlist(const char *fname);
 
 /* cache */
 int moneyof(int uid);
@@ -105,7 +112,6 @@ boardheader_t *getbcache(int bid);
 int apply_boards(int (*func)(boardheader_t *));
 int haspostperm(char *bname);
 void inbtotal(int bid, int add);
-void brc_addlist(const char *fname);
 void setbtotal(int bid);
 unsigned int safe_sleep(unsigned int seconds);
 int apply_ulist(int (*fptr)(userinfo_t *));

@@ -87,7 +87,7 @@ char            vetitle[TTLEN + 1] = "\0";
 char            currowner[IDLEN + 2] = "\0";
 char            currauthor[IDLEN + 2] = "\0";
 char            currfile[FNLEN];/* current file name @ bbs.c mail.c */
-char            currboard[IDLEN + 2];
+char           *currboard;
 char            currBM[IDLEN * 3 + 10];
 char            reset_color[4] = "\033[m";
 char            margs[64] = "\0";	/* main argv list */

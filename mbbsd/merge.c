@@ -8,7 +8,7 @@
 int
 m_fpg()
 {
-    char genbuf[256], buf[1024], userid[25], passbuf[24];
+    char genbuf[256], buf[256], userid[25], passbuf[24];
     int count=0, i;
     FILE *fp;
     ACCT man;
@@ -18,19 +18,22 @@ m_fpg()
     move(1,0);
 
     outs(
-	   "此功\能是專門給各位資深花園使用者,\n"
-    "把自己的變為資深Ptt使用者,讓花園的使用者享有平等安全的環境.\n"
-    "直接按[Enter]離開.\n\n"
-    "特別叮嚀: \n"
-    " 為了帳號安全,您只有連續三次密碼錯誤的機會,請小心輸入.\n"
-    " 連續三次錯誤您的變身功\能就會被開罰單並直接通知站長.\n"
-    " 請不要在變身過程中不正常斷線, 刻意斷線變半獸人站長不負責唷.");
+ "    小魚的紫色花園,\n"
+ "      讓花園的使用者轉移個人資產以及重要信用資料, 享有平等安全的環境.\n"
+ "      如果您不需要, 請直接按[Enter]離開.\n"
+ "    -----------------------------------------------------------------\n"
+ "    特別叮嚀:\n"
+ "      為了帳號安全,您只有連續三次密碼錯誤的機會,請小心輸入.\n"
+ "      連續三次錯誤您的變身功\能就會被開罰單並直接通知站長.\n"
+ "      請不要在變身過程中不正常斷線, 刻意斷線變半獸人站長不救唷.\n"
+	);
+
 
    if(search_ulistn(usernum,2)) 
-        {vmsg("請不要multi-login時使用, 以免變身失敗"); return 0;}
+        {vmsg("請登出其他視窗, 以免變身失敗"); return 0;}
    do
    {
-    if(!getdata(8,0, "請小心輸入小魚的ID [英文大小寫要完全正確]:", userid, 20,
+    if(!getdata(10,0, "      小魚的ID [英文大小寫要完全正確]:", userid, 20,
 	       DOECHO)) return 0;
     if(bad_user_id(userid)) continue;
     sprintf(genbuf, "/home/bbs/fpg/home/%c/%s.ACT",userid[0], userid);
@@ -44,7 +47,7 @@ m_fpg()
    }while(!count);
    count = 0;
    do{
-    getdata(9,0, "請小心輸入您在小魚的密碼:", passbuf, sizeof(passbuf), 
+    getdata(11,0, "      小魚的密碼:", passbuf, sizeof(passbuf), 
 		  NOECHO);
     if(++count>=3)
     {
@@ -66,34 +69,36 @@ m_fpg()
      }
    sprintf(buf,"%s.done",genbuf);
    rename(genbuf,buf);
-   move(10,0);
+   move(12,0);
+   clrtobot();
    reload_money(); 
    
    prints("您的花園幣有 %d 換算成 Ptt 幣為 %d (匯率 155:1), 匯入後共有 %d\n", 
 	    man.money, man.money/155, cuser.money + man.money/155);
    demoney(man.money/155);
 
-   cuser.exmailbox +=  man.mailk;
-   prints("您的花園信相有 %d , 匯入後共有 %d\n", 
-	    man.mailk, cuser.exmailbox );
+   cuser.exmailbox +=  (man.mailk + man.keepmail);
+   prints("您的花園信箱有 %d : %d, 匯入後共有 %d\n", 
+	    man.mailk, man.keepmail, cuser.exmailbox );
 
-   if(cuser.firstlogin>man.firstlogin) d = man.firstlogin;
+   if(cuser.firstlogin > man.firstlogin) d = man.firstlogin;
    else  d = cuser.firstlogin;
-   prints("花園註冊日期 %s 與此帳號 %s 比 將取 %s",
-	    Cdate(&man.firstlogin), Cdate(&cuser.firstlogin),
-            Cdate(&d) );
+   prints("花園註冊日期 %s 此帳號註冊日期 %s 將取 %s \n",
+	    Cdatedate(&(man.firstlogin)), 
+	    Cdatedate(&(cuser.firstlogin)), 
+            Cdatedate(&d) );
    cuser.firstlogin = d;
 
    if(cuser.numlogins < man.numlogins) i = man.numlogins;
    else i = cuser.numlogins;
 
-   prints("花園進站次數 %d 與此帳號 %d 比 將取 %d", man.numlogins,
+   prints("花園進站次數 %d 此帳號 %d 將取 %d \n", man.numlogins,
 	   cuser.numlogins, i);
    cuser.numlogins = i;
 
    if(cuser.numposts < man.numposts ) i = man.numposts;
    else i = cuser.numposts;
-   prints("花園文章次數 %d 與此帳號 %d 比 將取 %d", man.numposts,cuser.numposts,
+   prints("花園文章次數 %d 此帳號 %d 將取 %d\n", man.numposts,cuser.numposts,
 	   i); 
    cuser.numposts = i;
    while(search_ulistn(usernum,2)) 
@@ -101,28 +106,72 @@ m_fpg()
    passwd_update(usernum, &cuser);
    sethomeman(genbuf, cuser.userid);
    mkdir(genbuf, 0600);
-   sprintf(buf, "cd home/bbs/fpg/tmp; tar zxvf ../home/%c/%s.tgz"
-	   "cd home/bbs/home/%c; mv %s ../../../..;"
-	   "cd ../../../../%s; ",
-	   userid[0], userid, userid[0], userid, userid);
-   i = 0;
-   if (getans("是否匯入個人信箱以及信箱精華區? (Y/n)")!='n')
+   sprintf(buf, "tar zxvf home/%c/%s.tgz>/dev/null",
+	   userid[0], userid);
+   chdir("fpg");
+   system(buf);
+   chdir(BBSHOME);
+
+   if (getans("是否匯入個人信箱? (Y/n)")!='n')
+    {
+	sethomedir(buf, cuser.userid);
+	sprintf(genbuf, "fpg/home/bbs/home/%c/%s/.DIR",
+		userid[0], userid);
+	merge_dir(buf, genbuf);
+    }
+   if(getans("是否匯入個人信箱精華區? (Y/n)")!='n')
    {
-       sprintf(genbuf,
-	   "mv M.* /home/bbs/home/%c/%s;" 
-	   "mv man/* /home/bbs/home/%c/%s/man;", cuser.userid[0], cuser.userid, 
+        sprintf(buf,
+	   "mv fpg/home/bbs/home/%c/%s/man home/%c/%s/man", 
+	      userid[0], userid,
 	      cuser.userid[0], cuser.userid);
-       strcat(buf,genbuf);
-       i++;
+        system(buf);
    }
-   if (getans("是否匯入好友名單? (會覆蓋\現有設定, ID可能是不同人)? (y/N)")=='y')
+   if(getans("是否匯入好友名單? (會覆蓋\現有設定, ID可能是不同人)? (y/N)")=='y')
    {
-       sprintf(genbuf,"mv overrides /home/bbs/home/%c/%s; ",
-	         cuser.userid[0], cuser.userid);
+       sethomefile(genbuf, cuser.userid, "overrides");
+       sprintf(buf, "fpg/home/bbs/home/%c/%s/overrides",userid[0],userid);
+       Copy(buf, genbuf);
        strcat(buf, genbuf);
-       i++;
+       friend_load(FRIEND_OVERRIDE);
    }
-   if(i) system(buf);
    vmsg("恭喜您完成帳號變身..");
    return 0;
+}
+
+void
+m_fpg_brd(char *bname, char *fromdir)
+{
+  char fbname[25], buf[256];
+  fileheader_t fh;
+
+  fromdir[0]=0;
+  do{
+
+     if(!getdata(20,0, "小魚的板名 [英文大小寫要完全正確]:", fbname, 20,
+	        DOECHO)) return;
+  }
+  while(invalid_brdname(fbname));
+
+  sprintf(buf, "fpg/boards/%s.inf", fbname);
+  if(!dashf(buf))
+  {
+       vmsg("無此看板");
+       return;
+  }
+  chdir("fpg");
+  sprintf(buf, "tar zxf boards/%s.tgz >/dev/null",fbname);
+  system(buf);
+  sprintf(buf, "tar zxf boards/%s.man.tgz >/dev/null", fbname);
+  system(buf);
+  chdir(BBSHOME);
+  sprintf(buf, "mv fpg/home/bbs/man/boards/%s man/boards/%c/%s", fbname,
+	    bname[0], bname);
+  system(buf);
+  sprintf(fh.title, "%s 精華區", fbname);
+  sprintf(fh.filename, fbname);
+  sprintf(fh.owner, cuser.userid);
+  sprintf(buf, "man/boards/%c/%s/.DIR", bname[0], bname);
+  append_record(buf, &fh, sizeof(fh));
+  vmsg("匯入成功\ 精華區請link %s",fbname);
 }

@@ -24,6 +24,7 @@ void setup_man(boardheader_t * board);
 void delete_symbolic_link(boardheader_t *bh, int bid);
 int make_symbolic_link(char *bname, int gid);
 int make_symbolic_link_interactively(int gid);
+void merge_dir(char *dir1, char *dir2);
 
 /* announce */
 int a_menu(char *maintitle, char *path, int lastlevel);
@@ -341,6 +342,7 @@ int Name_Menu(void);
 #ifdef MERGEBBS
 /* merge */
 int m_fpg(void);
+void m_fpg_brd(char *bname,char *fromdir);
 #endif
 
 /* more */

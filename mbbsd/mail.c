@@ -156,10 +156,10 @@ chkmailbox()
 	mailsumlimit += cuser.exmailbox * 10;
 	mailmaxkeep = max_keepmail + cuser.exmailbox;
 	m_init();
-	if ((mailkeep = get_num_records(currmaildir, sizeof(fileheader_t))) >
-	    mailmaxkeep ||
-	    (mailsum = get_sum_records(currmaildir, sizeof(fileheader_t))) >
-            mailsumlimit) {
+	if(!mailkeep)mailkeep=get_num_records(currmaildir,sizeof(fileheader_t));
+	if(!mailsum)mailsum=get_sum_records(currmaildir, sizeof(fileheader_t));
+	if (mailkeep > mailmaxkeep ||
+	    mailsum  > mailsumlimit) {
 	    bell();
 	    bell();
 	    vmsg("您保存信件數目或容量 %d 超出上限 %d, 請整理",
@@ -737,6 +737,7 @@ read_new_mail(fileheader_t * fptr)
 	if (genbuf[0] == 'y') {
 	    unlink(fname);
 	    delmsgs[delcnt++] = idc; // FIXME 一次刪太多信 out of array boundary
+	    mailsum = mailkeep = 0;
 	}
     }
     clear();
@@ -831,6 +832,7 @@ mail_del(int ent, fileheader_t * fhdr, char *direct)
 	if (!delete_record(direct, sizeof(*fhdr), ent)) {
 	    setdirpath(genbuf, direct, fhdr->filename);
 	    unlink(genbuf);
+	    mailsum = mailkeep = 0;
 	    return DIRCHANGED;
 	}
     }
@@ -1115,18 +1117,15 @@ int
 mail_man()
 {
     char            buf[64], buf1[64];
-    if (HAS_PERM(PERM_MAILLIMIT)) {
-	int             mode0 = currutmp->mode;
-	int             stat0 = currstat;
+    int             mode0 = currutmp->mode;
+    int             stat0 = currstat;
 
 	sethomeman(buf, cuser.userid);
 	snprintf(buf1, sizeof(buf1), "%s 的信件夾", cuser.userid);
-	a_menu(buf1, buf, 1);
+	a_menu(buf1, buf, HAS_PERM(PERM_MAILLIMIT));
 	currutmp->mode = mode0;
 	currstat = stat0;
 	return FULLUPDATE;
-    }
-    return DONOTHING;
 }
 
 static int

@@ -86,7 +86,7 @@ void sigfree(int);
 #endif
 
 /* brc */
-void brc_initialize();
+int brc_initialize();
 void brc_finalize();
 int brc_unread(const char *fname, int bnum, const time_t *blist);
 int brc_unread_time(time_t ftime, int bnum, const time_t *blist);

@@ -293,14 +293,15 @@ brc_finalize(){
     }
 }
 
-void
+int
 brc_initialize(){
     static char done = 0;
     if (done)
-	return;
+	return 1;
     done = 1;
     brc_expire_time = login_start_time - 365 * 86400;
     read_brc_buf();
+    return 0;
 }
 
 int

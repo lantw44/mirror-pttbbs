@@ -50,7 +50,8 @@ void imovefav(int old)
 void
 init_brdbuf()
 {
-    brc_initialize();
+    if (brc_initialize())
+	return;
     brc_initial_board(DEFAULT_BOARD);
     set_board();
 }

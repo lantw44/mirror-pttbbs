@@ -330,8 +330,6 @@ outc(unsigned char c)
 	    slp->smod = cur_col;
     }
 
-/* never true statment
-
     if (++cur_col >= scr_cols) {
 	if (standing && (slp->mode & STANDOUT)) {
 	    standing = 0;
@@ -341,7 +339,6 @@ outc(unsigned char c)
 	if (cur_ln < scr_lns)
 	    cur_ln++;
     }
-*/
 }
 
 int

@@ -2,7 +2,7 @@
 
 .include "../pttbbs.mk"
 
-CFLAGS+= -DPTTBBS_UTIL
+CFLAGS+= -DPTTBBS_UTIL -g
 
 BBSBASE=	../include/var.h
 
@@ -22,7 +22,8 @@ CPROG_WITH_UTIL= \
 	openvice	parse_news	openticket	topusr		\
 	indexuser	yearsold	toplazyBM	toplazyBBM	\
 	reaper		buildAnnounce	inndBM		shmctl		\
-	outmail		chkhbf		checkmoney      merge_dir
+	outmail		chkhbf		checkmoney      merge_dir	\
+	loadstr
 
 # 下面這些程式, 會直接被 compile
 CPROG_WITHOUT_UTIL= \

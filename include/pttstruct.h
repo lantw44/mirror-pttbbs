@@ -413,7 +413,7 @@ typedef struct {
 
     /* utmpshm */
     userinfo_t      uinfo[USHM_SIZE];
-    userinfo_t      *sorted[2][8][USHM_SIZE];
+    int             sorted[2][8][USHM_SIZE];
                     /* 第一維double buffer 由currsorted指向目前使用的
 		       第二維sort type */
     int     currsorted;
@@ -425,10 +425,10 @@ typedef struct {
     /* brdshm */
     int     BMcache[MAX_BOARD][MAX_BMs];
     boardheader_t   bcache[MAX_BOARD];
-    boardheader_t   *bsorted[2][MAX_BOARD]; /* 0: by name 1: by class */
+    int     bsorted[2][MAX_BOARD]; /* 0: by name 1: by class */
 #if HOTBOARDCACHE
     unsigned char    nHOTs;
-    boardheader_t   *HBcache[HOTBOARDCACHE];
+    int              HBcache[HOTBOARDCACHE];
 #endif
     time_t  busystate_b[MAX_BOARD];
     int     total[MAX_BOARD];

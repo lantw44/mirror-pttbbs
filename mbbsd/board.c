@@ -131,7 +131,8 @@ load_uidofgid(const int gid, const int type)
     int             n, childcount = 0;
     currbptr = &bcache[gid - 1];
     for (n = 0; n < numboards; ++n) {
-	if( !(bptr = SHM->bsorted[type][n]) || bptr->brdname[0] == '\0' )
+	if( !(bptr = &bcache[SHM->bsorted[type][n]]) 
+              || bptr->brdname[0] == '\0' )
 	    continue;
 	if (bptr->gid == gid) {
 	    if (currbptr == &bcache[gid - 1])
@@ -259,14 +260,15 @@ load_boards(char *key)
 	else if( class_bid == -1 ){
 	    nbrd = (boardstat_t *)malloc(sizeof(boardstat_t) * SHM->nHOTs);
 	    for( i = 0 ; i < SHM->nHOTs ; ++i )
-		addnewbrdstat(SHM->HBcache[i] - SHM->bcache,
-			      HasPerm(SHM->HBcache[i]));
+                if(SHM->HBcache[i]==-1) continue;
+		addnewbrdstat(SHM->HBcache[i],
+			      HasPerm(bcache[SHM->HBcache[i]]));
 	}
 #endif
 	else { // general case
 	    nbrd = (boardstat_t *) MALLOC(sizeof(boardstat_t) * numboards);
 	    for (i = 0; i < numboards; i++) {
-		if ((bptr = SHM->bsorted[type][i]) == NULL)
+		if ((bptr = &bcache[SHM->bsorted[type][i]]) == NULL)
 		    continue;
 		n = getbid(bptr);
 		if (!bptr->brdname[0] ||

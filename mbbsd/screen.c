@@ -77,6 +77,41 @@ rel_move(int was_col, int was_ln, int new_col, int new_ln)
     do_move(new_col, new_ln);
 }
 
+static void
+standoutput(char *buf, int ds, int de, int sso, int eso)
+{
+    if (eso <= ds || sso >= de) {
+	output(buf + ds, de - ds);
+    } else {
+#if 0
+	if (sso > ds) // does is not happened?
+	    output(buf + ds, sso - ds);
+	else
+	    vmsg("!!!!!!");
+	o_standup();
+	output(buf + sso, de - sso);
+	o_standdown();
+	if (de > eso) // does is not happened?
+	    output(buf + eso, de - eso);
+	else
+	    vmsg("!!!!!!");
+#else
+	short st_start, st_end;
+
+	st_start = MAX(sso, ds);
+	st_end = MIN(eso, de);
+	if (sso > ds)
+	    output(buf + ds, sso - ds);
+	o_standup();
+	output(buf + st_start, st_end - st_start);
+	o_standdown();
+	if (de > eso)
+	    output(buf + eso, de - eso);
+#endif
+    }
+}
+
+
 void
 redoscr()
 {
@@ -91,7 +126,7 @@ redoscr()
 	if ((len = bp->len)) {
 	    rel_move(tc_col, tc_line, 0, i);
 	    if (bp->mode & STANDOUT) {
-//		standoutput((char *)bp->data, 0, len, bp->sso, bp->eso);
+		standoutput((char *)bp->data, 0, len, bp->sso, bp->eso);
 	    }
 	    else
 		output((char *)bp->data, len);
@@ -157,7 +192,7 @@ refresh()
 	    rel_move(tc_col, tc_line, bp->smod, i);
 
 	    if (bp->mode & STANDOUT) {
-//		standoutput((char *)bp->data, bp->smod, bp->emod + 1, bp->sso, bp->eso);
+		standoutput((char *)bp->data, bp->smod, bp->emod + 1, bp->sso, bp->eso);
 	    }
 	    else
 		output((char *)&bp->data[bp->smod], bp->emod - bp->smod + 1);

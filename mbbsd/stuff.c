@@ -619,7 +619,6 @@ void
 show_help(int *index)
 {
     char           *str;
-    int             i;
 
     clear();
     while (*index > 0 && *index < MAX_STRING) {

@@ -191,23 +191,44 @@ brc_update(){
 inline static int
 read_old_brc()
 {
-//#error read_old_brc() not implement yet
-    /* XXX: read from old brc file */
-    char brdname[BRC_STRLEN + 1];
+    char       brcfile[STRLEN];
+    char       brdname[BRC_STRLEN + 1];
+    char      *ptr;
+    int        fd;
+    brcnbrd_t  num;
+
+    setuserfile(brcfile, fn_oldboardrc);
+    if ((fd = open(brcfile, O_RDONLY)) != -1) {
+	ptr = brc_buf;
+	brc_size = 0;
+	while (read(fd, brdname, BRC_STRLEN + 1) == BRC_STRLEN + 1) {
+	    num = brdname[BRC_STRLEN];
+	    brdname[BRC_STRLEN] = 0;
+	    *(brcbid_t*)ptr = getbnum(brdname);
+	    ptr += sizeof(brcbid_t);
+	    *(brcnbrd_t*)ptr = num;
+	    ptr += sizeof(brcnbrd_t);
+	    if (read(fd, ptr, sizeof(int) * num) != sizeof(int) * num)
+		break;
+	    brc_size += sizeof(brcbid_t) + sizeof(brcnbrd_t)
+		+ sizeof(time_t) * num;
+	    ptr += sizeof(time_t) * num;
+	}
+	return 1;
+    }
     return 0;
-    brdname[0] = brdname[0];
 }
 
 inline static void
 read_brc_buf()
 {
     if (brc_buf == NULL) {
-	char            dirfile[STRLEN];
+	char            brcfile[STRLEN];
 	int             fd;
 
 	brc_buf = malloc(BRC_MAXSIZE);
-	setuserfile(dirfile, fn_brc);
-	if ((fd = open(dirfile, O_RDONLY)) != -1) {
+	setuserfile(brcfile, fn_brc);
+	if ((fd = open(brcfile, O_RDONLY)) != -1) {
 	    brc_size = read(fd, brc_buf, BRC_MAXSIZE);
 	    close(fd);
 	} else {

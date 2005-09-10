@@ -21,12 +21,14 @@ $Id$
 		proto/		mbbsd/ 裡面各個檔案的說明，詳見該目錄的 README
 		z6ibbs.[12].txt	in2 隨筆
 
-	sample/			範例
+	sample/			範例設定及資源檔
 		crontab		提供 bbs執行時須透過 crontab 定時跑的設定
 
-	blog/			PttBLOG
 	include/		include 檔
-	innbbsd/		轉信
 	mbbsd/			bbs 主程式
-	mbbsd.icc/		提供使用 icc來編譯所須要的 Makefile
-	pttpi/			Ptt Programming Interface
+
+	util/			工具程式
+	innbbsd/		轉信
+
+	blog/			PttBLOG 模組
+	staticweb/		靜態網頁瀏覽模組

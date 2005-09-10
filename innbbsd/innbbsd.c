@@ -266,7 +266,6 @@ static int
 CMDmode(client)
     ClientType     *client;
 {
-    /* char cwdpath[MAXPATHLEN+1]; */
     argv_t         *argv = &client->Argv;
     extern ClientType INNBBSD_STAT;
     daemoncmd_t    *p = argv->dc;
@@ -312,8 +311,11 @@ CMDmode(client)
     fprintf(argv->out, "NONE NEWSFEEDS %d\r\n", NONENEWSFEEDS);
     fprintf(argv->out, "Max connections %d\r\n", Maxclient);
 #ifdef DEBUGCWD
-    getwd(cwdpath);
-    fprintf(argv->out, "Working directory %s\r\n", cwdpath);
+    {
+	char cwdpath[MAXPATHLEN+1];
+	getcwd(cwdpath, sizeof(cwdpath));
+	fprintf(argv->out, "Working directory %s\r\n", cwdpath);
+    }
 #endif
     if (Channel)
 	for (i = 0, j = 0; i < Maxclient; ++i) {

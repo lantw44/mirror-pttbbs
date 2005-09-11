@@ -4,7 +4,8 @@
 ########################################################################
 # $Id$
 
-bin_PROGRAMS=mbbsd
+PROG=mbbsd
+bin_PROGRAMS=$(PROG)
 
 mbbsd_SOURCES= \
 	       ../include/var.h \
@@ -19,6 +20,12 @@ mbbsd_SOURCES= \
 ../include/var.h:	var.c
 	perl ../util/parsevar.pl < var.c > ../include/var.h
 
+test: $(PROG)
+	killall -9 test$(PROG) || true
+	cp $(PROG) test$(PROG)
+	./test$(PROG) 9000
+	rm -f test$(PROG)
+
 ## reduce .bss align overhead
 #.if !defined(DEBUG)
 #LDFLAGS+=-Wl,--sort-common
@@ -28,11 +35,6 @@ mbbsd_SOURCES= \
 #	sh ../util/newvers.sh
 #	$(DIETCC) $(CC) $(LDFLAGS) -o $(PROG) $(OBJS) $(LIBS) $(EXT_LIBS) vers.c
 
-#test: $(PROG)
-#	killall -9 testmbbsd || true
-#	cp mbbsd testmbbsd
-#	./testmbbsd 9000
-#	rm -f testmbbsd
 #
 #install: $(PROG)
 #	install -d $(BBSHOME)/bin/

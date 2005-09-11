@@ -11,7 +11,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/uio.h>
-#include "config.h"
+#include "bbsconf.h"
 
 #ifdef Solaris
     #include <utmpx.h>

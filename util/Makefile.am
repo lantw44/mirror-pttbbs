@@ -4,8 +4,11 @@
 ########################################################################
 # $Id$
 
+AUTOMAKE_OPTIONS=foreign
+
 CFLAGS=-DPTTBBS_UTIL
 BBSBASE=../include/var.h
+CFLAGS+=-Wall -pipe -DBBSHOME='"/home/bbs"' -I ../include
 
 # Compile and build with BBS utility library.
 CPROG_WITH_UTIL= \
@@ -17,13 +20,19 @@ CPROG_WITH_UTIL= \
 	reaper		buildAnnounce	inndBM		mailangel	\
 	outmail		chkhbf		checkmoney      merge_dir       \
 	transman	angel		gamblegive	checkdir	\
-	chesscountry	tunepasswd	buildir		xchatd
+	chesscountry	tunepasswd	buildir		xchatd		\
+	cleanpasswd	\
+	shmctl
 
 # Compile directly.
 CPROG_WITHOUT_UTIL= \
 	countalldice	bbsrf		bbsmail		initbbs		\
 	gamble_fix	merge_board	merge_passwd	showboard	\
-	userlist	uhash_loader
+	userlist	uhash_loader	
+
+# migration, not used in general case.
+CPROG_NO_BUILD=r2014convert	passwdconverter
+
 
 # No need to be compiled.
 SCRIPT_PROG = \
@@ -33,82 +42,58 @@ SCRIPT_PROG = \
 	dailybackup.pl	tarqueue.pl	waterball.pl	filtermail.pl	\
 	getbackup.pl	udnnews.pl	rebuildaloha.pl
 
-bin_PRORAMS=$(SCRIPT_PROG) $(CPROG_WITHOUT_UTIL) $(CPROG_WITH_UTIL) 	\
-	    shmctl
+MBBSD_PATH=../mbbsd
 
-UTIL_LIB=	\
-	util_cache.c	util_record.c	util_passwd.c	util_var.c	\
-	util_stuff.c	util_osdep.c	util_args.c	util_file.c	\
-	util_crypt.c
+MBBSD_LIB= \
+	$(MBBSD_PATH)/cache.c	$(MBBSD_PATH)/record.c	\
+	$(MBBSD_PATH)/passwd.c	$(MBBSD_PATH)/var.c	\
+	$(MBBSD_PATH)/stuff.c	$(MBBSD_PATH)/osdep.c	\
+	$(MBBSD_PATH)/args.c	$(MBBSD_PATH)/file.c	\
+	$(MBBSD_PATH)/crypt.c
 
-MBBSD_OBJS= \
-	cache		record		passwd		var		\
-	stuff		osdep		args		file		\
-	crypt
+bin_PROGRAMS=$(CPROG_WITH_UTIL) $(CPROG_WITHOUT_UTIL) 
 
-../include/var.h: ../mbbsd/var.c
+noinst_LIBRARIES=libmbbsd.a
+libmbbsd_a_SOURCES=$(MBBSD_LIB) $(BBSBASE)
+libmbbsd_a_CFLAGS=-D_BBS_UTIL_C_
+
+LDADD=libmbbsd.a
+
+$(BBSBASE): ../mbbsd/var.c
 	cd ../mbbsd; $(MAKE) ../include/var.h
 
-.for fn in ${CPROG_WITH_UTIL}
-${fn}: ${BBSBASE} ${fn}.c ${UTIL_OBJS}
-	$(CCACHE) ${CC} ${CFLAGS} ${LDFLAGS} -o ${fn} ${UTIL_OBJS} ${fn}.c
-.endfor
+#bbsmail: ${BBSBASE} bbsmail.c ../innbbsd/str_decode.c $(UTIL_OBJS)
+#	$(CCACHE) $(CC) $(CFLAGS) $(LDFLAGS) -o bbsmail -DUSE_ICONV \
+#	bbsmail.c ../innbbsd/str_decode.c $(UTIL_OBJS)
 
-.for fn in ${MBBSD_OBJS}
-util_${fn}.o: ${BBSBASE} ../mbbsd/${fn}.c
-	$(CCACHE) ${CC} ${CFLAGS} -D_BBS_UTIL_C_ -c -o $@ ../mbbsd/${fn}.c
-.endfor
+#install: $(PROGS)
+#	install -d $(BBSHOME)/bin/
+#	install -c -m 755 $(PROGS) $(BBSHOME)/bin/
+#	chmod 4755 $(BBSHOME)/bin/post
+#.if defined(WITHFILTERMAIL)
+#	$(MAKE) installfiltermail
+#.endif
 
-shmctl: ${BBSBASE} shmctl.c ${UTIL_OBJS}
-	$(CCACHE) ${CC} ${CFLAGS} ${LDFLAGS} -o shmctl ${UTIL_OBJS} shmctl.c
+#installfiltermail:
+#	mv $(BBSHOME)/bin/bbsmail $(BBSHOME)/bin/realbbsmail
+#	ln -s $(BBSHOME)/bin/filtermail.pl $(BBSHOME)/bin/bbsmail
 
-bbsmail: ${BBSBASE} bbsmail.c ../innbbsd/str_decode.c $(UTIL_OBJS)
-	$(CCACHE) $(CC) $(CFLAGS) $(LDFLAGS) -o bbsmail -DUSE_ICONV \
-	bbsmail.c ../innbbsd/str_decode.c $(UTIL_OBJS)
+## for diskstat(FreeBSD 4.x only) .
+## diskstat should be compiled with bbs and installed with root
+#diskstat: diskstat.c
+#	$(CCACHE) $(CC) $(CFLAGS) -o diskstat diskstat.c -ldevstat -lkvm
 
-install: $(PROGS)
-	install -d $(BBSHOME)/bin/
-	install -c -m 755 $(PROGS) $(BBSHOME)/bin/
-	chmod 4755 $(BBSHOME)/bin/post
-.if defined(WITHFILTERMAIL)
-	$(MAKE) installfiltermail
-.endif
-
-clean:
-	rm -f *.o $(CPROGS) $(CPROG_WITH_UTIL) $(CPROG_WITHOUT_UTIL)
-
-
-installfiltermail:
-	mv $(BBSHOME)/bin/bbsmail $(BBSHOME)/bin/realbbsmail
-	ln -s $(BBSHOME)/bin/filtermail.pl $(BBSHOME)/bin/bbsmail
-
-# for diskstat(FreeBSD 4.x only) .
-# diskstat should be compiled with bbs and installed with root
-diskstat: diskstat.c
-	$(CCACHE) $(CC) $(CFLAGS) -o diskstat diskstat.c -ldevstat -lkvm
-
-installdiskstat: diskstat
-	cp -f diskstat /usr/local/bin/
-	chgrp kmem /usr/local/bin/diskstat
-	chmod 2755 /usr/local/bin/diskstat
+#installdiskstat: diskstat
+#	cp -f diskstat /usr/local/bin/
+#	chgrp kmem /usr/local/bin/diskstat
+#	chmod 2755 /usr/local/bin/diskstat
 
 # for bbsctl. bbsctl should be compiled with bbs and installed with root
-bbsctl:	bbsctl.c
-	$(CCACHE) $(CC) $(CFLAGS) -o $@ $@.c
+#bbsctl:	bbsctl.c
+#	$(CCACHE) $(CC) $(CFLAGS) -o $@ $@.c
 
-installbbsctl: bbsctl
-	rm -f /home/bbs/bin/bbsctl
-	cp /home/bbs/pttbbs/util/bbsctl /home/bbs/bin/bbsctl
-	chown root /home/bbs/bin/bbsctl
-	chmod 4755 /home/bbs/bin/bbsctl
-
-cleanpasswd: cleanpasswd.c ${UTIL_OBJS}
-	$(CCACHE) ${CC} ${CFLAGS} ${LDFLAGS} -o cleanpasswd ${UTIL_OBJS} cleanpasswd.c
-
-r2014transfer: r2014convert
-	$(CCACHE) ${CC} ${CFLAGS} ${LDFLAGS} -o r2014convert r2014convert.c
-	./r2014convert
-	rm r2014convert
-
-passwdconverter: passwdconverter.c
-	$(CCACHE) $(CC) $(CFLAGS) $(LDFLAGS) $(UTIL_OBJS) -o passwdconverter passwdconverter.c
+#installbbsctl: bbsctl
+#	rm -f /home/bbs/bin/bbsctl
+#	cp /home/bbs/pttbbs/util/bbsctl /home/bbs/bin/bbsctl
+#	chown root /home/bbs/bin/bbsctl
+#	chmod 4755 /home/bbs/bin/bbsctl

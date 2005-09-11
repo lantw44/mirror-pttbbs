@@ -4,8 +4,6 @@ BBSHOME?=	$(HOME)
 BBSHOME?=	/home/bbs
 
 OS!=		uname
-OS_MAJOR_VER!=	uname -r|cut -d . -f 1
-OS_MINOR_VER!=	uname -r|cut -d . -f 2
 OSTYPE?=	$(OS)
 
 CC=		gcc
@@ -22,18 +20,10 @@ CFLAGS_FreeBSD=	-I/usr/local/include
 LDFLAGS_FreeBSD=
 LIBS_FreeBSD=	-lkvm -liconv
 
-# Linux特有的環境
-CFLAGS_Linux=	
-LDFLAGS_Linux=	
-LIBS_Linux=	
-
 # SunOS特有的環境
 CFLAGS_Solaris=	-DSolaris -I/usr/local/include 
 LDFLAGS_Solaris= -L/usr/local/lib -L/usr/lib
 LIBS_Solaris=	-lnsl -lsocket -liconv -lkstat
-
-OS_FLAGS=	-D__OS_MAJOR_VERSION__="$(OS_MAJOR_VER)" \
-		-D__OS_MINOR_VERSION__="$(OS_MINOR_VER)"
 
 # CFLAGS, LDFLAGS, LIBS 加入 OS 相關參數
 PTT_CFLAGS+=	$(CFLAGS_$(OSTYPE)) $(OS_FLAGS)
@@ -62,7 +52,9 @@ CFLAGS=		$(PTT_CFLAGS) -O1 -tpp6 -mcpu=pentiumpro -march=pentiumiii \
 		-ip -ipo
 LDFLAGS+=	-O1 -tpp6 -mcpu=pentiumpro -march=pentiumiii -ip -ipo \
 		$(PTT_LDFLAGS) $(PTT_LIBS)
+
 .elif defined(GDB)
+
 CFLAGS=		-g -O0 $(PTT_CFLAGS)
 LDFLAGS=	-O0 $(PTT_LDFLAGS) $(PTT_LIBS)
 .else

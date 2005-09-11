@@ -1,0 +1,41 @@
+------------------------------------------
+
+PTTBBS - 1.9 Branch
+
+Release Engineer: piaip
+
+------------------------------------------
+
+1.9 branch is a whole new generation.
+In this release we want to migrate old
+MAKE system from pmake(BSD flavor) to
+GNU Autoconf/Automake. And after this
+it is believed that we will be able to
+release faster and more stable.
+
+To apply this branch, please install:
+Autoconf 2.59
+Automake 1.9
+
+And run these commands in top level 
+directory:
+
+aclocal
+autoheader
+autoconf
+automake -a
+
+Then you will be able to use
+./configure
+make
+
+------------------------------------------
+Warning: 1.9 Automake branch is STILL
+WORK IN PROGRESS. That is, it's not stable
+and may not be run/build/install.
+
+Any help is welcome to make it faster
+released!
+
+	piaip@csie.ntu.edu.tw,
+	Sun Sep 11 11:50:56 CST 2005

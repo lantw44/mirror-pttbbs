@@ -38,7 +38,7 @@
 #include <sys/msg.h>
 
 /* our header */
-#include "config.h"
+#include "bbsconf.h"
 #ifdef TIMET64
 typedef uint32_t time4_t;
 #else

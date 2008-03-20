@@ -24,7 +24,23 @@ $Id$
 	sample/			範例
 		crontab		提供 bbs執行時須透過 crontab 定時跑的設定
 
-	blog/			PttBLOG
-	include/		include 檔
-	innbbsd/		轉信
-	mbbsd/			bbs 主程式
+	include/		共享的 include 檔
+
+	common/			共通程式庫
+		sys/		系統或其它底層相關
+		bbs/		有 BBS 邏輯的部份
+
+	web/			WWW Based Clients
+		blog/		PttBlog
+		static/		靜態網頁輸出
+
+	console/		Console Mode Client (mbbsd 傳統界面)
+
+	daemon/
+		innbbsd/	轉信
+		cached/		線上記錄伺服器
+		xchatd		聊天室伺服器
+
+	util/			其它管理輔助程式
+
+	upgrade/		系統昇級相關區

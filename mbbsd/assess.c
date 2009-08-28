@@ -231,10 +231,8 @@ u_fixgoodpost(void)
 	log_filef("log/fixgoodpost.log", LOG_CREAT,
 	        "%s %s 自動修正優文數: 由 %d 變為 %d\n", Cdate(&now), cuser.userid,
 		cuser.goodpost, newgp);
-	cuser.goodpost = newgp;
 	// update passwd file here?
-	passwd_force_update(ALERT_PWD_GOODPOST);
-	passwd_sync_update(usernum, &cuser);
+	pwcuSetGoodPost(newgp);
 	vmsgf("更新優文數目為%d。", newgp);
     }
 

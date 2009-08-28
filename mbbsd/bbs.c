@@ -170,9 +170,7 @@ anticrosspost(void)
              cuser.userid, Cdatelite(&now));
     post_violatelaw(cuser.userid, BBSMNAME "系統警察", 
 	    "Cross-post", "罰單處份");
-    cuser.userlevel |= PERM_VIOLATELAW;
-    cuser.timeviolatelaw = now;
-    cuser.vl_count++;
+    pwcuViolateLaw();
     mail_id(cuser.userid, "Cross-Post罰單",
 	    "etc/crosspost.txt", BBSMNAME "警察部隊");
     if ((now - cuser.firstlogin) / DAY_SECONDS < 14)
@@ -243,11 +241,7 @@ save_violatelaw(void)
     }
 
     demoney(-1000 * cuser.vl_count);
-    cuser.userlevel &= (~PERM_VIOLATELAW);
-    // force overriding alerts
-    if(currutmp)
-	currutmp->alerts &= ~ALERT_PWD_PERM;
-    passwd_sync_update(usernum, &cuser);
+    pwcuSaveViolateLaw();
     sendalert(cuser.userid, ALERT_PWD_PERM);
     log_filef("log/violation", LOG_CREAT,
 	    "%s %s pay-violation: $%d complete.\n", 
@@ -908,7 +902,8 @@ do_general(int garbage)
     int i, j;
     int             defanony, ifuseanony;
     int             money = 0;
-    char            genbuf[PATHLEN], *owner;
+    char            genbuf[PATHLEN];
+    const char	    *owner;
     char            ctype[8][5] = {"問題", "建議", "討論", "心得",
 				   "閒聊", "請益", "公告", "情報"};
     boardheader_t  *bp;
@@ -1128,9 +1123,10 @@ do_general(int garbage)
             if (money > 0)
 	    {
 		demoney(money);    
+		pwcuIncNumPost();
 		addPost = 1;
 		prints("這是您的第 %d 篇有效文章，稿酬 %d 元",
-			++cuser.numposts, money);
+			cuser.numposts, money);
 	    } else {
 		// no money, no record.
 		outs("本篇不列入記錄，敬請包涵。");
@@ -3125,10 +3121,11 @@ del_post(int ent, fileheader_t * fhdr, char *direct)
 		if (tusernum)
 		{
 		    userec_t xuser;
-		    passwd_sync_query(tusernum, &xuser);
-		    if (xuser.numposts)
+		    assert(tusernum != usernum);
+		    passwd_query(tusernum, &xuser);
+		    if (xuser.numposts > 0)
 			xuser.numposts--;
-		    passwd_sync_update(tusernum, &xuser);
+		    passwd_update(tusernum, &xuser);
 		    sendalert_uid(tusernum, ALERT_PWD_POSTS);
 
 		    // TODO alert user?
@@ -3143,11 +3140,9 @@ del_post(int ent, fileheader_t * fhdr, char *direct)
 	    else
 	    {
 		// owner case
-		if (cuser.numposts){
-		    cuser.numposts--;
-		    sendalert(cuser.userid, ALERT_PWD_POSTS);
-		}
+		pwcuDecNumPost();
 		demoney(-fhdr->multi.money);
+		sendalert(cuser.userid, ALERT_PWD_POSTS);
 		vmsgf("您的文章減為 %d 篇，支付清潔費 %d 元", 
 			cuser.numposts, fhdr->multi.money);
 	    }

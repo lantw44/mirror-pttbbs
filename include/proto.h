@@ -187,8 +187,8 @@ const char *ask_tmpbuf(int y);
 
 /* emaildb */
 #ifdef USE_EMAILDB
-int emaildb_check_email(char * email, int email_len);
-int emaildb_update_email(char * userid, int userid_len, char * email, int email_len);
+int emaildb_check_email (const char * email, int email_len);
+int emaildb_update_email(const char * userid, int userid_len, const char * email, int email_len);
 #endif
 #ifdef USE_REGCHECKD
 int regcheck_ambiguous_userid_exist(const char *userid);
@@ -615,7 +615,7 @@ int isvalidemail(char *email);
 void uinfo_query(userec_t *u, int real, int unum);
 int showsignature(char *fname, int *j, SigInfo *psi);
 int u_cancelbadpost();
-void kick_all(char *user);
+void kick_all(const char *user);
 void violate_law(userec_t * u, int unum);
 void mail_violatelaw(const char* crime, const char* police, const char* reason, const char* result);
 int u_info(void);
@@ -692,12 +692,31 @@ void passwd_force_update(int flag);
 int  passwd_sync_update (int num, userec_t * buf);
 int  passwd_sync_query  (int num, userec_t * buf);
 
-// int  passwd_add_my_numpost(int diff); // temporary hack before new account system ready.
-
 // current user help utilities
-int pwcuSetSignature	(unsigned char newsig);
 int pwcuBitSetLevel	(unsigned int mask);
 int pwcuBitUnsetLevel	(unsigned int mask);
+int pwcuSetSignature	(unsigned char newsig);
+int pwcuIncNumPost	();
+int pwcuDecNumPost	();
+int pwcuSetGoodPost	(unsigned int newgp);
+int pwcuViolateLaw	();
+int pwcuSaveViolateLaw	();
+int pwcuAddExMailBox	(int m);
+int pwcuToggleOutMail	();
+int pwcuSetLoginView	(unsigned int bits);
+int pwcuSetWaterballMode(unsigned int bm);
+int pwcuSetLastSongTime (time4_t clk);
+int pwcuSetMyAngel	(const char *angel_uid);
+int pwcuSetNickname	(const char *nickname);
+
+// session save
+int pwcuLoginSave	();
+int pwcuExitSave	();
+
+// initialization
+void pwcuInitGuestPerm	();
+void pwcuInitGuestInfo	();
+int  pwcuInitAdminPerm	();
 
 /* calendar */
 int calendar(void);

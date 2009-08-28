@@ -2999,10 +2999,11 @@ userlist(void)
 		if (HasUserPerm(PERM_LOGINOK)) {
 		    int             tmp;
 		    char           *wm[3] = {"一般", "進階", "未來"};
+
+
 		    tmp = cuser.uflag2 & WATER_MASK;
-		    cuser.uflag2 -= tmp;
 		    tmp = (tmp + 1) % 3;
-		    cuser.uflag2 |= tmp;
+		    pwcuSetWaterballMode(tmp);
 		    /* vmsg cannot support multi lines */
 		    move(b_lines - 4, 0);
 		    clrtobot();
@@ -3035,7 +3036,7 @@ userlist(void)
 		    if (getdata_str(1, 0, "新的暱稱: ",
 				tmp_nick, sizeof(tmp_nick), DOECHO, cuser.nickname) > 0)
 		    {
-			strlcpy(cuser.nickname, tmp_nick, sizeof(cuser.nickname));
+			pwcuSetNickname(tmp_nick);
 			strlcpy(currutmp->nickname, cuser.nickname, sizeof(currutmp->nickname));
 		    }
 		    redrawall = redraw = 1;

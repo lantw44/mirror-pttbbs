@@ -65,11 +65,11 @@ u_loginview(void)
     }
 
     if (pbits != cuser.loginview) {
-	cuser.loginview = pbits;
-	passwd_sync_update(usernum, &cuser);
+	pwcuSetLoginView(pbits);
     }
     return 0;
 }
+
 int u_cancelbadpost(void)
 {
    int day;
@@ -269,7 +269,7 @@ mail_violatelaw(const char *crime, const char *police, const char *reason, const
 }
 
 void
-kick_all(char *user)
+kick_all(const char *user)
 {
    userinfo_t *ui;
    int num = searchuser(user, NULL), i=1;
@@ -489,8 +489,7 @@ void Customize(void)
 		{
 		    int     currentset = cuser.uflag2 & WATER_MASK;  
 		    currentset = (currentset + 1) % 3;  
-		    cuser.uflag2 &= ~WATER_MASK;  
-		    cuser.uflag2 |= currentset;  
+		    pwcuSetWaterballMode(currentset);
 		    vmsg("修正水球模式後請正常離線再重新上線");  
 		    dirty = 1;
 		}

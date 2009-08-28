@@ -130,7 +130,7 @@ const char * postperm_msg(const char *bname);
 int give_tax(int money);
 const char* money_level(int money);
 int vice(int money, const char* item);
-#define reload_money()  cuser.money=moneyof(usernum)
+#define reload_money()  // cuser.money=moneyof(usernum)
 int lockutmpmode(int unmode, int state);
 int unlockutmpmode(void);
 int x_file(void);
@@ -695,7 +695,6 @@ int  passwd_sync_query  (int num, userec_t * buf);
 // current user help utilities
 int pwcuBitSetLevel	(unsigned int mask);
 int pwcuBitUnsetLevel	(unsigned int mask);
-int pwcuSetSignature	(unsigned char newsig);
 int pwcuIncNumPost	();
 int pwcuDecNumPost	();
 int pwcuSetGoodPost	(unsigned int newgp);
@@ -704,10 +703,15 @@ int pwcuSaveViolateLaw	();
 int pwcuAddExMailBox	(int m);
 int pwcuToggleOutMail	();
 int pwcuSetLoginView	(unsigned int bits);
-int pwcuSetWaterballMode(unsigned int bm);
 int pwcuSetLastSongTime (time4_t clk);
 int pwcuSetMyAngel	(const char *angel_uid);
 int pwcuSetNickname	(const char *nickname);
+
+// non-important based variables (only save on exit)
+int pwcuSetSignature	(unsigned char newsig);
+int pwcuSetWaterballMode(unsigned int bm);
+int pwcuToggleSortBoard ();
+int pwcuToggleFriendList();
 
 // session save
 int pwcuLoginSave	();

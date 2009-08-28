@@ -149,14 +149,6 @@ pwcuSetGoodPost(unsigned int newgp)
     PWCU_END();
 }
 
-int
-pwcuSetSignature(unsigned char newsig)
-{
-    PWCU_START();
-    cuser.signature = u.signature = newsig;
-    PWCU_END();
-}
-
 int 
 pwcuViolateLaw	()
 {
@@ -188,36 +180,6 @@ pwcuAddExMailBox(int m)
     PWCU_END();
 }
 
-int 
-pwcuToggleOutMail()
-{
-    PWCU_START();
-    u.uflag2     ^= REJ_OUTTAMAIL;
-    cuser.uflag2 ^= REJ_OUTTAMAIL;
-    PWCU_END();
-}
-
-int 
-pwcuSetLoginView(unsigned int bits)
-{
-    PWCU_START();
-    u.loginview     = bits;
-    cuser.loginview = u.loginview;
-    PWCU_END();
-}
-
-int 
-pwcuSetWaterballMode(unsigned int bm)
-{
-    PWCU_START();
-    bm &= WATER_MASK;
-    u.uflag2     &= ~WATER_MASK;  
-    cuser.uflag2 &= ~WATER_MASK;  
-    u.uflag2     |= bm;  
-    cuser.uflag2 |= bm;  
-    PWCU_END();
-}
-
 int pwcuSetLastSongTime (time4_t clk)
 {
     PWCU_START();
@@ -241,6 +203,57 @@ int pwcuSetNickname	(const char *nickname)
     strlcpy(cuser.nickname, nickname, sizeof(cuser.nickname));
     PWCU_END();
 }
+
+int 
+pwcuToggleOutMail()
+{
+    PWCU_START();
+    u.uflag2     ^= REJ_OUTTAMAIL;
+    cuser.uflag2 ^= REJ_OUTTAMAIL;
+    PWCU_END();
+}
+
+int 
+pwcuSetLoginView(unsigned int bits)
+{
+    PWCU_START();
+    u.loginview     = bits;
+    cuser.loginview = u.loginview;
+    PWCU_END();
+}
+
+
+// non-important variables (only save on exit)
+
+int
+pwcuSetSignature(unsigned char newsig)
+{
+    cuser.signature = newsig;
+    return 0;
+}
+
+int 
+pwcuSetWaterballMode(unsigned int bm)
+{
+    bm		 &=  WATER_MASK;
+    cuser.uflag2 &= ~WATER_MASK;  
+    cuser.uflag2 |= bm;  
+    return 0;
+}
+
+int pwcuToggleSortBoard ()
+{
+    cuser.uflag ^= BRDSORT_FLAG;
+    return 0;
+}
+
+int pwcuToggleFriendList()
+{
+    cuser.uflag ^= FRIEND_FLAG;
+    return 0;
+}
+
+// session save
 
 #if 0
 static void

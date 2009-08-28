@@ -2914,7 +2914,7 @@ userlist(void)
 
 	    case 'f':
 		if (HasUserPerm(PERM_LOGINOK)) {
-		    cuser.uflag ^= FRIEND_FLAG;
+		    pwcuToggleFriendList();
 		    redrawall = redraw = 1;
 		}
 		break;

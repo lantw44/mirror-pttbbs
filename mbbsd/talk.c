@@ -481,7 +481,7 @@ my_query(const char *uident)
 #endif
 	move(2, 40);
 #ifdef ASSESS
-	prints("《有效文章篇數》%d篇 (優:%d/劣:%d)\n", muser.numposts, muser.goodpost, muser.badpost);
+	prints("《有效文章篇數》%d篇 (劣:%d)\n", muser.numposts, muser.badpost);
 #else
 	prints("《有效文章篇數》%d篇\n", muser.numposts);
 #endif

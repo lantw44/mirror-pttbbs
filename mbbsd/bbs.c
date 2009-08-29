@@ -2342,14 +2342,6 @@ recommend_cancel(int ent, fileheader_t * fhdr, const char *direct)
     getdata(b_lines - 1, 0, "確定要推薦歸零[y/N]? ", yn, 5, LCECHO);
     if (yn[0] != 'y')
 	return FULLUPDATE;
-#ifdef ASSESS
-    // to save resource
-    if (fhdr->recommend > 9)
-    {
-	inc_goodpost(fhdr->owner, -1 * (fhdr->recommend / 10));
-	sendalert(fhdr->owner,  ALERT_PWD_GOODPOST);
-    }
-#endif
     fhdr->recommend = 0;
 
     substitute_ref_record(direct, fhdr, ent);
@@ -2765,20 +2757,6 @@ recommend(int ent, fileheader_t * fhdr, const char *direct)
     }
 
     do_add_recommend(direct, fhdr,  ent, buf, type);
-
-#ifdef ASSESS
-    /* 每 10 次推文 加一次 goodpost */
-    // TODO 轉來的怎麼辦？
-    // when recommend reaches MAX_RECOMMENDS...
-    if (type == RECTYPE_GOOD && (fhdr->filemode & FILE_MARKED) &&
-	(fhdr->recommend != oldrecom) &&
-	fhdr->recommend % 10 == 0)
-    {
-	inc_goodpost(fhdr->owner, 1);
-	sendalert(fhdr->owner,  ALERT_PWD_GOODPOST);
-    }
-#endif
-
     lastrecommend = now;
     lastrecommend_bid = currbid;
     strlcpy(lastrecommend_fname, fhdr->filename, sizeof(lastrecommend_fname));
@@ -2801,23 +2779,6 @@ mark_post(int ent, fileheader_t * fhdr, const char *direct)
 	return DONOTHING;
 
     fhdr->filemode ^= FILE_MARKED;
-
-#ifdef ASSESS
-    if (fhdr->filemode & FILE_MARKED) 
-    {
-	if (!(currbrdattr & BRD_BAD) && fhdr->recommend >= 10)
-	{
-	    inc_goodpost(fhdr->owner, fhdr->recommend / 10);
-	    sendalert(fhdr->owner,  ALERT_PWD_GOODPOST);
-	}
-    }
-    else if (fhdr->recommend > 9)
-    {
-	inc_goodpost(fhdr->owner, -1 * (fhdr->recommend / 10));
-	sendalert(fhdr->owner,  ALERT_PWD_GOODPOST);
-    }
-#endif
- 
     substitute_ref_record(direct, fhdr, ent);
     check_locked(fhdr);
     return PART_REDRAW;

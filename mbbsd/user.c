@@ -197,8 +197,7 @@ user_display(const userec_t * u, int adminmode)
 
     // conditional fields
 #ifdef ASSESS
-    prints("\t\t優 劣 文: 優:%d / 劣:%d\n",
-           u->goodpost, u->badpost);
+    prints("\t\t劣文數目: %d\n", u->badpost);
 #endif // ASSESS
 
 #ifdef CHESSCOUNTRY
@@ -816,10 +815,6 @@ uinfo_query(userec_t *u, int adminmode, int unum)
 		if ((tmp = atoi(buf)) >= 0)
 		    x.numposts = tmp;
 #ifdef ASSESS
-	    snprintf(genbuf, sizeof(genbuf), "%d", u->goodpost);
-	    if (getdata_str(y++, 0, "優良文章數:", buf, 10, DOECHO, genbuf))
-		if ((tmp = atoi(buf)) >= 0)
-		    x.goodpost = tmp;
 	    snprintf(genbuf, sizeof(genbuf), "%d", u->badpost);
 	    if (getdata_str(y++, 0, "惡劣文章數:", buf, 10, DOECHO, genbuf))
 		if ((tmp = atoi(buf)) >= 0)

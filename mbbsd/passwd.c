@@ -47,8 +47,6 @@ passwd_sync_update(int num, userec_t * buf)
 
 	if(alerts & ALERT_PWD_BADPOST)
 	   cuser.badpost = buf->badpost = u.badpost;
-	if(alerts & ALERT_PWD_GOODPOST)
-	   cuser.goodpost = buf->goodpost = u.goodpost;
         if(alerts & ALERT_PWD_PERM)	
 	   cuser.userlevel = buf->userlevel = u.userlevel;
         if(alerts & ALERT_PWD_JUSTIFY)	
@@ -143,15 +141,6 @@ pwcuDecNumPost()
     if (u.numposts > 0)
 	u.numposts--;
     cuser.numposts = u.numposts;
-    PWCU_END();
-}
-
-int
-pwcuSetGoodPost(unsigned int newgp)
-{
-    PWCU_START();
-    cuser.goodpost = u.goodpost = newgp;
-    // passwd_force_update(ALERT_PWD_GOODPOST);
     PWCU_END();
 }
 

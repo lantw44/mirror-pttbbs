@@ -66,7 +66,7 @@ typedef struct userec_t {
     uint32_t    numlogins;	/* 上站次數 */
     uint32_t    numposts;	/* 文章篇數 */
     time4_t	firstlogin;	/* 註冊時間 */
-    time4_t	lastlogin;	/* 最近上站時間 */
+    time4_t	lastlogin;	/* 最近上站時間(包含隱身) */
     char	lasthost[IPV4LEN+1];/* 上次上站來源 */
     int32_t     money;		/* Ptt幣 */
 
@@ -97,7 +97,8 @@ typedef struct userec_t {
     uint32_t	numlogindays;	/* 登入天次 */
 
     char	chkpad1[48];
-    time4_t	chkpad2[3];	/* in case 有人忘了把 time4_t 調好... */
+    time4_t	lastseen;	/* 最近上站時間(隱身不計) */
+    time4_t	chkpad2[2];	/* in case 有人忘了把 time4_t 調好... */
     // 以上應為 sizeof(chicken_t) 同等大小
     
     time4_t	lastsong;	/* 上次點歌時間 */
@@ -137,6 +138,14 @@ typedef struct userec_t {
 
     char	pad_tail[28];
 } PACKSTRUCT userec_t;
+
+#ifdef CONST_CUSER
+# define cuser	     ((const userec_t ) pwcuser)
+# define cuser_ref   ((const userec_t*)&pwcuser)
+#else
+# define cuser	     pwcuser
+# define cuser_ref   (&cuser)
+#endif
 
 /* flags in userec_t.withme */
 #define WITHME_ALLFLAG	0x55555555

@@ -1,4 +1,5 @@
 /* $Id$ */
+#define PWCU_IMPL
 #include "bbs.h"
 
 #define FN_REGISTER_LOG  "register.log"	// global registration history
@@ -1287,7 +1288,7 @@ toregister(char *email)
 	    snprintf(cuser.justify, sizeof(cuser.justify),
 		    "<Mobile>");
 #endif
-       email_justify(&cuser);
+       email_justify(cuser_ref);
     }
 }
 
@@ -1581,7 +1582,7 @@ u_register(void)
     toregister(email);
 
     // update cuser
-    passwd_sync_update(usernum, &cuser);
+    passwd_sync_update(usernum, cuser_ref);
 
     return FULLUPDATE;
 }

@@ -1343,7 +1343,7 @@ set_menu_BM(char *BM)
 {
     if (!HasUserPerm(PERM_NOCITIZEN) && (HasUserPerm(PERM_ALLBOARD) || is_uBM(BM, cuser.userid))) {
 	currmode |= MODE_GROUPOP;
-	cuser.userlevel |= PERM_SYSSUBOP | PERM_BM;
+	// cuser.userlevel |= PERM_SYSSUBOP | PERM_BM;
     }
 }
 
@@ -1599,7 +1599,7 @@ choose_board(int newflag)
 		    fav_sort_by_class();
 	    }
 	    else
-		cuser.uflag ^= BRDSORT_FLAG;
+		pwcuToggleSortBoard();
 	    brdnum = -1;
 	    break;
 

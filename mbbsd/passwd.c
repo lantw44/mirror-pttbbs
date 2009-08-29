@@ -1,8 +1,14 @@
 /* $Id$ */
+#define PWCU_IMPL
 #include "bbs.h"
 
 #ifdef _BBS_UTIL_C_
 #error sorry, mbbsd/passwd.c does not support utility mode anymore. please use libcmbbs instead.
+#endif
+
+#ifdef CONST_CUSER
+ #undef  cuser
+ #define cuser pwcuser
 #endif
 
 void
@@ -274,11 +280,10 @@ int pwcuLoginSave	()
 
     // new host from 'fromhost'
     strlcpy(cuser.lasthost, fromhost, sizeof(cuser.lasthost));
+    cuser.lastlogin = login_start_time;
 
-    // XXX keep 'lastlogin' and 'disp_lastlogin'...
-    // new 'lastlogin'
     if (!PERM_HIDE(currutmp))
-	cuser.lastlogin = login_start_time;
+	cuser.lastseen = login_start_time;
 
     // calculate numlogins
 
@@ -312,6 +317,11 @@ int pwcuExitSave	()
 }
 
 // Initialization
+
+void pwcuInitZero	()
+{
+    bzero(&cuser, sizeof(cuser));
+}
 
 int pwcuInitAdminPerm	()
 {

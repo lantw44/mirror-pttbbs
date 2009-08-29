@@ -402,7 +402,7 @@ resolve_over18_user(const userec_t *u)
 void
 resolve_over18(void)
 {
-    over18 = resolve_over18_user(&cuser);
+    over18 = resolve_over18_user(cuser_ref);
 }
 
 int

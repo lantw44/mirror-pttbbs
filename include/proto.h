@@ -718,6 +718,7 @@ int pwcuLoginSave	();
 int pwcuExitSave	();
 
 // initialization
+void pwcuInitZero	();
 void pwcuInitGuestPerm	();
 void pwcuInitGuestInfo	();
 int  pwcuInitAdminPerm	();

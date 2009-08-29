@@ -1,4 +1,5 @@
 /* $Id$ */
+#define PWCU_IMPL
 #include "bbs.h"
 
 static char    * const sex[8] = {
@@ -79,7 +80,7 @@ int u_cancelbadpost(void)
    if(search_ulistn(usernum,2))
      {vmsg("請登出其他視窗, 否則不受理."); return 0;}
 
-   passwd_sync_query(usernum, &cuser);
+   passwd_sync_query(usernum, cuser_ref);
    if (currutmp && (currutmp->alerts & ALERT_PWD))
        currutmp->alerts &= ~ALERT_PWD;
 
@@ -104,7 +105,7 @@ int u_cancelbadpost(void)
    {
        int prev = cuser.badpost--;
        cuser.timeremovebadpost = now;
-       passwd_sync_update(usernum, &cuser);
+       passwd_sync_update(usernum, cuser_ref);
        log_filef("log/cancelbadpost.log", LOG_CREAT,
 	        "%s %s 刪除一篇劣文 (%d -> %d 篇)\n", 
 		Cdate(&now), cuser.userid, prev, cuser.badpost);
@@ -526,7 +527,7 @@ void Customize(void)
 
     if(dirty)
     {
-	passwd_sync_update(usernum, &cuser);
+	passwd_sync_update(usernum, cuser_ref);
 	outs("設定已儲存。\n");
     } else {
 	outs("結束設定。\n");
@@ -1123,8 +1124,8 @@ u_info(void)
 {
     move(2, 0);
     reload_money();
-    user_display(&cuser, 0);
-    uinfo_query(&cuser, 0, usernum);
+    user_display(cuser_ref, 0);
+    uinfo_query (cuser_ref, 0, usernum);
     strlcpy(currutmp->nickname, cuser.nickname, sizeof(currutmp->nickname));
     return 0;
 }

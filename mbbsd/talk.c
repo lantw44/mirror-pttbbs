@@ -458,7 +458,7 @@ my_query(const char *uident)
 	{
 	    // XXX there're still users asking why money is not updated...
 	    reload_money();
-	    memcpy(&muser, &cuser, sizeof(muser));
+	    memcpy(&muser, cuser_ref, sizeof(muser));
 	}
 
 	if ((uentp = (userinfo_t *) search_ulist(tuid)))
@@ -494,7 +494,7 @@ my_query(const char *uident)
 	     ? "《私人信箱》有新進信件還沒看\n" :
 	     "《私人信箱》所有信件都看過了\n");
 	prints("《上次上站》%-28.28s《上次故鄉》",
-	       Cdate(&muser.lastlogin));
+	       Cdate(&muser.lastseen));
 	// print out muser.lasthost
 #ifdef USE_MASKED_FROMHOST
 	if(!HasUserPerm(PERM_SYSOP|PERM_ACCOUNTS)) 

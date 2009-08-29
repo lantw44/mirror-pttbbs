@@ -210,7 +210,8 @@ chat_query(char *arg)
 	printchatline(buf);
 
 	snprintf(buf, sizeof(buf),
-		 "最近(%s)從[%s]上站", Cdate(&xuser.lastlogin),
+		 "最近(%s)從[%s]上站", 
+		 Cdate(&xuser.lastseen),
 		(xuser.lasthost[0] ? xuser.lasthost : "(不詳)"));
 	printchatline(buf);
 

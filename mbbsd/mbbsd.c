@@ -775,7 +775,7 @@ login_query(char *ruid)
 	    sleep(3);
 	    exit(1);
 	}
-	bzero(&cuser, sizeof(cuser));
+	pwcuInitZero();
 
 #ifdef DEBUG
 	move(19, 0);

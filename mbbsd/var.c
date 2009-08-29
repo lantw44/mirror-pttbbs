@@ -98,7 +98,7 @@ char            margs[64] = "\0";	/* main argv list */
 pid_t           currpid;	/* current process ID */
 time4_t         login_start_time;
 time4_t         start_time;
-userec_t        cuser;		/* current user structure */
+userec_t        pwcuser;	/* current user structure */
 crosspost_t     postrecord;	/* anti cross post */
 unsigned int    currbrdattr;
 unsigned int    currstat;

@@ -693,8 +693,8 @@ int  passwd_sync_update (int num, userec_t * buf);
 int  passwd_sync_query  (int num, userec_t * buf);
 
 // current user help utilities
-int pwcuBitSetLevel	(unsigned int mask);
-int pwcuBitUnsetLevel	(unsigned int mask);
+int pwcuBitEnableLevel	(unsigned int mask);
+int pwcuBitDisableLevel	(unsigned int mask);
 int pwcuIncNumPost	();
 int pwcuDecNumPost	();
 int pwcuSetGoodPost	(unsigned int newgp);

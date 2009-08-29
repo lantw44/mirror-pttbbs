@@ -994,7 +994,7 @@ check_BM(void)
 	    return;
 
     // disable BM permission
-    pwcuBitUnsetLevel(PERM_BM);
+    pwcuBitDisableLevel(PERM_BM);
 }
 
 static void
@@ -1145,7 +1145,7 @@ inline static void foreign_warning(void){
 	    mail_muser(cuser, "[出入境管理局]", "etc/foreign_expired_warn");
 	}
 	else if (login_start_time - cuser.firstlogin > FOREIGN_REG_DAY * 24 * 3600){
-	    pwcuBitUnsetLevel(PERM_LOGINOK | PERM_POST);
+	    pwcuBitDisableLevel(PERM_LOGINOK | PERM_POST);
 	    vmsg("警告：請至出入境管理局申請永久居留");
 	}
     }

@@ -110,19 +110,22 @@ pwcuFinalCUser(userec_t *u)
 #define PWCU_START()  userec_t u; if(pwcuInitCUser (&u) != 0) return -1
 #define PWCU_END()    if (pwcuFinalCUser(&u) != 0) return -1; return 0
 
-int pwcuBitSetLevel	(unsigned int mask)
+#define _ENABLE_BIT( var,mask) var |=  (mask)
+#define _DISABLE_BIT(var,mask)	var &= ~(mask)
+
+int pwcuBitEnableLevel	(unsigned int mask)
 {
     PWCU_START();
-    cuser.userlevel |= mask;
-    u.userlevel     |= mask;
+    _ENABLE_BIT(    u.userlevel, mask);
+    _ENABLE_BIT(cuser.userlevel, mask);
     PWCU_END();
 }
 
-int pwcuBitUnsetLevel	(unsigned int mask)
+int pwcuBitDisableLevel	(unsigned int mask)
 {
     PWCU_START();
-    cuser.userlevel &= ~mask;
-    u.userlevel     &= ~mask;
+    _DISABLE_BIT(    u.userlevel, mask);
+    _DISABLE_BIT(cuser.userlevel, mask);
     PWCU_END();
 }
 
@@ -148,8 +151,8 @@ int
 pwcuViolateLaw	()
 {
     PWCU_START();
-    u.userlevel     |= PERM_VIOLATELAW;
-    cuser.userlevel |= PERM_VIOLATELAW;
+    _ENABLE_BIT(    u.userlevel, PERM_VIOLATELAW);
+    _ENABLE_BIT(cuser.userlevel, PERM_VIOLATELAW);
     u.timeviolatelaw     = now;
     cuser.timeviolatelaw = u.timeviolatelaw;
     u.vl_count++;
@@ -161,8 +164,8 @@ int
 pwcuSaveViolateLaw()
 {
     PWCU_START();
-    u.userlevel     &= (~PERM_VIOLATELAW);
-    cuser.userlevel &= (~PERM_VIOLATELAW);
+    _DISABLE_BIT(    u.userlevel, PERM_VIOLATELAW);
+    _DISABLE_BIT(cuser.userlevel, PERM_VIOLATELAW);
     PWCU_END();
 }
 
@@ -186,7 +189,7 @@ int pwcuSetLastSongTime (time4_t clk)
 int pwcuSetMyAngel	(const char *angel_uid)
 {
     PWCU_START();
-    strlcpy(u.myangel,     angel_uid, sizeof(u.myangel));
+    strlcpy(    u.myangel, angel_uid, sizeof(    u.myangel));
     strlcpy(cuser.myangel, angel_uid, sizeof(cuser.myangel));
     PWCU_END();
 }
@@ -194,7 +197,7 @@ int pwcuSetMyAngel	(const char *angel_uid)
 int pwcuSetNickname	(const char *nickname)
 {
     PWCU_START();
-    strlcpy(u.nickname,     nickname, sizeof(u.nickname));
+    strlcpy(    u.nickname, nickname, sizeof(    u.nickname));
     strlcpy(cuser.nickname, nickname, sizeof(cuser.nickname));
     PWCU_END();
 }
@@ -203,8 +206,9 @@ int
 pwcuToggleOutMail()
 {
     PWCU_START();
-    u.uflag2     ^= REJ_OUTTAMAIL;
-    cuser.uflag2 ^= REJ_OUTTAMAIL;
+    u.uflag2     ^=  REJ_OUTTAMAIL;
+    cuser.uflag2 &= ~REJ_OUTTAMAIL;
+    cuser.uflag2 |= (REJ_OUTTAMAIL & u.uflag2);
     PWCU_END();
 }
 
@@ -250,17 +254,6 @@ int pwcuToggleFriendList()
 
 // session save
 
-#if 0
-static void
-_setflags(int mask, int value)
-{
-    if (value)
-	cuser.uflag |= mask;
-    else
-	cuser.uflag &= ~mask;
-}
-#endif
-
 // XXX this is a little different - only invoked at login,
 // which we should update/calculate every variables to log.
 int pwcuLoginSave	()
@@ -269,12 +262,17 @@ int pwcuLoginSave	()
 
     // new host from 'fromhost'
     strlcpy(cuser.lasthost, fromhost, sizeof(cuser.lasthost));
+
+    // calculate numlogins (only increase one per each key)
+    if (((login_start_time - cuser.firstlogin) % 86400) != 
+	((cuser.lastlogin  - cuser.firstlogin) % 86400) )
+	cuser.numlogins++;
+
+    // update last login time
     cuser.lastlogin = login_start_time;
 
     if (!PERM_HIDE(currutmp))
 	cuser.lastseen = login_start_time;
-
-    // calculate numlogins
 
     PWCU_END();
 }
@@ -285,11 +283,12 @@ int pwcuExitSave	()
 {
     PWCU_START();
 
-    u.uflag &= ~(PAGER_FLAG | CLOAK_FLAG);
+    _DISABLE_BIT(u.uflag, (PAGER_FLAG | CLOAK_FLAG));
     if (currutmp->pager != PAGER_ON)
-	u.uflag |= PAGER_FLAG;
+	_ENABLE_BIT(u.uflag, PAGER_FLAG);
     if (currutmp->invisible)
-	u.uflag |= CLOAK_FLAG;
+	_ENABLE_BIT(u.uflag, CLOAK_FLAG);
+
     u.invisible = currutmp->invisible;
     u.withme    = currutmp->withme;
     u.pager     = currutmp->pager;
@@ -299,8 +298,6 @@ int pwcuExitSave	()
     memcpy(u.mind,currutmp->mind, sizeof(u.mind));
 
     reload_money();
-
-    // TODO deal with numlogin?
 
     PWCU_END();
 }
@@ -329,36 +326,28 @@ void pwcuInitGuestPerm	()
     cuser.uflag = PAGER_FLAG | BRDSORT_FLAG | MOVIE_FLAG;
     cuser.uflag2= 0; // we don't need FAVNEW_FLAG or anything else.
 # ifdef GUEST_DEFAULT_DBCS_NOINTRESC
-	cuser.uflag |= DBCS_NOINTRESC;
+    _ENABLE_BIT(cuser.uflag, DBCS_NOINTRESC);
 # endif
 }
 
-#define GUEST_INFO_RANDMAX (13)
+#undef  DIM
+#define DIM(x) (sizeof(x)/sizeof(x[0]))
+
 void pwcuInitGuestInfo	()
 {
     int i;
-    char           *nick[GUEST_INFO_RANDMAX] = {
+    char *nick[] = {
 	"椰子", "貝殼", "內衣", "寶特瓶", "翻車魚",
 	"樹葉", "浮萍", "鞋子", "潛水艇", "魔王",
 	"鐵罐", "考卷", "大美女"
     };
-    char           *name[GUEST_INFO_RANDMAX] = {
-	"大王椰子", "鸚鵡螺", "比基尼", "可口可樂", "仰泳的魚",
-	"憶", "高岡屋", "AIR Jordon", "紅色十月號", "批踢踢",
-	"SASAYA椰奶", "鴨蛋", "布魯克鱈魚香絲"
-    };
-    char           *addr[GUEST_INFO_RANDMAX] = {
-	"天堂樂園", "大海", "綠島小夜曲", "美國", "綠色珊瑚礁",
-	"遠方", "原本海", "NIKE", "蘇聯", "男八618室",
-	"愛之味", "天上", "藍色珊瑚礁"
-    };
-    i = random() % GUEST_INFO_RANDMAX;
+
+    i = random() % DIM(nick);
     snprintf(cuser.nickname, sizeof(cuser.nickname),
-	    "海邊漂來的%s", nick[(int)i]);
+	    "海邊漂來的%s", nick[i]);
     strlcpy(currutmp->nickname, cuser.nickname,
 	    sizeof(currutmp->nickname));
-    strlcpy(cuser.realname, name[(int)i], sizeof(cuser.realname));
-    strlcpy(cuser.address,  addr[(int)i], sizeof(cuser.address));
-    memset(cuser.mind, 0, sizeof(cuser.mind));
+    strlcpy(cuser.realname, "guest", sizeof(cuser.realname));
+    memset (cuser.mind, 0, sizeof(cuser.mind));
     cuser.sex = i % 8;
 }

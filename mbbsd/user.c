@@ -821,6 +821,32 @@ uinfo_query(const char *orig_uid, int adminmode, int unum)
 	    getdata_buf(y++, 0, "最近光臨機器：",
 			x.lasthost, sizeof(x.lasthost), DOECHO);
 
+	    while (1) {
+		struct tm t = {0};
+		time4_t clk = x.lastlogin;
+		localtime4_r(&clk, &t);
+		snprintf(genbuf, sizeof(genbuf), "%04i/%02i/%02i %02i:%02i:%02i",
+			t.tm_year + 1900, t.tm_mon+1, t.tm_mday,
+			t.tm_hour, t.tm_min, t.tm_sec);
+		if (getdata_str(y, 0, "最近上線時間：", buf, 20, DOECHO, genbuf) != 0) {
+		    int y, m, d, hh, mm, ss;
+		    if (ParseDateTime(buf, &y, &m, &d, &hh, &mm, &ss))
+			continue;
+		    t.tm_year = y-1900;
+		    t.tm_mon  = m-1;
+		    t.tm_mday = d;
+		    t.tm_hour = hh;
+		    t.tm_min  = mm;
+		    t.tm_sec  = ss;
+		    clk = mktime(&t);
+		    if (!clk)
+			continue;
+		    x.lastlogin= clk;
+		}
+		y++;
+		break;
+	    }
+
 	    snprintf(genbuf, sizeof(genbuf), "%d", x.numlogindays);
 	    if (getdata_str(y++, 0, "上線資歷：", buf, 10, DOECHO, genbuf))
 		if ((tmp = atoi(buf)) >= 0)
@@ -831,10 +857,13 @@ uinfo_query(const char *orig_uid, int adminmode, int unum)
 		    x.numposts = tmp;
 #ifdef ASSESS
 	    snprintf(genbuf, sizeof(genbuf), "%d", x.badpost);
-	    if (getdata_str(y++, 0, "惡劣文章數:", buf, 10, DOECHO, genbuf))
+	    if (getdata_str(y, 0, "惡劣文章數：", buf, 10, DOECHO, genbuf))
 		if ((tmp = atoi(buf)) >= 0)
 		    x.badpost = tmp;
 #endif // ASSESS
+	    move(y-1, 0); clrtobot();
+	    prints("文章數目： %d (劣: %d)\n",
+		    x.numposts, x.badpost);
 
 	    snprintf(genbuf, sizeof(genbuf), "%d", x.vl_count);
 	    if (getdata_str(y++, 0, "違法記錄：", buf, 10, DOECHO, genbuf))
@@ -864,7 +893,7 @@ uinfo_query(const char *orig_uid, int adminmode, int unum)
 		}
 	    snprintf(genbuf, sizeof(genbuf),
 		     "%d/%d/%d", x.chc_win, x.chc_lose, x.chc_tie);
-	    if (getdata_str(y++, 0, "象棋戰績 勝/敗/和：", buf, 16, DOECHO,
+	    if (getdata_str(y++, 0, " 象棋 戰績 勝/敗/和：", buf, 16, DOECHO,
 			    genbuf))
 		while (1) {
 		    char *p;
@@ -883,6 +912,33 @@ uinfo_query(const char *orig_uid, int adminmode, int unum)
 		    x.chc_tie = atoi(p);
 		    break;
 		}
+	    snprintf(genbuf, sizeof(genbuf),
+		     "%d/%d/%d", x.go_win, x.go_lose, x.go_tie);
+	    if (getdata_str(y++, 0, " 圍棋 戰績 勝/敗/和：", buf, 16, DOECHO,
+			    genbuf))
+		while (1) {
+		    char *p;
+		    char *strtok_pos;
+		    p = strtok_r(buf, "/\r\n", &strtok_pos);
+		    if (!p)
+			break;
+		    x.go_win = atoi(p);
+		    p = strtok_r(NULL, "/\r\n", &strtok_pos);
+		    if (!p)
+			break;
+		    x.go_lose = atoi(p);
+		    p = strtok_r(NULL, "/\r\n", &strtok_pos);
+		    if (!p)
+			break;
+		    x.go_tie = atoi(p);
+		    break;
+		}
+	    y -= 3; // rollback games set to get more space
+	    move(y++, 0); clrtobot();
+	    prints("棋類: (五子棋)%d/%d/%d (象棋)%d/%d/%d (圍棋)%d/%d/%d\n",
+		    x.five_win, x.five_lose, x.five_tie,
+		    x.chc_win, x.chc_lose, x.chc_tie,
+		    x.go_win, x.go_lose, x.go_tie);
 #ifdef FOREIGN_REG
 	    if (getdata_str(y++, 0, "住在 1)台灣 2)其他：", buf, 2, DOECHO, x.uflag2 & FOREIGN ? "2" : "1"))
 		if ((tmp = atoi(buf)) > 0){

@@ -315,14 +315,8 @@ typedef struct msgque_t {
 
 #define ALERT_NEW_MAIL        (0x01)
 #define ISNEWMAIL(utmp)       (utmp->alerts & ALERT_NEW_MAIL)
-#define ALERT_PWD_PERM        (0x02)
-#define ALERT_PWD_BADPOST     (0x04)
-#define ALERT_PWD_GOODPOST    (0x08)
-#define ALERT_PWD_JUSTIFY     (0x10)
-// #define ALERT_PWD_LOGINS      (0x20)
-#define ALERT_PWD_POSTS       (0x40)
-#define ALERT_PWD_RELOAD      (0x80) // reload entire pwd
-#define ALERT_PWD (ALERT_PWD_PERM|ALERT_PWD_BADPOST|ALERT_PWD_GOODPOST|ALERT_PWD_JUSTIFY|ALERT_PWD_POSTS|ALERT_PWD_RELOAD)
+#define ALERT_PWD_PERM	      (0x02)
+#define ISNEWPERM(utmp)	      (utmp->alerts & ALERT_PWD_PERM)
 
 // userinfo_t.angelpause values 
 #define ANGELPAUSE_NONE	    (0)	// reject none (accept all)

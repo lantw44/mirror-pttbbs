@@ -1122,10 +1122,7 @@ uinfo_query(const char *orig_uid, int adminmode, int unum)
     passwd_sync_update(unum, &x);
 
     if (adminmode)
-    {
-	sendalert(x.userid, ALERT_PWD_RELOAD);
 	kick_all(x.userid);
-    }
 
     // resolve_over18 only works for cuser
     if (!adminmode)

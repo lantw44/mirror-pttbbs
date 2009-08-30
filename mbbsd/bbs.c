@@ -242,12 +242,12 @@ save_violatelaw(void)
 
     demoney(-1000 * cuser.vl_count);
     pwcuSaveViolateLaw();
-    sendalert(cuser.userid, ALERT_PWD_PERM);
     log_filef("log/violation", LOG_CREAT,
 	    "%s %s pay-violation: $%d complete.\n", 
 	    Cdate(&now), cuser.userid, (int)cuser.vl_count*1000);
 
-    vmsg("罰單已付，請盡速重新登入。");
+    vmsg("罰單已付，請重新登入。");
+    exit(0);
     return 0;
 }
 
@@ -339,6 +339,13 @@ CheckPostPerm(void)
     
     if (currmode & MODE_DIGEST)
 	return 0;
+
+    // check if my own permission is changed.
+    if (ISNEWPERM(currutmp))
+    {
+	currmode &= ~MODE_POSTCHECKED;
+	pwcuReload();
+    }
 
     if (currmode & MODE_POSTCHECKED)
     {
@@ -3021,7 +3028,7 @@ del_post(int ent, fileheader_t * fhdr, char *direct)
 			xuser.timeviolatelaw = now;  
 			passwd_sync_update(tusernum, &xuser);
 		       }
-		       sendalert(userid,  ALERT_PWD_BADPOST);
+		       sendalert(userid,  ALERT_PWD_PERM);
 		       mail_id(userid, genbuf, newpath, cuser.userid);
 
 #ifdef BAD_POST_RECORD
@@ -3084,11 +3091,8 @@ del_post(int ent, fileheader_t * fhdr, char *direct)
 		    if (xuser.numposts > 0)
 			xuser.numposts--;
 		    passwd_update(tusernum, &xuser);
-		    sendalert_uid(tusernum, ALERT_PWD_POSTS);
-
-		    // TODO alert user?
 		    deumoney(tusernum, -fhdr->multi.money);
-
+		    sendalert_uid(tusernum, ALERT_PWD_PERM);
 #ifdef USE_COOLDOWN
 		    if (bp->brdattr & BRD_COOLDOWN)
 			add_cooldowntime(tusernum, 15);
@@ -3100,7 +3104,7 @@ del_post(int ent, fileheader_t * fhdr, char *direct)
 		// owner case
 		pwcuDecNumPost();
 		demoney(-fhdr->multi.money);
-		sendalert(cuser.userid, ALERT_PWD_POSTS);
+		sendalert(cuser.userid, ALERT_PWD_PERM);
 		vmsgf("您的文章減為 %d 篇，支付清潔費 %d 元", 
 			cuser.numposts, fhdr->multi.money);
 	    }

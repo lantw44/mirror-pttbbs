@@ -246,12 +246,6 @@ compute_user_value(const userec_t * urec, time4_t clock)
 	return 30 - value;
 #endif
 
-#if 0
-    if (!urec->numlogins)	/* 未 login 成功者，不保留 */
-	return -1;
-    if (urec->numlogins <= 3)	/* #login 少於三者，保留 20 天 */
-	return 20 * 24 * 60 - value;
-#endif
     /* 未完成註冊者，保留 15 天 */
     /* 一般情況，保留 120 天 */
     return (urec->userlevel & PERM_LOGINOK ? 120 : 15) * 24 * 60 - value;
@@ -1690,7 +1684,6 @@ regform_accept(const char *userid, const char *justify)
     // alert online users?
     if (search_ulist(unum))
     {
-	sendalert(muser.userid,  ALERT_PWD_PERM|ALERT_PWD_JUSTIFY); // force to reload perm
 	kick_all(muser.userid);
     }
 

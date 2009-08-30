@@ -455,37 +455,50 @@ my_query(const char *uident)
 	if ((uentp = (userinfo_t *) search_ulist(tuid)))
 	    fri_stat = friend_stat(currutmp, uentp);
 
-	prints("《ＩＤ暱稱》%s (%s)%*s《經濟狀況》%s",
+	// ------------------------------------------------------------
+
+	prints( "《ＩＤ暱稱》%s (%s)%*s",
 	       muser.userid,
 	       muser.nickname,
 	       strlen(muser.userid) + strlen(muser.nickname) >= 25 ? 0 :
-	       (int)(25 - strlen(muser.userid) - strlen(muser.nickname)), "",
+		   (int)(25 - strlen(muser.userid) - strlen(muser.nickname)), "");
+
+	prints( "《經濟狀況》%s",
 	       money_level(muser.money));
 	if (uentp && ((fri_stat & HFM && !uentp->invisible) || strcmp(muser.userid,cuser.userid) == 0))
 	    prints(" ($%d)", muser.money);
 	outc('\n');
 
-	prints("《上站次數》%d次", muser.numlogins);
+	// ------------------------------------------------------------
+
+	prints("《上站資歷》%d 點", muser.numlogindays);
 #ifdef SHOW_LOGINOK
 	if (!(muser.userlevel & PERM_LOGINOK))
 	    outs(" (尚未通過認證)");
 #endif
-	move(2, 40);
+
+	move(vgety(), 40);
+	prints("《有效文章》%d 篇", muser.numposts);
 #ifdef ASSESS
-	prints("《有效文章篇數》%d篇 (劣:%d)\n", muser.numposts, muser.badpost);
-#else
-	prints("《有效文章篇數》%d篇\n", muser.numposts);
+	prints(" (劣:%d)", muser.badpost);
 #endif
+	outc('\n');
+
+	// ------------------------------------------------------------
 
 	prints(ANSI_COLOR(1;33) "《目前動態》%-28.28s" ANSI_RESET,
 	       (uentp && isvisible_stat(currutmp, uentp, fri_stat)) ?
-	       modestring(uentp, 0) : "不在站上");
+		   modestring(uentp, 0) : "不在站上");
 
-	outs(((uentp && ISNEWMAIL(uentp)) || load_mailalert(muser.userid))
-	     ? "《私人信箱》有新進信件還沒看\n" :
-	     "《私人信箱》所有信件都看過了\n");
+	if ((uentp && ISNEWMAIL(uentp)) || load_mailalert(muser.userid))
+	    outs("《私人信箱》有新進信件還沒看\n");
+	else
+	    outs("《私人信箱》所有信件都看過了\n");
+
+	// ------------------------------------------------------------
+
 	prints("《上次上站》%-28.28s《上次故鄉》",
-	       Cdate(&muser.lastseen));
+		Cdate(muser.lastseen ? &muser.lastseen : &muser.lastlogin));
 	// print out muser.lasthost
 #ifdef USE_MASKED_FROMHOST
 	if(!HasUserPerm(PERM_SYSOP|PERM_ACCOUNTS)) 
@@ -494,8 +507,10 @@ my_query(const char *uident)
 	outs(muser.lasthost[0] ? muser.lasthost : "(不詳)");
 	outs("\n");
 
-	prints("《五子棋戰績》%3d 勝 %3d 敗 %3d 和      "
-	       "《象棋戰績》%3d 勝 %3d 敗 %3d 和\n",
+	// ------------------------------------------------------------
+	
+	prints("《 五子棋 》%5d 勝 %5d 敗 %5d 和  "
+	       "《象棋戰績》%5d 勝 %5d 敗 %5d 和\n",
 	       muser.five_win, muser.five_lose, muser.five_tie,
 	       muser.chc_win, muser.chc_lose, muser.chc_tie);
 
@@ -3292,8 +3307,8 @@ talkreply(void)
     strlcpy(currutmp->msgs[0].last_call_in, "呼叫、呼叫，聽到請回答 (Ctrl-R)",
 	    sizeof(currutmp->msgs[0].last_call_in));
     currutmp->msgs[0].msgmode = MSGMODE_TALK;
-    prints("對方來自 [%s]，共上站 %d 次，文章 %d 篇\n",
-	    uip->from, xuser.numlogins, xuser.numposts);
+    prints("對方來自 [%s]，上站資歷 %d 點，文章共 %d 篇\n",
+	    uip->from, xuser.numlogindays, xuser.numposts);
 
     if (is_chess)
 	ChessShowRequest();

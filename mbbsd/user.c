@@ -173,8 +173,8 @@ user_display(const userec_t * u, int adminmode)
 	prints("\t\t認證資料: %s\n", u->justify);
     }
 
-    prints("\t\t上站文章: 上站 %d 次 / 文章 %d 篇\n",
-	   u->numlogins, u->numposts);
+    prints("\t\t上站文章: 上站資歷 %d / 文章 %d 篇\n",
+	   u->numlogindays, u->numposts);
 
     sethomedir(genbuf, u->userid);
     prints("\t\t私人信箱: %d 封  (購買信箱: %d 封)\n",
@@ -821,10 +821,10 @@ uinfo_query(const char *orig_uid, int adminmode, int unum)
 	    getdata_buf(y++, 0, "最近光臨機器：",
 			x.lasthost, sizeof(x.lasthost), DOECHO);
 
-	    snprintf(genbuf, sizeof(genbuf), "%d", x.numlogins);
-	    if (getdata_str(y++, 0, "上線次數：", buf, 10, DOECHO, genbuf))
+	    snprintf(genbuf, sizeof(genbuf), "%d", x.numlogindays);
+	    if (getdata_str(y++, 0, "上線資歷：", buf, 10, DOECHO, genbuf))
 		if ((tmp = atoi(buf)) >= 0)
-		    x.numlogins = tmp;
+		    x.numlogindays = tmp;
 	    snprintf(genbuf, sizeof(genbuf), "%d", x.numposts);
 	    if (getdata_str(y++, 0, "文章數目：", buf, 10, DOECHO, genbuf))
 		if ((tmp = atoi(buf)) >= 0)
@@ -1419,7 +1419,7 @@ u_list_CB(void *data, int num, userec_t * uentp)
     prints("%-14s %-27.27s%5d %5d  %s  %s\n",
 	   uentp->userid,
 	   uentp->nickname,
-	   uentp->numlogins, uentp->numposts,
+	   uentp->numlogindays, uentp->numposts,
 	   HasUserPerm(PERM_SEEULEVELS) ? permstr : "", ptr);
     ctx->usercounter++;
     ctx->y++;

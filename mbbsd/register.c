@@ -259,7 +259,7 @@ check_and_expire_account(int uid, const userec_t * urec, int expireRange)
     if ((val = compute_user_value(urec, now)) < 0) {
 	snprintf(genbuf, sizeof(genbuf), "#%d %-12s %s %d %d %d",
 		 uid, urec->userid, Cdatelite(&(urec->lastlogin)),
-		 urec->numlogins, urec->numposts, val);
+		 urec->numlogindays, urec->numposts, val);
 
 	// 若超過 expireRange 則砍人，
 	// 不然就 return 0

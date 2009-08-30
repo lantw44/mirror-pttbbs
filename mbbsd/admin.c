@@ -108,7 +108,6 @@ upgrade_passwd(userec_t *puser)
 	memset(puser->chkpad0, 0, sizeof(puser->chkpad0));
 	memset(puser->chkpad1, 0, sizeof(puser->chkpad1));
 	memset(puser->chkpad2, 0, sizeof(puser->chkpad2));
-	puser->numlogindays = 0;
 	puser->lastseen     = 0;
 	puser->version = PASSWD_VERSION;
 	return ;

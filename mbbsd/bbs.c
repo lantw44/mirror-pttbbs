@@ -2714,7 +2714,7 @@ recommend(int ent, fileheader_t * fhdr, const char *direct)
 	static  int tolog = 0;
 	if( tolog == 0 )
 	    tolog =
-		(cuser.numlogins < 50 || (now - cuser.firstlogin) < DAY_SECONDS * 7)
+		(cuser.numlogindays < 50 || (now - cuser.firstlogin) < DAY_SECONDS * 7)
 		? 1 : 2;
 	if( tolog == 1 ){
 	    FILE   *fp;

@@ -428,21 +428,41 @@ pwcuToggleUserFlag2	(unsigned int mask)
 // which we should update/calculate every variables to log.
 int pwcuLoginSave	()
 {
-    PWCU_START();   // XXX no need to reload for speed up?
+    // XXX because LoginSave was called very long after
+    // login_start_time, so we must reload passwd again
+    // here to prevent race condition. 
+    // If you want to remove this reload, make sure
+    // pwcuLoginSave is called AFTER login_start_time
+    // was decided.
+    int regdays = 0, prev_regdays = 0;
+    int reftime = login_start_time;
+    PWCU_START();
 
     // new host from 'fromhost'
+    strlcpy(    u.lasthost, fromhost, sizeof(    u.lasthost));
     strlcpy(cuser.lasthost, fromhost, sizeof(cuser.lasthost));
 
-    // calculate numlogins (only increase one per each key)
-    if (((login_start_time - cuser.firstlogin) % DAY_SECONDS) != 
-	((cuser.lastlogin  - cuser.firstlogin) % DAY_SECONDS) )
-	cuser.numlogins++;
+    // this must be valid.
+    assert(login_start_time > 0);
+
+    // invalid session?
+    if (reftime < u.lastlogin)
+	reftime = u.lastlogin;
+
+    regdays =      (    reftime - u.firstlogin) / DAY_SECONDS;
+    prev_regdays = (u.lastlogin - u.firstlogin) / DAY_SECONDS;
+    // assert(regdays >= prev_regdays);
+
+    // calculate numlogindays (only increase one per each key)
+    if (regdays > prev_regdays)
+	++u.numlogindays;
+    cuser.numlogindays = u.numlogindays;
 
     // update last login time
-    cuser.lastlogin = login_start_time;
+    cuser.lastlogin = u.lastlogin = reftime;
 
     if (!PERM_HIDE(currutmp))
-	cuser.lastseen = login_start_time;
+	cuser.lastseen = u.lastseen = reftime;
 
     PWCU_END();
 }

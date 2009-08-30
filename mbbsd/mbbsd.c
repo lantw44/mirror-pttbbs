@@ -1049,9 +1049,9 @@ setup_utmp(int mode)
     strip_nonebig5((unsigned char *)currutmp->nickname, sizeof(currutmp->nickname));
     strip_nonebig5((unsigned char *)currutmp->mind, sizeof(currutmp->mind));
 
-    // XXX 不用每 20 才檢查吧
     // XXX 這個 check 花不少時間，有點間隔比較好
-    if ((cuser.userlevel & PERM_BM) && !(cuser.numlogins % 20))
+    // TODO XXX 使用 numlogindays 有點問題，同一天內多次 login 會狂檢查...
+    if ((cuser.userlevel & PERM_BM) && !(cuser.numlogindays % 20))
 	check_BM();		/* Ptt 自動取下離職板主權力 */
 
     // resolve fromhost
@@ -1090,15 +1090,14 @@ setup_utmp(int mode)
 
 inline static void welcome_msg(void)
 {
-    prints(ANSI_RESET "      歡迎您第 " 
-	    ANSI_COLOR(1;33) "%d" ANSI_COLOR(0;37) " 度拜訪本站，上次您是從 " 
+    prints(ANSI_RESET "      歡迎您再度拜訪本站，上次您是從 " 
 	    ANSI_COLOR(1;33) "%s" ANSI_COLOR(0;37) " 連往本站，" 
 	    ANSI_CLRTOEND "\n"
 	    "     我記得那天是 " ANSI_COLOR(1;33) "%s" ANSI_COLOR(0;37) "。"
 	    ANSI_CLRTOEND "\n"
 	    ANSI_CLRTOEND "\n"
 	    ,
-	    cuser.numlogins, cuser.lasthost, Cdate(&(cuser.lastlogin)));
+	    cuser.lasthost, Cdate(&(cuser.lastlogin)));
     pressanykey();
 }
 

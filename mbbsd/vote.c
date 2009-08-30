@@ -646,11 +646,9 @@ vote_maintain(const char *bname)
 	    closetime = atoi(inbuf);	// borrow variable
 	} while (closetime < 0 || closetime > 120);
 	fprintf(fp, "%d\n", now - (MONTH_SECONDS * closetime));
-	do {
-	    getdata(6, 0, "上站次數下限", inbuf, 6, DOECHO);
-	    closetime = atoi(inbuf);	// borrow variable
-	} while (closetime < 0);
-	fprintf(fp, "%d\n", closetime);
+
+	fprintf(fp, "%d\n", 0);	// was: numlogins
+
 	do {
 	    getdata(6, 0, "文章篇數下限", inbuf, 6, DOECHO);
 	    closetime = atoi(inbuf);	// borrow variable
@@ -791,7 +789,7 @@ user_vote_one(const vote_buffer_t *vbuf, const char *bname)
 	fclose(lfp);
 	// XXX if this is a private vote (limited), I think we don't need to check limits?
 	if (cuser.firstlogin > closetime || cuser.numposts < limits_posts ||
-		cuser.numlogins < limits_logins) {
+		cuser.numlogindays < limits_logins) {
 	    vmsg("你不夠資深喔！");
 	    return FULLUPDATE;
 	}

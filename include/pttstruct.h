@@ -63,7 +63,7 @@ typedef struct userec_t {
     uint32_t    uflag;		/* 習慣1 , see uflags.h */
     uint32_t    uflag2;		/* 習慣2 , see uflags.h */
     uint32_t    userlevel;	/* 權限 */
-    uint32_t    numlogins;	/* 上站次數 */
+    uint32_t    numlogindays;	/* 上線資歷 (每日最多+1的登入次數) */
     uint32_t    numposts;	/* 文章篇數 */
     time4_t	firstlogin;	/* 註冊時間 */
     time4_t	lastlogin;	/* 最近上站時間(包含隱身) */
@@ -94,9 +94,8 @@ typedef struct userec_t {
 
     char	career[40];	/* 學歷職業 */
     char	phone[20];	/* 電話 */
-    uint32_t	numlogindays;	/* 登入天次 */
 
-    char	chkpad1[48];
+    char	chkpad1[52];
     time4_t	lastseen;	/* 最近上站時間(隱身不計) */
     time4_t	chkpad2[2];	/* in case 有人忘了把 time4_t 調好... */
     // 以上應為 sizeof(chicken_t) 同等大小

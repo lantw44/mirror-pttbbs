@@ -612,7 +612,7 @@ int kill_user(int num, const char *userid);
 int u_editcalendar(void);
 void user_display(const userec_t *u, int real);
 int isvalidemail(char *email);
-void uinfo_query(userec_t *u, int real, int unum);
+void uinfo_query(const char *uid, int real, int unum);
 int showsignature(char *fname, int *j, SigInfo *psi);
 int u_cancelbadpost();
 void kick_all(const char *user);
@@ -700,6 +700,7 @@ int pwcuDecNumPost	();
 int pwcuSetGoodPost	(unsigned int newgp);
 int pwcuViolateLaw	();
 int pwcuSaveViolateLaw	();
+int pwcuCancelBadpost	();
 int pwcuAddExMailBox	(int m);
 int pwcuToggleOutMail	();
 int pwcuSetLoginView	(unsigned int bits);
@@ -708,16 +709,20 @@ int pwcuSetMyAngel	(const char *angel_uid);
 int pwcuSetNickname	(const char *nickname);
 int pwcuChessResult	(int sigType, ChessGameResult);
 int pwcuSetChessEloRating(uint16_t elo_rating);
+int pwcuSaveUserFlags	();
 
 // non-important based variables (only save on exit)
 int pwcuSetSignature	(unsigned char newsig);
 int pwcuSetWaterballMode(unsigned int bm);
 int pwcuToggleSortBoard ();
 int pwcuToggleFriendList();
+int pwcuToggleUserFlag	(unsigned int mask);	// not saved until pwcuSaveUserFlags
+int pwcuToggleUserFlag2	(unsigned int mask);	// not saved until pwcuSaveUserFlags
 
-// session save
+// session management
 int pwcuLoginSave	();
 int pwcuExitSave	();
+int pwcuReload		();
 
 // initialization
 void pwcuInitZero	();

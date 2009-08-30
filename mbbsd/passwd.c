@@ -170,6 +170,25 @@ pwcuSaveViolateLaw()
     PWCU_END();
 }
 
+int
+pwcuCancelBadpost()
+{
+    int day;
+    PWCU_START();
+
+    // check timebomb again
+    day = (now - u.timeremovebadpost ) / DAY_SECONDS;
+    if (day <= 180)
+	return -1;
+    if (u.badpost < 1)
+	return -1;
+
+    cuser.badpost = --u.badpost;
+    cuser.timeremovebadpost = u.timeremovebadpost = now;
+
+    PWCU_END();
+}
+
 int 
 pwcuAddExMailBox(int m)
 {
@@ -323,6 +342,15 @@ pwcuSetChessEloRating(uint16_t elo_rating)
     PWCU_END();
 }
 
+int 
+pwcuSaveUserFlags()
+{
+    PWCU_START();
+    u.uflag  = cuser.uflag;
+    u.uflag2 = cuser.uflag2;
+    PWCU_END();
+}
+
 // non-important variables (only save on exit)
 
 int
@@ -341,15 +369,31 @@ pwcuSetWaterballMode(unsigned int bm)
     return 0;
 }
 
-int pwcuToggleSortBoard ()
+int 
+pwcuToggleSortBoard ()
 {
     cuser.uflag ^= BRDSORT_FLAG;
     return 0;
 }
 
-int pwcuToggleFriendList()
+int 
+pwcuToggleFriendList()
 {
     cuser.uflag ^= FRIEND_FLAG;
+    return 0;
+}
+
+int 
+pwcuToggleUserFlag	(unsigned int mask)
+{
+    cuser.uflag ^= mask;
+    return 0;
+}
+
+int 
+pwcuToggleUserFlag2	(unsigned int mask)
+{
+    cuser.uflag2 ^= mask;
     return 0;
 }
 
@@ -365,8 +409,8 @@ int pwcuLoginSave	()
     strlcpy(cuser.lasthost, fromhost, sizeof(cuser.lasthost));
 
     // calculate numlogins (only increase one per each key)
-    if (((login_start_time - cuser.firstlogin) % 86400) != 
-	((cuser.lastlogin  - cuser.firstlogin) % 86400) )
+    if (((login_start_time - cuser.firstlogin) % DAY_SECONDS) != 
+	((cuser.lastlogin  - cuser.firstlogin) % DAY_SECONDS) )
 	cuser.numlogins++;
 
     // update last login time
@@ -380,9 +424,15 @@ int pwcuLoginSave	()
 
 // XXX this is a little different - only invoked at exist,
 // so no need to sync back to cuser.
-int pwcuExitSave	()
+int 
+pwcuExitSave	()
 {
     PWCU_START();
+
+    // uflag and uflag2: always trust cuser except REJ_OUTTAMAIL
+    _SETBY_BIT(cuser.uflag2, REJ_OUTTAMAIL, (u.uflag2 & REJ_OUTTAMAIL));
+    u.uflag = cuser.uflag;
+    u.uflag2= cuser.uflag2;
 
     _DISABLE_BIT(u.uflag, (PAGER_FLAG | CLOAK_FLAG));
     if (currutmp->pager != PAGER_ON)
@@ -401,6 +451,14 @@ int pwcuExitSave	()
     reload_money();
 
     PWCU_END();
+}
+
+int 
+pwcuReload	()
+{
+    int r = passwd_sync_query(usernum, &cuser);
+    // XXX TODO verify cuser structure?
+    return r;
 }
 
 // Initialization

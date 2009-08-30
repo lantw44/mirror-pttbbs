@@ -342,7 +342,7 @@ signal_xcpu_handler(int sig)
 	last_time_exceeded = login_start_time;
     assert(last_time_exceeded);
     // 不用 (time(0) - login_start_time) 來平均, 避免用好幾天之後突然狂吃 cpu 的狀況.
-    if (time(0) - last_time_exceeded < 86400)
+    if (time(0) - last_time_exceeded < DAY_SECONDS)
 	give_more_time = false;
     last_time_exceeded = time(0);
 

@@ -2835,7 +2835,7 @@ userlist(void)
 		    if ((id = getuser(uentp->userid, &muser)) > 0) {
 			user_display(&muser, 1);
 			if( HasUserPerm(PERM_ACCOUNTS) )
-			    uinfo_query(&muser, 1, id);
+			    uinfo_query(muser.userid, 1, id);
 			else
 			    pressanykey();
 		    }

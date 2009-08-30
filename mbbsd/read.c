@@ -985,7 +985,7 @@ i_read_key(const onekey_t * rcmdlist, keeploc_t * locmem,
 		if ((id = getuser(headers[locmem->crs_ln - locmem->top_ln].owner, &muser))) {
 		    user_display(&muser, 1);
 		    if( HasUserPerm(PERM_ACCOUNTS) )
-			uinfo_query(&muser, 1, id);
+			uinfo_query(muser.userid, 1, id);
 		    else
 			pressanykey();
 		}

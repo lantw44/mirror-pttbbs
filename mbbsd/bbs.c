@@ -2428,9 +2428,6 @@ recommend(int ent, fileheader_t * fhdr, const char *direct)
     int isGuest = (strcmp(cuser.userid, STR_GUEST) == EQUSTR);
     int logIP = 0;
     int ymsg = b_lines -1;
-#ifdef ASSESS
-    char oldrecom = fhdr->recommend;
-#endif // ASSESS
 
     if (!fhdr || !fhdr->filename[0])
 	return DONOTHING;

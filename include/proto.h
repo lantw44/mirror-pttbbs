@@ -706,6 +706,8 @@ int pwcuSetLoginView	(unsigned int bits);
 int pwcuSetLastSongTime (time4_t clk);
 int pwcuSetMyAngel	(const char *angel_uid);
 int pwcuSetNickname	(const char *nickname);
+int pwcuChessResult	(int sigType, ChessGameResult);
+int pwcuSetChessEloRating(uint16_t elo_rating);
 
 // non-important based variables (only save on exit)
 int pwcuSetSignature	(unsigned char newsig);

@@ -111,7 +111,8 @@ pwcuFinalCUser(userec_t *u)
 #define PWCU_END()    if (pwcuFinalCUser(&u) != 0) return -1; return 0
 
 #define _ENABLE_BIT( var,mask) var |=  (mask)
-#define _DISABLE_BIT(var,mask)	var &= ~(mask)
+#define _DISABLE_BIT(var,mask) var &= ~(mask)
+#define _SETBY_BIT(var,mask,val) if (val) { _ENABLE_BIT(var, (mask)); } else { _DISABLE_BIT(var, (mask)); }
 
 int pwcuBitEnableLevel	(unsigned int mask)
 {
@@ -207,8 +208,8 @@ pwcuToggleOutMail()
 {
     PWCU_START();
     u.uflag2     ^=  REJ_OUTTAMAIL;
-    cuser.uflag2 &= ~REJ_OUTTAMAIL;
-    cuser.uflag2 |= (REJ_OUTTAMAIL & u.uflag2);
+    _SETBY_BIT(cuser.uflag2, REJ_OUTTAMAIL,
+	    u.uflag2 & REJ_OUTTAMAIL);
     PWCU_END();
 }
 
@@ -221,6 +222,106 @@ pwcuSetLoginView(unsigned int bits)
     PWCU_END();
 }
 
+#include "chess.h"
+int 
+pwcuChessResult(int sigType, ChessGameResult r)
+{
+    uint16_t *utmp_win = NULL, *cuser_win = NULL, *u_win = NULL,
+	     *utmp_lose= NULL, *cuser_lose= NULL, *u_lose= NULL,
+	     *utmp_tie = NULL, *cuser_tie = NULL, *u_tie = NULL;
+
+    PWCU_START();
+
+    // verify variable size
+    assert(sizeof(* utmp_win) == sizeof(currutmp->chc_win));
+    assert(sizeof(*cuser_lose)== sizeof(   cuser.five_lose));
+    assert(sizeof(*    u_tie) == sizeof(       u.go_tie));
+
+    // determine variables
+    switch(sigType)
+    {
+	case SIG_CHC:
+	    utmp_win  = &(currutmp->chc_win);
+	    utmp_lose = &(currutmp->chc_lose);
+	    utmp_tie  = &(currutmp->chc_tie);
+	    cuser_win = &(    cuser.chc_win);
+	    cuser_lose= &(    cuser.chc_lose);
+	    cuser_tie = &(    cuser.chc_tie);
+	    u_win     = &(        u.chc_win);
+	    u_lose    = &(        u.chc_lose);
+	    u_tie     = &(        u.chc_tie);
+	    break;
+
+	case SIG_GO:
+	    utmp_win  = &(currutmp->go_win);
+	    utmp_lose = &(currutmp->go_lose);
+	    utmp_tie  = &(currutmp->go_tie);
+	    cuser_win = &(    cuser.go_win);
+	    cuser_lose= &(    cuser.go_lose);
+	    cuser_tie = &(    cuser.go_tie);
+	    u_win     = &(        u.go_win);
+	    u_lose    = &(        u.go_lose);
+	    u_tie     = &(        u.go_tie);
+	    break;
+
+	case SIG_GOMO:
+	    utmp_win  = &(currutmp->five_win);
+	    utmp_lose = &(currutmp->five_lose);
+	    utmp_tie  = &(currutmp->five_tie);
+	    cuser_win = &(    cuser.five_win);
+	    cuser_lose= &(    cuser.five_lose);
+	    cuser_tie = &(    cuser.five_tie);
+	    u_win     = &(        u.five_win);
+	    u_lose    = &(        u.five_lose);
+	    u_tie     = &(        u.five_tie);
+	    break;
+
+	default:
+	    assert(!"unknown sigtype");
+	    break;
+    }
+
+    // perform action
+    switch(r)
+    {
+	case CHESS_RESULT_WIN:
+	    *utmp_win = *cuser_win = 
+		++(*u_win);
+	    // recover init lose
+	    if (*u_lose > 0)
+		*utmp_lose = *cuser_lose = 
+		    --(*u_lose);
+	    break;
+
+	case CHESS_RESULT_TIE:
+	    *utmp_tie = *cuser_tie = 
+		++*u_tie;
+	    // recover init lose
+	    if (*u_lose > 0)
+		*utmp_lose = *cuser_lose = 
+		    --(*u_lose);
+	    break;
+
+	case CHESS_RESULT_LOST:
+	    *utmp_lose = *cuser_lose = 
+		++(*u_lose);
+	    break;
+
+	default:
+	    assert(!"unknown result");
+	    return -1;
+    }
+
+    PWCU_END();
+}
+
+int 
+pwcuSetChessEloRating(uint16_t elo_rating)
+{
+    PWCU_START();
+    cuser.chess_elo_rating = u.chess_elo_rating = elo_rating;
+    PWCU_END();
+}
 
 // non-important variables (only save on exit)
 

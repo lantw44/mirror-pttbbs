@@ -793,35 +793,14 @@ go_post_game(ChessInfo* info)
 }
 
 static void
-go_usr_put(userec_t* userec, const ChessUser* user)
-{
-    userec->go_win = user->win;
-    userec->go_lose = user->lose;
-    userec->go_tie = user->tie;
-}
-
-static void
 go_gameend(ChessInfo* info, ChessGameResult result)
 {
     if (info->mode == CHESS_MODE_VERSUS) {
-	ChessUser* const user1 = &info->user1;
-	/* ChessUser* const user2 = &info->user2; */
 
-	user1->lose--;
-	if (result == CHESS_RESULT_WIN) {
-	    user1->win++;
-	    currutmp->go_win++;
-	} else if (result == CHESS_RESULT_LOST) {
-	    user1->lose++;
-	    currutmp->go_lose++;
-	} else {
-	    user1->tie++;
-	    currutmp->go_tie++;
-	}
+	// lost was already initialized
+	if (result != CHESS_RESULT_LOST)
+	    pwcuChessResult(SIG_GO, result);
 
-	go_usr_put(cuser_ref, user1);
-
-	passwd_sync_update(usernum, cuser_ref);
     } else if (info->mode == CHESS_MODE_REPLAY) {
 	free(info->board);
 	free(info->tag);
@@ -936,9 +915,7 @@ gochess(int s, ChessGameMode mode)
     if (info->mode == CHESS_MODE_VERSUS) {
 	/* Assume that info->user1 is me. */
 	info->user1.lose++;
-	passwd_sync_query(usernum, cuser_ref);
-	go_usr_put(cuser_ref, &info->user1);
-	passwd_sync_update(usernum, cuser_ref);
+	pwcuChessResult(SIG_GO, CHESS_RESULT_LOST);
     }
 
     if (mode == CHESS_MODE_WATCH)

@@ -453,6 +453,9 @@ int pwcuLoginSave	()
     prev_regdays = (u.lastlogin - u.firstlogin) / DAY_SECONDS;
     // assert(regdays >= prev_regdays);
 
+    if (u.numlogindays > prev_regdays)
+	u.numlogindays = prev_regdays;
+
     // calculate numlogindays (only increase one per each key)
     if (regdays > prev_regdays)
 	++u.numlogindays;

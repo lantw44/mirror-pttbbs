@@ -140,11 +140,12 @@ typedef struct userec_t {
 } PACKSTRUCT userec_t;
 
 #ifdef CONST_CUSER
-# define cuser	     ((const userec_t ) pwcuser)
+// const userec_t  cuser;
 # define cuser_ref   ((const userec_t*)&pwcuser)
+# define cuser	    (*cuser_ref)
 #else
-# define cuser	     pwcuser
 # define cuser_ref   (&cuser)
+# define cuser	     pwcuser
 #endif
 
 /* flags in userec_t.withme */

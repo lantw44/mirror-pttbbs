@@ -3878,11 +3878,3 @@ Select(void)
     return do_select();
 }
 
-#ifdef HAVEMOBILE
-void
-mobile_message(const char *mobile, char *message)
-{
-    // this is for validation.
-    bsmtp(fpath, title, rcpt, "non-exist");
-}
-#endif

@@ -1238,7 +1238,6 @@ user_login(void)
 	}
 	check_bad_login();
 	check_mailbox_quota();
-	check_birthday();
 	check_register();
 	pwcuLoginSave();
 	restore_backup();

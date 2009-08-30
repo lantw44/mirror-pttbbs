@@ -458,7 +458,6 @@ int setupnewuser(const userec_t *user);
 int regform_estimate_queuesize();
 void new_register(void);
 void check_register(void);
-void check_birthday(void);
 int  check_regmail(char *email); // check and prompt for invalid reason; will str_lower() mail domain.
 void delregcodefile(void);
 
@@ -710,6 +709,19 @@ int pwcuSetNickname	(const char *nickname);
 int pwcuChessResult	(int sigType, ChessGameResult);
 int pwcuSetChessEloRating(uint16_t elo_rating);
 int pwcuSaveUserFlags	();
+int pwcuRegCompleteJustify    (const char *justify);
+int pwcuRegSetTemporaryJustify(const char *justify, const char *email);
+int pwcuRegisterSetInfo (const char *rname,
+			 const char *addr,
+			 const char *career,
+			 const char *phone,
+			 const char *email,
+			 int         mobile,
+			 uint8_t     sex,
+			 uint8_t     year,
+			 uint8_t     month,
+			 uint8_t     day,
+			 uint8_t     is_foreign);
 
 // non-important based variables (only save on exit)
 int pwcuSetSignature	(unsigned char newsig);

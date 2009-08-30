@@ -241,6 +241,72 @@ pwcuSetLoginView(unsigned int bits)
     PWCU_END();
 }
 
+int 
+pwcuRegCompleteJustify(const char *justify)
+{
+    PWCU_START();
+    strlcpy(    u.justify, justify, sizeof(u.justify));
+    strlcpy(cuser.justify, justify, sizeof(cuser.justify));
+    _ENABLE_BIT(    u.userlevel, (PERM_POST | PERM_LOGINOK));
+    _ENABLE_BIT(cuser.userlevel, (PERM_POST | PERM_LOGINOK));
+    PWCU_END();
+}
+
+int
+pwcuRegSetTemporaryJustify(const char *justify, const char *email)
+{
+    PWCU_START();
+    strlcpy(    u.email, email, sizeof(u.email));
+    strlcpy(cuser.email, email, sizeof(cuser.email));
+    strlcpy(    u.justify, justify, sizeof(u.justify));
+    strlcpy(cuser.justify, justify, sizeof(cuser.justify));
+    _DISABLE_BIT(    u.userlevel, (PERM_POST | PERM_LOGINOK));
+    _DISABLE_BIT(cuser.userlevel, (PERM_POST | PERM_LOGINOK));
+    PWCU_END();
+}
+
+int pwcuRegisterSetInfo (const char *rname,
+			 const char *addr,
+			 const char *career,
+			 const char *phone,
+			 const char *email,
+			 int         mobile,
+			 uint8_t     sex,
+			 uint8_t     year,
+			 uint8_t     month,
+			 uint8_t     day,
+			 uint8_t     is_foreign)
+{
+    PWCU_START();
+    strlcpy(u.realname, rname,  sizeof(u.realname));
+    strlcpy(u.address,  addr,   sizeof(u.address));
+    strlcpy(u.career,   career, sizeof(u.career));
+    strlcpy(u.phone,    phone,  sizeof(u.phone));
+    strlcpy(u.email,    email,  sizeof(u.email));
+    u.mobile = mobile;
+    u.sex    = sex;
+    u.year   = year;
+    u.month  = month;
+    u.day    = day;
+    _SETBY_BIT(u.uflag2, FOREIGN, is_foreign);
+
+    // duplicate to cuser
+    
+    strlcpy(cuser.realname, rname,  sizeof(cuser.realname));
+    strlcpy(cuser.address,  addr,   sizeof(cuser.address));
+    strlcpy(cuser.career,   career, sizeof(cuser.career));
+    strlcpy(cuser.phone,    phone,  sizeof(cuser.phone));
+    strlcpy(cuser.email,    email,  sizeof(cuser.email));
+    cuser.mobile = mobile;
+    cuser.sex    = sex;
+    cuser.year   = year;
+    cuser.month  = month;
+    cuser.day    = day;
+    _SETBY_BIT(cuser.uflag2, FOREIGN, is_foreign);
+
+    PWCU_END();
+}
+
 #include "chess.h"
 int 
 pwcuChessResult(int sigType, ChessGameResult r)

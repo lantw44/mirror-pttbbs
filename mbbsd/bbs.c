@@ -247,6 +247,7 @@ save_violatelaw(void)
 	    Cdate(&now), cuser.userid, (int)cuser.vl_count*1000);
 
     vmsg("罰單已付，請重新登入。");
+    u_exit("save_violate");
     exit(0);
     return 0;
 }

@@ -847,10 +847,22 @@ uinfo_query(const char *orig_uid, int adminmode, int unum)
 		break;
 	    }
 
-	    snprintf(genbuf, sizeof(genbuf), "%d", x.numlogindays);
-	    if (getdata_str(y++, 0, "上線資歷：", buf, 10, DOECHO, genbuf))
-		if ((tmp = atoi(buf)) >= 0)
-		    x.numlogindays = tmp;
+	    do {
+		int max_days = (x.lastlogin - x.firstlogin) / DAY_SECONDS;
+		snprintf(genbuf, sizeof(genbuf), "%d", x.numlogindays);
+		if (getdata_str(y++, 0, "上線資歷：", buf, 10, DOECHO, genbuf))
+		    if ((tmp = atoi(buf)) >= 0)
+			x.numlogindays = tmp;
+		if (x.numlogindays > max_days)
+		{
+		    x.numlogindays = max_days;
+		    vmsgf("根據此使用者最後上線時間，資歷最大值為 %d.", max_days);
+		    move(--y, 0); clrtobot();
+		    continue;
+		}
+		break;
+	    } while (1);
+
 	    snprintf(genbuf, sizeof(genbuf), "%d", x.numposts);
 	    if (getdata_str(y++, 0, "文章數目：", buf, 10, DOECHO, genbuf))
 		if ((tmp = atoi(buf)) >= 0)

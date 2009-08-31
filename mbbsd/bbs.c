@@ -1235,7 +1235,12 @@ do_generalboardreply(/*const*/ fileheader_t * fhdr)
 
     if (!CheckPostRestriction(currbid))
     {
-	getdata(b_lines - 1, 0,	ANSI_COLOR(1;31) "▲ 無法回應至看板。 " ANSI_RESET
+	getdata(b_lines - 1, 0,	
+#ifdef USE_PFTERM
+		ANSI_COLOR(1;31) "▲ 無法回應至看板。 " ANSI_RESET
+#else
+		"▲ 無法回應至看板。 "
+#endif
 		"改回應至 (M)作者信箱 (Q)取消？[Q] ",
 		genbuf, sizeof(genbuf), LCECHO);
 	switch (genbuf[0]) {
@@ -3211,6 +3216,8 @@ view_postinfo(int ent, const fileheader_t * fhdr, const char *direct, int crs_ln
     move(area_l -(area_l < l) + area_lines, 0); 
     outc(' '); outs(ANSI_CLRTOEND);
     move(area_l, 0);
+
+    // TODO XXX support wide terminal someday.
 
     prints("┌─────────────────────────────────────┐\n");
 

@@ -1204,7 +1204,6 @@ u_info(void)
     reload_money();
     user_display(cuser_ref, 0);
     uinfo_query (cuser.userid, 0, usernum);
-    // XXX TODO update from u to cuser
     pwcuReload();
     strlcpy(currutmp->nickname, cuser.nickname, sizeof(currutmp->nickname));
     return 0;

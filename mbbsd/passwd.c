@@ -381,6 +381,7 @@ pwcuSaveUserFlags()
 int
 pwcuSetSignature(unsigned char newsig)
 {
+    // XXX you MUST save this variable in pwcuExitSave();
     cuser.signature = newsig;
     return 0;
 }
@@ -388,6 +389,7 @@ pwcuSetSignature(unsigned char newsig)
 int 
 pwcuSetWaterballMode(unsigned int bm)
 {
+    // XXX you MUST save this variable in pwcuExitSave();
     bm		 &=  WATER_MASK;
     cuser.uflag2 &= ~WATER_MASK;  
     cuser.uflag2 |= bm;  
@@ -397,6 +399,7 @@ pwcuSetWaterballMode(unsigned int bm)
 int 
 pwcuToggleSortBoard ()
 {
+    // XXX you MUST save this variable in pwcuExitSave();
     cuser.uflag ^= BRDSORT_FLAG;
     return 0;
 }
@@ -404,6 +407,7 @@ pwcuToggleSortBoard ()
 int 
 pwcuToggleFriendList()
 {
+    // XXX you MUST save this variable in pwcuExitSave();
     cuser.uflag ^= FRIEND_FLAG;
     return 0;
 }
@@ -411,6 +415,7 @@ pwcuToggleFriendList()
 int 
 pwcuToggleUserFlag	(unsigned int mask)
 {
+    // XXX you MUST save this variable in pwcuExitSave();
     cuser.uflag ^= mask;
     return 0;
 }
@@ -418,6 +423,7 @@ pwcuToggleUserFlag	(unsigned int mask)
 int 
 pwcuToggleUserFlag2	(unsigned int mask)
 {
+    // XXX you MUST save this variable in pwcuExitSave();
     cuser.uflag2 ^= mask;
     return 0;
 }
@@ -475,7 +481,20 @@ int pwcuLoginSave	()
 int 
 pwcuExitSave	()
 {
+    int dirty = 0;
+    uint32_t uflag, uflag2, withme;
+    uint8_t  invisible, pager;
+    int32_t  money;
+
     PWCU_START();
+
+    // save variables for dirty check
+    uflag = u.uflag;
+    uflag2= u.uflag2;
+    withme= u.withme;
+    pager = u.pager;
+    invisible = u.invisible;
+    money = u.money;
 
     // uflag and uflag2: always trust cuser except REJ_OUTTAMAIL
     _SETBY_BIT(cuser.uflag2, REJ_OUTTAMAIL, (u.uflag2 & REJ_OUTTAMAIL));
@@ -491,12 +510,38 @@ pwcuExitSave	()
     u.invisible = currutmp->invisible;
     u.withme    = currutmp->withme;
     u.pager     = currutmp->pager;
+    u.money     = moneyof(usernum);
 
     // XXX 當初設計的人把 mind 設計成非 NULL terminated 的...
     // assert(sizeof(u.mind) == sizeof(currutmp->mind));
-    memcpy(u.mind,currutmp->mind, sizeof(u.mind));
+    if (memcmp(u.mind, currutmp->mind, sizeof(u.mind)) != 0)
+    {
+	memcpy(u.mind,currutmp->mind, sizeof(u.mind));
+	dirty = 1;
+    }
 
-    reload_money();
+    // check dirty
+    if (!dirty && (
+	uflag  != u.uflag ||
+	uflag2 != u.uflag2||
+	withme != u.withme||
+	pager  != u.pager ||
+	money  != u.money ||
+	invisible != u.invisible))
+    {
+	dirty = 1;
+    }
+
+#ifdef DEBUG
+    log_filef("log/pwcu_exitsave.log", LOG_CREAT,
+	    "%s exit %s at %s\n", u.userid,
+	    dirty ? "DIRTY" : "CLEAN",
+	    Cdatelite(&now));
+#endif
+
+    // no need to save data.
+    if (!dirty)
+	return 0;
 
     PWCU_END();
 }

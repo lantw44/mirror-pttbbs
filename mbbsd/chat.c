@@ -204,7 +204,7 @@ chat_query(char *arg)
 	char            buf[ANSILINELEN], *ptr;
 	FILE           *fp;
 
-	snprintf(buf, sizeof(buf), "%s(%s) 上站資歷 %d 點，發表過 %d 篇文章",
+	snprintf(buf, sizeof(buf), "%s(%s) " STR_LOGINDAYS " %d ，發表過 %d 篇文章",
 		 xuser.userid, xuser.nickname,
 		 xuser.numlogindays, xuser.numposts);
 	printchatline(buf);

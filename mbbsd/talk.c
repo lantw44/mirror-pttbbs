@@ -471,7 +471,7 @@ my_query(const char *uident)
 
 	// ------------------------------------------------------------
 
-	prints("《上站資歷》%d 點", muser.numlogindays);
+	prints("《" STR_LOGINDAYS "》%d ", muser.numlogindays);
 #ifdef SHOW_LOGINOK
 	if (!(muser.userlevel & PERM_LOGINOK))
 	    outs(" (尚未通過認證)");
@@ -3307,7 +3307,7 @@ talkreply(void)
     strlcpy(currutmp->msgs[0].last_call_in, "呼叫、呼叫，聽到請回答 (Ctrl-R)",
 	    sizeof(currutmp->msgs[0].last_call_in));
     currutmp->msgs[0].msgmode = MSGMODE_TALK;
-    prints("對方來自 [%s]，上站資歷 %d 點，文章共 %d 篇\n",
+    prints("對方來自 [%s]，" STR_LOGINDAYS " %d ，文章共 %d 篇\n",
 	    uip->from, xuser.numlogindays, xuser.numposts);
 
     if (is_chess)

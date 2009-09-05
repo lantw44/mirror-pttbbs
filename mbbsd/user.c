@@ -173,7 +173,7 @@ user_display(const userec_t * u, int adminmode)
 	prints("\t\t認證資料: %s\n", u->justify);
     }
 
-    prints("\t\t上站文章: 上站資歷 %d / 文章 %d 篇\n",
+    prints("\t\t上站文章: " STR_LOGINDAYS " %d / 文章 %d 篇\n",
 	   u->numlogindays, u->numposts);
 
     sethomedir(genbuf, u->userid);
@@ -850,13 +850,13 @@ uinfo_query(const char *orig_uid, int adminmode, int unum)
 	    do {
 		int max_days = (x.lastlogin - x.firstlogin) / DAY_SECONDS;
 		snprintf(genbuf, sizeof(genbuf), "%d", x.numlogindays);
-		if (getdata_str(y++, 0, "上線資歷：", buf, 10, DOECHO, genbuf))
+		if (getdata_str(y++, 0, STR_LOGINDAYS, buf, 10, DOECHO, genbuf))
 		    if ((tmp = atoi(buf)) >= 0)
 			x.numlogindays = tmp;
 		if (x.numlogindays > max_days)
 		{
 		    x.numlogindays = max_days;
-		    vmsgf("根據此使用者最後上線時間，資歷最大值為 %d.", max_days);
+		    vmsgf("根據此使用者最後上線時間，最大值為 %d.", max_days);
 		    move(--y, 0); clrtobot();
 		    continue;
 		}

@@ -479,7 +479,7 @@ void Customize(void)
 	    {
 		pwcuToggleUserFlag(masks1[key]);
 	    } else {
-		pwcuToggleUserFlag2(masks2[key]);
+		pwcuToggleUserFlag2(masks2[key-ic]);
 	    }
 	    continue;
 	}

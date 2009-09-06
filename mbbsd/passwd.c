@@ -442,6 +442,7 @@ int pwcuLoginSave	()
     // was decided.
     int regdays = 0, prev_regdays = 0;
     int reftime = login_start_time;
+    time4_t baseref = 0;
     PWCU_START();
 
     // new host from 'fromhost'
@@ -451,12 +452,15 @@ int pwcuLoginSave	()
     // this must be valid.
     assert(login_start_time > 0);
 
+    // adjust base reference by rounding to beginning of each day (0:00am)
+    baseref = u.firstlogin - (u.firstlogin % DAY_SECONDS);
+
     // invalid session?
     if (reftime < u.lastlogin)
 	reftime = u.lastlogin;
 
-    regdays =      (    reftime - u.firstlogin) / DAY_SECONDS;
-    prev_regdays = (u.lastlogin - u.firstlogin) / DAY_SECONDS;
+    regdays =      (    reftime - baseref) / DAY_SECONDS;
+    prev_regdays = (u.lastlogin - baseref) / DAY_SECONDS;
     // assert(regdays >= prev_regdays);
 
     if (u.numlogindays > prev_regdays)

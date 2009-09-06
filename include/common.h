@@ -115,7 +115,7 @@
 #define STR_POST1       "看板:"
 #define STR_POST2       "站內:"
 
-#define STR_LOGINDAYS	"登入天次"
+#define STR_LOGINDAYS	"登入次數"
 
 /* AIDS */
 #define AID_DISPLAYNAME	"文章代碼(AID)"

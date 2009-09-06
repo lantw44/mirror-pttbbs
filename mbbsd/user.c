@@ -173,7 +173,7 @@ user_display(const userec_t * u, int adminmode)
 	prints("\t\t認證資料: %s\n", u->justify);
     }
 
-    prints("\t\t上站文章: " STR_LOGINDAYS " %d / 文章 %d 篇\n",
+    prints("\t\t上站文章: " STR_LOGINDAYS " %d " STR_LOGINDAYS_QTY "/ 文章 %d 篇\n",
 	   u->numlogindays, u->numposts);
 
     sethomedir(genbuf, u->userid);

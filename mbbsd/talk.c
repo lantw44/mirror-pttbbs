@@ -436,6 +436,7 @@ my_query(const char *uident)
 {
     userec_t        muser;
     int             tuid, fri_stat = 0;
+    int		    is_self = 0;
     userinfo_t     *uentp;
     const char *sex[8] =
     {MSG_BIG_BOY, MSG_BIG_GIRL,
@@ -454,6 +455,8 @@ my_query(const char *uident)
 
 	if ((uentp = (userinfo_t *) search_ulist(tuid)))
 	    fri_stat = friend_stat(currutmp, uentp);
+	if (strcmp(muser.userid, cuser.userid) == 0)
+	    is_self =1;
 
 	// ------------------------------------------------------------
 
@@ -465,17 +468,23 @@ my_query(const char *uident)
 
 	prints( "《經濟狀況》%s",
 	       money_level(muser.money));
-	if (uentp && ((fri_stat & HFM && !uentp->invisible) || strcmp(muser.userid,cuser.userid) == 0))
+	if (uentp && ((fri_stat & HFM && !uentp->invisible) || is_self))
 	    prints(" ($%d)", muser.money);
 	outc('\n');
 
 	// ------------------------------------------------------------
 
 	prints("《" STR_LOGINDAYS "》%d " STR_LOGINDAYS_QTY, muser.numlogindays);
+
+	if (is_self && muser.old_numlogins)
+	    prints(" (舊值: %d) ", muser.old_numlogins);
+	else
+	{
 #ifdef SHOW_LOGINOK
 	if (!(muser.userlevel & PERM_LOGINOK))
 	    outs(" (尚未通過認證)");
 #endif
+	}
 
 	move(vgety(), 40);
 	prints("《有效文章》%d 篇", muser.numposts);
@@ -514,7 +523,7 @@ my_query(const char *uident)
 	       muser.five_win, muser.five_lose, muser.five_tie,
 	       muser.chc_win, muser.chc_lose, muser.chc_tie);
 
-	if ((uentp && ((fri_stat & HFM) || strcmp(muser.userid,cuser.userid) == 0) && !uentp->invisible))
+	if ((uentp && ((fri_stat & HFM) || is_self) && !uentp->invisible))
 	    prints("《 性  別 》%-28.28s\n", sex[muser.sex % 8]);
 
 	showplans_userec(&muser);

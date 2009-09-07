@@ -45,7 +45,7 @@
 #define FN_BADLOGIN	"logins.bad"	// in BBSHOME & user directory
 #define FN_RECENTLOGIN	"logins.recent"	// in user directory
 #ifndef SZ_RECENTLOGIN
-#define SZ_RECENTLOGIN	(32000)
+#define SZ_RECENTLOGIN	(16000)		// size of max recent log before rotation
 #endif
 
 

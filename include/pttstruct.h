@@ -95,7 +95,8 @@ typedef struct userec_t {
     char	career[40];	/* 學歷職業 */
     char	phone[20];	/* 電話 */
 
-    char	chkpad1[52];
+    uint32_t	old_numlogins;	/* 轉換前的 numlogins, 備份檢視用 */
+    char	chkpad1[48];
     time4_t	lastseen;	/* 最近上站時間(隱身不計) */
     time4_t	chkpad2[2];	/* in case 有人忘了把 time4_t 調好... */
     // 以上應為 sizeof(chicken_t) 同等大小

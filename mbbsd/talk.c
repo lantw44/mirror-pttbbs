@@ -475,16 +475,10 @@ my_query(const char *uident)
 	// ------------------------------------------------------------
 
 	prints("《" STR_LOGINDAYS "》%d " STR_LOGINDAYS_QTY, muser.numlogindays);
-
-	if (is_self && muser.old_numlogins)
-	    prints(" (舊值: %d) ", muser.old_numlogins);
-	else
-	{
 #ifdef SHOW_LOGINOK
 	if (!(muser.userlevel & PERM_LOGINOK))
 	    outs(" (尚未通過認證)");
 #endif
-	}
 
 	move(vgety(), 40);
 	prints("《有效文章》%d 篇", muser.numposts);

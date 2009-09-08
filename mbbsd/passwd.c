@@ -1,6 +1,7 @@
 /* $Id$ */
 #define PWCU_IMPL
 #include "bbs.h"
+#include "time.h"
 
 #ifdef _BBS_UTIL_C_
 #error sorry, mbbsd/passwd.c does not support utility mode anymore. please use libcmbbs instead.
@@ -442,7 +443,9 @@ int pwcuLoginSave	()
     // was decided.
     int regdays = 0, prev_regdays = 0;
     int reftime = login_start_time;
-    time4_t baseref = 0;
+    time4_t   baseref = 0;
+    struct tm baseref_tm = {0};
+
     PWCU_START();
 
     // new host from 'fromhost'
@@ -453,7 +456,12 @@ int pwcuLoginSave	()
     assert(login_start_time > 0);
 
     // adjust base reference by rounding to beginning of each day (0:00am)
-    baseref = u.firstlogin - (u.firstlogin % DAY_SECONDS);
+    baseref = u.firstlogin;
+    if (localtime4_r(&baseref, &baseref_tm))
+    {
+	baseref_tm.tm_sec = baseref_tm.tm_min = baseref_tm.tm_hour = 0;
+	baseref = mktime(&baseref_tm);
+    }
 
     // invalid session?
     if (reftime < u.lastlogin)

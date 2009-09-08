@@ -53,11 +53,7 @@ void BlogMain(int);
 #endif
 
 /* assess */
-int inc_goodpost(const char *, int num);
 int inc_badpost(const char *, int num);
-int inc_goodsale(const char *, int num);
-int inc_badsale(const char *, int num);
-//void set_assess(int uid, unsigned char num, int type);
 
 /* bbs */
 void delete_allpost(const char *userid);

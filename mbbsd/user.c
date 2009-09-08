@@ -176,7 +176,7 @@ user_display(const userec_t * u, int adminmode)
     prints("\t\t使用記錄: " STR_LOGINDAYS " %d " STR_LOGINDAYS_QTY
 	    ,u->numlogindays);
     if (u->old_numlogins)
-	prints(" (轉換新制前: %d)", u->old_numlogins);
+	prints("(轉換新制前結算:%d)", u->old_numlogins);
     prints(" / 文章 %d 篇\n", u->numposts);
 
     sethomedir(genbuf, u->userid);

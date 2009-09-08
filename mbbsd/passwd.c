@@ -468,7 +468,10 @@ int pwcuLoginSave	()
 
     // calculate numlogindays (only increase one per each key)
     if (regdays > prev_regdays)
+    {
 	++u.numlogindays;
+	is_first_login_of_today = 1;
+    }
     cuser.numlogindays = u.numlogindays;
 
     // update last login time

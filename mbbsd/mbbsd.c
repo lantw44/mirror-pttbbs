@@ -1049,11 +1049,6 @@ setup_utmp(int mode)
     strip_nonebig5((unsigned char *)currutmp->nickname, sizeof(currutmp->nickname));
     strip_nonebig5((unsigned char *)currutmp->mind, sizeof(currutmp->mind));
 
-    // XXX 這個 check 花不少時間，有點間隔比較好
-    // TODO XXX 使用 numlogindays 有點問題，同一天內多次 login 會狂檢查...
-    if ((cuser.userlevel & PERM_BM) && !(cuser.numlogindays % 20))
-	check_BM();		/* Ptt 自動取下離職板主權力 */
-
     // resolve fromhost
 #if defined(WHERE)
 
@@ -1260,8 +1255,15 @@ user_login(void)
 	check_bad_login();
 	check_mailbox_quota();
 	check_register();
-	pwcuLoginSave();
+	pwcuLoginSave();	// is_first_login_of_today is only valid after pwcuLoginSave.
 	restore_backup();
+
+	// XXX 這個 check 花不少時間，有點間隔比較好
+	if (HasUserPerm(PERM_BM) && 
+	    (cuser.numlogindays % 10 == 0) &&	// when using numlogindays, check with is_first_login_of_today
+	    is_first_login_of_today )
+	    check_BM();		/* 自動取下離職板主權力 */
+
 
     } else if (strcmp(cuser.userid, STR_GUEST) == 0) { /* guest */
 

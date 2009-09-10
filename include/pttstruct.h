@@ -139,7 +139,7 @@ typedef struct userec_t {
     char	pad_tail[28];
 } PACKSTRUCT userec_t;
 
-#ifdef CONST_CUSER
+#ifndef NO_CONST_CUSER
 // const userec_t  cuser;
 # define cuser_ref   ((const userec_t*)&pwcuser)
 # define cuser	    (*cuser_ref)

@@ -3093,10 +3093,12 @@ del_post(int ent, fileheader_t * fhdr, char *direct)
 		{
 		    userec_t xuser;
 		    assert(tusernum != usernum);
-		    passwd_query(tusernum, &xuser);
-		    if (xuser.numposts > 0)
-			xuser.numposts--;
-		    passwd_update(tusernum, &xuser);
+		    // TODO we're doing redundant i/o here... merge and refine someday
+		    if (passwd_sync_query(tusernum, &xuser) == 0) {
+			if (xuser.numposts > 0)
+			    xuser.numposts--;
+			passwd_sync_update(tusernum, &xuser);
+		    }
 		    deumoney(tusernum, -fhdr->multi.money);
 		    sendalert_uid(tusernum, ALERT_PWD_PERM);
 #ifdef USE_COOLDOWN

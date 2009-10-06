@@ -179,7 +179,7 @@ TagPruner(int bid)
 	if (vans("刪除所有標記[N]?") != 'y')
 	    return READ_REDRAW;
 #ifdef SAFE_ARTICLE_DELETE
-        if(bp && !(currmode & MODE_DIGEST) && bp->nuser > 30)
+        if(bp && bp->nuser > 30)
             safe_delete_range(currdirect, 0, 0);
         else
 #endif
@@ -483,7 +483,7 @@ select_read(const keeploc_t * locmem, int sr_mode)
 	  }
    else {
        // Ptt: only once for these modes.
-       if(!first_select && _mode & sr_mode & (RS_TITLE | RS_NEWPOST | RS_MARK | RS_SOLVED))
+       if(!first_select && _mode & sr_mode & (RS_TITLE | RS_NEWPOST | RS_MARK | RS_SOLVED | RS_DIGEST))
 	   return DONOTHING;
 
        if(sr_mode & RS_TITLE) {
@@ -554,7 +554,7 @@ select_read(const keeploc_t * locmem, int sr_mode)
    }
 
    /* mark and recommend shouldn't incremental select */
-   if(sr_mode & (RS_MARK | RS_RECOMMEND | RS_SOLVED))
+   if(sr_mode & (RS_MARK | RS_RECOMMEND | RS_SOLVED | RS_DIGEST))
        inc = 0;
 
    if(reload) {
@@ -597,6 +597,9 @@ select_read(const keeploc_t * locmem, int sr_mode)
 		   reference++;
 		   if( (sr_mode & RS_MARK)  &&
 		       !(fhs[i].filemode & FILE_MARKED) )
+		       continue;
+		   if( (sr_mode & RS_DIGEST)  &&
+		       !(fhs[i].filemode & FILE_DIGEST) )
 		       continue;
 		   if( (sr_mode & RS_SOLVED) &&
 		       !(fhs[i].filemode & FILE_SOLVED) )
@@ -709,8 +712,7 @@ i_read_key(const onekey_t * rcmdlist, keeploc_t * locmem,
 		mode =  NEWDIRECT;
 	    }
 	    else
-		mode =  
-		    (currmode & MODE_DIGEST) ? board_digest() : DOQUIT;
+		mode = DOQUIT;
 	    break;
 	case '#':
 	    {
@@ -762,17 +764,6 @@ i_read_key(const onekey_t * rcmdlist, keeploc_t * locmem,
 	            n += getbtotal(currbid);
 	              /* 不可用 bottom_line，因為如果是在 digest mode，
 	                 bottom_line 會是文摘的數目，而不是真正的文章數 */
-	            if(currmode & MODE_DIGEST)
-	            {
-	              newdirect_new_ln = n;
-
-	              new_ln = locmem->crs_ln;
-	                /* dirty hack for crs_ln = 1, then HOME pressed */
-
-	              default_ch = KEY_TAB;
-	              mode = DONOTHING;
-	              break;
-	            }
 	          }
 	        }
 	        if(n < 0)
@@ -780,36 +771,6 @@ i_read_key(const onekey_t * rcmdlist, keeploc_t * locmem,
 	        {
 	          setbfile(dirfile, currboard, FN_DIR);
 	          n = search_aidu(dirfile, aidu);
-	          if(n >= 0 && (currmode & MODE_DIGEST))
-	          /* switch to normal read mode */
-	          {
-	            newdirect_new_ln = n;
-
-	            new_ln = locmem->crs_ln;
-	              /* dirty hack for crs_ln = 1, then HOME pressed */
-
-	            default_ch = KEY_TAB;
-	            mode = DONOTHING;
-	            break;
-	          }
-	        }
-	        if(n < 0)
-	        /* search digest */
-	        {
-	          setbfile(dirfile, currboard, fn_mandex);
-	          n = search_aidu(dirfile, aidu);
-	          if(n >= 0 && !(currmode & MODE_DIGEST))
-	          /* switch to digest mode */
-	          {
-	            newdirect_new_ln = n;
-
-	            new_ln = locmem->crs_ln;
-	              /* dirty hack for crs_ln = 1, then HOME pressed */
-
-	            default_ch = KEY_TAB;
-	            mode = DONOTHING;
-	            break;
-	          }
 	        }
 	      }  /* if(aidu > 0) */
 	      if(n < 0)
@@ -869,6 +830,10 @@ i_read_key(const onekey_t * rcmdlist, keeploc_t * locmem,
 		    mode = select_read(locmem, RS_MARK);
 		    break;
 	    }
+	    break;
+
+	case KEY_TAB:
+	    mode = select_read(locmem, RS_DIGEST);
 	    break;
 
         case '/':
@@ -1056,8 +1021,6 @@ i_read_key(const onekey_t * rcmdlist, keeploc_t * locmem,
     case KEY_RIGHT:
 	ch = 'r';
     default:
-	if( ch == 'h' && currmode & (MODE_DIGEST) )
-	    break;
 	if (ch > 0 && ch <= onekey_size) {
 	    int (*func)() = rcmdlist[ch - 1].func;
 	    if(rcmdlist[ch - 1].needitem && locmem->crs_ln == 0)
@@ -1152,7 +1115,7 @@ get_records_and_bottom(const char *direct,  fileheader_t* headers,
 	return 0;
 
     // 不顯示置底的情形
-    if( n >= headers_size || (currmode & (MODE_SELECT | MODE_DIGEST)) )
+    if( n >= headers_size || (currmode & MODE_SELECT) )
     {
 	rv = get_records(direct, headers, sizeof(fileheader_t), 
 		recbase, headers_size);
@@ -1231,7 +1194,7 @@ i_read(int cmdmode, const char *direct, void (*dotitle) (),
 
 	case NEWDIRECT:	/* 第一次載入此目錄 */
 	case DIRCHANGED:
-	    if (bidcache > 0 && !(currmode & (MODE_SELECT | MODE_DIGEST))){
+	    if (bidcache > 0 && !(currmode & MODE_SELECT)){
 		if( (last_line = getbtotal(currbid)) == 0 ){
 		    setbtotal(currbid);
                     setbottomtotal(currbid);
@@ -1272,7 +1235,7 @@ i_read(int cmdmode, const char *direct, void (*dotitle) (),
 	    /* In general, records won't be reloaded in PARTUPDATE state.
 	     * But since a board is often changed and cached, it is always
 	     * reloaded here. */
-	    if (bidcache > 0 && !(currmode & (MODE_SELECT | MODE_DIGEST))) {
+	    if (bidcache > 0 && !(currmode & MODE_SELECT)) {
 		int rec_num;
 		bottom_line = getbtotal(currbid);
 		rec_num = bottom_line + getbottomtotal(currbid);

@@ -125,26 +125,6 @@ modify_dir_lite(
     return 0;
 }
 
-static void 
-check_locked(fileheader_t *fhdr)
-{
-    boardheader_t *bp = NULL;
-
-    if (currstat == RMAIL)
-	return;
-    if (!currboard[0] || currbid <= 0)
-	return;
-    bp = getbcache(currbid);
-    if (!bp)
-	return;
-    if (!(fhdr->filemode & FILE_SOLVED))
-	return;
-    if (!(fhdr->filemode & FILE_MARKED))
-	return;
-    syncnow();
-    bp->SRexpire = now;
-}
-
 /* hack for listing modes */
 enum LISTMODES {
     LISTMODE_DATE = 0,
@@ -335,8 +315,6 @@ int IsFreeBoardName(const char *brdname)
 int
 CheckPostPerm(void)
 {
-    if (currmode & MODE_DIGEST)
-	return 0;
     return CheckModifyPerm();
 }
 
@@ -778,7 +756,7 @@ do_deleteCrossPost(const fileheader_t *fh, char bname[])
     if( (i=getindex(bdir, &newfh, 0))>0)
     {
 #ifdef SAFE_ARTICLE_DELETE
-        if(bp && !(currmode & MODE_DIGEST) && bp->nuser > 30 )
+        if(bp && bp->nuser > 30 )
 	        safe_article_delete(i, &newfh, bdir, NULL);
         else
 #endif
@@ -1414,7 +1392,7 @@ edit_post(int ent, fileheader_t * fhdr, const char *direct)
 
     assert(0<=currbid-1 && currbid-1<MAX_BOARD && bp);
 
-    // special modes (plus MODE_DIGEST?)
+    // special modes
     if( currmode & MODE_SELECT )
 	return DONOTHING;
 
@@ -2154,9 +2132,14 @@ stop_gamble(void)
     }
     return 1;
 }
+#endif
+
 static int
 join_gamble(int ent, const fileheader_t * fhdr, const char *direct)
 {
+#ifdef NO_GAMBLE
+    return DONOTHING;
+#else
     if (!HasUserPerm(PERM_LOGINOK))
 	return DONOTHING;
     if (stop_gamble()) {
@@ -2166,10 +2149,15 @@ join_gamble(int ent, const fileheader_t * fhdr, const char *direct)
     assert(0<=currbid-1 && currbid-1<MAX_BOARD);
     ticket(currbid);
     return FULLUPDATE;
+#endif
 }
+
 static int
 hold_gamble(void)
 {
+#ifdef NO_GAMBLE
+    return DONOTHING;
+#else
     char            fn_ticket[128], fn_ticket_end[128], genbuf[128], msg[256] = "",
                     yn[10] = "";
     char tmp[128];
@@ -2288,8 +2276,8 @@ hold_gamble(void)
 
     vmsg("賭盤設定完成");
     return FULLUPDATE;
-}
 #endif
+}
 
 static int
 cite_post(int ent, const fileheader_t * fhdr, const char *direct)
@@ -2366,19 +2354,6 @@ edit_title(int ent, fileheader_t * fhdr, const char *direct)
     }
     return FULLUPDATE;
 }
-
-static int
-solve_post(int ent, fileheader_t * fhdr, const char *direct)
-{
-    if ((currmode & MODE_BOARD)) {
-	fhdr->filemode ^= FILE_SOLVED;
-        substitute_ref_record(direct, fhdr, ent);
-	check_locked(fhdr);
-	return PART_REDRAW;
-    }
-    return DONOTHING;
-}
-
 
 static int
 recommend_cancel(int ent, fileheader_t * fhdr, const char *direct)
@@ -2808,25 +2783,68 @@ recommend(int ent, fileheader_t * fhdr, const char *direct)
     return FULLUPDATE;
 }
 
-static int
-mark_post(int ent, fileheader_t * fhdr, const char *direct)
+static void 
+check_sr_expire(fileheader_t *fhdr, unsigned int tag)
 {
-    char buf[STRLEN], fpath[STRLEN];
+    boardheader_t *bp = NULL;
+    unsigned int mode = fhdr->filemode;
+    int need_expire = 0;
 
+    if (currstat == RMAIL)
+	return;
+    if (!currboard[0] || currbid <= 0 || currbid > MAX_BOARD)
+	return;
+    bp = getbcache(currbid);
+    if (!bp)
+	return;
+
+    // SOLVE + MARKED = LOCKED (cannot edit)
+    if (!need_expire &&
+	(mode & FILE_SOLVED) &&
+	(mode & FILE_MARKED))
+	need_expire = 1;
+
+    // digest always needs reload
+    if (!need_expire &&
+	(tag & FILE_DIGEST))
+	need_expire = 1;
+
+    if (!need_expire)
+	return;
+
+    syncnow();
+    bp->SRexpire = now;
+}
+
+static int
+toggle_post_tag(int ent, fileheader_t * fhdr, 
+	const char *direct, unsigned int tag)
+{
     if (!(currmode & MODE_BOARD))
 	return DONOTHING;
 
-    setbpath(fpath, currboard);
-    sprintf(buf, "%s/%s", fpath, fhdr->filename);
-
-    if( !(fhdr->filemode & FILE_MARKED) && /* 若目前還沒有 mark 才要 check */
-	access(buf, F_OK) < 0 )
-	return DONOTHING;
-
-    fhdr->filemode ^= FILE_MARKED;
+    fhdr->filemode ^= tag;
     substitute_ref_record(direct, fhdr, ent);
-    check_locked(fhdr);
+    check_sr_expire(fhdr, tag);
     return PART_REDRAW;
+}
+
+static int
+mark_post(int ent, fileheader_t * fhdr, const char *direct)
+{
+    return toggle_post_tag(ent, fhdr, direct, FILE_MARKED);
+}
+
+static int
+digest_post(int ent, fileheader_t * fhdr, const char *direct)
+{
+    return toggle_post_tag(ent, fhdr, direct, FILE_DIGEST);
+}
+
+static int
+solve_post(int ent, fileheader_t * fhdr, const char *direct)
+{
+    return toggle_post_tag(ent, fhdr, direct, FILE_SOLVED);
 }
 
 int
@@ -2871,7 +2889,7 @@ del_range(int ent, const fileheader_t *fhdr, const char *direct)
 	    outmsg("處理中,請稍後...");
 	    refresh();
 #ifdef SAFE_ARTICLE_DELETE
-	    if(bp && !(currmode & MODE_DIGEST) && bp->nuser > 30)
+	    if(bp && bp->nuser > 30)
 		ret = safe_article_delete_range(direct, inum1, inum2);
 	    else
 #endif
@@ -2945,7 +2963,7 @@ del_post(int ent, fileheader_t * fhdr, char *direct)
     // reason 1: BM may alter post restrictions to this board
     // reason 2: this account may be occupied by someone else.
     if (!HasUserPerm(PERM_BASIC) ||	// including guests
-	!( (currmode & MODE_DIGEST) ? (currmode & MODE_BOARD) : CheckPostPerm() ) || // allow BM to delete posts in digest mode
+	!CheckPostPerm() ||
 	!CheckPostRestriction(currbid)
 	)   
 	return DONOTHING;
@@ -2994,8 +3012,8 @@ del_post(int ent, fileheader_t * fhdr, char *direct)
     if (genbuf[0] == 'y') {
 	if(
 #ifdef SAFE_ARTICLE_DELETE
-	   ((reason[0] || bp->nuser > 30) && !(currmode & MODE_DIGEST) &&
-            !safe_article_delete(ent, fhdr, direct, reason[0] ? reason : NULL)) ||
+	   ((reason[0] || bp->nuser > 30) && 
+	    !safe_article_delete(ent, fhdr, direct, reason[0] ? reason : NULL)) ||
 #endif
 	   // XXX TODO delete_record is really really dangerous - 
 	   // we should verify the header (maybe by filename) is the same.
@@ -3010,8 +3028,8 @@ del_post(int ent, fileheader_t * fhdr, char *direct)
 
 	    // badpost assignment
 
-	    // case one, self-owned, invalid author, or digest mode - should not give bad posts
-	    if (!not_owned || tusernum <= 0 || (currmode & MODE_DIGEST) )
+	    // case one, self-owned, invalid author - should not give bad posts
+	    if (!not_owned || tusernum <= 0 )
 	    {
 		// do nothing
 	    } 
@@ -3120,7 +3138,6 @@ del_post(int ent, fileheader_t * fhdr, char *direct)
 	    // INVALIDMONEY_MODES (FILE_BID, FILE_ANONYMOUS, ...) 也都不用扣
 	    if (fhdr->multi.money < 0 || 
 		IsFreeBoardName(currboard) || (currbrdattr & BRD_BAD) ||
-		(currmode & MODE_DIGEST) ||
 		(fhdr->filemode & INVALIDMONEY_MODES) ||
 		0)
 		fhdr->multi.money = 0;
@@ -3367,11 +3384,13 @@ view_postinfo(int ent, const fileheader_t * fhdr, const char *direct, int crs_ln
     return FULLUPDATE;
 }
 
-#ifdef OUTJOBSPOOL
 /* 看板備份 */
 static int
 tar_addqueue(void)
 {
+#ifndef OUTJOBSPOOL
+    return DONOTHING;
+#else
     char            email[60], qfn[80], ans[2];
     FILE           *fp;
     char            bakboard, bakman;
@@ -3435,8 +3454,8 @@ tar_addqueue(void)
     outs("稍後將會在系統負荷較低的時候將資料寄給您~ :) ");
     pressanykey();
     return FULLUPDATE;
-}
 #endif
+}
 
 /* ----------------------------------------------------- */
 /* 看板進板畫面、文摘、精華區                              */
@@ -3536,28 +3555,13 @@ board_select(void)
     return NEWDIRECT;
 }
 
-int
-board_digest(void)
-{
-    if (currmode & MODE_SELECT)
-	board_select();
-    currmode ^= MODE_DIGEST;
-
-    // MODE_POST may be changed if board is modified.
-    // do not change post perm here. use other instead.
-
-    setbdir(currdirect, currboard);
-    return NEWDIRECT;
-}
-
-
 static int
 push_bottom(int ent, fileheader_t *fhdr, const char *direct)
 {
     int num;
     char buf[PATHLEN];
-    if ((currmode & MODE_DIGEST) || !(currmode & MODE_BOARD)
-        || fhdr->filename[0]=='L')
+    if (!(currmode & MODE_BOARD) || 
+	  fhdr->filename[0]=='L')
         return DONOTHING;
     setbottomtotal(currbid);  // <- Ptt : will be remove when stable
     num = getbottomtotal(currbid);
@@ -3588,87 +3592,6 @@ push_bottom(int ent, fileheader_t *fhdr, const char *direct)
     assert(0<=currbid-1 && currbid-1<MAX_BOARD);
     setbottomtotal(currbid);
     return DIRCHANGED;
-}
-
-static int
-good_post(int ent, fileheader_t * fhdr, const char *direct)
-{
-    char            genbuf[200];
-    char            genbuf2[200];
-    int             delta = 0;
-
-    if ((currmode & MODE_DIGEST) || !(currmode & MODE_BOARD))
-	return DONOTHING;
-
-    if(vans(fhdr->filemode & FILE_DIGEST ? 
-              "取消看板文摘?(Y/n)" : "收入看板文摘?(Y/n)") == 'n')
-	return READ_REDRAW;
-
-    if (fhdr->filemode & FILE_DIGEST) {
-	fhdr->filemode = (fhdr->filemode & ~FILE_DIGEST);
-	if (!strcmp(currboard, BN_NOTE) || 
-#ifdef BN_ARTDSN	    
-	    !strcmp(currboard, BN_ARTDSN) || 
-#endif
-	    !strcmp(currboard, BN_BUGREPORT) ||
-	    !strcmp(currboard, BN_LAW)
-	    ) 
-	{
-	    deumoney(searchuser(fhdr->owner, NULL), -1000); // TODO if searchuser() return 0
-	    if (!(currmode & MODE_SELECT))
-		fhdr->multi.money -= 1000;
-	    else
-		delta = -1000;
-	}
-    } else {
-	fileheader_t    digest;
-	char           *ptr, buf[PATHLEN];
-
-	memcpy(&digest, fhdr, sizeof(digest));
-	digest.filename[0] = 'G';
-	strlcpy(buf, direct, sizeof(buf));
-	ptr = strrchr(buf, '/');
-	assert(ptr);
-	ptr++;
-	ptr[0] = '\0';
-	snprintf(genbuf, sizeof(genbuf), "%s%s", buf, digest.filename);
-
-	if (dashf(genbuf))
-	    unlink(genbuf);
-
-	digest.filemode = 0;
-	snprintf(genbuf2, sizeof(genbuf2), "%s%s", buf, fhdr->filename);
-	Copy(genbuf2, genbuf);
-	strcpy(ptr, fn_mandex);
-	append_record(buf, &digest, sizeof(digest));
-
-#ifdef BN_DIGEST
-	assert(0<=currbid-1 && currbid-1<MAX_BOARD);
-	if(!(getbcache(currbid)->brdattr & BRD_HIDE)) { 
-          getdata(1, 0, "好文值得出版到全站文摘?(N/y)", genbuf2, 3, LCECHO);
-          if(genbuf2[0] == 'y')
-	      do_crosspost(BN_DIGEST, &digest, genbuf, 1);
-        }
-#endif
-
-	fhdr->filemode = (fhdr->filemode & ~FILE_MARKED) | FILE_DIGEST;
-	if (!strcmp(currboard, BN_NOTE) || 
-#ifdef BN_ARTDSN	    
-	    !strcmp(currboard, BN_ARTDSN) || 
-#endif
-	    !strcmp(currboard, BN_BUGREPORT) ||
-	    !strcmp(currboard, BN_LAW)
-	    ) 
-	{
-	    deumoney(searchuser(fhdr->owner, NULL), 1000); // TODO if searchuser() return 0
-	    if (!(currmode & MODE_SELECT))
-		fhdr->multi.money += 1000;
-	    else
-		delta = 1000;
-	}
-    }
-    substitute_ref_record(direct, fhdr, ent);
-    return FULLUPDATE;
 }
 
 static int
@@ -3714,12 +3637,17 @@ int check_cooldown(boardheader_t *bp)
    }
    return 0;
 }
+#endif
+
 /**
  * 設定看板冷靜功能, 限制使用者發文時間
  */
 static int
 change_cooldown(void)
 {
+#ifndef USE_COOLDOWN
+    return DONOTHING;
+#else
     char genbuf[256] = {'\0'};
     boardheader_t *bp = getbcache(currbid);
     
@@ -3744,9 +3672,10 @@ change_cooldown(void)
     post_policelog(bp->brdname, NULL, "冷靜", genbuf, bp->brdattr & BRD_COOLDOWN);
     pressanykey();
     return FULLUPDATE;
-}
 #endif
+}
 
+#if 0
 static int
 b_moved_to_config()
 {
@@ -3757,6 +3686,7 @@ b_moved_to_config()
     }
     return DONOTHING;
 }
+#endif
 
 /* ----------------------------------------------------- */
 /* 看板功能表                                            */
@@ -3769,13 +3699,9 @@ const onekey_t read_comms[] = {
     { 0, NULL }, // Ctrl('D')
     { 1, lock_post }, // Ctrl('E')
     { 0, NULL }, // Ctrl('F')
-#ifdef NO_GAMBLE
-    { 0, NULL }, // Ctrl('G')
-#else
     { 0, hold_gamble }, // Ctrl('G')
-#endif
     { 0, NULL }, // Ctrl('H')
-    { 0, board_digest }, // Ctrl('I') KEY_TAB 9
+    { 0, NULL }, // Ctrl('I') KEY_TAB 9
     { 0, NULL }, // Ctrl('J')
     { 0, NULL }, // Ctrl('K')
     { 0, NULL }, // Ctrl('L')
@@ -3809,13 +3735,9 @@ const onekey_t read_comms[] = {
     { 1, edit_post }, // 'E'
     { 0, NULL }, // 'F'
     { 0, NULL }, // 'G'
-    { 0, b_moved_to_config }, // 'H'
+    { 0, NULL }, // 'H'
     { 0, b_config }, // 'I'
-#ifdef USE_COOLDOWN
     { 0, change_cooldown }, // 'J'
-#else
-    { 0, NULL }, // 'J'
-#endif
     { 0, NULL }, // 'K'
     { 1, solve_post }, // 'L'
     { 0, NULL }, // 'M'
@@ -3840,12 +3762,8 @@ const onekey_t read_comms[] = {
     { 1, cite_post }, // 'c'
     { 1, del_post }, // 'd'
     { 0, NULL }, // 'e'
-#ifdef NO_GAMBLE
-    { 0, NULL }, // 'f'
-#else
     { 0, join_gamble }, // 'f'
-#endif
-    { 1, good_post }, // 'g'
+    { 1, digest_post }, // 'g'
     { 0, b_help }, // 'h'
     { 0, b_config }, // 'i'
     { 0, NULL }, // 'j'
@@ -3859,11 +3777,7 @@ const onekey_t read_comms[] = {
     { 1, read_post }, // 'r'
     { 0, do_select }, // 's'
     { 0, NULL }, // 't'
-#ifdef OUTJOBSPOOL
     { 0, tar_addqueue }, // 'u'
-#else
-    { 0, NULL }, // 'u'
-#endif
     { 0, NULL }, // 'v'
     { 1, b_call_in }, // 'w'
     { 1, cross_post }, // 'x'

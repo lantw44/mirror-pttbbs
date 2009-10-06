@@ -125,8 +125,6 @@ showtitle(const char *title, const char *mid)
     /* prepare tail */
     if (currmode & MODE_SELECT)
 	tail_type = TITLE_TAIL_SELECT;
-    else if (currmode & MODE_DIGEST)
-	tail_type = TITLE_TAIL_DIGEST;
     else
 	tail_type = TITLE_TAIL_BOARD;
 

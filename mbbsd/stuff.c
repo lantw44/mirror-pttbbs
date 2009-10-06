@@ -22,8 +22,7 @@ void
 setbdir(char *buf, const char *boardname)
 {
     //assert(boardname[0]);
-    snprintf(buf, PATHLEN, str_board_file, boardname[0], boardname,
-	    (currmode & MODE_DIGEST ? fn_mandex : str_dotdir));
+    snprintf(buf, PATHLEN, str_board_file, boardname[0], boardname, str_dotdir);
 }
 
 /**

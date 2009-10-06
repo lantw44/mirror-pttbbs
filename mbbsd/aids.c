@@ -197,16 +197,6 @@ int search_aidu_in_board(SearchAIDResult_t *r, const char *bname, const aidu_t a
       r->n = n;
     }
   }
-  /* else search digest */
-  if(r->n < 0)
-  {
-    setbfile(dirfile, bname, fn_mandex);
-    if((n = search_aidu_in_bfile(dirfile, aidu)) >= 0)
-    {
-      r->where = AIDR_DIGEST;
-      r->n = n;
-    }
-  }
   return r->n;
 }
 

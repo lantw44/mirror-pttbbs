@@ -90,7 +90,10 @@ OBJS+=		screen.o
 .c.o:	$(SRCROOT)/include/var.h
 	$(CC) $(CFLAGS) -c $*.c
 
-all: $(PROG)
+all: deprecated $(PROG)
+
+deprecated:
+	@cat ../DEPRECATED && false
 
 $(PROG): testsz $(OBJS)
 	sh $(SRCROOT)/util/newvers.sh

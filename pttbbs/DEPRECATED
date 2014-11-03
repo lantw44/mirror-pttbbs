@@ -1,0 +1,20 @@
+
+
+Thanks for using PTTBBS on OpenSVN.
+
+Starting from 2010, OpenSVN has suspended its public service due to maintenance
+issue. PTTBBS has stayed there longer but now we've decided to move to GitHub.
+It was a tough decision, but that makes lots of things easier.
+
+This PTTBBS repository on OpenSVN is now deprecated. No more new patches.
+Please migrate to GitHub:
+
+    https://github.com/ptt/pttbbs
+
+If you want to stay with current version (on OpenSVN), edit mbbsd/Makefile and
+delete the "deprecated" object.
+
+Regards,
+						piaip, 2014/11/03.
+
+
